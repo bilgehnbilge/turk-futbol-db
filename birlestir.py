@@ -82,7 +82,11 @@ def mackolik_oku():
 
 def avrupa_oku():
     with open(os.path.join(KOK, "avrupa_maclar.csv"), encoding="utf-8") as f:
-        return list(csv.DictReader(f))
+        ms = list(csv.DictReader(f))
+    for x in ms:   # UEFA satırları Maçkolik kulüp kimliklerini taşır (uefa_kimlik.json); bilinmeyen takım "uefa:<no>"
+        if x["kaynak"] == "uefa":
+            x["kk"] = x["kaynak_kimlik_ev"] = x["kaynak_kimlik_dep"] = "mackolik"
+    return ms
 
 
 def tff_oku():

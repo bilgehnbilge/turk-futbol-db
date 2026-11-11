@@ -17,6 +17,7 @@ import json
 import os
 import re
 import sys
+import subprocess
 import time
 import urllib.parse
 
@@ -233,6 +234,115 @@ def ayikla():
     print("Turk takimlari:", takimlar.most_common())
 
 
+# ---------------------------------------------------------------- UEFA (güncel sezon; GitHub'dan da erişilebilir)
+UEFA_API = "https://match.uefa.com/v5/matches"
+UEFA_YAR = {"sl": 1, "el": 14, "kl": 2019, "sk": 2}
+UEFA_TUR = {"first qualifying round": "1. Eleme Turu", "second qualifying round": "2. Eleme Turu",
+            "third qualifying round": "3. Eleme Turu", "play-offs": "Play-off", "league phase": "Lig Aşaması",
+            "group stage": "Grup Aşaması", "knockout round play-offs": "Son 16 Play-off Turu", "round of 16": "Son 16 Turu",
+            "quarter-finals": "Çeyrek Final", "semi-finals": "Yarı Final", "final": "Final"}
+UEFA_KIMLIK = os.path.join(KOK, "uefa_kimlik.json")   # UEFA takım no -> Maçkolik kimliği (kulüp eşleştirmesi için)
+
+
+def uefa_maclari(sezon):
+    """Sezonun Türk takımı maçları: [(kod, mac)]. seasonYear = sezonun bitiş yılı."""
+    out = []
+    for kod, cid in UEFA_YAR.items():
+        off = 0
+        while True:
+            url = f"{UEFA_API}?competitionId={cid}&seasonYear={sezon[5:]}&limit=100&offset={off}&order=ASC"
+            r = subprocess.run(["curl", "-sL", "--compressed", "-m", "60", "-A", M.UA, url], capture_output=True, text=True)
+            d = json.loads(r.stdout or "[]")
+            out += [(kod, m) for m in d if "TUR" in (m["homeTeam"].get("countryCode"), m["awayTeam"].get("countryCode"))]
+            if len(d) < 100:
+                break
+            off += 100
+            time.sleep(1)
+        time.sleep(1)
+    return out
+
+
+def _ad_norm(s):
+    s = s.lower().translate(str.maketrans("çğıöşüâî", "cgiosuai"))
+    return re.sub(r"\b(fk|sk|as|a s|jk|spor kulubu)\b|[^a-z0-9 ]", " ", s).split()
+
+
+def uefa_kimlik_ogren(sezon):
+    """Aynı sezonun Maçkolik satırlarıyla (tarih ±1 gün + skor) eşleştirerek UEFA takım no -> Maçkolik kimliği öğrenir."""
+    kimlik = json.load(open(UEFA_KIMLIK, encoding="utf-8")) if os.path.exists(UEFA_KIMLIK) else {}
+    with open(CIKTI, encoding="utf-8") as f:
+        mk = [x for x in csv.DictReader(f) if x["sezon"] == sezon and x["kaynak"] == "mackolik"]
+    ue = uefa_maclari(sezon)
+    for _ in range(3):
+        for kod, m in ue:
+            t = datetime.date.fromisoformat(m["kickOffTime"]["date"])
+            sk = (m.get("score") or {}).get("total")
+            h, a = m["homeTeam"]["id"], m["awayTeam"]["id"]
+            aday = [x for x in mk if x["yarisma"] == kod and x["tarih"] and abs((datetime.date.fromisoformat(x["tarih"]) - t).days) <= 1
+                    and (not sk or (x["ev_gol"], x["dep_gol"]) == (str(sk["home"]), str(sk["away"])))
+                    and (h not in kimlik or kimlik[h] == x["ev_id"]) and (a not in kimlik or kimlik[a] == x["dep_id"])]
+            if len(aday) == 1:
+                kimlik[h], kimlik[a] = aday[0]["ev_id"], aday[0]["dep_id"]
+    json.dump(dict(sorted(kimlik.items())), open(UEFA_KIMLIK, "w", encoding="utf-8"), ensure_ascii=False, indent=0)
+    print(f"UEFA kimlik eslemesi: {len(kimlik)} takim", flush=True)
+
+
+def uefa_guncel(sezon):
+    """Güncel sezonun Avrupa maçlarını UEFA'dan çekip avrupa_maclar.csv'de o sezonu yeniler (Maçkolik GitHub'dan 403 veriyor)."""
+    kimlik = json.load(open(UEFA_KIMLIK, encoding="utf-8")) if os.path.exists(UEFA_KIMLIK) else {}
+    uuid, _, _ = turk_kimlikleri()
+    ad_kim, kim_ad = {}, {}
+    with open(os.path.join(KOK, "mackolik_maclar.csv"), encoding="utf-8") as f:   # Türk kulüplerinin adı -> kimliği
+        for x in csv.DictReader(f):
+            for s in ("ev", "dep"):
+                if x["kaynak"] == "mackolik":
+                    ad_kim.setdefault(" ".join(_ad_norm(x[s + "_adi"])), x[s + "_id"])
+    with open(CIKTI, encoding="utf-8") as f:
+        eski = list(csv.DictReader(f))
+    for x in eski:
+        for s in ("ev", "dep"):
+            kim_ad[x[s + "_id"]] = x[s + "_adi"]
+    ue = uefa_maclari(sezon)
+    if not ue:
+        print(f"UEFA {sezon}: veri alinamadi, eski satirlar korunuyor", flush=True)
+        return
+    yeni = []
+    for kod, m in ue:
+        satir = {"kaynak": "uefa", "kaynak_id": f"uefa:{m['id']}", "yarisma": kod, "lig": lig_adi(kod, int(sezon[:4])), "sezon": sezon}
+        for s, tk in (("ev", m["homeTeam"]), ("dep", m["awayTeam"])):
+            tid, ad = tk["id"], tk.get("internationalName") or tk.get("translations", {}).get("displayName", {}).get("EN", "")
+            kim = kimlik.get(tid)
+            if not kim and tk.get("countryCode") == "TUR":
+                kim = ad_kim.get(" ".join(_ad_norm(ad)))
+            satir[s + "_id"] = kim or f"uefa:{tid}"
+            satir[s + "_adi"] = kim_ad.get(kim, ad)
+        dt = datetime.datetime.strptime(m["kickOffTime"]["dateTime"][:19], "%Y-%m-%dT%H:%M:%S").replace(tzinfo=datetime.timezone.utc).astimezone(M.TR)
+        satir["tarih"], satir["saat"] = dt.date().isoformat(), dt.strftime("%H:%M")
+        tur = (m.get("round") or {}).get("metaData", {}).get("name", "")
+        satir["tur"] = UEFA_TUR.get(tur.lower(), tur)
+        sk = m.get("score") or {}
+        if m.get("status") == "FINISHED" and sk.get("total"):
+            satir["ev_gol"], satir["dep_gol"] = str(sk["total"]["home"]), str(sk["total"]["away"])
+            uz = sk.get("regular") and sk["regular"] != sk["total"]
+            if uz:
+                satir["ev_90"], satir["dep_90"] = str(sk["regular"]["home"]), str(sk["regular"]["away"])
+            if sk.get("penalty"):
+                satir["ev_pen"], satir["dep_pen"] = str(sk["penalty"]["home"]), str(sk["penalty"]["away"])
+            satir["durum"] = "Pen" if sk.get("penalty") else "UZ" if uz else "MS"
+        else:
+            satir["durum"] = "Fixture"
+        yeni.append(satir)
+    kalan = [x for x in eski if not (x["sezon"] == sezon and x["kaynak"] in ("mackolik", "uefa"))]
+    satirlar = sorted(kalan + yeni, key=lambda x: (x["tarih"], x["kaynak_id"]))
+    with open(CIKTI, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, ALANLAR, extrasaction="ignore", restval="")
+        w.writeheader()
+        w.writerows(satirlar)
+    eslesmeyen = sorted({x[s + "_adi"] for x in yeni for s in ("ev", "dep") if x[s + "_id"].startswith("uefa:")})
+    print(f"UEFA {sezon}: {len(yeni)} Turk takimi maci ({sum(1 for x in yeni if x.get('ev_gol'))} oynanmis); "
+          f"onceki {len(eski) - len(kalan)} satirin yerine yazildi; kimligi bilinmeyen takim: {eslesmeyen}", flush=True)
+
+
 def guncel(sezon):
     """Güncel sezonu yeni Maçkolik'ten (4 sayfa) yeniden çeker ve avrupa_maclar.csv'de yalnız o sezonun satırlarını
     değiştirir. Arşiv ham dosyaları gerekmez (GitHub üzerinde de çalışır). Sayfa alınamazsa eski satırlar kalır."""
@@ -269,7 +379,7 @@ def guncel(sezon):
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("komut", choices=["yeni", "arsiv", "ayikla", "guncel"])
+    p.add_argument("komut", choices=["yeni", "arsiv", "ayikla", "guncel", "uefa", "uefa_kimlik"])
     p.add_argument("--kod")
     p.add_argument("--sezon")
     p.add_argument("--bekle", type=float, help="yeni site: istekler arasi bekleme (sn)")
@@ -282,5 +392,9 @@ if __name__ == "__main__":
         arsiv_indir(a.kod, a.sezon)
     elif a.komut == "guncel":
         guncel(a.sezon)
+    elif a.komut == "uefa":
+        uefa_guncel(a.sezon)
+    elif a.komut == "uefa_kimlik":
+        uefa_kimlik_ogren(a.sezon)
     else:
         ayikla()

@@ -4,7 +4,7 @@
   python3 guncelle.py --yayinla   # ayrıca GitHub'a gönderir (site birkaç dakikada yenilenir)
   python3 guncelle.py --sezon 2026-2027
 
-Lig: TFF (~250 sayfa x 2 sn). Avrupa kupaları: yeni Maçkolik'ten güncel sezonun 4 sayfası (avrupa.py guncel).
+Lig: TFF (~250 sayfa x 2 sn). Avrupa kupaları: UEFA'nın maç verisi (avrupa.py uefa; takım eşlemesi uefa_kimlik.json).
 Süre: ~10 dakika indirme + 3 dakika birleştirme. Tam kurulum (topla.py kur) gerekmez.
 TFF'nin güncel sezon sayfaları (arşive geçmeden önce): Süper Lig 198, 1. Lig 142, 2. Lig 976, 3. Lig 971.
 """
@@ -48,9 +48,9 @@ def main():
         sys.exit("Hiçbir lig indirilemedi")
 
     topla.kur(os.path.join(KOK, "raw", "tff.db"), topla.HAM, sadece=klasorler)
-    try:   # Avrupa kupaları: yeni Maçkolik'ten 4 sayfa; alınamazsa eski veri kalır
+    try:   # Avrupa kupaları: UEFA'nın maç verisi (Maçkolik GitHub sunucularına 403 veriyor); alınamazsa eski veri kalır
         import avrupa
-        avrupa.guncel(a.sezon)
+        avrupa.uefa_guncel(a.sezon)
     except Exception as e:
         print("Avrupa güncellenemedi:", e, flush=True)
     calistir(sys.executable, "-B", "birlestir.py")
@@ -58,7 +58,7 @@ def main():
     if a.yayinla:
         # Yalnız site verisi ve rapor commit'lenir; futbol.db (37 MB) her hafta commit'lenirse depo şişer,
         # o yüzden "veritabani" sürümüne (GitHub Releases) yüklenir ve üzerine yazılır.
-        calistir("git", "add", "docs", "birlestirme_raporu.txt", "avrupa_maclar.csv")
+        calistir("git", "add", "docs", "birlestirme_raporu.txt", "avrupa_maclar.csv", "uefa_kimlik.json")
         degisti = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=KOK).returncode != 0
         if degisti:
             calistir("git", "commit", "-q", "-m", f"Güncel sezon {a.sezon}: {datetime.date.today():%d.%m.%Y} itibarıyla")
