@@ -233,9 +233,43 @@ def ayikla():
     print("Turk takimlari:", takimlar.most_common())
 
 
+def guncel(sezon):
+    """Güncel sezonu yeni Maçkolik'ten (4 sayfa) yeniden çeker ve avrupa_maclar.csv'de yalnız o sezonun satırlarını
+    değiştirir. Arşiv ham dosyaları gerekmez (GitHub üzerinde de çalışır). Sayfa alınamazsa eski satırlar kalır."""
+    os.makedirs(HAM, exist_ok=True)
+    uuid, _, _ = turk_kimlikleri()
+    yeni, alinan = [], set()
+    for kod in ("sl", "el", "kl", "sk"):
+        yol = os.path.join(HAM, f"{kod}_{sezon}.html.gz")
+        gecici = yol + ".yeni"
+        ok, durum = M.curl(yeni_url(YENI[kod], sezon), gecici, deneme=2)
+        time.sleep(M.BEKLE)
+        if not ok:
+            print(f"  {kod} {sezon}: alinamadi (HTTP {durum}), eski satirlar korunuyor", flush=True)
+            if os.path.exists(gecici):
+                os.remove(gecici)
+            continue
+        os.replace(gecici, yol)
+        alinan.add(kod)
+        for m in yeni_maclar(yol):
+            if m["ev_id"] in uuid or m["dep_id"] in uuid or TR_AD.search(m["ev_adi"] + " " + m["dep_adi"]):
+                yeni.append({**m, "yarisma": kod, "lig": lig_adi(kod, int(sezon[:4])), "sezon": sezon})
+    with open(CIKTI, encoding="utf-8") as f:
+        eski = list(csv.DictReader(f))
+    kalan = [x for x in eski if not (x["kaynak"] == "mackolik" and x["sezon"] == sezon and x["yarisma"] in alinan)]
+    satirlar = sorted(kalan + yeni, key=lambda x: (x["tarih"], x["kaynak_id"]))
+    with open(CIKTI, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, ALANLAR, extrasaction="ignore", restval="")
+        w.writeheader()
+        w.writerows(satirlar)
+    oynanan = sum(1 for x in yeni if x["ev_gol"])
+    print(f"Avrupa {sezon}: {len(alinan)}/4 sayfa, {len(yeni)} Turk takimi maci ({oynanan} oynanmis); "
+          f"onceki {len(eski) - len(kalan)} satirin yerine yazildi", flush=True)
+
+
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("komut", choices=["yeni", "arsiv", "ayikla"])
+    p.add_argument("komut", choices=["yeni", "arsiv", "ayikla", "guncel"])
     p.add_argument("--kod")
     p.add_argument("--sezon")
     p.add_argument("--bekle", type=float, help="yeni site: istekler arasi bekleme (sn)")
@@ -246,5 +280,7 @@ if __name__ == "__main__":
         yeni_indir()
     elif a.komut == "arsiv":
         arsiv_indir(a.kod, a.sezon)
+    elif a.komut == "guncel":
+        guncel(a.sezon)
     else:
         ayikla()
