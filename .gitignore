@@ -1,0 +1,7 @@
+# ham indirmeler (birkaç GB) ve ara dosyalar depoya girmez
+raw/
+*.log
+__pycache__/
+.claude/
+.DS_Store
+*.tmp

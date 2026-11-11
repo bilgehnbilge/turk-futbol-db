@@ -1,0 +1,64 @@
+{
+  "_aciklama": "birlestir.py her calismada okur. Kimlik bicimi kaynak:kimlik (tff:106, mackolik_arsiv:565, mackolik:<uuid basi>).",
+
+  "uuid_bol": [
+    {"uuid": "bt4gef1fvb", "sinir": "2005-2006", "once": "tff:26", "sonra": "tff:2328",
+     "not": "Mackolik eski Muşspor (TFF 26) ile Muş Spor FC'yi (TFF 2328, eski Hasköy Yıldızspor) tek kimlikte birlestirmis"},
+    {"uuid": "bmig6j4o81", "sinir": "2007-2008", "once": "tff:67", "sonra": "tff:4908",
+     "not": "Mackolik 'Kale 50 FSK' kimligi: 1990'lar Nevşehirspor (TFF 67), 2012 sonrasi Nevşehir Spor Gençlik/Belediye (TFF 4908)"},
+    {"uuid": "6rcihpg989", "sinir": "2000-2001", "once": "tff:23", "sonra": "mackolik:6rcihpg989y2oypn42zm7zdzb",
+     "not": "Mackolik 'Yüksekovaspor' kimligi: 1992-93 kupasi Yüksekova Bld (TFF 23), 2013 sonrasi Yüksekovaspor; 1986-90 Yüksekova Cilospor ayri kulup (kullanici)"},
+    {"uuid": "c4gj2lbrf1", "sinir": "1999-2000", "once": "tff:3633", "sonra": "tff:3331",
+     "not": "1930 Bafraspor 1999'da Bafra Belediyespor adiyla kuruldu (tr.wikipedia); 1982-93 kupa maclari eski Bafraspor'un"},
+    {"uuid": "cfzuf1n09v", "sinir": "2010-2011", "once": "tff:3627", "sonra": "tff:4193",
+     "not": "1926 Bulancakspor 2010'da Bulancakspor'un yerine kuruldu (tr.wikipedia); 1991-93 kupa maclari Bulancakspor'un"},
+    {"uuid": "4xf0v8svcq", "sinir": "1999-2000", "once": "tff:140", "sonra": "tff:3292",
+     "not": "Karacabey Belediyespor 1999'da Nilüfer Belediyespor adiyla kuruldu (tr.wikipedia); 1966-67 kupa maci Karacabeyspor'un"},
+    {"uuid": "4iofznnd7l", "sinir": "1995-1996", "once": "mackolik:4iofznnd7luyts5polhtrrvb9-once", "sonra": "tff:5025",
+     "not": "Sivas Belediyespor 1995'te kuruldu (tr.wikipedia); 1983-84 kupa maclari baska (bilinmeyen) bir Sivas takiminin"},
+    {"uuid": "etascl8un7", "sinir": "1990-1991", "once": "mackolik:etascl8un7-once", "sonra": "tff:3922",
+     "not": "Yeşil Bursa 1990'da kuruldu (tr.wikipedia); 1980-81 kupa maci baska bir takimin"},
+    {"uuid": "c2kt12j7e8", "sinir": "2005-2006", "once": "tff:319", "sonra": "mackolik:macko17201151195404208314",
+     "not": "Hakkarispor 2004'te kapandi (tr.wikipedia); 2016-17 kupa maci Hakkarispor FK'nin"}
+  ],
+
+  "bagla": [
+    ["mackolik_arsiv:611", "tff:5011", "Sinopspor (1970): 3. Lig 1984-89 ve 2001-05 (tr.wikipedia Sinopspor); Köy Hiz. Sinopspor ayri"]
+  ],
+
+  "baglama": [
+    ["mackolik_arsiv:9646", "tff:23", "Yüksekova Cilospor ile Yüksekova Belediyespor ayri kulupler (kullanici)"],
+    ["mackolik_arsiv:611", "tff:5293", "Sinopspor ile Sinop Köy Hizmetleri Spor ayri kulupler (kullanici)"],
+    ["mackolik_arsiv:565", "tff:3588", "Ankara PTT ile Hakkari PTT farkli kulupler; Hakkari PTT onceden Hakkarispor (kullanici)"],
+    ["mackolik_arsiv:13332", "tff:3645", "Burdurgücü 1989'da Burdurspor amatöre düşünce kuruldu, ayri kulup (tr.wikipedia)"]
+  ],
+
+  "ayni": [
+    ["tff:3588", "tff:319", "Hakkarispor 1991'de kuruldu, PTT satin alinca Hakkari PTT Spor oldu, 1996'da Hakkarispor olarak döndü (tr.wikipedia, kullanici)"]
+  ],
+
+  "tff_kes": [
+    {"tff": "3688", "sinir": "2007-2008", "once_ad": "Aliağa (Göztepe A.Ş. Aliağa)", "once_donem_adi": "GÖZTEPE A.Ş. (ALİAĞA)",
+     "sonra": "tff:106",
+     "not": "TFF 3688 2007'ye kadar Aliağa'nin kaydi (TFF eski sezonlara 'GÖZTEPE' yaziyor). Göztepe (TFF 106) Aliağa'nin yarisma hakkini aldi, Aliağa kapandi; 2007-08'den itibaren 3688 = Göztepe (kullanici)"},
+    {"tff": "2434", "sinir": "2000-2001", "once_hedef": "tff:103", "once_donem_adi": "ZONGULDAKSPOR",
+     "not": "TFF 1984-88 Süper Lig Zonguldakspor maclarini bugunku Zonguldakspor FK'nin (1986 Dilaverspor) numarasina yazmis; bu maclar eski Zonguldakspor'un (TFF 103, tr.wikipedia Fenerspor)"}
+  ],
+
+  "arsiv_kes": [
+    {"arsiv": "13184", "sinir": "1980-1981",
+     "not": "Yeni Afyonspor 1981'de Afyonspor adiyla kuruldu (tr.wikipedia); arsivin ayni kimlikteki 1967-74 Afyonspor'u ayri kulup"}
+  ],
+
+  "donem_adi": [
+    {"kim": "tff:8722", "ilk": "2015-2016", "son": "2020-2021", "ad": "Muş Menderesspor", "kaynak": "tr.wikipedia Muşspor (2015)"},
+    {"kim": "tff:8722", "ilk": "2021-2022", "son": "2023-2024", "ad": "Muş 1984 Muşspor", "kaynak": "tr.wikipedia Muşspor (2015)"},
+    {"kim": "tff:103", "ilk": "1959", "son": "1965-1966", "eski": "Zonguldak Fenerspor", "ad": "Kömürspor", "kaynak": "tr.wikipedia Fenerspor"},
+    {"kim": "tff:103", "ilk": "1966-1967", "son": "2010-2011", "eski": "Zonguldak Fenerspor", "ad": "Zonguldakspor", "kaynak": "tr.wikipedia Fenerspor"}
+  ],
+
+  "ardil": [
+    {"onceki": "tff:3688-once", "sonraki": "tff:106", "sezon": "2007-2008", "tur": "hak devri",
+     "aciklama": "Aliağa'nın yarışmacı hakkı Göztepe'ye geçti, Aliağa kapandı; Göztepe TFF 3688 numarasıyla devam etti."}
+  ]
+}
