@@ -562,7 +562,9 @@ def main():
         SELECT t.id FROM t JOIN n USING(kademe, sezon, g, k) JOIN buyuk USING(kademe, sezon, g) WHERE n.n <= 2)""")
     po = c.total_changes - once_deg
     yaz(f"   TFF grup sayfalarindaki tekil dis takim maclari play-off sayildi: {po}")
-    resmi_tablolar(c, lambda node: kok_no.get(bb.bul(node)) if node in bb.p else None, kes_no, dugum)
+    no_bul = lambda node: kok_no.get(bb.bul(node)) if node in bb.p else None
+    mac_duzelt(c, dz, no_bul, kes_no)
+    resmi_tablolar(c, no_bul, kes_no, dugum)
     for d in dz.get("donem_adi", []):   # elle donem adi (orn. Vikipedi'den eski adlar)
         no = kok_no[bb.bul(kim_coz(d["kim"]))]
         for s in ("ev", "dep"):   # "eski" verilmisse yalniz o adla yazilmis maclar
@@ -609,6 +611,73 @@ def main():
 
 
 # ---------------------------------------------------------------- resmi puan durumlari ve hukmen maclar
+def mac_duzelt(c, dz, no_bul, kes_no):
+    """Cift kayitlari sil ve kulup_duzeltme.json'daki elle mac kararlarini uygula."""
+    n = c.execute("""DELETE FROM mac WHERE kaynak='tff' AND id IN (
+        SELECT m.id FROM mac m JOIN mac o ON o.tarih=m.tarih AND o.ev_kulup=m.ev_kulup AND o.dep_kulup=m.dep_kulup
+          AND o.yarisma=m.yarisma AND o.ev_gol IS m.ev_gol AND o.dep_gol IS m.dep_gol AND o.id<m.id AND o.kaynak='tff')""").rowcount
+    yaz(f"   Cift kayit silindi: {n}")
+    for d in dz.get("mac_duzelt", []):
+        ev = no_bul(("tff", kes_no(d["ev"].split(":")[1], d["sezon"])))
+        dep = no_bul(("tff", kes_no(d["dep"].split(":")[1], d["sezon"])))
+        k = c.execute("""UPDATE mac SET ev_gol=?, dep_gol=?, durum=?, notlar=? WHERE sezon=? AND tarih=? AND ev_kulup=? AND dep_kulup=?""",
+                      (d.get("ev_gol"), d.get("dep_gol"), d["durum"], d.get("not"), d["sezon"], d["tarih"], ev, dep)).rowcount
+        yaz(f"   Elle mac duzeltmesi ({d['sezon']} {d['tarih']}): {k} mac")
+
+
+def fazla_maclar(c, secilen):
+    """Resmi tabloda sayilmayan maclar: iki takimin da fazlasi varsa aralarindaki mac cikarilir.
+    Sezon sonundan sonraysa play-off, degilse 'gecersiz' (iptal edilip yeniden oynanmis ya da sayilmamis mac)."""
+    po = gec = 0
+    for (sezon, y, kd, g), (_, kaynak, satir) in secilen.items():
+        resmi = {s["kulup"]: s for s in satir if s["kulup"]}
+        ms = c.execute("""SELECT id, tarih, ev_kulup, dep_kulup, ev_gol, dep_gol FROM mac WHERE sezon=? AND yarisma=? AND asama='lig'
+                          AND COALESCE(grup,'')=? AND kademe IS ? AND ev_gol IS NOT NULL""", (sezon, y, g, kd)).fetchall()
+        biz = collections.defaultdict(lambda: dict(O=0, G=0, B=0, M=0, A=0, Y=0))
+        for _, _, e, d, eg, dg in ms:
+            for k, a, b in ((e, eg, dg), (d, dg, eg)):
+                x = biz[k]; x["O"] += 1; x["A"] += a; x["Y"] += b; x["G" if a > b else "M" if a < b else "B"] += 1
+        fazla = {k: {f: biz[k][f] - r[f] for f in ("O", "G", "B", "M", "A", "Y")} for k, r in resmi.items()}
+        if not any(v["O"] > 0 for v in fazla.values()):
+            continue
+        tarihler = sorted(t for _, t, *_ in ms if t)
+        sinir = tarihler[int(len(tarihler) * 0.97) - 1] if tarihler else None
+        cift = collections.Counter((e, d) for _, _, e, d, *_ in ms)
+        kalan = list(ms)
+        while True:
+            secenek = []
+            for m in kalan:
+                mid, t, e, d, eg, dg = m
+                fe, fd = fazla.get(e), fazla.get(d)
+                if not fe or not fd or fe["O"] <= 0 or fd["O"] <= 0:
+                    continue
+                ke = dict(O=1, A=eg, Y=dg, G=int(eg > dg), B=int(eg == dg), M=int(eg < dg))
+                kd_ = dict(O=1, A=dg, Y=eg, G=int(dg > eg), B=int(eg == dg), M=int(dg < eg))
+                if not (all(fe[f] >= ke[f] for f in ke) and all(fd[f] >= kd_[f] for f in kd_)):
+                    continue
+                tam = all(fe[f] == ke[f] for f in ke) + all(fd[f] == kd_[f] for f in kd_)
+                tekrar = cift[(e, d)] > 1
+                # tekrar oynanan eslesmede once oynanan (iptal edilen) cikar; digerlerinde en son oynanan (play-off)
+                sonra = bool(t and sinir and t > sinir)   # sezon sonundan sonra: play-off/eslik maci
+                tk = int((t or "0000-00-00").replace("-", ""))
+                # oncelik: tekrar eden eslesme > sezon sonrasi mac > tabloyu tam tutturan > tarih
+                # (tekrarda once oynanan iptal edilmistir; digerlerinde en son oynanan play-off'tur)
+                secenek.append(((tekrar, sonra, tam, -tk if tekrar and not sonra else tk), m, ke, kd_))
+            if not secenek:
+                break
+            _, m, ke, kd_ = max(secenek, key=lambda x: x[0])
+            mid, t, e, d, eg, dg = m
+            kalan.remove(m); cift[(e, d)] -= 1
+            for f in ke:
+                fazla[e][f] -= ke[f]; fazla[d][f] -= kd_[f]
+            if t and sinir and t > sinir:
+                c.execute("UPDATE mac SET asama='play-off' WHERE id=?", (mid,)); po += 1
+            else:
+                c.execute("UPDATE mac SET asama='gecersiz', notlar=? WHERE id=?",
+                          ("Resmi puan tablosunda sayılmamış (iptal edilip yeniden oynanmış olabilir)", mid)); gec += 1
+    yaz(f"   Resmi tabloda sayilmayan maclar: {po} play-off, {gec} gecersiz")
+
+
 def resmi_tablolar(c, no_bul, kes_no, dugum):
     """TFF grup sayfalarindaki ve Mackolik arsivindeki resmi puan durumlarini puan_durumu tablosuna yazar
     (puan silmeleriyle), sonra resmi tablo ile mac listesi arasindaki farki hukmen maclarla kapatir."""
@@ -660,7 +729,7 @@ def resmi_tablolar(c, no_bul, kes_no, dugum):
         if not aday:
             continue
         ort = len(ks & gruplar[aday]) / len(satir)
-        if ort < 0.7 or len(gruplar[aday] - {None}) > len(satir) + 2:
+        if ort < 0.7 or abs(len(gruplar[aday] - {None}) - len(satir)) > 1:   # takim sayisi da tutmali
             continue
         onc = (kaynak == "tff", ort)
         if aday not in secilen or onc > secilen[aday][0]:
@@ -676,6 +745,7 @@ def resmi_tablolar(c, no_bul, kes_no, dugum):
     yaz(f"   Resmi puan durumu: {len(tablolar)} tablo okundu, {len(secilen)} lig grubuna baglandi; puan silme/ek puan satiri: {silme}")
 
     # hukmen: resmi tabloda sayilip bizde skoru olmayan ya da hic olmayan maclar
+    fazla_maclar(c, secilen)
     eklenen = guncel = 0
     for (sezon, y, kd, g), (_, kaynak, satir) in secilen.items():
         resmi = {s["kulup"]: s for s in satir if s["kulup"]}
@@ -750,11 +820,13 @@ CREATE INDEX mac_ev ON mac(ev_kulup); CREATE INDEX mac_dep ON mac(dep_kulup); CR
 CREATE UNIQUE INDEX mac_kaynak ON mac(kaynak, kaynak_id);
 -- her mac iki satir: takimin gozunden. Istatistiklerde durum IN ('MS','UZ','Pen','Hük.') ve gol dolu olanlar kullanilir.
 CREATE VIEW takim_maci AS
+  -- 'Çifte H': iki takım da 0-3 hükmen yenik sayılmış maç (skor alanları boş kalır)
   SELECT id mac_id, yarisma, lig, kademe, sezon, grup, asama, tur, tarih, ev_kulup kulup, ev_adi takim, dep_kulup rakip_kulup,
-         dep_adi rakip, 'ev' saha, ev_gol attigi, dep_gol yedigi, ev_gol-dep_gol fark, durum FROM mac WHERE ev_gol IS NOT NULL
+         dep_adi rakip, 'ev' saha, COALESCE(ev_gol, 0) attigi, COALESCE(dep_gol, 3) yedigi, COALESCE(ev_gol-dep_gol, -3) fark, durum
+    FROM mac WHERE ev_gol IS NOT NULL OR durum='Çifte H'
   UNION ALL
   SELECT id, yarisma, lig, kademe, sezon, grup, asama, tur, tarih, dep_kulup, dep_adi, ev_kulup, ev_adi, 'deplasman',
-         dep_gol, ev_gol, dep_gol-ev_gol, durum FROM mac WHERE ev_gol IS NOT NULL;
+         COALESCE(dep_gol, 0), COALESCE(ev_gol, 3), COALESCE(dep_gol-ev_gol, -3), durum FROM mac WHERE ev_gol IS NOT NULL OR durum='Çifte H';
 """
 
 if __name__ == "__main__":

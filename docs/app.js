@@ -25,11 +25,13 @@ const kulupAd = id => KULUP.get(id)?.ad ?? "?";
 const kulupBag = (id, ad) => id != null && KULUP.has(id) ? `<a class="bag" href="#/kulup/${id}">${esc(ad ?? kulupAd(id))}</a>` : esc(ad ?? "?");
 function sonuc(a, y) { if (a == null || y == null) return "N"; return a > y ? "G" : a < y ? "M" : "B"; }
 function skorYaz(a, y, pa, py, durum) {
+  if (a == null && durum === "Çifte H") return `0-3 / 3-0 <small class="soluk" title="İki takım da hükmen yenik">(çifte H)</small>`;
   if (a == null) return `<span class="soluk">${esc(durum === "Cancelled" ? "iptal" : "oynanmadı")}</span>`;
   let s = `${a}-${y}`;
   if (pa != null && py != null) s += ` <small class="soluk">(pen ${pa}-${py})</small>`;
   if (durum === "UZ") s += ` <small class="soluk">uz.</small>`;
   if (durum === "Hük.") s += ` <small class="soluk" title="Hükmen">(H)</small>`;
+  if (durum === "Çifte H") s = `0-3 / 3-0 <small class="soluk" title="İki takım da hükmen yenik">(çifte H)</small>`;
   return s;
 }
 const yuzde = (a, b) => b ? Math.round(100 * a / b) : 0;
@@ -69,7 +71,7 @@ function kulupAra(q, adet = 12) {
       else if (a.startsWith(n) || b.startsWith(nn)) x = 80;
       else if ((" " + a).includes(" " + n) || (" " + b).includes(" " + nn)) x = 60;
       else if (a.includes(n)) x = 40;
-      if (i === 0) x += 5;
+      if (x && i === 0) x += 5;
       p = Math.max(p, x);
     }
     if (p) sonuc.push([p + (k.yerli ? 10 : 0) + Math.min(k.mac / 400, 9), k]);
@@ -170,7 +172,7 @@ async function kulupMaclari(id) {
   return d.maclar.map(r => ({
     id: r[0], tarih: r[1], sezon: r[2], yar: r[3], lig: r[4], kademe: r[5], tur: r[6], po: r[7] === "p", saha: r[8],
     takim: r[9], rakipId: r[10], rakip: r[11], a: r[12], y: r[13], pa: r[14], py: r[15], durum: r[16], not: r[17], kulup: id,
-    s: sonuc(r[12], r[13]),
+    iptal: r[7] === "x", s: r[7] === "x" ? "N" : sonuc(r[12], r[13]),   // geçersiz maç istatistiğe girmez
   }));
 }
 function oncul(id, gor = new Set()) {   // öncül kulüpler (kulup_ardil), özyinelemeli
@@ -336,7 +338,7 @@ function ozetHtml(ms) {
 function macSatir(m, gosterTakim) {
   return `<tr><td class="o"><span class="son ${m.s}">${m.s === "N" ? "–" : m.s}</span></td>
     <td>${tarihYaz(m.tarih)}</td><td><a class="bag" href="#/sezon/${m.sezon}">${esc(m.sezon)}</a></td>
-    <td class="gizle-mobil">${esc(m.lig || YAR_AD[m.yar])}${m.tur ? ` <span class="soluk">· ${esc(m.tur)}</span>` : ""}${m.po ? ` <span class="rozet">play-off</span>` : ""}</td>
+    <td class="gizle-mobil">${esc(m.lig || YAR_AD[m.yar])}${m.tur ? ` <span class="soluk">· ${esc(m.tur)}</span>` : ""}${m.po ? ` <span class="rozet">play-off</span>` : ""}${m.iptal ? ` <span class="rozet" title="${esc(m.not || "")}">sayılmadı</span>` : ""}</td>
     ${gosterTakim ? `<td class="ad">${esc(m.takim)}</td>` : ""}
     <td class="o">${m.saha === "E" ? "İç" : "Dış"}</td>
     <td class="ad">${kulupBag(m.rakipId, m.rakip)}</td>
@@ -529,7 +531,7 @@ async function sezonSayfa(sezon) {
   document.title = `${sezon} · Türk Futbol Arşivi`;
   icerik.innerHTML = `<div class="yukleniyor">${esc(sezon)} yükleniyor…</div>`;
   const d = await al(`data/sezon/${sezon}.json`);
-  const ms = d.maclar.map(r => ({ id: r[0], tarih: r[1], yar: r[2], lig: r[3], kademe: r[4], tur: r[5], po: r[6] === "p", ev: r[7], evAd: r[8], dep: r[9], depAd: r[10], eg: r[11], dg: r[12], ep: r[13], dp: r[14], durum: r[15] }));
+  const ms = d.maclar.map(r => ({ id: r[0], tarih: r[1], yar: r[2], lig: r[3], kademe: r[4], tur: r[5], po: r[6] === "p" || r[6] === "x", iptal: r[6] === "x", ev: r[7], evAd: r[8], dep: r[9], depAd: r[10], eg: r[11], dg: r[12], ep: r[13], dp: r[14], durum: r[15] }));
   const i = OZET.sezonlar.indexOf(sezon);
   const onceki = OZET.sezonlar[i - 1], sonraki = OZET.sezonlar[i + 1];
   const gruplar = new Map();
@@ -543,6 +545,7 @@ async function sezonSayfa(sezon) {
     const t = new Map();
     const sat = (id, ad) => t.get(id) || t.set(id, { id, ad, O: 0, G: 0, B: 0, M: 0, AG: 0, YG: 0 }).get(id);
     for (const m of g.ms) {
+      if (m.durum === "Çifte H") { for (const [id, ad] of [[m.ev ?? "a" + m.evAd, m.evAd], [m.dep ?? "a" + m.depAd, m.depAd]]) { const x = sat(id, ad); x.O++; x.M++; x.YG += 3; } continue; }
       if (m.eg == null) continue;
       const e = sat(m.ev ?? "a" + m.evAd, m.evAd), dd = sat(m.dep ?? "a" + m.depAd, m.depAd);
       e.ad = m.evAd; dd.ad = m.depAd;
@@ -550,7 +553,7 @@ async function sezonSayfa(sezon) {
       if (m.eg > m.dg) { e.G++; dd.M++; } else if (m.eg < m.dg) { dd.G++; e.M++; } else { e.B++; dd.B++; }
     }
     const l = [...t.values()].map(x => ({ ...x, P: x.G * p + x.B, Av: x.AG - x.YG })).sort((a, b) => b.P - a.P || b.Av - a.Av || b.AG - a.AG);
-    const oynanmamis = g.ms.filter(m => m.eg == null).length;
+    const oynanmamis = g.ms.filter(m => m.eg == null && m.durum !== "Çifte H").length;
     return `<div class="kart" style="padding:0;overflow:hidden">
       <div style="padding:14px 16px 6px"><h3 style="margin:0">${esc(g.lig)}${g.grup ? ` · ${esc(g.grup)}` : ""}</h3>
       <span class="soluk" style="font-size:13px">${g.ms.length} maç${oynanmamis ? `, ${oynanmamis} oynanmadı` : ""}</span></div>

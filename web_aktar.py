@@ -87,7 +87,12 @@ def main():
         return m["tur"] or m["grup"] or ""   # kupa: tur adi Mackolik'te grup alaninda
 
     def asama(m):
-        return "p" if m["asama"] == "play-off" else ""
+        return "p" if m["asama"] == "play-off" else "x" if m["asama"] == "gecersiz" else ""
+
+    def gol(m, s, r):   # 'Çifte H': iki takım da 0-3 yenik
+        if m["durum"] == "Çifte H":
+            return 0, 3
+        return m[s + "_gol"], m[r + "_gol"]
 
     # ---- kulupler
     adlar = collections.defaultdict(list)
@@ -117,7 +122,7 @@ def main():
                 yerli.add(k)
             kulup_mac[k].append([m["id"], m["tarih"], m["sezon"], YAR[m["yarisma"]], m["lig"], m["kademe"], tur(m), asama(m),
                                  "E" if s == "ev" else "D", okunur(m[s + "_adi"]), m[r + "_kulup"], okunur(m[r + "_adi"]),
-                                 m[s + "_gol"], m[r + "_gol"], m[s + "_pen"], m[r + "_pen"], m["durum"], m["notlar"]])
+                                 *gol(m, s, r), m[s + "_pen"], m[r + "_pen"], m["durum"], m["notlar"]])
     liste = []
     for r in c.execute("SELECT id, ad FROM kulup ORDER BY id"):
         k, ad = r

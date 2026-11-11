@@ -1,0 +1,1 @@
+({"l":[[626,"1.Ligi"],[14060,"2.Futbol Ligi Grup A"],[14061,"2.Futbol Ligi Grup B"],[14062,"2.Futbol Ligi Grup C"],[14508,"3.Lig 1.Grup"],[14509,"3.Lig 2.Grup"],[14510,"3.Lig 3.Grup"],[14511,"3.Lig 4.Grup"],[14512,"3.Lig 5.Grup"],[14513,"3.Lig 6.Grup"],[14514,"3.Lig 7.Grup"],[14515,"3.Lig 8.Grup"],[14516,"3.Lig 9.Grup"]],"c":[[12750,"Spor Yazarları Derneği Kupası"]]})

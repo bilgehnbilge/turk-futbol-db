@@ -122,6 +122,37 @@ def haftalar(t):
                   | {int(h) for h in re.findall(r'class=haftaNo\w+><a href="?Default\.aspx\?[^ >"]*hafta=(\d+)', t)})
 
 
+def sezon_indir(d, kaynak, etiket, pid, deneme=False):
+    """Bir sezonun giris, grup ve hafta sayfalarini raw/tff/<kaynak>_<etiket>_<pid>/ altina indirir (var olani atlar)."""
+    klasor = os.path.join(HAM, f"{kaynak}_{etiket}_{pid}")
+    t = d.al(f"{TAB}?pageID={pid}", os.path.join(klasor, "giris.html"))
+    if t is None:
+        return
+    if not gruplar(t) and not haftalar(t) and not maclar(t):
+        # Bazi eski sezonlarin arsiv sayfasi yalnizca taranmis puan tablosu resmi iceriyor (orn. Super Lig 1959, 1975-76)
+        resim = re.search(r'src="([^"]*Arsiv[^"]*\.(?:jpe?g|png|gif))"', t, re.I)
+        satir = f"{kaynak}\t{etiket}\tpageID={pid}\t{resim.group(1) if resim else '-'}\n"
+        yol = os.path.join(HAM, "veri_yok.txt")
+        if not (os.path.exists(yol) and satir in open(yol, encoding="utf-8").read()):
+            with open(yol, "a", encoding="utf-8") as f:
+                f.write(satir)
+        print(f"{kaynak} {etiket}: mac verisi yok (yalnizca resim) -> veri_yok.txt", flush=True)
+        return
+    g = gruplar(t) or {"": ""}
+    if gruplar(t) and ana_yukselme(t):
+        g = {"": "Yükselme Grubu", **g}   # ana sayfanin haftalari da indirilsin
+    print(f"{kaynak} {etiket}: {len(g)} grup", flush=True)
+    for gid in (list(g)[:2] if deneme else g):
+        ek = f"&grupID={gid}" if gid else ""
+        gt = t if not gid else d.al(f"{TAB}?pageID={pid}{ek}", os.path.join(klasor, f"g{gid}.html"))
+        if gt is None:
+            continue
+        hs = haftalar(gt) or [0]
+        for h in (hs[:2] if deneme else hs):
+            if h:
+                d.al(f"{TAB}?pageID={pid}{ek}&hafta={h}", os.path.join(klasor, f"g{gid}_h{h}.html"))
+
+
 def indir(deneme):
     d = Indirici()
     liste = sezonlar()
@@ -130,33 +161,7 @@ def indir(deneme):
         secilen = {("superlig", "1959"), ("superlig", "1975-1976"), ("3lig", "1990-1991"), ("2lig", "1990-1991")}
         liste = [s for s in liste if (s[0], s[2]) in secilen]
     for kaynak, yil, etiket, pid in liste:
-        klasor = os.path.join(HAM, f"{kaynak}_{etiket}_{pid}")
-        t = d.al(f"{TAB}?pageID={pid}", os.path.join(klasor, "giris.html"))
-        if t is None:
-            continue
-        if not gruplar(t) and not haftalar(t) and not maclar(t):
-            # Bazi eski sezonlarin arsiv sayfasi yalnizca taranmis puan tablosu resmi iceriyor (orn. Super Lig 1959, 1975-76)
-            resim = re.search(r'src="([^"]*Arsiv[^"]*\.(?:jpe?g|png|gif))"', t, re.I)
-            satir = f"{kaynak}\t{etiket}\tpageID={pid}\t{resim.group(1) if resim else '-'}\n"
-            yol = os.path.join(HAM, "veri_yok.txt")
-            if not (os.path.exists(yol) and satir in open(yol, encoding="utf-8").read()):
-                with open(yol, "a", encoding="utf-8") as f:
-                    f.write(satir)
-            print(f"{kaynak} {etiket}: mac verisi yok (yalnizca resim) -> veri_yok.txt", flush=True)
-            continue
-        g = gruplar(t) or {"": ""}
-        if gruplar(t) and ana_yukselme(t):
-            g = {"": "Yükselme Grubu", **g}   # ana sayfanin haftalari da indirilsin
-        print(f"{kaynak} {etiket}: {len(g)} grup", flush=True)
-        for gid in (list(g)[:2] if deneme else g):
-            ek = f"&grupID={gid}" if gid else ""
-            gt = t if not gid else d.al(f"{TAB}?pageID={pid}{ek}", os.path.join(klasor, f"g{gid}.html"))
-            if gt is None:
-                continue
-            hs = haftalar(gt) or [0]
-            for h in (hs[:2] if deneme else hs):
-                if h:
-                    d.al(f"{TAB}?pageID={pid}{ek}&hafta={h}", os.path.join(klasor, f"g{gid}_h{h}.html"))
+        sezon_indir(d, kaynak, etiket, pid, deneme)
     print(f"Bitti, yeni indirilen sayfa: {d.indirilen}")
 
 
@@ -256,13 +261,26 @@ def puan_tablosu(t):
     return satirlar
 
 
-def kur(db, ham):
-    if os.path.exists(db):
+def kur(db, ham, sadece=None):
+    """Butun ham sayfalardan tff.db'yi kurar. sadece=[klasor adlari] verilirse mevcut veritabaninda yalniz o
+    sezonlari siler ve yeniden yazar (guncel sezon icin; tam kurulum ~35 dk, bu birkac saniye)."""
+    if sadece is None and os.path.exists(db):
         os.remove(db)
     c = sqlite3.connect(db)
-    c.executescript(SEMA)
     kulupler, adlar, yazilan, gor = {}, collections.defaultdict(list), 0, []
-    for klasor in sorted(d for d in glob.glob(os.path.join(ham, "*_*_*")) if os.path.isdir(d)):
+    if sadece is None:
+        c.executescript(SEMA)
+    else:
+        kulupler = {t: i for i, t in c.execute("SELECT id, tff_id FROM kulup")}
+        eski_kulup = set(kulupler)
+        for k in sadece:
+            kaynak, etiket, _ = k.rsplit("_", 2)
+            c.execute("DELETE FROM mac WHERE kaynak='tff' AND sezon=? AND lig=?", (etiket, LIG[kaynak]))
+            c.execute("DELETE FROM puan WHERE sezon=? AND lig=?", (etiket, LIG[kaynak]))
+    klasorler = sorted(d for d in glob.glob(os.path.join(ham, "*_*_*")) if os.path.isdir(d))
+    if sadece is not None:
+        klasorler = [d for d in klasorler if os.path.basename(d) in sadece]
+    for klasor in klasorler:
         kaynak, etiket, _pid = os.path.basename(klasor).rsplit("_", 2)
         yil = int(etiket[:4])
         giris = os.path.join(klasor, "giris.html")
@@ -290,14 +308,22 @@ def kur(db, ham):
                 s = re.fullmatch(r"(\d+)\s*-\s*(\d+)", m["skor"])
                 pen = re.search(r"(\d+)\s*-\s*(\d+)", m["pen"] or "")
                 hafta = int(ad.group(2)) if ad.group(2) and not m["po"] else None
+                grup = None if m["po"] else (gad.get(ad.group(1) or "") or None)
+                ana = int(not ad.group(1))
+                # 2007-10 2. Lig: Yukselme Grubu'nun kendi sayfasi yok; maclari her sayfanin yan modulunde, "1 - 2"
+                # bicimli skorla gorunur (haftasi = sayfanin haftasi)
+                if gad.get("") == "Yükselme Grubu" and not m["po"] and re.fullmatch(r"\d+ - \d+", m["skor"]):
+                    grup, ana = "Yükselme Grubu", 0
+                elif gad.get("") == "Yükselme Grubu" and not ad.group(1):
+                    grup = None   # ana sayfanin hafta listesi aslinda 01 grubunu gosteriyor
                 # ana sayfa (grupID'siz) bazen varsayilan grubu (01) gosterir: o gorunum ayri bir grup sayilmaz
-                gor.append((m["mac"], None if m["po"] else (gad.get(ad.group(1) or "") or None), int(not ad.group(1))))
+                gor.append((m["mac"], grup, ana))
                 c.execute("""INSERT INTO mac(kaynak,kaynak_id,kademe,lig,sezon,grup,asama,hafta,tarih,saat,ev_id,dep_id,ev_adi,dep_adi,ev_gol,dep_gol,ev_pen,dep_pen,ham_skor)
                              VALUES('tff',?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                              ON CONFLICT(kaynak,kaynak_id) DO UPDATE SET
                                hafta=COALESCE(hafta,excluded.hafta), grup=COALESCE(grup,excluded.grup)""",
                           (m["mac"], kademe(kaynak, yil), LIG[kaynak], etiket,
-                           None if m["po"] else (gad.get(ad.group(1) or "") or None), m["tur"] or ("play-off" if m["po"] else "lig"),
+                           grup, m["tur"] or ("play-off" if m["po"] else "lig"),
                            hafta, m["tarih"], m["saat"], kulupler[m["ev_id"]], kulupler[m["dep_id"]], m["ev"], m["dep"],
                            int(s.group(1)) if s else None, int(s.group(2)) if s else None,
                            int(pen.group(1)) if pen else None, int(pen.group(2)) if pen else None, m["skor"]))
@@ -313,10 +339,18 @@ def kur(db, ham):
                      WHERE kaynak='tff' AND kaynak_id IN (SELECT kaynak_id FROM gor GROUP BY kaynak_id HAVING COUNT(DISTINCT grup)>1)""").rowcount
     print("birden cok grupta gorunen mac (gruba yazilmadi, play-off):", n)
     for tid, kid in kulupler.items():
+        if sadece is not None and tid in eski_kulup:
+            continue
         en = max((n for k, n in adlar if k == kid), key=lambda n: len(adlar[(kid, n)]))
         c.execute("INSERT INTO kulup VALUES(?,?,?)", (kid, tid, en))
-    for (kid, n), ss in adlar.items():
-        c.execute("INSERT INTO kulup_adi VALUES(?,?,?,?,?)", (kid, n, min(ss), max(ss), len(ss)))
+    if sadece is None:
+        for (kid, n), ss in adlar.items():
+            c.execute("INSERT INTO kulup_adi VALUES(?,?,?,?,?)", (kid, n, min(ss), max(ss), len(ss)))
+    else:
+        c.execute("DELETE FROM kulup_adi")
+        c.execute("""INSERT INTO kulup_adi SELECT k, ad, MIN(sezon), MAX(sezon), COUNT(DISTINCT sezon) FROM
+                     (SELECT ev_id k, ev_adi ad, sezon FROM mac UNION ALL SELECT dep_id, dep_adi, sezon FROM mac) GROUP BY 1, 2""")
+    c.execute("DELETE FROM kapsam")
     c.execute("""INSERT INTO kapsam
       WITH m AS (SELECT kademe, sezon, COALESCE(grup,'') grup, ev_id, dep_id FROM mac WHERE asama='lig'),
            t AS (SELECT kademe, sezon, grup, ev_id k FROM m UNION SELECT kademe, sezon, grup, dep_id FROM m),

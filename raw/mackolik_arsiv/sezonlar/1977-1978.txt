@@ -1,0 +1,1 @@
+({"l":[[3151,"1.Ligi"],[14429,"2.Futbol Ligi Kırmızı Grup"],[14430,"2.Futbol Ligi Beyaz Grup"],[14583,"3.Lig Beyaz Grup"],[14584,"3.Lig Kırmızı Grup"],[27836,"3.Lige Terfi Ligi Beyaz Grup"],[27837,"3.Lige Terfi Ligi Kırmızı Grup"]],"c":[[12738,"Spor Yazarları Derneği Kupası"]]})

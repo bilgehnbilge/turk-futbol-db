@@ -1,0 +1,1 @@
+({"l":[[3169,"Milli Ligi"],[27874,"Ankara Mahalli Ligi"],[29008,"İstanbul Mahalli Ligi"],[30416,"İzmir Mahalli Ligi"],[30431,"Milli Lig Baraj Maçları"]],"c":[[17010,"Cemal Gürsel Kupası Final"],[17007,"Cemal Gürsel Kupası Grup A"],[17008,"Cemal Gürsel Kupası Grup B"],[17009,"Cemal Gürsel Kupası Grup C"]]})

@@ -1,0 +1,41 @@
+name: Güncel sezonu güncelle
+
+# TFF'den güncel sezonun dört ligini çeker, futbol.db'yi ve site verisini yeniden üretir.
+# Site verisi (docs/) commit'lenir; futbol.db "veritabani" sürümüne (Releases) yüklenir.
+on:
+  schedule:
+    - cron: "0 5 * * 1,4"   # pazartesi ve perşembe 08:00 (TSİ)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: guncelle
+  cancel-in-progress: false
+
+jobs:
+  guncelle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Git kimliği
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Güncelle ve yayınla
+        run: python3 guncelle.py --yayinla
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Siteyi yeniden oluştur
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" || true
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Rapor
+        if: always()
+        run: sed -n '1,20p' birlestirme_raporu.txt || true

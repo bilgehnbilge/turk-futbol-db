@@ -57,6 +57,11 @@
     {"kim": "tff:103", "ilk": "1966-1967", "son": "2010-2011", "eski": "Zonguldak Fenerspor", "ad": "Zonguldakspor", "kaynak": "tr.wikipedia Fenerspor"}
   ],
 
+  "mac_duzelt": [
+    {"sezon": "2022-2023", "tarih": "2022-11-27", "ev": "tff:3688", "dep": "tff:3591", "durum": "Çifte H",
+     "not": "Maç oynanmadı; iki takım da 0-3 hükmen yenik sayıldı (resmi puan tablosu)"}
+  ],
+
   "ardil": [
     {"onceki": "tff:3688-once", "sonraki": "tff:106", "sezon": "2007-2008", "tur": "hak devri",
      "aciklama": "Aliağa'nın yarışmacı hakkı Göztepe'ye geçti, Aliağa kapandı; Göztepe TFF 3688 numarasıyla devam etti."}

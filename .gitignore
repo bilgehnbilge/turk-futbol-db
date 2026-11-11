@@ -1,5 +1,11 @@
-# ham indirmeler (birkaç GB) ve ara dosyalar depoya girmez
-raw/
+# ham indirmeler (raw/tff 4 GB) depoya girmez; güncelleme için gereken küçük girdiler girer
+raw/*
+!raw/tff.db
+!raw/tff_kupa/
+!raw/mackolik_arsiv/
+raw/mackolik_arsiv/*
+!raw/mackolik_arsiv/sezonlar/
+!raw/mackolik_arsiv/puan/
 *.log
 __pycache__/
 .claude/

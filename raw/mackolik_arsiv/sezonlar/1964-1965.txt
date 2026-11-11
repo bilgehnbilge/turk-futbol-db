@@ -1,0 +1,1 @@
+({"l":[[3164,"1.Ligi"],[14470,"2.Futbol Ligi"],[27617,"2.Lige Terfi Maçları"],[27879,"Ankara Mahalli Ligi"],[29013,"İstanbul Mahalli Ligi"],[30421,"İzmir Mahalli Ligi"]],"c":[[12726,"Spor Yazarları Derneği Kupası"],[12790,"Spor-Toto Kupası"]]})
