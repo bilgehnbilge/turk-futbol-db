@@ -223,6 +223,8 @@ CREATE TABLE mac(id INTEGER PRIMARY KEY, kaynak TEXT, kaynak_id TEXT, kademe INT
   grup TEXT, asama TEXT, hafta INTEGER, tarih TEXT, saat TEXT, ev_id INTEGER, dep_id INTEGER, ev_adi TEXT, dep_adi TEXT,
   ev_gol INTEGER, dep_gol INTEGER, ev_pen INTEGER, dep_pen INTEGER, ham_skor TEXT, UNIQUE(kaynak, kaynak_id));
 CREATE TABLE kapsam(kademe INTEGER, sezon TEXT, grup TEXT, takim INTEGER, bulunan INTEGER, beklenen INTEGER);
+CREATE TABLE puan(kademe INTEGER, lig TEXT, sezon TEXT, grup TEXT, sira INTEGER, tff_id TEXT, ad TEXT,
+  O INTEGER, G INTEGER, B INTEGER, M INTEGER, A INTEGER, Y INTEGER, AV INTEGER, P INTEGER, sayfa TEXT);
 CREATE INDEX i1 ON mac(ev_id); CREATE INDEX i2 ON mac(dep_id); CREATE INDEX i3 ON mac(sezon, kademe);
 CREATE VIEW takim_maci AS
   SELECT m.id mac_id, m.kademe, m.lig, m.sezon, m.grup, m.asama, m.hafta, m.tarih, m.ev_id kulup_id, m.ev_adi takim, m.dep_id rakip_id, m.dep_adi rakip,
@@ -232,6 +234,26 @@ CREATE VIEW takim_maci AS
          'deplasman', m.dep_gol, m.ev_gol, m.dep_gol-m.ev_gol, m.ham_skor FROM mac m WHERE m.ev_gol IS NOT NULL;
 """
 LIG = {"superlig": "Süper Lig", "1lig": "1. Lig", "2lig": "2. Lig", "3lig": "3. Lig"}
+
+
+def puan_tablosu(t):
+    """Grup/sezon sayfasindaki resmi puan durumu (ilk tablo = genel; ardindan ic saha ve dis saha tablolari gelir)."""
+    satirlar = []
+    for blok in re.findall(r'grvACetvel_ctl\d+_lnkTakim"[^>]*?(?:kulupID=(\d+))?"?>(.*?)</a>(.*?)(?=grvACetvel_ctl\d+_lnkTakim|</table>)', t, re.S):
+        kid, ad, geri = blok
+        m = re.match(r"\s*(\d+)\.\s*(.*)", temiz(ad))
+        if not m:
+            continue
+        sira = int(m.group(1))
+        if satirlar and sira <= satirlar[-1]["sira"]:
+            break   # ic saha tablosu basladi
+        say = [int(x) if re.fullmatch(r"-?\d+", x) else None for x in
+               re.findall(r'_(?:lblOyun|Label4|lblKazanma|lblPuan|Label1|Label2|Label5|Label3)">\s*(-?\d*)\s*<', geri)]
+        if len(say) < 8:
+            continue
+        satirlar.append(dict(sira=sira, tff_id=kid or None, ad=m.group(2).strip(), O=say[0], G=say[1], B=say[2], M=say[3],
+                             A=say[4], Y=say[5], AV=say[6], P=say[7]))
+    return satirlar
 
 
 def kur(db, ham):
@@ -248,6 +270,14 @@ def kur(db, ham):
         gad = {k: grup_tam_ad(v) for k, v in gruplar(gt0).items()} if gt0 else {}
         if gad and ana_yukselme(gt0):
             gad[""] = "Yükselme Grubu"
+        # resmi puan durumu: grup sayfasi (haftasiz); grupsuz sezonda giris sayfasi
+        tablo_sayfalari = [(os.path.join(klasor, f"g{g}.html"), gad[g]) for g in gad if g] if gad else [(giris, None)]
+        for yol, grup in tablo_sayfalari:
+            if os.path.exists(yol):
+                for r in puan_tablosu(oku(yol)):
+                    c.execute("INSERT INTO puan VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                              (kademe(kaynak, yil), LIG[kaynak], etiket, grup, r["sira"], r["tff_id"], r["ad"], r["O"], r["G"],
+                               r["B"], r["M"], r["A"], r["Y"], r["AV"], r["P"], os.path.basename(klasor) + "/" + os.path.basename(yol)))
         for yol in sorted(glob.glob(os.path.join(klasor, "*.html"))):
             ad = re.fullmatch(r"g(\d*)(?:_h(\d+))?\.html|giris\.html", os.path.basename(yol))
             if not ad:
@@ -260,7 +290,8 @@ def kur(db, ham):
                 s = re.fullmatch(r"(\d+)\s*-\s*(\d+)", m["skor"])
                 pen = re.search(r"(\d+)\s*-\s*(\d+)", m["pen"] or "")
                 hafta = int(ad.group(2)) if ad.group(2) and not m["po"] else None
-                gor.append((m["mac"], None if m["po"] else (gad.get(ad.group(1) or "") or None)))
+                # ana sayfa (grupID'siz) bazen varsayilan grubu (01) gosterir: o gorunum ayri bir grup sayilmaz
+                gor.append((m["mac"], None if m["po"] else (gad.get(ad.group(1) or "") or None), int(not ad.group(1))))
                 c.execute("""INSERT INTO mac(kaynak,kaynak_id,kademe,lig,sezon,grup,asama,hafta,tarih,saat,ev_id,dep_id,ev_adi,dep_adi,ev_gol,dep_gol,ev_pen,dep_pen,ham_skor)
                              VALUES('tff',?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                              ON CONFLICT(kaynak,kaynak_id) DO UPDATE SET
@@ -272,8 +303,12 @@ def kur(db, ham):
                            int(pen.group(1)) if pen else None, int(pen.group(2)) if pen else None, m["skor"]))
                 yazilan += 1
     # Birden cok grubun sayfasinda gorunen mac (play-off/final modulu her grup sayfasinda tekrarlaniyor) hicbir gruba ait degil
-    c.execute("CREATE TEMP TABLE gor(kaynak_id TEXT, grup TEXT)")
-    c.executemany("INSERT INTO gor VALUES(?,?)", gor)
+    c.execute("CREATE TEMP TABLE gor(kaynak_id TEXT, grup TEXT, ana INTEGER)")
+    c.executemany("INSERT INTO gor VALUES(?,?,?)", gor)
+    # Grup sayfalarinda gorunen mac icin ana sayfa gorunumu yok sayilir; yalniz ana sayfada gorunende o kullanilir
+    c.execute("""DELETE FROM gor WHERE ana=1 AND kaynak_id IN (SELECT kaynak_id FROM gor WHERE ana=0)""")
+    c.execute("""UPDATE mac SET grup=(SELECT MAX(grup) FROM gor WHERE gor.kaynak_id=mac.kaynak_id)
+                 WHERE kaynak='tff' AND asama='lig' AND kaynak_id IN (SELECT kaynak_id FROM gor GROUP BY kaynak_id HAVING COUNT(DISTINCT grup)=1)""")
     n = c.execute("""UPDATE mac SET grup=NULL, asama=CASE asama WHEN 'lig' THEN 'play-off' ELSE asama END
                      WHERE kaynak='tff' AND kaynak_id IN (SELECT kaynak_id FROM gor GROUP BY kaynak_id HAVING COUNT(DISTINCT grup)>1)""").rowcount
     print("birden cok grupta gorunen mac (gruba yazilmadi, play-off):", n)

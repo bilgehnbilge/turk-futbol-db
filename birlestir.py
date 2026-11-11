@@ -562,6 +562,7 @@ def main():
         SELECT t.id FROM t JOIN n USING(kademe, sezon, g, k) JOIN buyuk USING(kademe, sezon, g) WHERE n.n <= 2)""")
     po = c.total_changes - once_deg
     yaz(f"   TFF grup sayfalarindaki tekil dis takim maclari play-off sayildi: {po}")
+    resmi_tablolar(c, lambda node: kok_no.get(bb.bul(node)) if node in bb.p else None, kes_no, dugum)
     for d in dz.get("donem_adi", []):   # elle donem adi (orn. Vikipedi'den eski adlar)
         no = kok_no[bb.bul(kim_coz(d["kim"]))]
         for s in ("ev", "dep"):   # "eski" verilmisse yalniz o adla yazilmis maclar
@@ -605,6 +606,127 @@ def main():
     yaz("\nKulubu bulunamayan mac tarafi:",
         c.execute("SELECT COUNT(*) FROM mac WHERE ev_kulup IS NULL OR dep_kulup IS NULL").fetchone()[0])
     open(RAPOR, "w", encoding="utf-8").write("\n".join(rapor) + "\n")
+
+
+# ---------------------------------------------------------------- resmi puan durumlari ve hukmen maclar
+def resmi_tablolar(c, no_bul, kes_no, dugum):
+    """TFF grup sayfalarindaki ve Mackolik arsivindeki resmi puan durumlarini puan_durumu tablosuna yazar
+    (puan silmeleriyle), sonra resmi tablo ile mac listesi arasindaki farki hukmen maclarla kapatir."""
+    import mackolik as M
+    tablolar = []   # (kaynak, sezon, kademe, [satir dict(kulup, ad, sira, O,G,B,M,A,Y,P,silme)])
+    t = sqlite3.connect(TFF_DB)
+    grp = collections.defaultdict(list)
+    for r in t.execute("SELECT sezon, kademe, COALESCE(grup,''), sira, tff_id, ad, O, G, B, M, A, Y, P FROM puan ORDER BY rowid"):
+        grp[(r[0], r[1], r[2])].append(r)
+    for (sezon, kademe, _), rs in grp.items():
+        w = 3 if sezon[:4] >= "1987" else 2
+        tablolar.append(("tff", sezon, kademe, [dict(kulup=no_bul(("tff", kes_no(r[4], sezon))) if r[4] else None, ad=r[5], sira=r[3],
+                                                     O=r[6], G=r[7], B=r[8], M=r[9], A=r[10], Y=r[11], P=r[12], silme=r[12] - (r[7] * w + r[8]))
+                                                for r in rs]))
+    sid_bilgi = {}
+    for f in glob.glob(os.path.join(ARSIV, "sezonlar", "*.txt")):
+        d = json.loads(open(f, encoding="utf-8").read().strip()[1:-1])
+        for sid, ad in d["l"]:
+            sid_bilgi[sid] = (os.path.basename(f)[:-4], ad)
+    for f in sorted(glob.glob(os.path.join(ARSIV, "puan", "*.json"))):
+        d = json.load(open(f, encoding="utf-8"))
+        if d["id"] not in sid_bilgi:
+            continue
+        etiket, ligad = sid_bilgi[d["id"]]
+        _, kademe = M.lig_adi_kademe(ligad)
+        satir = []
+        for i, r in enumerate(d["s"]):
+            silme = r[17] if isinstance(r[17], int) else 0
+            satir.append(dict(kulup=no_bul(dugum("mackolik_arsiv", str(r[0]), etiket, str(kademe or ""))), ad=r[1], sira=i + 1,
+                              O=r[2] + r[3], G=r[4] + r[5], B=r[6] + r[7], M=r[8] + r[9], A=r[10] + r[11], Y=r[12] + r[13],
+                              P=r[14] + r[15] + silme, silme=silme))
+        tablolar.append(("mackolik_arsiv", etiket, kademe, satir))
+
+    # tabloyu mac grubuna bagla: ayni sezonda takimlari en cok ortusen lig/terfi grubu (TFF'nin hatali tekrar
+    # tablolari -- 2007-10 2. Lig'de her grup sayfasi 01'in tablosunu gosterir -- elenir)
+    gruplar = collections.defaultdict(set)
+    for y, kd, sz, g, e, dp in c.execute("""SELECT yarisma, kademe, sezon, COALESCE(grup,''), ev_kulup, dep_kulup FROM mac
+                                            WHERE yarisma IN ('lig','terfi') AND asama='lig'"""):
+        gruplar[(sz, y, kd, g)] |= {e, dp}
+    sezon_gruplari = collections.defaultdict(list)
+    for k in gruplar:
+        sezon_gruplari[k[0]].append(k)
+    secilen = {}
+    for kaynak, sezon, kademe, satir in tablolar:
+        ks = {s["kulup"] for s in satir if s["kulup"]}
+        if not ks:
+            continue
+        aday = max(sezon_gruplari.get(sezon, []), key=lambda g: (len(ks & gruplar[g]), g[2] == kademe), default=None)
+        if not aday:
+            continue
+        ort = len(ks & gruplar[aday]) / len(satir)
+        if ort < 0.7 or len(gruplar[aday] - {None}) > len(satir) + 2:
+            continue
+        onc = (kaynak == "tff", ort)
+        if aday not in secilen or onc > secilen[aday][0]:
+            secilen[aday] = (onc, kaynak, satir)
+    c.execute("""CREATE TABLE puan_durumu(kaynak TEXT, yarisma TEXT, kademe INTEGER, sezon TEXT, grup TEXT, sira INTEGER,
+                 kulup INTEGER, ad TEXT, O INTEGER, G INTEGER, B INTEGER, M INTEGER, AG INTEGER, YG INTEGER, P INTEGER, puan_silme INTEGER)""")
+    for (sezon, y, kd, g), (_, kaynak, satir) in secilen.items():
+        for s in satir:
+            c.execute("INSERT INTO puan_durumu VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                      (kaynak, y, kd, sezon, g or None, s["sira"], s["kulup"], s["ad"], s["O"], s["G"], s["B"], s["M"],
+                       s["A"], s["Y"], s["P"], s["silme"]))
+    silme = c.execute("SELECT COUNT(*) FROM puan_durumu WHERE puan_silme<>0").fetchone()[0]
+    yaz(f"   Resmi puan durumu: {len(tablolar)} tablo okundu, {len(secilen)} lig grubuna baglandi; puan silme/ek puan satiri: {silme}")
+
+    # hukmen: resmi tabloda sayilip bizde skoru olmayan ya da hic olmayan maclar
+    eklenen = guncel = 0
+    for (sezon, y, kd, g), (_, kaynak, satir) in secilen.items():
+        resmi = {s["kulup"]: s for s in satir if s["kulup"]}
+        ms = c.execute(f"""SELECT id, ev_kulup, dep_kulup, ev_gol, dep_gol FROM mac WHERE sezon=? AND yarisma=? AND asama='lig'
+                           AND COALESCE(grup,'')=? AND kademe IS ?""", (sezon, y, g, kd)).fetchall()
+        lig = c.execute("SELECT lig FROM mac WHERE id=?", (ms[0][0],)).fetchone()[0] if ms else None
+        biz = collections.defaultdict(lambda: dict(O=0, G=0, B=0, M=0, A=0, Y=0))
+        cift = collections.Counter()
+        for _, e, d, eg, dg in ms:
+            cift[(e, d)] += 1
+            if eg is None:
+                continue
+            for k, a, b in ((e, eg, dg), (d, dg, eg)):
+                x = biz[k]; x["O"] += 1; x["A"] += a; x["Y"] += b
+                x["G" if a > b else "M" if a < b else "B"] += 1
+        acik = {k: {f: resmi[k][f] - biz[k][f] for f in ("O", "G", "B", "M", "A", "Y")} for k in resmi}
+        if not any(v["O"] > 0 for v in acik.values()):
+            continue
+        tur = max(cift.values(), default=1)   # devre sayisi
+        adaylar = [(mid, e, d) for mid, e, d, eg, dg in ms if eg is None] + \
+                  [(None, e, d) for e in resmi for d in resmi if e != d for _ in range(max(0, tur - cift[(e, d)]))]
+        for mid, e, d in adaylar:
+            ae, ad_ = acik.get(e), acik.get(d)
+            if not ae or not ad_ or ae["O"] <= 0 or ad_["O"] <= 0:
+                continue
+            if ad_["M"] > 0 and ae["G"] > 0 and ad_["Y"] >= 3 and ae["A"] >= 3:
+                eg, dg = 3, 0
+            elif ae["M"] > 0 and ad_["G"] > 0 and ae["Y"] >= 3 and ad_["A"] >= 3:
+                eg, dg = 0, 3
+            else:
+                continue
+            for x, a, b in ((ae, eg, dg), (ad_, dg, eg)):
+                x["O"] -= 1; x["A"] -= a; x["Y"] -= b; x["G" if a > b else "M"] -= 1
+            if mid:
+                c.execute("UPDATE mac SET ev_gol=?, dep_gol=?, durum='Hük.', notlar=? WHERE id=?",
+                          (eg, dg, "Resmi puan tablosuna göre hükmen sonuç", mid)); guncel += 1
+            else:
+                ea = next((s["ad"] for s in satir if s["kulup"] == e), None)
+                da = next((s["ad"] for s in satir if s["kulup"] == d), None)
+                c.execute(f"INSERT INTO mac VALUES(NULL,{','.join('?' * 26)})",
+                          ("hukmen", f"{sezon}/{g}/{e}-{d}", y, lig,
+                           kd, sezon, g or None, "lig", None, None, None, e, d, ea, da, ea, da, eg, dg, None, None, None, None,
+                           "Hük.", None, "Maç oynanmadı; resmi puan tablosuna göre hükmen sonuç"))
+                eklenen += 1
+        # butun maclari hukmen kaybeden takim (orn. Ankaraspor 2009-10): oynanmis gorunen maclari da hukmen
+        for k, s in resmi.items():
+            if s["O"] and s["G"] == s["B"] == 0 and s["A"] == 0 and s["Y"] == 3 * s["O"]:
+                c.execute(f"""UPDATE mac SET durum='Hük.' WHERE sezon=? AND yarisma=? AND COALESCE(grup,'')=? AND kademe IS ?
+                              AND (ev_kulup=? AND ev_gol=0 AND dep_gol=3 OR dep_kulup=? AND ev_gol=3 AND dep_gol=0)""",
+                          (sezon, y, g, kd, k, k))
+    yaz(f"   Hukmen: {guncel} skorsuz maca resmi tablodan sonuc yazildi, {eklenen} oynanmamis mac eklendi")
 
 
 def gol(x):

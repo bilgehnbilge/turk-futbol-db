@@ -13,7 +13,7 @@ const norm = s => String(s || "").toLocaleLowerCase("tr").replace(/[çğıöşü
   .replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
 const tarihYaz = t => { if (!t) return "—"; const [y, a, g] = t.split("-"); return `${g}.${a}.${y}`; };
 const YAR_AD = { L: "Lig", K: "Türkiye Kupası", A: "Avrupa", T: "Terfi" };
-const KADEME_AD = { 1: "1. seviye", 2: "2. seviye", 3: "3. seviye", 4: "4. seviye" };
+const KADEME_AD = { 1: "Süper Lig", 2: "1. Lig", 3: "TFF 2. Lig", 4: "TFF 3. Lig" };   // bugünkü adlar, seviyeye göre
 
 async function al(yol) {
   if (onbellek.has(yol)) return onbellek.get(yol);
@@ -29,7 +29,7 @@ function skorYaz(a, y, pa, py, durum) {
   let s = `${a}-${y}`;
   if (pa != null && py != null) s += ` <small class="soluk">(pen ${pa}-${py})</small>`;
   if (durum === "UZ") s += ` <small class="soluk">uz.</small>`;
-  if (durum === "Hük.") s += ` <small class="soluk">hük.</small>`;
+  if (durum === "Hük.") s += ` <small class="soluk" title="Hükmen">(H)</small>`;
   return s;
 }
 const yuzde = (a, b) => b ? Math.round(100 * a / b) : 0;
@@ -79,7 +79,7 @@ function kulupAra(q, adet = 12) {
 function kulupAltYazi(k) {
   const yil = `${k.ilk.slice(0, 4)}–${k.son.slice(0, 4)}`;
   if (!k.yerli) return `Avrupa rakibi · ${k.mac} maç`;
-  return `${yil} · ${sayiYaz(k.mac)} maç${k.enust === 1 ? " · 1. lig seviyesi" : ""}`;
+  return `${yil} · ${sayiYaz(k.mac)} maç${k.enust === 1 ? " · Süper Lig" : ""}`;
 }
 function oneriKutusu(input, kutu, secince) {
   let secili = -1, liste = [];
@@ -179,8 +179,8 @@ function oncul(id, gor = new Set()) {   // öncül kulüpler (kulup_ardil), özy
   return k.ardil.filter(a => a.yon === "onceki").flatMap(a => [a.kulup, ...oncul(a.kulup, gor)]);
 }
 function toplam(ms) {
-  const t = { O: 0, G: 0, B: 0, M: 0, AG: 0, YG: 0 };
-  for (const m of ms) { if (m.s === "N") continue; t.O++; t[m.s]++; t.AG += m.a; t.YG += m.y; }
+  const t = { O: 0, G: 0, B: 0, M: 0, AG: 0, YG: 0, GY: 0 };
+  for (const m of ms) { if (m.s === "N") continue; t.O++; t[m.s]++; t.AG += m.a; t.YG += m.y; if (m.y === 0) t.GY++; }
   return t;
 }
 function seriler(ms) {
@@ -193,7 +193,7 @@ function seriler(ms) {
     ["galibiyetsiz", "Galibiyetsiz seri", m => m.s !== "G"],
     ["golsuz", "Gol atamadan", m => m.a === 0],
   ];
-  const oynanan = ms.filter(m => m.s !== "N");
+  const oynanan = ms.filter(m => m.s !== "N" && m.tarih);   // tarihsiz hükmen maçlar sıralanamaz
   return tanim.map(([k, ad, f]) => {
     let en = { n: 0 }, cur = { n: 0 };
     for (let i = 0; i < oynanan.length; i++) {
@@ -261,7 +261,7 @@ async function kulupSayfa(id, sekme) {
 function filtrele(ms, d, sekme) {
   return ms.filter(m => (!d.yar || m.yar === d.yar) && (!d.saha || m.saha === d.saha)
     && (sekme === "rekorlar" || sekme === "rakipler" ? true : (!d.sezon || m.sezon === d.sezon))
-    && (sekme !== "maclar" || ((!d.sonuc || m.s === d.sonuc) && (!d.rakip || norm(m.rakip).includes(norm(d.rakip))))));
+    && (sekme !== "maclar" || ((!d.sonuc || (d.sonuc === "GY" ? m.y === 0 && m.s !== "N" : m.s === d.sonuc)) && (!d.rakip || norm(m.rakip).includes(norm(d.rakip))))));
 }
 function filtreHtml(d, ms, sekme, onculler) {
   if (sekme === "ozet" || sekme === "sezonlar") {
@@ -274,7 +274,7 @@ function filtreHtml(d, ms, sekme, onculler) {
     <div class="cipler">${cip("Tümü", "", "yar")}${["L", "K", "A", "T"].filter(y => yarlar.includes(y)).map(y => cip(YAR_AD[y], y, "yar")).join("")}</div>
     <div class="cipler">${cip("İç + dış", "", "saha")}${cip("İç saha", "E", "saha")}${cip("Deplasman", "D", "saha")}</div>
     ${sekme === "maclar" ? `
-      <div class="cipler">${cip("Her sonuç", "", "sonuc")}${cip("G", "G", "sonuc")}${cip("B", "B", "sonuc")}${cip("M", "M", "sonuc")}</div>
+      <div class="cipler">${cip("Her sonuç", "", "sonuc")}${cip("G", "G", "sonuc")}${cip("B", "B", "sonuc")}${cip("M", "M", "sonuc")}${cip("Gol yemedi", "GY", "sonuc")}</div>
       <select id="fSezon"><option value="">Bütün sezonlar</option>${sezonlar.map(s => `<option ${s === d.sezon ? "selected" : ""}>${s}</option>`).join("")}</select>
       <input type="search" id="fRakip" placeholder="Rakip ara…" value="${esc(d.rakip)}">
       <select id="fSira">${[["yeni", "En yeni"], ["eski", "En eski"], ["fark", "En farklı galibiyet"], ["farkm", "En farklı mağlubiyet"], ["gol", "En gollü"]]
@@ -296,9 +296,10 @@ function ozetSatir(t) {
     <div><b>${sayiYaz(t.O)}</b><span>Maç</span></div><div><b>${sayiYaz(t.G)}</b><span>Galibiyet</span></div>
     <div><b>${sayiYaz(t.B)}</b><span>Beraberlik</span></div><div><b>${sayiYaz(t.M)}</b><span>Mağlubiyet</span></div>
     <div><b>${sayiYaz(t.AG)}</b><span>Attığı</span></div><div><b>${sayiYaz(t.YG)}</b><span>Yediği</span></div>
+    <div><b>${sayiYaz(t.GY)}</b><span>Gol yemediği</span></div>
   </div>
   <div class="cubuk"><i class="g" style="width:${yuzde(t.G, t.O)}%"></i><i class="b" style="width:${yuzde(t.B, t.O)}%"></i><i class="m" style="width:${yuzde(t.M, t.O)}%"></i></div>
-  <p class="soluk" style="margin:8px 0 0;font-size:13px">Galibiyet oranı %${yuzde(t.G, t.O)} · Maç başı ${(t.AG / Math.max(t.O, 1)).toFixed(2)} – ${(t.YG / Math.max(t.O, 1)).toFixed(2)} gol</p>`;
+  <p class="soluk" style="margin:8px 0 0;font-size:13px">Galibiyet oranı %${yuzde(t.G, t.O)} · Kalesini gole kapattığı maç %${yuzde(t.GY, t.O)} · Maç başı ${(t.AG / Math.max(t.O, 1)).toFixed(2)} – ${(t.YG / Math.max(t.O, 1)).toFixed(2)} gol</p>`;
 }
 function ozetHtml(ms) {
   const bolumler = [["", "Bütün resmi maçlar"], ["L", "Lig"], ["K", "Türkiye Kupası"], ["A", "Avrupa kupaları"], ["T", "Terfi maçları"]];
@@ -307,16 +308,26 @@ function ozetHtml(ms) {
     return `<div class="kart"><h3>${ad}</h3>${ozetSatir(toplam(alt))}</div>`;
   }).join("");
   const son = ms.filter(m => m.s !== "N").slice(-10).reverse();
-  const ligBas = {};
-  for (const m of ms) if (m.yar === "L" && m.kademe) { (ligBas[m.kademe] ||= new Set()).add(m.sezon); }
+  const ligBas = {}, eskiAd = {};
+  for (const m of ms) if (m.yar === "L" && m.kademe) {
+    (ligBas[m.kademe] ||= new Set()).add(m.sezon);
+    if (m.lig) (eskiAd[m.kademe] ||= new Set()).add(m.lig.replace(/\.(?=\S)/g, ". ").replace(/\s+/g, " ").trim());
+  }
+  const ligSatiri = kd => {
+    const ss = [...ligBas[kd]].sort();
+    const eski = [...(eskiAd[kd] || [])].filter(a => norm(a) !== norm(KADEME_AD[kd]) && norm("TFF " + a) !== norm(KADEME_AD[kd]));
+    return `<p style="margin:6px 0"><b>${KADEME_AD[kd]}</b>: ${ss.length} sezon <span class="soluk">(${ss[0].slice(0, 4)}–${ss.at(-1).slice(-4)})</span>
+      ${eski.length ? `<br><small class="soluk">Dönemin adıyla: ${eski.map(esc).join(", ")}</small>` : ""}</p>`;
+  };
   return `<div class="izgara k2">${kartlar}</div>
   <div class="bolum izgara k2">
-    <div class="kart"><h3>Lig seviyelerinde geçirdiği sezonlar</h3>
-      ${Object.keys(ligBas).sort().map(kd => `<p style="margin:6px 0"><b>${KADEME_AD[kd]}</b>: ${ligBas[kd].size} sezon</p>`).join("") || `<p class="soluk">Lig maçı yok.</p>`}
+    <div class="kart"><h3>Liglerde geçirdiği sezonlar</h3>
+      ${Object.keys(ligBas).sort().map(ligSatiri).join("") || `<p class="soluk">Lig maçı yok.</p>`}
+      <p class="soluk" style="font-size:12px;margin-top:10px">Ligler bugünkü adlarıyla, seviyeye göre gösterilir (Süper Lig = en üst lig).</p>
     </div>
     <div class="kart"><h3>Son maçlar</h3>
       ${son.map(m => `<div style="display:flex;gap:8px;align-items:center;margin:5px 0"><span class="son ${m.s}">${m.s}</span>
-        <span class="soluk" style="width:84px">${tarihYaz(m.tarih)}</span><span>${m.saha === "E" ? "" : "@ "}${kulupBag(m.rakipId, m.rakip)}</span>
+        <span class="soluk" style="width:84px">${tarihYaz(m.tarih)}</span><span>${kulupBag(m.rakipId, m.rakip)}${m.saha === "E" ? "" : ` <small class="soluk" title="Deplasman">(D)</small>`}</span>
         <b style="margin-left:auto">${skorYaz(m.a, m.y, m.pa, m.py, m.durum)}</b></div>`).join("")}
     </div>
   </div>`;
@@ -343,7 +354,7 @@ function macTablosu(hedef, ms, d) {
   const t = toplam(liste);
   let n = 200;
   const ciz = () => {
-    hedef.innerHTML = `<p class="soluk">${sayiYaz(liste.length)} maç · ${t.G}G ${t.B}B ${t.M}M · ${t.AG}-${t.YG}</p>
+    hedef.innerHTML = `<p class="soluk">${sayiYaz(liste.length)} maç · ${t.G}G ${t.B}B ${t.M}M · ${t.AG}-${t.YG} · ${t.GY} maçta gol yemedi</p>
       ${liste.length ? `<div class="tablo-kap"><table class="tablo"><thead><tr><th class="o">S</th><th>Tarih</th><th>Sezon</th><th class="gizle-mobil">Yarışma</th><th class="o">Saha</th><th>Rakip</th><th class="s">Skor</th></tr></thead>
       <tbody>${liste.slice(0, n).map(m => macSatir(m)).join("")}</tbody></table></div>` : `<div class="bos">Bu filtreye uyan maç yok.</div>`}
       ${liste.length > n ? `<button class="dugme daha" id="daha">${sayiYaz(liste.length - n)} maç daha göster</button>` : ""}`;
@@ -357,8 +368,8 @@ function rekorKart(baslik, l) {
   if (!m) return `<div class="kart rekor"><span class="baslik">${baslik}</span><span class="soluk">—</span></div>`;
   const satir = m => `${m.saha === "E" ? `${esc(m.takim)} – ${kulupBag(m.rakipId, m.rakip)}` : `${kulupBag(m.rakipId, m.rakip)} – ${esc(m.takim)}`}`;
   return `<div class="kart rekor"><span class="baslik">${baslik}</span>
-    <span class="deger">${m.saha === "E" ? `${m.a}-${m.y}` : `${m.y}-${m.a}`}</span>
-    ${l.slice(0, 4).map(m => `<span class="detay">${satir(m)} · ${tarihYaz(m.tarih)} · ${esc(m.lig || YAR_AD[m.yar])}</span>`).join("")}
+    <span class="deger">${Math.abs(m.a - m.y) ? `${Math.max(m.a, m.y)}-${Math.min(m.a, m.y)}` : `${m.a}-${m.y}`}</span>
+    ${l.slice(0, 4).map(m => `<span class="detay">${satir(m)} <b>${m.saha === "E" ? `${m.a}-${m.y}` : `${m.y}-${m.a}`}</b> · ${tarihYaz(m.tarih)} · ${esc(m.lig || YAR_AD[m.yar])}</span>`).join("")}
     ${l.length > 4 ? `<span class="detay">ve aynı skorla ${l.length - 4} maç daha</span>` : ""}</div>`;
 }
 function enIyi(ms, f, esit) {   // rekor + aynı değerdeki bütün maçlar (en eskiden yeniye)
@@ -382,8 +393,20 @@ function rekorHtml(ms) {
     return `<details class="kart rekor"><summary style="list-style:none"><span class="baslik">${s.ad}</span><br>${r}${dv}</summary>
       ${s.en.n ? `<div class="tablo-kap" style="margin-top:10px;max-height:320px;overflow:auto"><table class="tablo"><tbody>${s.liste.slice(s.en.bas, s.en.son + 1).map(m => macSatir(m)).join("")}</tbody></table></div>` : ""}</details>`;
   };
+  // kalesini gole kapattığı maçlar: toplam, iç/dış, en iyi sezonlar
+  const oy = ms.filter(m => m.s !== "N"), gy = oy.filter(m => m.y === 0);
+  const sz = new Map();
+  for (const m of oy) { const x = sz.get(m.sezon) || { sezon: m.sezon, O: 0, GY: 0 }; x.O++; if (m.y === 0) x.GY++; sz.set(m.sezon, x); }
+  const enSezon = [...sz.values()].filter(x => x.O >= 5).sort((a, b) => b.GY - a.GY || b.GY / b.O - a.GY / a.O).slice(0, 5);
+  const gyKart = `<div class="kart rekor"><span class="baslik">Kalesini gole kapattığı maç</span>
+      <span class="deger">${sayiYaz(gy.length)} <small class="soluk" style="font-size:1rem">/ ${sayiYaz(oy.length)} (%${yuzde(gy.length, oy.length)})</small></span>
+      <span class="detay">İç sahada ${gy.filter(m => m.saha === "E").length}, deplasmanda ${gy.filter(m => m.saha === "D").length}</span></div>
+    <div class="kart rekor"><span class="baslik">En çok gol yemediği sezonlar</span>
+      ${enSezon.map(x => `<span class="detay"><a class="bag" href="#/sezon/${x.sezon}">${x.sezon}</a>: <b>${x.GY}</b> / ${x.O} maç</span>`).join("") || `<span class="soluk">—</span>`}</div>`;
   return `
-  <h2>En farklı sonuçlar</h2>
+  <h2>Kalesini gole kapattığı maçlar</h2>
+  <div class="izgara k3">${gyKart}${seriKart(sr.find(s => s.k === "golyemeden"))}</div>
+  <h2 class="bolum">En farklı sonuçlar</h2>
   <div class="izgara k3">${rekorKart("En farklı galibiyet", gal)}${rekorKart("En farklı mağlubiyet", mag)}${rekorKart("En gollü maç", gol)}
   ${rekorKart("İç sahada en farklı galibiyet", evG)}${rekorKart("Deplasmanda en farklı galibiyet", depG)}</div>
   <h2 class="bolum">Seriler <small class="soluk" style="font-weight:400;font-size:14px">— seçili maçlar art arda, sezonlar arası; ayrıntı için karta tıkla</small></h2>

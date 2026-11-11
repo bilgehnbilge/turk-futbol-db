@@ -21,10 +21,31 @@ YAR = {"lig": "L", "kupa": "K", "avrupa": "A", "terfi": "T"}
 KISALTMA = {"MKE", "PTT", "DSİ", "YSE", "GSK", "TEK", "THY", "PTT", "TCDD", "SAİ", "TKİ", "DHMİ", "TSK", "İDSİ", "BŞB", "ASKİ", "İSKİ"}
 
 
+TR_BUYUK = set("ÇĞİÖŞÜ")
+KATLA = str.maketrans("ÇĞİÖŞÜ", "CGIOSU")
+SOZLUK = collections.defaultdict(collections.Counter)   # ASCII hali -> Turkce harfli yazimlar
+
+
+def sozluk_kur(adlar):
+    """Turkce harfle yazilmis buyuk harfli adlardaki kelimeler: 'PENDİKSPOR' -> PENDIKSPOR anahtari."""
+    for ad in adlar:
+        if ad and not any(ch.islower() for ch in ad) and TR_BUYUK & set(ad):
+            for w in ad.split():
+                SOZLUK[w.translate(KATLA)][w] += 1
+
+
+def turkcele(ad):
+    """TFF'nin bazi eski kayitlari Turkce harfsiz ('PENDIKSPOR'): kelimeyi sozlukteki Turkce yazimiyla degistir."""
+    if not ad or any(ch.islower() for ch in ad) or TR_BUYUK & set(ad):
+        return ad
+    return " ".join(SOZLUK[w].most_common(1)[0][0] if w in SOZLUK else w for w in ad.split(" "))
+
+
 def okunur(ad):
     """TFF'nin tamamen buyuk harfli adlari: 'GÖZTEPE A.Ş.' -> 'Göztepe A.Ş.' (kisaltmalar korunur)."""
     if not ad or any(ch.islower() for ch in ad):
         return ad
+    ad = turkcele(ad)
     def kelime(w):
         harf = "".join(ch for ch in w if ch.isalpha())
         if len(harf) <= 2 or harf in KISALTMA or w.replace(".", "") in KISALTMA:
@@ -58,6 +79,7 @@ def main():
     if os.path.isdir(CIKTI):
         shutil.rmtree(CIKTI)
     maclar = [dict(r) for r in c.execute("SELECT * FROM mac ORDER BY tarih IS NULL, tarih, saat, id")]
+    sozluk_kur([m["ev_adi"] for m in maclar] + [m["dep_adi"] for m in maclar])
 
     def tur(m):
         if m["yarisma"] == "lig" or m["yarisma"] == "terfi":

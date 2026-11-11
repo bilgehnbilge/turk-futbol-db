@@ -4,11 +4,13 @@ Kaynaklar: Mackolik 51875 mac, Avrupa 1457, TFF 97041
    Mackolik'ten TFF'de de bulunan lig sezonlari cikarildi: 884 mac
 3) Sinir (arsiv<->TFF): 298 aday, 202 eslesme (tam ad disindakiler raporda: 18), 0 supheli
    TFF grup sayfalarindaki tekil dis takim maclari play-off sayildi: 17
+   Resmi puan durumu: 662 tablo okundu, 546 lig grubuna baglandi; puan silme/ek puan satiri: 148
+   Hukmen: 5 skorsuz maca resmi tablodan sonuc yazildi, 85 oynanmamis mac eklendi
 
-futbol.db: 149489 mac, 1190 kulup
+futbol.db: 149574 mac, 1190 kulup
    avrupa 1457 1956-1957 2026-2027
    kupa 7901 1962-1963 2026-2027
-   lig 139480 1959 2025-2026
+   lig 139565 1959 2025-2026
    terfi 651 1959-1960 1982-1983
 
 Birden cok TFF numarasi ya da birden cok Mackolik kimligi tek kulupte birlesen kulupler (ARDILLIK ADAYI):
@@ -43,7 +45,7 @@ Birden cok TFF numarasi ya da birden cok Mackolik kimligi tek kulupte birlesen k
 
 1990 sinirinda emin olunamayan eslesmeler (BAGLANMADI):
 
-Sezon tamligi: 648 lig grubunun 615'inde mac sayisi tam (n*(n-1)). Tutmayanlar (kademe, sezon, grup, takim, bulunan, beklenen):
+Sezon tamligi: 658 lig grubunun 630'inde mac sayisi tam (n*(n-1)). Tutmayanlar (kademe, sezon, grup, takim, bulunan, beklenen):
    (3, '1979-1980', 'A Grubu', 8, 112, 56)
    (3, '1979-1980', 'Grup B', 10, 180, 90)
    (2, '1994-1995', 'Yükselme Grubu', 10, 91, 90)
@@ -59,17 +61,12 @@ Sezon tamligi: 648 lig grubunun 615'inde mac sayisi tam (n*(n-1)). Tutmayanlar (
    (2, '2005-2006', '', 18, 307, 306)
    (3, '2005-2006', '03', 10, 91, 90)
    (4, '2005-2006', '03', 16, 241, 240)
-   (4, '2006-2007', '01', 16, 239, 240)
-   (4, '2006-2007', '02', 16, 228, 240)
    (2, '2008-2009', '', 18, 318, 306)
-   (1, '2009-2010', '', 18, 280, 306)
    (3, '2009-2010', '3. Klasman Grubu', 9, 61, 72)
    (4, '2009-2010', '02', 11, 93, 110)
    (4, '2009-2010', '2. Klasman Grubu', 9, 61, 72)
-   (4, '2010-2011', '02', 18, 275, 306)
    (1, '2011-2012', '', 18, 330, 306)
    (2, '2011-2012', '', 18, 311, 306)
-   (3, '2011-2012', 'Kırmızı', 17, 257, 272)
    (2, '2012-2013', '', 18, 311, 306)
    (2, '2013-2014', '', 19, 347, 342)
    (2, '2014-2015', '', 18, 311, 306)
