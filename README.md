@@ -2,14 +2,14 @@
 
 1959'dan bugüne Türkiye'deki profesyonel lig maçları, terfi maçları, Türkiye Kupası ve Türk kulüplerinin resmi Avrupa kupası maçları: **149.489 maç, 1.190 kulüp**.
 
-Arama arayüzü GitHub Pages üzerinde yayınlanır (`site/` klasörü). Kulüp ara; rekorlarına, serilerine (yenilmezlik, gol yemeden…), rakiplerine ve sezon sezon puan tablolarına bak.
+Arama arayüzü GitHub Pages üzerinde yayınlanır (`docs/` klasörü). Kulüp ara; rekorlarına, serilerine (yenilmezlik, gol yemeden…), rakiplerine ve sezon sezon puan tablolarına bak.
 
 ## İçerik
 
 | Dosya | Açıklama |
 |---|---|
 | `futbol.db` | SQLite veritabanı: `mac`, `kulup`, `kulup_kimlik`, `kulup_adi`, `kulup_ardil`, `kapsam` tabloları ve `takim_maci` görünümü |
-| `site/` | Statik arayüz (`index.html`, `app.js`, `style.css`) ve `web_aktar.py`'nin ürettiği `site/data/*.json` |
+| `docs/` | Statik arayüz (`index.html`, `app.js`, `style.css`) ve `web_aktar.py`'nin ürettiği `docs/data/*.json` |
 | `kulup_duzeltme.json` | Elle yapılan kulüp eşleştirme kararları (ayırma, birleştirme, ardıllık, dönem adları) ve gerekçeleri |
 | `mackolik_maclar.csv`, `avrupa_maclar.csv` | Maçkolik'ten ayıklanmış maçlar |
 | `topla.py` | TFF arşivini indirir ve `raw/tff.db`'yi kurar |
@@ -34,7 +34,7 @@ ORDER BY fark DESC, attigi DESC LIMIT 5;
 
 ```bash
 python3 birlestir.py     # futbol.db
-python3 web_aktar.py     # site/data
+python3 web_aktar.py     # docs/data
 ```
 
 ## Kaynaklar ve sınırlar

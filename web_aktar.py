@@ -1,12 +1,12 @@
-"""futbol.db -> site/data/*.json (GitHub Pages arayuzu icin).
+"""futbol.db -> docs/data/*.json (GitHub Pages arayuzu icin).
 
   python3 web_aktar.py
 
 Uretilen dosyalar:
-  site/data/ozet.json          genel sayilar, sezon listesi, lig adlari
-  site/data/kulupler.json      kulup listesi (arama icin): id, ad, donem adlari, ilk/son sezon, mac sayisi, ardillik
-  site/data/kulup/<id>.json    kulubun tum maclari (takim bakis acisiyla)
-  site/data/sezon/<sezon>.json sezonun tum maclari (puan tablosu ve fikstur icin)
+  docs/data/ozet.json          genel sayilar, sezon listesi, lig adlari
+  docs/data/kulupler.json      kulup listesi (arama icin): id, ad, donem adlari, ilk/son sezon, mac sayisi, ardillik
+  docs/data/kulup/<id>.json    kulubun tum maclari (takim bakis acisiyla)
+  docs/data/sezon/<sezon>.json sezonun tum maclari (puan tablosu ve fikstur icin)
 
 Satir bicimleri dosyalarin "alanlar" anahtarinda yazar.
 """
@@ -14,7 +14,7 @@ import collections, json, os, shutil, sqlite3
 
 KOK = os.path.dirname(os.path.abspath(__file__))
 DB = os.path.join(KOK, "futbol.db")
-CIKTI = os.path.join(KOK, "site", "data")
+CIKTI = os.path.join(KOK, "docs", "data")
 YAR = {"lig": "L", "kupa": "K", "avrupa": "A", "terfi": "T"}
 
 
