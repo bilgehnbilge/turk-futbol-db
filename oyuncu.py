@@ -32,7 +32,13 @@ def hedefler(kademe=None, sezon=None):
         q += " AND kademe=?"; p.append(kademe)
     if sezon:
         q += " AND sezon=?"; p.append(sezon)
-    return [r[0] for r in c.execute(q + " ORDER BY kademe, sezon DESC, tarih", p)]
+    sirali = [(r[0], r[1]) for r in c.execute(q.replace("SELECT kaynak_id, sezon, kademe", "SELECT kaynak_id, kademe") + " ORDER BY kademe, sezon DESC, tarih", p)]
+    # 1990-2007 TFF numara boşlukları (sezon sayfalarında listelenmeyen play-off/baraj, kupa, PAF... maçları): Süper Lig'den sonra
+    yoklama = os.path.join(KOK, "raw", "tff_mac_yoklama.txt")
+    if kademe or sezon or not os.path.exists(yoklama):
+        return [m for m, _ in sirali]
+    ek = open(yoklama).read().split()
+    return [m for m, k in sirali if k == 1] + ek + [m for m, k in sirali if k != 1]
 
 
 def indir(kademe, sezon, bekle):
@@ -46,13 +52,13 @@ def indir(kademe, sezon, bekle):
                            capture_output=True)
         govde, _, kod = r.stdout.rpartition(b"\n")
         kod = kod.decode().strip()
-        if kod == "200" and len(govde) > 20000 and b"rptKadrolar" in govde:
+        if kod == "200" and len(govde) > 20000 and (b"rptKadrolar" in govde or b"lblOrganizasyonAdi" in govde):
             with gzip.open(hedef + ".tmp", "wb") as g:
                 g.write(govde)
             os.replace(hedef + ".tmp", hedef)
             hata = 0
-        elif kod == "200" and len(govde) > 20000 and b"macId" in govde:
-            # sayfa geldi ama kadro yok (hükmen / oynanmamış maç): işaretle, bir daha deneme
+        elif kod == "200" and len(govde) > 15000 and b"tff.org" in govde.lower():
+            # TFF normal sayfa döndü ama kadro yok (hükmen / oynanmamış maç / boş numara): işaretle, bir daha deneme
             open(hedef + ".yok", "w").close()
             hata = 0
         else:
@@ -113,6 +119,17 @@ def sayfa_oku(t):
             out["kadro"] = [(k[0], k[1], k[2], k[3], 0 if k[0] == taraf and k[1] in girenler else k[4]) for k in out["kadro"]]
     stad = re.search(r'lnkStad"[^>]*>([^<]*)<', t)
     out["stad"] = topla.temiz(stad.group(1)) if stad else None
+    # maç bilgisi (sezon sayfalarında listelenmeyen maçlar için: play-off, baraj, kupa, PAF...)
+    g = lambda k: (lambda m: topla.temiz(m.group(1)) if m else None)(re.search(r'dtMacBilgisi_' + k + r'"[^>]*>([^<]*)<', t))
+    takim = lambda n: re.search(r'dtMacBilgisi_lnkTakim' + n + r'" href="Default\.aspx\?pageId=28&(?:amp;)?kulupId=(\d+)">([^<]*)<', t)
+    t1, t2 = takim("1"), takim("2")
+    tarih = re.match(r"(\d+)\.(\d+)\.(\d{4})(?:\s*-\s*(\d+:\d+))?", g("lblTarih") or "")
+    sayi = lambda s: int(s) if s and s.strip().isdigit() else None
+    out["bilgi"] = (g("lblOrganizasyonAdi"), f"{tarih.group(3)}-{int(tarih.group(2)):02d}-{int(tarih.group(1)):02d}" if tarih else None,
+                    tarih.group(4) if tarih else None,
+                    int(t1.group(1)) if t1 else None, topla.temiz(t1.group(2)) if t1 else None,
+                    int(t2.group(1)) if t2 else None, topla.temiz(t2.group(2)) if t2 else None,
+                    sayi(g("lblTakim1Skor")), sayi(g("Label12")), g("lblKod"))
     return out
 
 
@@ -123,7 +140,8 @@ CREATE TABLE kart(mac TEXT, taraf INTEGER, kisi INTEGER, ad TEXT, renk TEXT, dak
 CREATE TABLE degisiklik(mac TEXT, taraf INTEGER, giren INTEGER, giren_ad TEXT, cikan INTEGER, cikan_ad TEXT, dakika TEXT, dk INTEGER, ek INTEGER);
 CREATE TABLE teknik(mac TEXT, taraf INTEGER, kisi INTEGER, ad TEXT);
 CREATE TABLE hakem(mac TEXT, kisi INTEGER, ad TEXT, gorev TEXT);
-CREATE TABLE mac_bilgi(mac TEXT PRIMARY KEY, stad TEXT);
+CREATE TABLE mac_bilgi(mac TEXT PRIMARY KEY, stad TEXT, organizasyon TEXT, tarih TEXT, saat TEXT,
+  ev_tff INTEGER, ev_adi TEXT, dep_tff INTEGER, dep_adi TEXT, ev_gol INTEGER, dep_gol INTEGER, kod TEXT);
 CREATE INDEX k1 ON kadro(kisi); CREATE INDEX k2 ON kadro(mac); CREATE INDEX g1 ON gol(kisi); CREATE INDEX g2 ON gol(mac);
 CREATE INDEX c1 ON kart(kisi); CREATE INDEX c2 ON kart(mac);
 """
@@ -142,7 +160,7 @@ def ayikla():
         o = sayfa_oku(t)
         for tablo, n_al in (("kadro", 5), ("gol", 7), ("kart", 7), ("degisiklik", 8), ("teknik", 3), ("hakem", 3)):
             c.executemany(f"INSERT INTO {tablo} VALUES(?{',?' * n_al})", [(mac, *r) for r in o[tablo]])
-        c.execute("INSERT INTO mac_bilgi VALUES(?,?)", (mac, o["stad"]))
+        c.execute("INSERT INTO mac_bilgi VALUES(?,?,?,?,?,?,?,?,?,?,?,?)", (mac, o["stad"], *o["bilgi"]))
         n += 1
     c.commit()
     say = {t: c.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0] for t in ("kadro", "gol", "kart", "degisiklik", "teknik", "hakem")}
