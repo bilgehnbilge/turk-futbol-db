@@ -287,6 +287,77 @@ def uefa_kimlik_ogren(sezon):
     print(f"UEFA kimlik eslemesi: {len(kimlik)} takim", flush=True)
 
 
+def uefa_tamamla():
+    """Maçkolik'te olmayan geçmiş Avrupa maçlarını (ör. 1990'ların Şampiyonlar Ligi grupları) UEFA ayrıntı arşivinden
+    (uefa_detay.py: raw/uefa_mac, raw/uefa_detay.db) ekler; aynı maç skorsuz duruyorsa skoru doldurur."""
+    import gzip, sqlite3
+    kimlik = json.load(open(UEFA_KIMLIK, encoding="utf-8")) if os.path.exists(UEFA_KIMLIK) else {}
+    for k, v in json.load(open(os.path.join(KOK, "logo_uefa.json"), encoding="utf-8")).items():   # yabancı rakipler
+        if k.startswith("mackolik:"):
+            kimlik.setdefault(v[1:], k.split(":", 1)[1])
+    uuid, _, _ = turk_kimlikleri()
+    ad_kim = {}
+    with open(os.path.join(KOK, "mackolik_maclar.csv"), encoding="utf-8") as f:
+        for x in csv.DictReader(f):
+            for s in ("ev", "dep"):
+                if x["kaynak"] == "mackolik":
+                    ad_kim.setdefault(" ".join(_ad_norm(x[s + "_adi"])), x[s + "_id"])
+    with open(CIKTI, encoding="utf-8") as f:
+        rd = csv.DictReader(f); alanlar = rd.fieldnames; eski = list(rd)
+    kim_ad = {x[s + "_id"]: x[s + "_adi"] for x in eski for s in ("ev", "dep")}
+    KOD = {"1": "sl", "2": "kgk", "14": "el", "2019": "kl", "9": "sk"}
+    db = sqlite3.connect(os.path.join(KOK, "raw", "uefa_detay.db"))
+    fdb = sqlite3.connect(os.path.join(KOK, "futbol.db")); fdb.row_factory = sqlite3.Row
+    vt = [dict(r) for r in fdb.execute("SELECT sezon, tarih, ev_adi, dep_adi, ev_gol, dep_gol, '' ev_id, '' dep_id FROM mac WHERE yarisma='avrupa'")]
+    ekle, dolu = [], 0
+    for (uid,) in db.execute("SELECT uefa_id FROM mac WHERE mac_id IS NULL ORDER BY tarih"):
+        m = json.load(gzip.open(os.path.join(KOK, "raw", "uefa_mac", f"{uid}.json.gz"), "rt", encoding="utf-8"))["mac"]
+        kod = KOD.get(str(m["competition"]["id"]))
+        d0 = datetime.date.fromisoformat(m["kickOffTime"]["date"])
+        y = d0.year + 1 if d0.month >= 7 else d0.year   # sezonun bitiş yılı (UEFA seasonYear eski maçlarda tutarsız)
+        satir = {a: "" for a in alanlar}
+        satir.update({"kaynak": "uefa", "kaynak_id": f"uefa:{uid}", "yarisma": kod, "lig": lig_adi(kod, y - 1), "sezon": f"{y - 1}-{y}"})
+        for s, tk in (("ev", m["homeTeam"]), ("dep", m["awayTeam"])):
+            tid, ad = tk["id"], tk.get("internationalName", "")
+            kim = kimlik.get(tid) or (ad_kim.get(" ".join(_ad_norm(ad))) if tk.get("countryCode") == "TUR" else None)
+            satir[s + "_id"] = kim or f"uefa:{tid}"
+            satir[s + "_adi"] = kim_ad.get(kim, ad)
+        dt = datetime.datetime.strptime(m["kickOffTime"]["dateTime"][:19], "%Y-%m-%dT%H:%M:%S").replace(tzinfo=datetime.timezone.utc).astimezone(M.TR)
+        satir["tarih"], satir["saat"] = dt.date().isoformat(), dt.strftime("%H:%M")
+        tur = (m.get("round") or {}).get("metaData", {}).get("name", "")
+        satir["tur"] = UEFA_TUR.get(tur.lower(), "Grup Aşaması" if tur == m["competition"].get("metaData", {}).get("name") else tur)
+        sk = m.get("score") or {}
+        satir["ev_gol"], satir["dep_gol"] = str(sk["total"]["home"]), str(sk["total"]["away"])
+        if sk.get("regular") and sk["regular"] != sk["total"]:
+            satir["ev_90"], satir["dep_90"] = str(sk["regular"]["home"]), str(sk["regular"]["away"])
+        if sk.get("penalty"):
+            satir["ev_pen"], satir["dep_pen"] = str(sk["penalty"]["home"]), str(sk["penalty"]["away"])
+        satir["durum"] = "Pen" if sk.get("penalty") else "UZ" if satir["ev_90"] else "MS"
+        # aynı maç bizde var mı: ±10 gün içinde (Maçkolik'te tarih yanlış olabiliyor), aynı sezon, ev ve deplasman
+        # takımı kimlikle ya da adın ilk kelimesiyle tutuyor
+        t0 = datetime.date.fromisoformat(satir["tarih"])
+        import unicodedata
+        kel = lambda s: {w[:5] for w in _ad_norm("".join(c for c in unicodedata.normalize("NFKD", s or "") if not unicodedata.combining(c))) if len(w) >= 3}
+        ayni = lambda x, s: x[s + "_id"] == satir[s + "_id"] or bool(kel(x[s + "_adi"]) & kel(satir[s + "_adi"]))
+        yakin = lambda x: x["sezon"] == satir["sezon"] and x["tarih"] and abs((datetime.date.fromisoformat(x["tarih"]) - t0).days) <= 10 \
+            and ayni(x, "ev") and ayni(x, "dep")
+        var = [x for x in eski if yakin(x) and (not x["ev_gol"] or (x["ev_gol"], x["dep_gol"]) == (satir["ev_gol"], satir["dep_gol"]))]
+        if not var and any(yakin(x) and (str(x["ev_gol"]), str(x["dep_gol"])) == (satir["ev_gol"], satir["dep_gol"]) for x in vt):
+            continue   # başka kaynaktan (Maçkolik arşivi) zaten var
+        if var:
+            if not var[0]["ev_gol"]:
+                for k in ("ev_gol", "dep_gol", "ev_90", "dep_90", "ev_pen", "dep_pen", "durum"):
+                    var[0][k] = satir[k]
+                dolu += 1
+            continue
+        ekle.append(satir)
+    with open(CIKTI, "w", encoding="utf-8", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=alanlar); w.writeheader(); w.writerows(eski + ekle)
+    print(f"UEFA'dan {len(ekle)} eksik Avrupa maçı eklendi, {dolu} skorsuz maçın skoru dolduruldu")
+    for x in ekle:
+        print("  ", x["tarih"], x["lig"], x["ev_adi"], x["ev_gol"], "-", x["dep_gol"], x["dep_adi"], "" if not x["ev_id"].startswith("uefa:") and not x["dep_id"].startswith("uefa:") else "(kimliksiz takım)")
+
+
 def uefa_guncel(sezon):
     """Güncel sezonun Avrupa maçlarını UEFA'dan çekip avrupa_maclar.csv'de o sezonu yeniler (Maçkolik GitHub'dan 403 veriyor)."""
     kimlik = json.load(open(UEFA_KIMLIK, encoding="utf-8")) if os.path.exists(UEFA_KIMLIK) else {}
@@ -379,7 +450,7 @@ def guncel(sezon):
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("komut", choices=["yeni", "arsiv", "ayikla", "guncel", "uefa", "uefa_kimlik"])
+    p.add_argument("komut", choices=["yeni", "arsiv", "ayikla", "guncel", "uefa", "uefa_kimlik", "uefa_tamamla"])
     p.add_argument("--kod")
     p.add_argument("--sezon")
     p.add_argument("--bekle", type=float, help="yeni site: istekler arasi bekleme (sn)")
@@ -396,5 +467,7 @@ if __name__ == "__main__":
         uefa_guncel(a.sezon)
     elif a.komut == "uefa_kimlik":
         uefa_kimlik_ogren(a.sezon)
+    elif a.komut == "uefa_tamamla":
+        uefa_tamamla()
     else:
         ayikla()

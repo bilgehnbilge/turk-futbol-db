@@ -58,7 +58,7 @@ def main():
     if a.yayinla:
         # Yalnız site verisi ve rapor commit'lenir; futbol.db (37 MB) her hafta commit'lenirse depo şişer,
         # o yüzden "veritabani" sürümüne (GitHub Releases) yüklenir ve üzerine yazılır.
-        calistir("git", "add", "docs", "birlestirme_raporu.txt", "avrupa_maclar.csv", "uefa_kimlik.json")
+        calistir("git", "add", "docs", "birlestirme_raporu.txt", "avrupa_maclar.csv", "uefa_kimlik.json", "kulup_no.json")
         degisti = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=KOK).returncode != 0
         if degisti:
             calistir("git", "commit", "-q", "-m", f"Güncel sezon {a.sezon}: {datetime.date.today():%d.%m.%Y} itibarıyla")

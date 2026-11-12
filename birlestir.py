@@ -457,8 +457,29 @@ def main():
     # ------------------------------------------------ veritabani
     c = sqlite3.connect(DB)
     c.executescript(SEMA)
+    # kalıcı kulüp numaraları (sitedeki #/kulup/<no> bağlantıları bozulmasın): kulup_no.json kimlik -> no.
+    # Bir kulübün kimliklerinden biri daha önce numara aldıysa onu kullanır (birleşmede en küçüğü); yeni kulüp sona eklenir.
     kokler = sorted({bb.bul(k) for k in kimlik_sezon}, key=str)
-    kok_no = {r: i + 1 for i, r in enumerate(kokler)}
+    no_yol = os.path.join(KOK, "kulup_no.json")
+    eski_no = json.load(open(no_yol, encoding="utf-8")) if os.path.exists(no_yol) else {}
+    uyeler = collections.defaultdict(list)
+    for k in kimlik_sezon:
+        uyeler[bb.bul(k)].append(f"{k[0]}:{k[1]}")
+    kok_no, kullanilan = {}, set()
+    for r in sorted(kokler, key=lambda r: min((eski_no[s] for s in uyeler[r] if s in eski_no), default=10 ** 9)):
+        aday = sorted(eski_no[s] for s in uyeler[r] if s in eski_no and eski_no[s] not in kullanilan)
+        if aday:
+            kok_no[r] = aday[0]; kullanilan.add(aday[0])
+    sonraki = max(list(eski_no.values()) + [0]) + 1
+    for r in kokler:
+        if r not in kok_no:
+            kok_no[r] = sonraki; sonraki += 1
+    for r in kokler:
+        for s in uyeler[r]:
+            eski_no.setdefault(s, kok_no[r])
+            if eski_no[s] != kok_no[r] and eski_no[s] not in kok_no.values():
+                eski_no[s] = kok_no[r]
+    json.dump(dict(sorted(eski_no.items())), open(no_yol, "w", encoding="utf-8"), ensure_ascii=False, indent=0)
 
     def kulup_no(kaynak, kim, sezon="", kademe="", mac=None):
         return kok_no[bb.bul(dugum(kaynak, kim, sezon, kademe, mac) if sezon else (kaynak, kim))] if kim else None
