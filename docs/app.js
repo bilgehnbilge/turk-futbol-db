@@ -607,6 +607,7 @@ async function avrupaUlkeler() {
   const adIndeks = new Map();
   for (const k of KULUPLER) if (!k.yerli) for (const a of [k.ad, ...k.adlar.map(x => x[0])]) adIndeks.set(norm(a), k.id);
   const bagla = (id, ad) => id ?? adIndeks.get(norm(ad)) ?? null;
+  const adUlke = new Map(Object.entries(d.ad_ulke || {}).map(([a, u]) => [norm(a), u]));   // büyük/küçük harf farkı tutsun
   const tum = d.maclar.map(r => ({ id: r[0], tarih: r[1], sezon: r[2], lig: r[3], tur: r[4], ev: bagla(r[5], r[12]), dep: bagla(r[6], r[13]), eg: r[7], dg: r[8], ep: r[9], dp: r[10], durum: r[11], evAd: r[12], depAd: r[13] }));
   const turk = id => KULUP.get(id)?.yerli;
   const kulupler = [...tum.reduce((m, x) => { for (const k of [x.ev, x.dep]) if (turk(k)) m.set(k, (m.get(k) || 0) + 1); return m; }, new Map())].sort((a, b) => b[1] - a[1]);
@@ -622,7 +623,7 @@ async function avrupaUlkeler() {
       const biz = evT ? m.ev : m.dep, rakip = evT ? m.dep : m.ev;
       if (D.kulup && biz !== +D.kulup) continue;
       const a = evT ? m.eg : m.dg, y = evT ? m.dg : m.eg;
-      satir.push({ ...m, biz, rakip, rakipAd: evT ? m.depAd : m.evAd, a, y, saha: evT ? "E" : "D", s: sonuc(a, y), ulke: KULUP.get(rakip)?.ulke || d.ad_ulke?.[evT ? m.depAd : m.evAd] || "" });
+      satir.push({ ...m, biz, rakip, rakipAd: evT ? m.depAd : m.evAd, a, y, saha: evT ? "E" : "D", s: sonuc(a, y), ulke: KULUP.get(rakip)?.ulke || adUlke.get(norm(evT ? m.depAd : m.evAd)) || "" });
     }
     const tablo = new Map();
     for (const m of satir) {
