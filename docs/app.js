@@ -635,7 +635,7 @@ async function avrupaUlkeler() {
     const top = satir.reduce((t, m) => (t.O++, t[m.s]++, t.AG += m.a, t.YG += m.y, t), { O: 0, G: 0, B: 0, M: 0, AG: 0, YG: 0 });
     const ayrinti = D.ulke !== null ? satir.filter(m => m.ulke === D.ulke).sort((p, q) => q.tarih.localeCompare(p.tarih)) : [];
     kap.innerHTML = `<h2>Avrupa'da ülkelere göre</h2>
-      <p class="soluk not">Türk kulüplerinin Avrupa kupası maçları, rakibin ülkesine göre. Ülke, rakibin UEFA kaydından gelir; Fuar Şehirleri Kupası ve Intertoto'da yalnız karşılaşılan bazı rakiplerin ülkesi bilinmiyor.</p>
+      <p class="soluk not">Türk kulüplerinin Avrupa kupası maçları, rakibin ülkesine göre. Bir ülkeye tıklayınca o ülke takımlarıyla oynanan maçlar açılır.</p>
       <div class="filtre">
         <select id="avKulup"><option value="">Bütün Türk kulüpleri</option>${kulupler.map(([id, n]) => `<option value="${id}" ${+D.kulup === id ? "selected" : ""}>${esc(kulupAd(id))} (${n})</option>`).join("")}</select>
         <select id="avYar"><option value="">Bütün kupalar</option>${ligler.map(y => `<option ${D.yar === y ? "selected" : ""}>${esc(y)}</option>`).join("")}</select>
