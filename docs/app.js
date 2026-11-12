@@ -120,7 +120,7 @@ const yollar = [
   [/^#\/h2h\/(\d+)\/(\d+)$/, (a, b) => ikiliSayfa(+a, +b)],
   [/^#\/sezonlar$/, sezonlarSayfa],
   [/^#\/sezon\/([\d-]+)$/, s => sezonSayfa(s)],
-  [/^#\/rekorlar(?:\/(\w+))?$/, k => rekorlarSayfa(k || "1")],
+  [/^#\/rekorlar(?:\/(\w+))?$/, k => rekorlarSayfa(k || "tum")],
   [/^#\/karsilastir$/, karsilastirSayfa],
   [/^#\/hakkinda$/, hakkindaSayfa],
 ];
@@ -604,6 +604,7 @@ async function rekorlarSayfa(kap) {
   const v = R.veri[kap];
   if (!v) { location.hash = "#/rekorlar"; return; }
   const kapAd = Object.fromEntries(R.kapsamlar)[kap];
+  if (!v.tablo) v.tablo = null;
   const lig = kap !== "kupa";
   const sira = (l, f) => { let r = 0, onceki; return l.map((x, i) => { const d = f(x); if (d !== onceki) { r = i + 1; onceki = d; } return r; }); };
 
@@ -650,9 +651,9 @@ async function rekorlarSayfa(kap) {
     <p class="soluk">${esc(kapAd)} · ${esc(v.sezon[0])} – ${esc(v.sezon[1])} · ${sayiYaz(v.mac)} maç.
       ${kap === "pro" ? "Bütün lig seviyeleri bir arada: bir kulübün Süper Lig'den alt lige geçişi seriyi bozmaz." : ""}</p>
 
-    <h2 class="bolum">Tüm zamanlar tablosu</h2>
+    ${v.tablo ? `<h2 class="bolum">Tüm zamanlar tablosu</h2>
     <p class="soluk not">Galibiyet bütün sezonlar için 3 puan sayıldı. ${lig ? "Play-off maçları ve puan silme cezaları dahil değil; hükmen sonuçlar dahil." : "Uzatmada biten maçlar skora göre, penaltıyla biten maçlar beraberlik sayıldı."}</p>
-    ${tablo()}
+    ${tablo()}` : `<p class="soluk not">Bütün lig seviyeleri ve Türkiye Kupası birlikte. Seriler ve tablolar her yarışma için ayrı sekmelerde.</p>`}
 
     <h2 class="bolum">Maç rekorları</h2>
     <div class="izgara genis">
@@ -661,14 +662,14 @@ async function rekorlarSayfa(kap) {
       <div><h3>Deplasmanda en farklı galibiyetler</h3>${macTablo(v.dep_fark, "dep_fark")}</div>
     </div>
 
-    <h2 class="bolum">Seriler</h2>
+    ${v.seriler ? `<h2 class="bolum">Seriler</h2>
     <div class="izgara k3">${["yenilmez", "ic_yenilmez", "dis_yenilmez", "galibiyetsiz", "galibiyet", "golyemeden", "golsuz"].map(seriKart).join("")}</div>
 
     <h2 class="bolum">Toplam maç sayıları</h2>
     <div class="izgara k2">
       ${sayimKart("gy", "Kalesini en çok gole kapatanlar", "Gol yemediği maç sayısı", v.golyemedi)}
       ${sayimKart("gs", "En çok maçta gol atamayanlar", "Gol atamadığı maç sayısı", v.golatamadi)}
-    </div>
+    </div>` : ""}
     <p class="soluk not bolum">Seriler kulübün bu kapsamdaki maçlarının tarih sırasıyla sayılır ve sezonlar arası sürer; kulüp bir sezon bu kapsamda yer almazsa seri kesilir.
       Hükmen sonuçlar ile tarihi bilinmeyen maçlar serilere, maç rekorlarına ve gol sayımlarına girmez. Kulüpler bugünkü adlarıyla, maçlar dönemin adlarıyla gösterilir.
       Eski sezonlardaki çok farklı skorlar kaynaklarda yazdığı gibidir.</p>`;

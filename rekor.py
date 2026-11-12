@@ -1,4 +1,4 @@
-"""Tüm zamanlar rekorları: lig kademeleri, bütün profesyonel ligler ve Türkiye Kupası için.
+"""Tüm zamanlar rekorları: lig kademeleri, bütün profesyonel ligler, Türkiye Kupası ve lig + kupa birlikte (yalnız maç rekorları).
 
 web_aktar.py çağırır -> docs/data/rekorlar.json
 
@@ -16,6 +16,7 @@ import collections
 
 ADET = 25
 KAPSAMLAR = [
+    ("tum", "Tüm maçlar (lig + kupa)", lambda m: m["yarisma"] in ("lig", "kupa")),
     ("1", "Süper Lig", lambda m: m["yarisma"] == "lig" and m["kademe"] == 1),
     ("2", "1. Lig", lambda m: m["yarisma"] == "lig" and m["kademe"] == 2),
     ("3", "TFF 2. Lig", lambda m: m["yarisma"] == "lig" and m["kademe"] == 3),
@@ -42,7 +43,7 @@ def hesapla(maclar, sezon_sira, okunur):
     out = {"kapsamlar": [[k, ad] for k, ad, _ in KAPSAMLAR], "veri": {}}
     for anahtar, ad, f in KAPSAMLAR:
         ms = [m for m in maclar if f(m) and m["asama"] != "gecersiz"]
-        out["veri"][anahtar] = kapsam(ms, sezon_sira, son_sezon, okunur, lig=anahtar != "kupa")
+        out["veri"][anahtar] = kapsam(ms, sezon_sira, son_sezon, okunur, lig=anahtar != "kupa", sadece_mac=anahtar == "tum")
     return out
 
 
@@ -51,7 +52,7 @@ def mac_satir(m, okunur):
             m["dep_kulup"], okunur(m["dep_adi"]), m["ev_gol"], m["dep_gol"], m["ev_pen"], m["dep_pen"], m["durum"]]
 
 
-def kapsam(ms, sezon_sira, son_sezon, okunur, lig):
+def kapsam(ms, sezon_sira, son_sezon, okunur, lig, sadece_mac=False):
     oynanan = [m for m in ms if m["ev_gol"] is not None and m["durum"] not in HUKMEN]
 
     # ---- maç rekorları
@@ -59,6 +60,16 @@ def kapsam(ms, sezon_sira, son_sezon, okunur, lig):
     gollu = sorted(oynanan, key=lambda m: (-(m["ev_gol"] + m["dep_gol"]), m["tarih"] or "9"))
     dep_fark = sorted((m for m in oynanan if m["dep_gol"] > m["ev_gol"]),
                       key=lambda m: (m["ev_gol"] - m["dep_gol"], -m["dep_gol"], m["tarih"] or "9"))
+
+    ozet = {
+        "mac": len(ms), "oynanan": len(oynanan),
+        "sezon": [min((m["sezon"] for m in ms), key=sezon_sira.get, default=None), max((m["sezon"] for m in ms), key=sezon_sira.get, default=None)],
+        "fark": [mac_satir(m, okunur) for m in fark[:ADET]],
+        "dep_fark": [mac_satir(m, okunur) for m in dep_fark[:ADET]],
+        "gollu": [mac_satir(m, okunur) for m in gollu[:ADET]],
+    }
+    if sadece_mac:   # lig + kupa birlikte: yalnız maç rekorları (seri ve tablo yarışma başına anlamlı)
+        return ozet
 
     # ---- kulüp bakışıyla maçlar
     kulup = collections.defaultdict(list)
@@ -119,12 +130,7 @@ def kapsam(ms, sezon_sira, son_sezon, okunur, lig):
     gy.sort(key=lambda r: (-r[1], r[2]))
     golsuz.sort(key=lambda r: (-r[1], r[2]))
 
-    return {
-        "mac": len(ms), "oynanan": len(oynanan),
-        "sezon": [min((m["sezon"] for m in ms), key=sezon_sira.get, default=None), max((m["sezon"] for m in ms), key=sezon_sira.get, default=None)],
-        "fark": [mac_satir(m, okunur) for m in fark[:ADET]],
-        "dep_fark": [mac_satir(m, okunur) for m in dep_fark[:ADET]],
-        "gollu": [mac_satir(m, okunur) for m in gollu[:ADET]],
+    return {**ozet,
         "seriler": seriler,
         "golyemedi": gy[:ADET],
         "golatamadi": golsuz[:ADET],
