@@ -366,3 +366,15 @@ a.skor.bagli:hover { color: var(--vurgu); }
 a.oyuncu-bag { color: inherit; }
 a.oyuncu-bag:hover { color: var(--vurgu); text-decoration: underline; text-underline-offset: 3px; }
 .katki { font-size: 12.5px; color: var(--soluk); padding: 0 0 6px; margin-top: -2px; text-align: right; }
+
+/* maç istatistikleri */
+.istat { display: grid; grid-template-columns: 56px 1fr 56px; grid-template-rows: auto 6px; column-gap: 10px; align-items: center; padding: 7px 0; }
+.istat .isd { font-weight: 650; font-variant-numeric: tabular-nums; color: var(--yazi2); }
+.istat .isd:last-of-type { text-align: right; }
+.istat .isd.fazla { color: var(--yazi); font-weight: 800; }
+.istat .isad { text-align: center; font-size: 13.5px; color: var(--soluk); }
+.istat .iscubuklar { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.istat .iscubuk { height: 6px; background: var(--yuzey2); border-radius: 99px; overflow: hidden; display: flex; justify-content: flex-end; }
+.istat .iscubuk.sag { justify-content: flex-start; }
+.istat .iscubuk i { display: block; height: 100%; background: var(--ia); border-radius: 99px; }
+.istat .iscubuk.sag i { background: var(--ib); }

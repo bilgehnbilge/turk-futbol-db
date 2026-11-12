@@ -1,7 +1,8 @@
 """Türk takımlarının Avrupa maçlarının ayrıntısı: UEFA maç servisi (kadro, goller, kartlar, değişiklikler, hakem, stat).
 
   python3 uefa_detay.py indir   -> raw/uefa_mac/<UEFA maç no>.json.gz  (maç özeti + kadro + olaylar; kaldığı yerden)
-  python3 uefa_detay.py ayikla  -> raw/uefa_detay.db (mac, kadro, olay) + bizim maç numarasıyla eşleme
+  python3 uefa_detay.py istat   -> raw/uefa_istat/<UEFA maç no>.json.gz  (takım ve oyuncu istatistikleri; matchstats.uefa.com)
+  python3 uefa_detay.py ayikla  -> raw/uefa_detay.db (mac, kadro, olay, takim_istat, oyuncu_istat) + bizim maç numarasıyla eşleme
 
 Maç listesi: Türk takımlarının UEFA takım numaralarıyla (raw/uefa_maclar.json'dan) teamId sorgusu.
 """
@@ -66,6 +67,40 @@ def indir():
             print(f"  {i}/{len(ms)} {time.strftime('%H:%M')}", flush=True)
         time.sleep(0.4)
     print("Bitti,", yeni, "yeni maç", flush=True)
+
+
+OYUNCU_ISTAT = {"minutes_played_official", "goals", "assists", "attempts", "attempts_on_target", "passes_attempted", "passes_completed",
+                "passes_accuracy", "tackles", "recovered_ball", "fouls_committed", "fouls_suffered", "saves", "offsides", "distance_covered",
+                "top_speed", "cross_completed", "yellow_cards", "red_cards"}
+
+
+def istat():
+    """Takım ve oyuncu istatistikleri (yalnız seçili oyuncu alanları saklanır)."""
+    d = os.path.join(KOK, "raw", "uefa_istat")
+    os.makedirs(d, exist_ok=True)
+    idler = sorted(os.path.basename(f)[:-8] for f in glob.glob(os.path.join(HAM, "*.json.gz")))
+    yeni = 0
+    for i, uid in enumerate(idler, 1):
+        yol = os.path.join(d, f"{uid}.json.gz")
+        if os.path.exists(yol):
+            continue
+        takim = al(f"https://matchstats.uefa.com/v1/team-statistics/{uid}")
+        oyuncu = al(f"https://matchstats.uefa.com/v1/player-statistics/{uid}")
+        if takim is None and oyuncu is None:
+            print("alınamadı", uid, flush=True); continue
+        sade = lambda l: {s["name"]: s["value"] for s in l or [] if s.get("value") not in (None, "")}
+        veri = {"takim": [{"takim": x.get("teamId"), "istat": sade(x.get("statistics"))} for x in takim or [] if isinstance(x, dict)],
+                "oyuncu": [{"oyuncu": x.get("playerId"), "takim": x.get("teamId"),
+                            "istat": {k: v for k, v in sade(x.get("statistics")).items() if k in OYUNCU_ISTAT}}
+                           for x in oyuncu or [] if isinstance(x, dict)]}
+        with gzip.open(yol + ".tmp", "wt", encoding="utf-8") as f:
+            json.dump(veri, f, ensure_ascii=False)
+        os.replace(yol + ".tmp", yol)
+        yeni += 1
+        if i % 200 == 0:
+            print(f"  {i}/{len(idler)} {time.strftime('%H:%M')}", flush=True)
+        time.sleep(0.3)
+    print("Bitti,", yeni, "yeni", flush=True)
 
 
 SEMA = """
@@ -156,4 +191,4 @@ def ayikla():
 
 
 if __name__ == "__main__":
-    {"indir": indir, "ayikla": ayikla}[sys.argv[1]]()
+    {"indir": indir, "istat": istat, "ayikla": ayikla}[sys.argv[1]]()

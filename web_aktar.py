@@ -109,9 +109,32 @@ def mac_detay(maclar, okunur):
         if ters:
             kadro = {1: kadro[2], 2: kadro[1]}; teknik = {1: teknik[2], 2: teknik[1]}
             olay = [[3 - o[0], *o[1:]] for o in olay]
+        # takım ve oyuncu istatistikleri (uefa_detay.py istat): ev/deplasman sırasıyla
+        istat, oy_istat = None, {}
+        iy = os.path.join(KOK, "raw", "uefa_istat", f"{uid}.json.gz")
+        if os.path.exists(iy):
+            import gzip
+            iv = json.load(gzip.open(iy, "rt", encoding="utf-8"))
+            ev_u, dep_u = u.execute("SELECT ev_uefa, dep_uefa FROM mac WHERE uefa_id=?", (uid,)).fetchone()
+            if ters:
+                ev_u, dep_u = dep_u, ev_u
+            ti = {x["takim"]: x["istat"] for x in iv.get("takim", [])}
+            if ti.get(ev_u) or ti.get(dep_u):
+                istat = [ti.get(ev_u, {}), ti.get(dep_u, {})]
+            KISA = {"minutes_played_official": "dk", "goals": "g", "assists": "a", "attempts": "s", "attempts_on_target": "is",
+                    "passes_attempted": "p", "passes_completed": "pt", "tackles": "t", "recovered_ball": "tk", "saves": "kr",
+                    "distance_covered": "km", "top_speed": "hz"}
+            for x in iv.get("oyuncu", []):
+                v = {KISA[k]: x["istat"][k] for k in KISA if k in x["istat"] and x["istat"][k] not in ("0", 0)}
+                if x.get("oyuncu") and v:
+                    oy_istat[x["oyuncu"]] = v
+        for taraf in (1, 2):
+            for p_ in kadro[taraf]:
+                if p_[4] in oy_istat:
+                    p_.append(oy_istat[p_[4]])
         for taraf in (1, 2):
             kid = m["ev_kulup"] if taraf == 1 else m["dep_kulup"]
-            for forma, ad, ilk11, kaptan, pid in kadro[taraf]:
+            for forma, ad, ilk11, kaptan, pid, *_ in kadro[taraf]:
                 if not pid:
                     continue
                 ol = [o for o in olay if o[7] == pid or o[8] == pid]
@@ -121,19 +144,20 @@ def mac_detay(maclar, okunur):
                 giris = next((o[2] for o in ol if o[1] == "SUBSTITUTION" and o[8] == pid), None)
                 cikis = next((o[2] for o in ol if o[1] == "SUBSTITUTION" and o[7] == pid), None)
                 if ilk11 or giris is not None:   # yedek kulübesinde kalanlar katılım sayılmaz
-                    katilim.append([pid, mid, kid, ilk11, gol, sari, kirmizi, giris, cikis])
+                    dk = oy_istat.get(pid, {}).get("dk")
+                    katilim.append([pid, mid, kid, ilk11, gol, sari, kirmizi, giris, cikis, int(dk) if dk and str(dk).isdigit() else None])
         yaz(os.path.join(CIKTI, "mac", f"{mid}.json"), {
             "id": mid, "tarih": m["tarih"], "saat": m["saat"], "sezon": m["sezon"], "lig": m["lig"], "tur": m["tur"] or m["grup"],
             "ev": [m["ev_kulup"], okunur(m["ev_adi"])], "dep": [m["dep_kulup"], okunur(m["dep_adi"])],
             "skor": [m["ev_gol"], m["dep_gol"], m["ev_pen"], m["dep_pen"], m["durum"]],
             "stad": stad, "sehir": sehir, "seyirci": seyirci, "hakem": hakem, "hakem_ulke": hakem_ulke, "kaynak": "UEFA",
-            "kadro": [kadro[1], kadro[2]], "teknik": [teknik[1], teknik[2]],
+            "kadro": [kadro[1], kadro[2]], "teknik": [teknik[1], teknik[2]], **({"istat": istat} if istat else {}),
             "olay_alanlar": ["taraf", "tur", "dk", "ek", "oyuncu", "oyuncu2", "ayrinti", "oyuncu_no", "oyuncu2_no"], "olay": olay})
         out.append(mid)
     kullanilan = {k[0] for k in katilim}
     yaz(os.path.join(CIKTI, "oyuncu_uefa.json"), {
         "oyuncu": {p: v for p, v in oyuncular.items() if p in kullanilan},
-        "alanlar": ["oyuncu", "mac", "kulup", "ilk11", "gol", "sari", "kirmizi", "giris", "cikis"], "katilim": katilim})
+        "alanlar": ["oyuncu", "mac", "kulup", "ilk11", "gol", "sari", "kirmizi", "giris", "cikis", "dakika"], "katilim": katilim})
     return sorted(out)
 
 

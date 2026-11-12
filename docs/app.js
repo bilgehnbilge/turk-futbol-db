@@ -628,12 +628,35 @@ async function macSayfa(id) {
       ${d.hakem ? `<span>🧑‍⚖️ ${esc(d.hakem)}${d.hakem_ulke && ULKE[d.hakem_ulke] ? ` <small class="soluk">(${ULKE[d.hakem_ulke][0]})</small>` : ""}</span>` : ""}
     </div>
   </div>
+  ${istatHtml(d)}
   ${d.olay.length ? `<div class="kart bolum"><h3>Maçın akışı</h3><div class="akis">${akis}</div></div>` : ""}
   <div class="izgara iki bolum ust-hiza">
     <div class="kart"><h3>${ad(d.ev)}</h3>${kadroHtml(d.kadro[0], d.teknik[0])}</div>
     <div class="kart"><h3>${ad(d.dep)}</h3>${kadroHtml(d.kadro[1], d.teknik[1])}</div>
   </div>
   <p class="soluk not bolum">Kadro ve olaylar: ${esc(d.kaynak)}. Oyuncu adları kaynakta yazıldığı gibidir.</p>`;
+}
+
+const ISTAT = [   // [anahtar, ad, yüzde mi]
+  ["ball_possession", "Topla oynama", true], ["attempts", "Şut"], ["attempts_on_target", "İsabetli şut"], ["attempts_off_target", "İsabetsiz şut"],
+  ["attempts_blocked", "Engellenen şut"], ["big_chance", "Net gol fırsatı"], ["woodwork", "Direk"], ["attempts_on_post", "Direk"], ["corners", "Korner"],
+  ["offsides", "Ofsayt"], ["saves", "Kurtarış"], ["passes_attempted", "Pas"], ["passes_completed", "İsabetli pas"], ["passes_accuracy", "Pas isabeti", true],
+  ["cross_completed", "İsabetli orta"], ["tackles", "Top kapma"], ["recovered_ball", "Top kazanma"], ["fouls_committed", "Faul"],
+  ["yellow_cards", "Sarı kart"], ["red_cards", "Kırmızı kart"], ["distance_covered", "Koşu mesafesi (km)"],
+];
+function istatHtml(d) {
+  if (!d.istat) return "";
+  const [a, b] = d.istat, gor = new Set();
+  const satir = ISTAT.filter(([k, ad]) => (a[k] != null || b[k] != null) && !gor.has(ad) && gor.add(ad)).map(([k, ad, yuzdeMi]) => {
+    const x = parseFloat(a[k] ?? 0) || 0, y = parseFloat(b[k] ?? 0) || 0, t = x + y || 1;
+    const fmt = v => yuzdeMi ? `%${Math.round(v)}` : Number.isInteger(v) ? v : v.toFixed(1);
+    if (!x && !y) return "";
+    return `<div class="istat"><span class="isd ${x > y ? "fazla" : ""}">${fmt(x)}</span><span class="isad">${ad}</span><span class="isd ${y > x ? "fazla" : ""}">${fmt(y)}</span>
+      <div class="iscubuklar"><div class="iscubuk"><i style="width:${100 * x / t}%"></i></div><div class="iscubuk sag"><i style="width:${100 * y / t}%"></i></div></div></div>`;
+  });
+  if (satir.filter(Boolean).length < 2) return "";
+  const [ta, tb] = [takimTema(KULUP.get(d.ev[0])), takimTema(KULUP.get(d.dep[0]))];
+  return `<div class="kart bolum istatlar" style="--ia:${ta ? ta["--tv-acik"] : "var(--yazi2)"};--ib:${tb ? tb["--tv-acik"] : "var(--soluk)"}"><h3>İstatistikler</h3>${satir.join("")}</div>`;
 }
 
 // ---------------------------------------------------------------- oyuncu sayfası (şimdilik UEFA: Avrupa maçları)
@@ -647,11 +670,11 @@ async function oyuncuSayfa(no) {
   const mac = new Map(av.maclar.map(r => [r[0], r]));
   const ks = d.katilim.filter(k => k[0] === no).map(k => {
     const r = mac.get(k[1]); const ev = r[5] === k[2];
-    return { id: k[1], kulup: k[2], ilk11: k[3], gol: k[4], sari: k[5], kirmizi: k[6], giris: k[7], cikis: k[8], tarih: r[1], sezon: r[2], lig: r[3], tur: r[4],
+    return { id: k[1], kulup: k[2], ilk11: k[3], gol: k[4], sari: k[5], kirmizi: k[6], giris: k[7], cikis: k[8], dakika: k[9], tarih: r[1], sezon: r[2], lig: r[3], tur: r[4],
       saha: ev ? "E" : "D", rakipId: ev ? r[6] : r[5], rakip: kulupAd(ev ? r[6] : r[5]) || (ev ? r[13] : r[12]), takim: kulupAd(k[2]),
       a: ev ? r[7] : r[8], y: ev ? r[8] : r[7], pa: ev ? r[9] : r[10], py: ev ? r[10] : r[9], durum: r[11] };
   }).map(m => ({ ...m, s: sonuc(m.a, m.y) })).sort((a, b) => b.tarih.localeCompare(a.tarih));
-  const top = ks.reduce((t, k) => (t.mac++, t.ilk += k.ilk11, t.gol += k.gol, t.sari += k.sari, t.kirmizi += k.kirmizi, t), { mac: 0, ilk: 0, gol: 0, sari: 0, kirmizi: 0 });
+  const top = ks.reduce((t, k) => (t.mac++, t.ilk += k.ilk11, t.gol += k.gol, t.sari += k.sari, t.kirmizi += k.kirmizi, t.dk += k.dakika || 0, t), { mac: 0, ilk: 0, gol: 0, sari: 0, kirmizi: 0, dk: 0 });
   const kulupler = [...ks.reduce((m, k) => m.set(k.kulup, [...(m.get(k.kulup) || []), k]), new Map())];
   const yas = dogum && dogum.slice(5) !== "01-01" ? tarihYaz(dogum) : dogum ? dogum.slice(0, 4) : null;
   icerik.innerHTML = `
@@ -659,7 +682,9 @@ async function oyuncuSayfa(no) {
     <p class="soluk">${ulke ? `${ULKE[ulke] ? ULKE[ulke][1] + " " + ULKE[ulke][0] : ulke === "TUR" ? "🇹🇷 Türkiye" : esc(ulke)}` : ""}${yas ? ` · Doğum: ${yas}` : ""}</p></div></div>
   <div class="kart"><div class="ozet-sat">
     <div><b>${top.mac}</b><span>Avrupa maçı</span></div><div><b>${top.ilk}</b><span>İlk 11</span></div><div><b>${top.gol}</b><span>Gol</span></div>
-    <div><b>${top.sari}</b><span>Sarı kart</span></div><div><b>${top.kirmizi}</b><span>Kırmızı kart</span></div></div></div>
+    <div><b>${top.sari}</b><span>Sarı kart</span></div><div><b>${top.kirmizi}</b><span>Kırmızı kart</span></div>
+    ${top.dk ? `<div><b>${sayiYaz(top.dk)}</b><span>Dakika*</span></div>` : ""}</div>
+    ${top.dk ? `<p class="soluk not" style="margin:8px 0 0">* Dakika bilgisi UEFA'nın istatistik tuttuğu maçlardan.</p>` : ""}</div>
   <div class="izgara iki bolum ust-hiza">${kulupler.map(([kid, l]) => `<div class="kart"><h3>${kid != null && KULUP.has(kid) ? kulupBag(kid) : esc(kulupAd(kid))}</h3>
     <p class="soluk" style="margin:0 0 6px;font-size:13px">${l.length} maç · ${l.reduce((s, k) => s + k.gol, 0)} gol · ${l.at(-1).sezon} – ${l[0].sezon}</p>
     <div class="tabelalar">${l.map(m => `${tabelaSatir(m, true)}<div class="katki">${m.ilk11 ? "İlk 11" : `${m.giris}'de girdi`}${m.cikis != null ? ` · ${m.cikis}'de çıktı` : ""}${m.gol ? ` · ${"⚽".repeat(m.gol)}` : ""}${m.sari ? " · 🟨" : ""}${m.kirmizi ? " · 🟥" : ""}</div>`).join("")}</div></div>`).join("")}</div>
