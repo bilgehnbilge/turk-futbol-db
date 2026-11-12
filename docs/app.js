@@ -532,7 +532,12 @@ async function ikiliSayfa(a, b) {
     const f = ms.filter(m => (!d.yar || m.yar === d.yar) && (!d.saha || m.saha === d.saha));
     const t = toplam(f);
     icerik.innerHTML = `
-    <div class="yan-yana" style="margin-bottom:12px"><h1 style="margin:0">${kulupBag(a)}</h1><span class="vs">vs</span><h1 style="margin:0">${kulupBag(b)}</h1></div>
+    <div class="karsilasma">
+      ${[a, b].map((id, i) => { const k = KULUP.get(id), tema = takimTema(k);
+        return `${i ? `<span class="vs">vs</span>` : ""}<a class="taraf ${i ? "sag" : ""}" href="#/kulup/${id}" style="--tr:${tema ? tema["--tv-acik"] : "var(--yazi)"}">
+          <span class="buyuk-logo">${k.logo ? `<img src="logo/${k.logo}.png" alt="">` : esc(k.ad.slice(0, 2).toLocaleUpperCase("tr"))}</span>
+          <span class="ad">${esc(k.ad)}</span></a>`; }).join("")}
+    </div>
     <p class="soluk">${ms.length ? `${tarihYaz(ms[0].tarih)} ile ${tarihYaz(ms.at(-1).tarih)} arasında ${ms.length} resmi maç` : "Aralarında kayıtlı maç yok."}</p>
     <div class="filtre"><div class="cipler">${[["", "Tümü"], ["L", "Lig"], ["K", "Kupa"], ["A", "Avrupa"]].map(([v, ad]) => `<button class="cip ${d.yar === v ? "aktif" : ""}" data-y="${v}">${ad}</button>`).join("")}</div>
     <div class="cipler">${[["", "İç + dış"], ["E", `${esc(ka.ad)} evinde`], ["D", `${esc(kb.ad)} evinde`]].map(([v, ad]) => `<button class="cip ${d.saha === v ? "aktif" : ""}" data-s="${v}">${ad}</button>`).join("")}</div></div>
