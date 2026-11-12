@@ -237,7 +237,7 @@ def ayikla():
 # ---------------------------------------------------------------- UEFA (güncel sezon; GitHub'dan da erişilebilir)
 UEFA_API = "https://match.uefa.com/v5/matches"
 UEFA_YAR = {"sl": 1, "el": 14, "kl": 2019, "sk": 2}
-UEFA_TUR = {"first qualifying round": "1. Eleme Turu", "second qualifying round": "2. Eleme Turu",
+UEFA_TUR = {"first group match stage": "1. Grup Aşaması", "second group match stage": "2. Grup Aşaması", "qualifying matches": "Eleme Turu", "second qualifying phase": "2. Eleme Turu", "first round": "1. Tur", "second round": "2. Tur", "qualifying round": "Eleme Turu", "first qualifying round": "1. Eleme Turu", "second qualifying round": "2. Eleme Turu",
             "third qualifying round": "3. Eleme Turu", "play-offs": "Play-off", "league phase": "Lig Aşaması",
             "group stage": "Grup Aşaması", "knockout round play-offs": "Son 16 Play-off Turu", "round of 16": "Son 16 Turu",
             "quarter-finals": "Çeyrek Final", "semi-finals": "Yarı Final", "final": "Final"}

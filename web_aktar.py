@@ -76,6 +76,46 @@ def yaz(yol, veri):
         json.dump(veri, f, ensure_ascii=False, separators=(",", ":"))
 
 
+def mac_detay(maclar, okunur):
+    """raw/uefa_detay.db'deki kadro/olay/hakem bilgisini maç başına küçük JSON dosyalarına yazar; ayrıntılı maç no listesi döner."""
+    yol = os.path.join(KOK, "raw", "uefa_detay.db")
+    if not os.path.exists(yol):
+        return []
+    u = sqlite3.connect(yol)
+    m_ = {m["id"]: m for m in maclar}
+    out = []
+    for uid, mid, stad, sehir, seyirci, hakem, hakem_ulke in u.execute(
+            "SELECT uefa_id, mac_id, stad, sehir, seyirci, hakem, hakem_ulke FROM mac WHERE mac_id IS NOT NULL"):
+        m = m_.get(mid)
+        if not m:
+            continue
+        kadro = {1: [], 2: []}
+        for taraf, oyuncu, ad, forma, ilk11, kaptan in u.execute(
+                "SELECT taraf, oyuncu, ad, forma, ilk11, kaptan FROM kadro WHERE uefa_id=? ORDER BY taraf, ilk11 DESC, CAST(forma AS INTEGER)", (uid,)):
+            kadro[taraf].append([forma, ad, ilk11, kaptan, oyuncu])
+        teknik = {1: [], 2: []}
+        for taraf, ad in u.execute("SELECT taraf, ad FROM teknik WHERE uefa_id=?", (uid,)):
+            teknik[taraf].append(ad)
+        olay = [[taraf, tur, dk, ek, ad, ad2, ay, o1, o2] for taraf, tur, dk, ek, ad, ad2, ay, o1, o2 in u.execute(
+            "SELECT taraf, tur, dk, ek, ad, ad2, ayrinti, oyuncu, oyuncu2 FROM olay WHERE uefa_id=? ORDER BY dk, ek", (uid,))]
+        # UEFA'da ev/deplasman bizimkinin tersi olabilir (ör. tarafsız saha): takım adına göre değil, skora göre değil,
+        # UEFA ev sahibi = bizim ev sahibi varsayılır; ters ise taraflar değiştirilir
+        ters = u.execute("SELECT ev_gol, dep_gol FROM mac WHERE uefa_id=?", (uid,)).fetchone() != (m["ev_gol"], m["dep_gol"]) \
+            and u.execute("SELECT dep_gol, ev_gol FROM mac WHERE uefa_id=?", (uid,)).fetchone() == (m["ev_gol"], m["dep_gol"])
+        if ters:
+            kadro = {1: kadro[2], 2: kadro[1]}; teknik = {1: teknik[2], 2: teknik[1]}
+            olay = [[3 - o[0], *o[1:]] for o in olay]
+        yaz(os.path.join(CIKTI, "mac", f"{mid}.json"), {
+            "id": mid, "tarih": m["tarih"], "saat": m["saat"], "sezon": m["sezon"], "lig": m["lig"], "tur": m["tur"] or m["grup"],
+            "ev": [m["ev_kulup"], okunur(m["ev_adi"])], "dep": [m["dep_kulup"], okunur(m["dep_adi"])],
+            "skor": [m["ev_gol"], m["dep_gol"], m["ev_pen"], m["dep_pen"], m["durum"]],
+            "stad": stad, "sehir": sehir, "seyirci": seyirci, "hakem": hakem, "hakem_ulke": hakem_ulke, "kaynak": "UEFA",
+            "kadro": [kadro[1], kadro[2]], "teknik": [teknik[1], teknik[2]],
+            "olay_alanlar": ["taraf", "tur", "dk", "ek", "oyuncu", "oyuncu2", "ayrinti", "oyuncu_no", "oyuncu2_no"], "olay": olay})
+        out.append(mid)
+    return sorted(out)
+
+
 def main():
     c = sqlite3.connect(DB)
     c.row_factory = sqlite3.Row
@@ -185,6 +225,9 @@ def main():
         "maclar": [[m["id"], m["tarih"], m["sezon"], m["lig"], tur(m), m["ev_kulup"], m["dep_kulup"], m["ev_gol"], m["dep_gol"],
                     m["ev_pen"], m["dep_pen"], m["durum"], okunur(m["ev_adi"]), okunur(m["dep_adi"])] for m in maclar if m["yarisma"] == "avrupa"]})
 
+    # ---- maç ayrıntıları (şimdilik Avrupa: UEFA; uefa_detay.py) -> data/mac/<id>.json
+    detayli = mac_detay(maclar, okunur)
+
     # ---- tüm zamanlar rekorları
     sezon_sira = {s: i for i, s in enumerate(sorted(sez, key=lambda s: (s[:4], s)))}
     yaz(os.path.join(CIKTI, "rekorlar.json"), rekor.hesapla(maclar, sezon_sira, okunur))
@@ -197,7 +240,7 @@ def main():
         "sezonlar": sorted(sez, key=lambda s: (s[:4], s)),
         "ilk_tarih": next((m["tarih"] for m in maclar if m["tarih"]), None),
         "son_tarih": max(m["tarih"] for m in maclar if m["tarih"] and m["ev_gol"] is not None),
-        "kapsam": kapsam})
+        "kapsam": kapsam, "detayli": detayli})
     toplam = sum(os.path.getsize(os.path.join(d, f)) for d, _, fs in os.walk(CIKTI) for f in fs)
     print(f"{len(liste)} kulup, {len(sez)} sezon, {len(maclar)} mac -> {CIKTI} ({toplam / 1e6:.1f} MB)")
 

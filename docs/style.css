@@ -332,3 +332,33 @@ details.rekor[open] summary::after { content: "Gizle ▴"; }
   .karsilasma .buyuk-logo { width: 64px; height: 64px; border-radius: 16px; }
   .karsilasma .buyuk-logo img { width: 48px; height: 48px; }
 }
+
+/* maç sayfası */
+a.skor.bagli { color: inherit; text-decoration: none; border-bottom: 1px dashed color-mix(in srgb, var(--vurgu) 60%, transparent); }
+a.skor.bagli:hover { color: var(--vurgu); }
+.tabela a.skor.bagli { border: 0; background: var(--yuzey2); border-radius: 7px; padding: 2px 8px; font-size: 15px; font-weight: 750; white-space: nowrap; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--vurgu) 35%, transparent); }
+.tabela a.skor.bagli:hover { background: var(--vurgu-zemin); }
+.mac-bas { background: var(--yuzey); border: 1px solid var(--cizgi); border-radius: 20px; box-shadow: var(--golge); padding: 18px 22px 20px; }
+.mac-ust { font-size: 13.5px; text-align: center; margin-bottom: 10px; }
+.karsilasma.mac { margin: 6px 0 14px; }
+.mac-skor { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.mac-skor b { font-size: clamp(2rem, 6vw, 3.2rem); font-weight: 800; letter-spacing: -.03em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mac-skor small { color: var(--soluk); font-size: 13px; }
+.mac-bilgi { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; font-size: 14px; color: var(--yazi2); border-top: 1px solid var(--cizgi); padding-top: 14px; }
+.akis { display: flex; flex-direction: column; }
+.akis-satir { display: grid; grid-template-columns: 1fr 52px 1fr; align-items: center; padding: 6px 0; border-top: 1px solid var(--cizgi); font-size: 14px; }
+.akis-satir:first-child { border-top: 0; }
+.akis-satir .akis-dk { grid-column: 2; grid-row: 1; text-align: center; font-weight: 700; color: var(--soluk); font-variant-numeric: tabular-nums; font-size: 13px; }
+.akis-satir.ev .akis-ic { grid-column: 1; grid-row: 1; text-align: right; padding-right: 8px; }
+.akis-satir.dep .akis-ic { grid-column: 3; grid-row: 1; padding-left: 8px; }
+.akis-satir.gol .akis-dk { color: var(--vurgu); }
+.akis .gir { color: var(--g); } .akis .cik { color: var(--m); }
+.kadro-bolum { font-size: 12px; font-weight: 650; color: var(--soluk); margin: 12px 0 4px; letter-spacing: .02em; }
+.kadro-bolum:first-child { margin-top: 0; }
+.oyuncu { display: flex; align-items: center; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--cizgi); font-size: 14px; }
+.oyuncu .forma { width: 26px; text-align: right; color: var(--soluk); font-variant-numeric: tabular-nums; font-size: 13px; flex: none; }
+.oyuncu .oad { flex: 1; min-width: 0; }
+.oyuncu.yedek .oad { color: var(--yazi2); }
+.oyuncu .osimge { display: flex; gap: 4px; font-size: 12px; white-space: nowrap; }
+.oyuncu .gir { color: var(--g); font-weight: 600; } .oyuncu .cik { color: var(--m); font-weight: 600; }
+@media (max-width: 720px) { .mac-bas { padding: 14px 14px 16px; } .akis-satir { grid-template-columns: 1fr 40px 1fr; font-size: 13px; } }
