@@ -433,7 +433,9 @@ function rekorHtml(ms) {
       <span class="detay">${esc(s.liste[s.en.bas].sezon)}${s.liste[s.en.son].sezon !== s.liste[s.en.bas].sezon ? " → " + esc(s.liste[s.en.son].sezon) : ""}</span>` : `<span class="soluk">—</span>`;
     const dv = s.devam && s.devam.n > 1 ? `<span class="detay"><b>Süren seri:</b> ${s.devam.n} maç</span>` : "";
     return `<details class="kart rekor"><summary><span class="baslik">${s.ad}</span>${r}${dv}</summary>
-      ${s.en.n ? `<div class="tablo-kap" style="margin-top:10px;max-height:320px;overflow:auto"><table class="tablo"><tbody>${s.liste.slice(s.en.bas, s.en.son + 1).map(m => macSatir(m)).join("")}</tbody></table></div>` : ""}</details>`;
+      ${s.en.n ? `<div class="seri-maclar">${s.liste.slice(s.en.bas, s.en.son + 1).map(m => `<div class="son-satir"><span class="son ${m.s}">${m.s}</span>
+        <span class="tarih">${tarihYaz(m.tarih)}</span><span class="rakip">${kulupBag(m.rakipId, m.rakip)}${m.saha === "E" ? "" : ` <small class="soluk" title="Deplasman">(D)</small>`}</span>
+        <b class="skor">${skorYaz(m.a, m.y, m.pa, m.py, m.durum)}</b></div>`).join("")}</div>` : ""}</details>`;
   };
   // kalesini gole kapattığı maçlar: toplam, iç/dış, en iyi sezonlar
   const oy = ms.filter(m => m.s !== "N"), gy = oy.filter(m => m.y === 0);
@@ -447,12 +449,12 @@ function rekorHtml(ms) {
       ${enSezon.map(x => `<span class="detay"><a class="bag" href="#/sezon/${x.sezon}">${x.sezon}</a>: <b>${x.GY}</b> / ${x.O} maç</span>`).join("") || `<span class="soluk">—</span>`}</div>`;
   return `
   <h2>Kalesini gole kapattığı maçlar</h2>
-  <div class="izgara k3">${gyKart}${seriKart(sr.find(s => s.k === "golyemeden"))}</div>
+  <div class="izgara k3 ust-hiza">${gyKart}${seriKart(sr.find(s => s.k === "golyemeden"))}</div>
   <h2 class="bolum">En farklı sonuçlar</h2>
   <div class="izgara k3">${rekorKart("En farklı galibiyet", gal)}${rekorKart("En farklı mağlubiyet", mag)}${rekorKart("En gollü maç", gol)}
   ${rekorKart("İç sahada en farklı galibiyet", evG)}${rekorKart("Deplasmanda en farklı galibiyet", depG)}</div>
   <h2 class="bolum">Seriler <small class="soluk" style="font-weight:400;font-size:14px">— seçili maçlar art arda, sezonlar arası; ayrıntı için karta tıkla</small></h2>
-  <div class="izgara k3">${sr.map(seriKart).join("")}</div>
+  <div class="izgara k3 ust-hiza">${sr.map(seriKart).join("")}</div>
   <p class="soluk" style="font-size:13px;margin-top:16px">Seriler seçili filtredeki maçların tarih sırasıyla hesaplanır. Penaltıyla biten kupa maçları beraberlik sayılır. "İç saha" seçilirse ev sahibi yenilmezlik serisi gibi kayıtlar çıkar.</p>`;
 }
 

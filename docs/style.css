@@ -288,3 +288,9 @@ details.rekor[open] summary::after { content: "Gizle ▴"; }
   .gizle-mobil { display: none; }
   .tablo th, .tablo td { padding: 8px 8px; }
 }
+
+/* seri kartlarında maç listesi: açılan kart komşularını uzatmasın, liste karta sığsın */
+.izgara.ust-hiza { align-items: start; }
+.seri-maclar { max-height: 340px; overflow-y: auto; margin: 0 -4px; padding: 0 4px; border-top: 1px solid var(--cizgi); }
+.seri-maclar .son-satir { font-size: 13.5px; gap: 8px; }
+.seri-maclar .son-satir .tarih { width: 76px; font-size: 12.5px; }
