@@ -379,7 +379,7 @@ function macSatir(m, gosterTakim) {
   return `<tr><td class="o"><span class="son ${m.s}">${m.s === "N" ? "–" : m.s}</span></td>
     <td>${tarihYaz(m.tarih)}</td><td><a class="bag" href="#/sezon/${m.sezon}">${esc(m.sezon)}</a></td>
     <td class="gizle-mobil">${esc(m.lig || YAR_AD[m.yar])}${m.tur ? ` <span class="soluk">· ${esc(m.tur)}</span>` : ""}${m.po ? ` <span class="rozet">play-off</span>` : ""}${m.iptal ? ` <span class="rozet" title="${esc(m.not || "")}">sayılmadı</span>` : ""}</td>
-    ${gosterTakim ? `<td class="ad">${esc(m.takim)}</td>` : ""}
+    ${gosterTakim ? `<td class="ad">${logoImg(m.kulup)}${esc(m.takim)}</td>` : ""}
     <td class="o">${m.saha === "E" ? "İç" : "Dış"}</td>
     <td class="ad">${kulupBag(m.rakipId, m.rakip)}</td>
     <td class="s skor">${skorYaz(m.a, m.y, m.pa, m.py, m.durum)}</td></tr>`;
@@ -408,7 +408,8 @@ function macTablosu(hedef, ms, d) {
 function rekorKart(baslik, l) {
   const m = l?.[0];
   if (!m) return `<div class="kart rekor"><span class="baslik">${baslik}</span><span class="soluk">—</span></div>`;
-  const satir = m => `${m.saha === "E" ? `${esc(m.takim)} – ${kulupBag(m.rakipId, m.rakip)}` : `${kulupBag(m.rakipId, m.rakip)} – ${esc(m.takim)}`}`;
+  const biz = m => `<span class="biz">${logoImg(m.kulup)}${esc(m.takim)}</span>`;
+  const satir = m => `${m.saha === "E" ? `${biz(m)} – ${kulupBag(m.rakipId, m.rakip)}` : `${kulupBag(m.rakipId, m.rakip)} – ${biz(m)}`}`;
   return `<div class="kart rekor"><span class="baslik">${baslik}</span>
     <span class="deger">${Math.abs(m.a - m.y) ? `${Math.max(m.a, m.y)}-${Math.min(m.a, m.y)}` : `${m.a}-${m.y}`}</span>
     ${l.slice(0, 4).map(m => `<span class="detay">${satir(m)} <b>${m.saha === "E" ? `${m.a}-${m.y}` : `${m.y}-${m.a}`}</b> · ${tarihYaz(m.tarih)} · ${esc(m.lig || YAR_AD[m.yar])}</span>`).join("")}
@@ -531,7 +532,7 @@ async function ikiliSayfa(a, b) {
       <div class="cubuk"><i class="g" style="width:${yuzde(t.G, t.O)}%"></i><i class="b" style="width:${yuzde(t.B, t.O)}%"></i><i class="m" style="width:${yuzde(t.M, t.O)}%"></i></div></div>
     <div class="bolum tablo-kap"><table class="tablo"><thead><tr><th class="o">S</th><th>Tarih</th><th>Sezon</th><th class="gizle-mobil">Yarışma</th><th>Ev sahibi</th><th class="s">Skor</th><th>Deplasman</th></tr></thead>
     <tbody>${[...f].reverse().map(m => {
-      const ev = m.saha === "E" ? esc(m.takim) : esc(m.rakip), dep = m.saha === "E" ? esc(m.rakip) : esc(m.takim);
+      const ev = m.saha === "E" ? logoImg(m.kulup) + esc(m.takim) : logoImg(m.rakipId) + esc(m.rakip), dep = m.saha === "E" ? logoImg(m.rakipId) + esc(m.rakip) : logoImg(m.kulup) + esc(m.takim);
       const sk = m.saha === "E" ? skorYaz(m.a, m.y, m.pa, m.py, m.durum) : skorYaz(m.y, m.a, m.py, m.pa, m.durum);
       return `<tr><td class="o"><span class="son ${m.s}">${m.s === "N" ? "–" : m.s}</span></td><td>${tarihYaz(m.tarih)}</td><td><a class="bag" href="#/sezon/${m.sezon}">${m.sezon}</a></td>
         <td class="gizle-mobil">${esc(m.lig || "")}${m.tur ? ` <span class="soluk">· ${esc(m.tur)}</span>` : ""}</td><td class="ad">${ev}</td><td class="s skor">${sk}</td><td class="ad">${dep}</td></tr>`;
