@@ -200,7 +200,7 @@ function anaSayfa() {
 
 // ---------------------------------------------------------------- kulüp verisi
 async function kulupMaclari(id) {
-  const d = await al(`data/kulup/${id}.json`);
+  const d = await al(`data/kulup/${id}.json?s=${OZET.surum || ""}`);
   return d.maclar.map(r => ({
     id: r[0], tarih: r[1], sezon: r[2], yar: r[3], lig: r[4], kademe: r[5], tur: r[6], po: r[7] === "p", saha: r[8],
     takim: r[9], rakipId: r[10], rakip: r[11], a: r[12], y: r[13], pa: r[14], py: r[15], durum: r[16], not: r[17], kulup: id,
@@ -667,7 +667,7 @@ function sezonlarSayfa() {
 async function sezonSayfa(sezon) {
   document.title = `${sezon} · Türk Futbol Arşivi`;
   icerik.innerHTML = `<div class="yukleniyor">${esc(sezon)} yükleniyor…</div>`;
-  const d = await al(`data/sezon/${sezon}.json`);
+  const d = await al(`data/sezon/${sezon}.json?s=${OZET.surum || ""}`);
   const ms = d.maclar.map(r => ({ id: r[0], tarih: r[1], yar: r[2], lig: r[3], kademe: r[4], tur: r[5], po: r[6] === "p" || r[6] === "x", iptal: r[6] === "x", ev: r[7], evAd: r[8], dep: r[9], depAd: r[10], eg: r[11], dg: r[12], ep: r[13], dp: r[14], durum: r[15] }));
   const i = OZET.sezonlar.indexOf(sezon);
   const onceki = OZET.sezonlar[i - 1], sonraki = OZET.sezonlar[i + 1];
@@ -848,7 +848,8 @@ function hakkindaSayfa() {
 // ---------------------------------------------------------------- başlat
 (async function basla() {
   try {
-    [KULUPLER, OZET] = await Promise.all([al("data/kulupler.json"), al("data/ozet.json", { cache: "no-cache" })]);
+    OZET = await al("data/ozet.json", { cache: "no-cache" });   // sürüm anahtarı: veri dosyaları eski önbellekten gelmesin
+    KULUPLER = await al(`data/kulupler.json?s=${OZET.surum || ""}`);
   } catch (e) {
     icerik.innerHTML = `<div class="bos">Veri yüklenemedi (${esc(e.message)}). Sayfayı bir web sunucusu üzerinden açın.</div>`;
     return;
