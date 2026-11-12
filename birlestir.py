@@ -475,6 +475,12 @@ def main():
         r = bb.bul(("tff", t + "-once"))
         if r in son_ad and k.get("once_ad"):
             son_ad[r] = (son_ad[r][0], k["once_ad"])
+    for kim, ad in dz.get("kulup_adi", {}).items():   # elle gorunen ad (ayni adli ayri kulupleri ayirt etmek icin)
+        if kim.startswith("_"):
+            continue
+        r = bb.bul(tuple(kim.split(":", 1)))
+        if r in son_ad:
+            son_ad[r] = (son_ad[r][0], ad)
     for r, no in kok_no.items():
         c.execute("INSERT INTO kulup VALUES(?,?)", (no, son_ad[r][1]))
     for k in kimlik_sezon:

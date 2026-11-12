@@ -24,7 +24,52 @@
 
   "bagla": [
     ["mackolik_arsiv:611", "tff:5011", "Sinopspor (1970): 3. Lig 1984-89 ve 2001-05 (tr.wikipedia Sinopspor); Köy Hiz. Sinopspor ayri"],
-    ["mackolik_arsiv:9740", "tff:3661", "Ümraniyespor (1938): 3. Lig 1984-87 arşiv kaydı, aynı kulüp"]
+    ["mackolik_arsiv:9740", "tff:3661", "Ümraniyespor (1938): 3. Lig 1984-87 arşiv kaydı, aynı kulüp"],
+    ["tff:5331", "mackolik_arsiv:13485", "Afşinspor: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:234", "mackolik:d0zdg647gvgc95xdtk1vpbkys", "Ajax: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["tff:5315", "mackolik_arsiv:13510", "Alaşehirspor: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:254", "mackolik:6vyr13j6kbwdtxjwm1m4m8nu2", "Anderlecht: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["tff:272", "tff:5307", "Ardeşenspor: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:703", "mackolik:dl45qfp9w39e0jxi4qru58vnm", "Argeş Piteşti: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:20", "mackolik:4dsgumo7d4zupm2ugsvm4zm4d", "Arsenal: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:287", "mackolik:84gk4ytf9vr8oml51cqyit78w", "Austria Wien: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:350", "mackolik:dfvvrv84skv23rsn1k6kt4slc", "Banik Ostrava: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:83", "mackolik:agh9ifb2mw3ivjusgedj7c3fe", "Barcelona: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:270", "mackolik:9ldqu49smv1xg2va0n2cy28zl", "Benfica: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:158", "mackolik:ej5er0oyngdw138yuumwqbyqt", "Bologna: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:1626", "mackolik:1zonhnbljfdm4obzfj3orzzc8", "Carl Zeiss Jena: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:1136", "mackolik:bschq9e72atozq6g9ufvko950", "Dinamo Minsk: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik:26ghrt0xa68jloeiptek082y1", "mackolik_arsiv:13469", "Egespor: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["tff:5316", "mackolik_arsiv:13319", "Erdekspor: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:1189", "mackolik:4raiad4l2j5lkfaz92pk4osb", "Fiorentina: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik:ev0c8ellw6vx4zxaj0b69k06h", "tff:3681", "Gaskispor: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:379", "mackolik:awc8tinkh5u7cy58a00ohg6al", "Gornik Zabrze: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:391", "mackolik:303582z192rnbr2x28o2t7u38", "HJK Helsinki: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:132", "mackolik:75xi6hloabmnjn2kzgj1g8h1s", "Hamburg: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:575", "tff:321", "Iğdırspor: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["tff:5308", "tff:321", "Iğdırspor: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik:3kwrz31n37w6gj4q636538xgq", "tff:3646", "Karamanspor: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:1612", "tff:3642", "Karsspor: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["tff:5344", "tff:4678", "Konya Yolspor: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:8214", "tff:1015", "Kırıkhanspor: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:29", "mackolik:48gk2hpqtsl6p9sx9kjhaydq4", "Leeds United: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:377", "mackolik:d7udukc1t631drge83p7ucqws", "Legia Varşova: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:363", "mackolik:ad5l7of8nxlt7c7uyf5pjiy14", "MTK Budapest: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik:aht9xe7n0z428nzw912k4f9m2", "mackolik_arsiv:13281", "Mamakspor: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:197", "mackolik:27xvwccz8kpmqsefjv2b2sc0o", "Marsilya: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik:3xq7lzv17zq3n4yjgc2dttbvu", "tff:3654", "Mudanyaspor: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:195", "mackolik:2b3mar72yy8d6uvat1ka6tn3r", "Psg: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:75", "mackolik:cnnku8uihko7u4th0fms4pvg6", "Rangers: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:290", "mackolik:eljjik2vvlpy6d649mgwwivam", "Rapid Wien: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:161", "mackolik:2tk2l9sgktwc9jhzqdd4mpdtb", "Roma: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:89", "mackolik:10eyb18v5puw4ez03ocaug09m", "Sevilla: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:1244", "mackolik:b9fc1umgats16gk6wr769wh8a", "Sion: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik:60akdrg2ri2dn043tn9wzjb6y", "mackolik_arsiv:13284", "Sitespor: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:267", "mackolik:5z1b7fuvpqe6vnigvopomvecu", "Standard Liege: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:247", "mackolik:4tic29sox7m39fy1ztgv0jsiq", "Twente: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:121", "mackolik:cu0eztmjcsbydyp53aleznorw", "Werder Bremen: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["tff:263", "tff:5342", "Çayelispor: ayni kulup (cift kayit denetimi 2026-11-12)"],
+    ["mackolik_arsiv:12973", "tff:263", "Çayelispor (1949): 1973-94 arşiv kaydı, aynı kulüp"]
   ],
 
   "baglama": [
@@ -66,5 +111,10 @@
   "ardil": [
     {"onceki": "tff:3688-once", "sonraki": "tff:106", "sezon": "2007-2008", "tur": "hak devri",
      "aciklama": "Aliağa'nın yarışmacı hakkı Göztepe'ye geçti, Aliağa kapandı; Göztepe TFF 3688 numarasıyla devam etti."}
-  ]
+  ],
+  "kulup_adi": {
+    "_aciklama": "Ayni adli ayri kulupleri ayirt etmek icin elle gorunen ad",
+    "tff:2035": "24 Erzincanspor",
+    "tff:379": "Çankırı Belediyespor"
+  }
 }

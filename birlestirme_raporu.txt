@@ -2,7 +2,7 @@ Kaynaklar: Mackolik 51875 mac, Avrupa 1457, TFF 99223
 1) Mackolik<->TFF: 4636 ortak mac adayi, 394 Mackolik kulubu TFF numarasina baglandi
 2) Arsiv<->Mackolik: puan tablosundaki 2907 takim satirinin 2803'i imzayla eslendi, 274 arsiv kimligi
    Mackolik'ten TFF'de de bulunan lig sezonlari cikarildi: 884 mac
-3) Sinir (arsiv<->TFF): 298 aday, 203 eslesme (tam ad disindakiler raporda: 18), 0 supheli
+3) Sinir (arsiv<->TFF): 298 aday, 247 eslesme (tam ad disindakiler raporda: 18), 0 supheli
    TFF grup sayfalarindaki tekil dis takim maclari play-off sayildi: 17
    Cift kayit silindi: 9
    Elle mac duzeltmesi (2022-2023 2022-11-27): 1 mac
@@ -10,7 +10,7 @@ Kaynaklar: Mackolik 51875 mac, Avrupa 1457, TFF 99223
    Resmi tabloda sayilmayan maclar: 47 play-off, 6 gecersiz
    Hukmen: 5 skorsuz maca resmi tablodan sonuc yazildi, 85 oynanmamis mac eklendi
 
-futbol.db: 151747 mac, 1191 kulup
+futbol.db: 151747 mac, 1147 kulup
    avrupa 1457 1956-1957 2026-2027
    kupa 7901 1962-1963 2026-2027
    lig 141738 1959 2026-2027
@@ -18,13 +18,17 @@ futbol.db: 151747 mac, 1191 kulup
 
 Birden cok TFF numarasi ya da birden cok Mackolik kimligi tek kulupte birlesen kulupler (ARDILLIK ADAYI):
   [311] ANADOLU ÜSKÜDAR 1908 SPOR: mackolik:629qqb884l 1994-1995..2018-2019; tff:4485 1998-1999..2026-2027; mackolik:bkq50sxwwn 2024-2025..2025-2026 | adlar: ÖZ SAHRAYİ CEDİTSPOR, ANADOLU ÜSKÜDAR 1908 SPOR, ANADOLU ÜSKÜDAR 1908 SPOR A.Ş., ANADOLU BAĞCILAR SPOR KULÜBÜ, BAĞCILAR SPOR KULÜBÜ, BEYKOZ İSHAKLI SPOR FAALİYETLERİ A.Ş.
+  [1049] ARDEŞENSPOR: tff:5307 1991-1992..1992-1993; tff:272 1998-1999..1998-1999 | adlar: ARDEŞENSPOR, ARDEŞEN BLD.SPOR
   [197] Gaziemir GOG: mackolik:49d6q1o2xo 2024-2025..2026-2027; mackolik:568q5disre 2024-2025..2024-2025; tff:3095 2024-2025..2026-2027 | adlar: TİRE 2021 FUTBOL KULÜBÜ, GAZİEMİR G.O.G. SPOR YAT. A.Ş.
-  [993] GÖZTEPE A.Ş.: mackolik:cjbaf8s09q 1959..2026-2027; tff:106 1990-1991..2006-2007; tff:3688 2007-2008..2026-2027 | adlar: Göztepe, GÖZTEPE, GÖZTEPE A.Ş.
-  [1088] HAKKARİSPOR: tff:3588 1991-1992..1992-1993; tff:319 1996-1997..2003-2004 | adlar: HAKKARİ BLD.SPOR, HAKKARİ PTT SPOR, HAKKARİSPOR
+  [984] GÖZTEPE A.Ş.: mackolik:cjbaf8s09q 1959..2026-2027; tff:106 1990-1991..2006-2007; tff:3688 2007-2008..2026-2027 | adlar: Göztepe, GÖZTEPE, GÖZTEPE A.Ş.
+  [1053] HAKKARİSPOR: tff:3588 1991-1992..1992-1993; tff:319 1996-1997..2003-2004 | adlar: HAKKARİ BLD.SPOR, HAKKARİ PTT SPOR, HAKKARİSPOR
   [880] Hakkarispor: mackolik:c2kt12j7e8 1999-2000..2016-2017; mackolik:macko17201 2016-2017..2016-2017 | adlar: Hakkarispor, Hakkarispor FK
+  [652] IĞDIRSPOR: tff:5308 1990-1991..1990-1991; tff:321 1997-1998..2006-2007; mackolik:bq45bwr2or 2001-2002..2001-2002 | adlar: Iğdırspor, IĞDIRSPOR, IĞDIR BELEDİYESPOR
+  [1117] KONYA YOLSPOR: tff:5344 1991-1992..1992-1993; tff:4678 1996-1997..2000-2001 | adlar: KONYA YOLSPOR, KONYA KARTALI SPOR A.Ş.
   [176] Muş Spor FC: mackolik:bt4gef1fvb 1984-1985..2017-2018; mackolik:3ybuekiig8 2014-2015..2014-2015; tff:2328 2016-2017..2017-2018 | adlar: Hasköy Yıldızspor, Muş Spor FC
   [48] Uşakspor A.Ş.: mackolik:1muac47v9f 2012-2013..2012-2013; mackolik:av9piaoghf 2013-2014..2026-2027; tff:5155 2017-2018..2026-2027 | adlar: UTAŞ UŞAKSPOR A.Ş., UŞAK SPOR A.Ş., AFC KABLO KANALLARI UŞAK SPOR A.Ş., OKTAŞ UŞAK SPOR A.Ş.
   [283] ZONGULDAKSPOR: tff:2434-once 1984-1985..1987-1988; tff:103 1990-1991..2007-2008; mackolik:5l7a6w16my 1992-1993..2003-2004 | adlar: Zonguldakspor, ZONGULDAKSPOR
+  [189] Çayelispor: tff:5342 1990-1991..1993-1994; mackolik:43hht36ezr 1992-1993..2025-2026; tff:263 2024-2025..2025-2026 | adlar: Çayelispor, ÇAYELİSPOR, SMART HOLDİNG A.Ş.ÇAYELİ SPOR, ÇAYELİ SPOR KULÜBÜ
 
 1990 sinirinda ADLA eslenen kulupler (arsiv adi, son sezon -> TFF adi, ilk sezon, puan) -- kontrol edilmeli:
    (['Düzce Kervan Doğsanspor'], '1989-1990', '->', ['DÜZCE DOĞSANSPOR', 'MUDURNUSPOR'], '1990-1991', 2.17, 'uuid kaniti')
