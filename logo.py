@@ -127,7 +127,7 @@ def kopyala():
     os.makedirs(CIKTI, exist_ok=True)
     gerekli = set(json.load(open(ESLESME, encoding="utf-8")).values())
     for f in os.listdir(CIKTI):
-        if f.endswith(".png") and int(f[:-4]) not in gerekli:
+        if f.endswith(".png") and f[:-4].isdigit() and int(f[:-4]) not in gerekli:   # w*.png: Vikipedi (wiki_logo.py)
             os.remove(os.path.join(CIKTI, f))
     yeni = 0
     for f in gerekli:
@@ -210,8 +210,9 @@ def renkler(yol):
 
 def renk_hesapla():
     es = json.load(open(ESLESME, encoding="utf-8"))
+    wiki = os.path.join(KOK, "logo_wiki.json")
     out = {}
-    for f in sorted(set(es.values())):
+    for f in sorted({str(v) for v in es.values()} | (set(json.load(open(wiki)).values()) if os.path.exists(wiki) else set())):
         yol = os.path.join(CIKTI, f"{f}.png")
         if os.path.exists(yol):
             out[str(f)] = renkler(yol)

@@ -112,6 +112,8 @@ def main():
         ardil[r[1]].append({"yon": "onceki", "kulup": r[0], "sezon": r[2], "tur": r[3], "aciklama": r[4]})
     # logo: logo_eslesme.json {"tff:3661": <FM kimligi>, ...} -> docs/logo/<FM kimligi>.png
     logo_es = json.load(open(os.path.join(KOK, "logo_eslesme.json"), encoding="utf-8")) if os.path.exists(os.path.join(KOK, "logo_eslesme.json")) else {}
+    wiki_yol = os.path.join(KOK, "logo_wiki.json")   # FM paketinde olmayanlar: Vikipedi arması (wiki_logo.py)
+    logo_es = {**(json.load(open(wiki_yol, encoding="utf-8")) if os.path.exists(wiki_yol) else {}), **logo_es}
     logo = {}
     for r in c.execute("SELECT kulup_id, kaynak || ':' || kaynak_id FROM kulup_kimlik ORDER BY kaynak <> 'tff', son_sezon DESC"):
         fm = logo_es.get(r[1])
