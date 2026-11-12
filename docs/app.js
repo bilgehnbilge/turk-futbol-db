@@ -449,12 +449,12 @@ function rekorHtml(ms) {
       ${enSezon.map(x => `<span class="detay"><a class="bag" href="#/sezon/${x.sezon}">${x.sezon}</a>: <b>${x.GY}</b> / ${x.O} maç</span>`).join("") || `<span class="soluk">—</span>`}</div>`;
   return `
   <h2>Kalesini gole kapattığı maçlar</h2>
-  <div class="izgara k3 ust-hiza">${gyKart}${seriKart(sr.find(s => s.k === "golyemeden"))}</div>
+  <div class="izgara iki ust-hiza">${gyKart}${seriKart(sr.find(s => s.k === "golyemeden"))}</div>
   <h2 class="bolum">En farklı sonuçlar</h2>
-  <div class="izgara k3">${rekorKart("En farklı galibiyet", gal)}${rekorKart("En farklı mağlubiyet", mag)}${rekorKart("En gollü maç", gol)}
+  <div class="izgara iki ust-hiza">${rekorKart("En farklı galibiyet", gal)}${rekorKart("En farklı mağlubiyet", mag)}${rekorKart("En gollü maç", gol)}
   ${rekorKart("İç sahada en farklı galibiyet", evG)}${rekorKart("Deplasmanda en farklı galibiyet", depG)}</div>
   <h2 class="bolum">Seriler <small class="soluk" style="font-weight:400;font-size:14px">— seçili maçlar art arda, sezonlar arası; ayrıntı için karta tıkla</small></h2>
-  <div class="izgara k3 ust-hiza">${sr.map(seriKart).join("")}</div>
+  <div class="izgara iki ust-hiza">${sr.map(seriKart).join("")}</div>
   <p class="soluk" style="font-size:13px;margin-top:16px">Seriler seçili filtredeki maçların tarih sırasıyla hesaplanır. Penaltıyla biten kupa maçları beraberlik sayılır. "İç saha" seçilirse ev sahibi yenilmezlik serisi gibi kayıtlar çıkar.</p>`;
 }
 

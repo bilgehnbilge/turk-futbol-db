@@ -294,3 +294,5 @@ details.rekor[open] summary::after { content: "Gizle ▴"; }
 .seri-maclar { max-height: 340px; overflow-y: auto; margin: 0 -4px; padding: 0 4px; border-top: 1px solid var(--cizgi); }
 .seri-maclar .son-satir { font-size: 13.5px; gap: 8px; }
 .seri-maclar .son-satir .tarih { width: 76px; font-size: 12.5px; }
+.izgara.iki { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 720px) { .izgara.iki { grid-template-columns: 1fr; } }
