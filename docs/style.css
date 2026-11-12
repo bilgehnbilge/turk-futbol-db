@@ -308,4 +308,11 @@ details.rekor[open] summary::after { content: "Gizle ▴"; }
 .tabela .ev .logo-k { flex: none; }
 .tabela .dep .logo-k { flex: none; margin: 0 0 0 7px; }
 .tabela .skor { font-size: 15px; padding: 2px 8px; background: var(--yuzey2); border-radius: 7px; white-space: nowrap; }
-@media (max-width: 520px) { .tabela { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); } .tabela .tarih { grid-column: 1 / -1; } }
+.tabela.sonuclu { grid-template-columns: 22px 78px minmax(0, 1fr) auto minmax(0, 1fr); }
+.seri-maclar.tabelalar { margin-top: 0; }
+.seri-maclar .tabela:first-child { border-top: 0; }
+@media (max-width: 520px) {
+  .tabela { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); } .tabela .tarih { grid-column: 1 / -1; }
+  .tabela.sonuclu { grid-template-columns: 22px minmax(0, 1fr) auto minmax(0, 1fr); } .tabela.sonuclu .tarih { grid-column: 2 / -1; grid-row: 1; }
+  .tabela.sonuclu .son { grid-row: 1 / 3; }
+}

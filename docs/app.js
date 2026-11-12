@@ -405,22 +405,25 @@ function macTablosu(hedef, ms, d) {
   ciz();
 }
 
+// skor tabelası satırı: [G/B/M] · tarih · ev logosu + adı · skor · deplasman adı + logosu (sayfadaki kulübün adı bağlantısız)
+function tabelaSatir(m, sonucGoster = false) {
+  const ad = (id, ad) => id !== m.kulup && id != null && KULUP.has(id) ? `<a class="bag" href="#/kulup/${id}">${esc(ad)}</a>` : `<span>${esc(ad)}</span>`;
+  const [evId, evAd, depId, depAd, eg, dg, ep, dp] = m.saha === "E" ? [m.kulup, m.takim, m.rakipId, m.rakip, m.a, m.y, m.pa, m.py] : [m.rakipId, m.rakip, m.kulup, m.takim, m.y, m.a, m.py, m.pa];
+  const skor = m.durum === "Çifte H" ? "0-3 / 3-0" : eg == null ? "–" : `${eg} - ${dg}`;
+  const ek = ep != null && dp != null ? ` <small class="soluk">(pen ${ep}-${dp})</small>` : m.durum === "Hük." ? ` <small class="soluk">(H)</small>` : "";
+  return `<div class="tabela${sonucGoster ? " sonuclu" : ""}" title="${esc(m.lig || YAR_AD[m.yar])}${m.tur ? " · " + esc(m.tur) : ""}">
+    ${sonucGoster ? `<span class="son ${m.s}">${m.s === "N" ? "–" : m.s}</span>` : ""}
+    <span class="tarih">${tarihYaz(m.tarih)}</span>
+    <span class="ev">${logoImg(evId)}${ad(evId, evAd)}</span>
+    <b class="skor">${skor}${ek}</b>
+    <span class="dep">${ad(depId, depAd)}${logoImg(depId)}</span></div>`;
+}
 function rekorKart(baslik, l) {
   const m = l?.[0];
   if (!m) return `<div class="kart rekor"><span class="baslik">${baslik}</span><span class="soluk">—</span></div>`;
-  // skor tabelası düzeni: tarih · ev logosu + adı · skor · deplasman adı + logosu
-  const ad = (id, ad, bag) => bag && id != null && KULUP.has(id) ? `<a class="bag" href="#/kulup/${id}">${esc(ad)}</a>` : `<span>${esc(ad)}</span>`;
-  const satir = m => {
-    const [evId, evAd, depId, depAd, eg, dg] = m.saha === "E" ? [m.kulup, m.takim, m.rakipId, m.rakip, m.a, m.y] : [m.rakipId, m.rakip, m.kulup, m.takim, m.y, m.a];
-    return `<div class="tabela" title="${esc(m.lig || YAR_AD[m.yar])}${m.tur ? " · " + esc(m.tur) : ""}">
-      <span class="tarih">${tarihYaz(m.tarih)}</span>
-      <span class="ev">${logoImg(evId)}${ad(evId, evAd, evId !== m.kulup)}</span>
-      <b class="skor">${eg} - ${dg}</b>
-      <span class="dep">${ad(depId, depAd, depId !== m.kulup)}${logoImg(depId, "logo-k sag")}</span></div>`;
-  };
   return `<div class="kart rekor"><span class="baslik">${baslik}</span>
     <span class="deger">${Math.abs(m.a - m.y) ? `${Math.max(m.a, m.y)}-${Math.min(m.a, m.y)}` : `${m.a}-${m.y}`}</span>
-    <div class="tabelalar">${l.slice(0, 4).map(satir).join("")}</div>
+    <div class="tabelalar">${l.slice(0, 4).map(m => tabelaSatir(m)).join("")}</div>
     ${l.length > 4 ? `<span class="detay">ve aynı skorla ${l.length - 4} maç daha</span>` : ""}</div>`;
 }
 function enIyi(ms, f, esit) {   // rekor + aynı değerdeki bütün maçlar (en eskiden yeniye)
@@ -442,9 +445,7 @@ function rekorHtml(ms) {
       <span class="detay">${esc(s.liste[s.en.bas].sezon)}${s.liste[s.en.son].sezon !== s.liste[s.en.bas].sezon ? " → " + esc(s.liste[s.en.son].sezon) : ""}</span>` : `<span class="soluk">—</span>`;
     const dv = s.devam && s.devam.n > 1 ? `<span class="detay"><b>Süren seri:</b> ${s.devam.n} maç</span>` : "";
     return `<details class="kart rekor"><summary><span class="baslik">${s.ad}</span>${r}${dv}</summary>
-      ${s.en.n ? `<div class="seri-maclar">${s.liste.slice(s.en.bas, s.en.son + 1).map(m => `<div class="son-satir"><span class="son ${m.s}">${m.s}</span>
-        <span class="tarih">${tarihYaz(m.tarih)}</span><span class="rakip">${kulupBag(m.rakipId, m.rakip)}${m.saha === "E" ? "" : ` <small class="soluk" title="Deplasman">(D)</small>`}</span>
-        <b class="skor">${skorYaz(m.a, m.y, m.pa, m.py, m.durum)}</b></div>`).join("")}</div>` : ""}</details>`;
+      ${s.en.n ? `<div class="seri-maclar tabelalar">${s.liste.slice(s.en.bas, s.en.son + 1).map(m => tabelaSatir(m, true)).join("")}</div>` : ""}</details>`;
   };
   // kalesini gole kapattığı maçlar: toplam, iç/dış, en iyi sezonlar
   const oy = ms.filter(m => m.s !== "N"), gy = oy.filter(m => m.y === 0);
