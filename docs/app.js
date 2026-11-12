@@ -15,9 +15,9 @@ const tarihYaz = t => { if (!t) return "—"; const [y, a, g] = t.split("-"); re
 const YAR_AD = { L: "Lig", K: "Türkiye Kupası", A: "Avrupa", T: "Terfi" };
 const KADEME_AD = { 1: "Süper Lig", 2: "1. Lig", 3: "TFF 2. Lig", 4: "TFF 3. Lig" };   // bugünkü adlar, seviyeye göre
 
-async function al(yol) {
+async function al(yol, secenek) {
   if (onbellek.has(yol)) return onbellek.get(yol);
-  const p = fetch(yol).then(r => { if (!r.ok) throw new Error(yol + " " + r.status); return r.json(); });
+  const p = fetch(yol, secenek).then(r => { if (!r.ok) throw new Error(yol + " " + r.status); return r.json(); });
   onbellek.set(yol, p);
   try { return await p; } catch (e) { onbellek.delete(yol); throw e; }
 }
@@ -600,9 +600,9 @@ const rekorDurum = { tablo: 20, acik: new Set() };
 async function rekorlarSayfa(kap) {
   document.title = "Tüm zamanlar rekorları · Türk Futbol Arşivi";
   icerik.innerHTML = `<div class="yukleniyor">Rekorlar yükleniyor…</div>`;
-  const R = await al("data/rekorlar.json");
+  const R = await al(`data/rekorlar.json?s=${OZET.surum || ""}`);
+  if (!R.veri[kap]) kap = R.kapsamlar[0][0];   // eski önbellekteki dosyada olmayan sekme
   const v = R.veri[kap];
-  if (!v) { location.hash = "#/rekorlar"; return; }
   const kapAd = Object.fromEntries(R.kapsamlar)[kap];
   if (!v.tablo) v.tablo = null;
   const lig = kap !== "kupa";
@@ -712,7 +712,7 @@ function hakkindaSayfa() {
 // ---------------------------------------------------------------- başlat
 (async function basla() {
   try {
-    [KULUPLER, OZET] = await Promise.all([al("data/kulupler.json"), al("data/ozet.json")]);
+    [KULUPLER, OZET] = await Promise.all([al("data/kulupler.json"), al("data/ozet.json", { cache: "no-cache" })]);
   } catch (e) {
     icerik.innerHTML = `<div class="bos">Veri yüklenemedi (${esc(e.message)}). Sayfayı bir web sunucusu üzerinden açın.</div>`;
     return;

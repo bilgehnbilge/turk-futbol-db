@@ -11,7 +11,7 @@ Uretilen dosyalar:
 
 Satir bicimleri dosyalarin "alanlar" anahtarinda yazar.
 """
-import collections, json, os, shutil, sqlite3
+import collections, datetime, json, os, shutil, sqlite3
 
 import rekor
 
@@ -162,6 +162,7 @@ def main():
     kapsam = [list(r) for r in c.execute("SELECT kademe, sezon, grup, takim, bulunan, beklenen FROM kapsam")]
     yaz(os.path.join(CIKTI, "ozet.json"), {
         "mac": len(maclar), "kulup": len(liste), "yarisma": say,
+        "surum": datetime.datetime.now().strftime("%Y%m%d%H%M"),   # veri dosyalari icin onbellek anahtari
         "sezonlar": sorted(sez, key=lambda s: (s[:4], s)),
         "ilk_tarih": next((m["tarih"] for m in maclar if m["tarih"]), None),
         "son_tarih": max(m["tarih"] for m in maclar if m["tarih"] and m["ev_gol"] is not None),
