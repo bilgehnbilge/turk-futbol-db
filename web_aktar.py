@@ -113,7 +113,9 @@ def main():
     # logo: logo_eslesme.json {"tff:3661": <FM kimligi>, ...} -> docs/logo/<FM kimligi>.png
     logo_es = json.load(open(os.path.join(KOK, "logo_eslesme.json"), encoding="utf-8")) if os.path.exists(os.path.join(KOK, "logo_eslesme.json")) else {}
     wiki_yol = os.path.join(KOK, "logo_wiki.json")   # FM paketinde olmayanlar: Vikipedi arması (wiki_logo.py)
-    logo_es = {**(json.load(open(wiki_yol, encoding="utf-8")) if os.path.exists(wiki_yol) else {}), **logo_es}
+    uefa_yol = os.path.join(KOK, "logo_uefa.json")   # Avrupa rakipleri: UEFA logosu (uefa_logo.py)
+    logo_es = {**(json.load(open(uefa_yol, encoding="utf-8")) if os.path.exists(uefa_yol) else {}),
+               **(json.load(open(wiki_yol, encoding="utf-8")) if os.path.exists(wiki_yol) else {}), **logo_es}
     logo = {}
     for r in c.execute("SELECT kulup_id, kaynak || ':' || kaynak_id FROM kulup_kimlik ORDER BY kaynak <> 'tff', son_sezon DESC"):
         fm = logo_es.get(r[1])
@@ -123,6 +125,14 @@ def main():
     for f in ("logo_renk.json", "logo_renk_elle.json"):   # elle olan üstüne yazar
         if os.path.exists(os.path.join(KOK, f)):
             renk.update({k: v for k, v in json.load(open(os.path.join(KOK, f), encoding="utf-8")).items() if not k.startswith("_")})
+    ulke_es = {}   # Avrupa rakibinin ülkesi (uefa_logo.py esle: kulup_ulke.json; elle: ulke_elle.json)
+    for f in ("kulup_ulke.json", "ulke_elle.json"):
+        if os.path.exists(os.path.join(KOK, f)):
+            ulke_es.update({k: v for k, v in json.load(open(os.path.join(KOK, f), encoding="utf-8")).items() if not k.startswith("_")})
+    ulke = {}
+    for r in c.execute("SELECT kulup_id, kaynak || ':' || kaynak_id FROM kulup_kimlik"):
+        if r[1] in ulke_es:
+            ulke.setdefault(r[0], ulke_es[r[1]])
     tff = collections.defaultdict(list)
     for r in c.execute("SELECT kulup_id, kaynak_id FROM kulup_kimlik WHERE kaynak='tff' AND kaynak_id NOT LIKE '%-once'"):
         tff[r[0]].append(r[1])
@@ -149,7 +159,7 @@ def main():
         en_ust = min((x[5] for x in ms if x[3] == "L" and x[5]), default=None)
         liste.append({"id": k, "ad": gorunen(ad, adlar.get(k, [])), "adlar": adlar.get(k, []), "ilk": sezonlar[0], "son": sezonlar[-1], "mac": len(ms),
                       "yerli": k in yerli, "enust": en_ust, "tff": tff.get(k, []), "ardil": ardil.get(k, []),
-                      **({"logo": logo[k]} if k in logo else {}),
+                      **({"logo": logo[k]} if k in logo else {}), **({"ulke": ulke[k]} if k in ulke and k not in yerli else {}),
                       **({"renk": [x for x in renk[str(logo[k])] if x]} if k in logo and str(logo[k]) in renk else {})})
         yaz(os.path.join(CIKTI, "kulup", f"{k}.json"), {
             "alanlar": ["id", "tarih", "sezon", "yarisma", "lig", "kademe", "grup_tur", "playoff", "saha", "takim", "rakip_id",
@@ -168,6 +178,12 @@ def main():
             "alanlar": ["id", "tarih", "yarisma", "lig", "kademe", "grup_tur", "playoff", "ev_id", "ev", "dep_id", "dep",
                         "ev_gol", "dep_gol", "ev_pen", "dep_pen", "durum", "not"],
             "maclar": ms})
+
+    # ---- Avrupa maçları (ülkelere göre karşılaştırma için tek dosya)
+    yaz(os.path.join(CIKTI, "avrupa.json"), {"ad_ulke": {k[3:]: v for k, v in ulke_es.items() if k.startswith("ad:")},
+        "alanlar": ["id", "tarih", "sezon", "lig", "tur", "ev_id", "dep_id", "ev_gol", "dep_gol", "ev_pen", "dep_pen", "durum", "ev", "dep"],
+        "maclar": [[m["id"], m["tarih"], m["sezon"], m["lig"], tur(m), m["ev_kulup"], m["dep_kulup"], m["ev_gol"], m["dep_gol"],
+                    m["ev_pen"], m["dep_pen"], m["durum"], okunur(m["ev_adi"]), okunur(m["dep_adi"])] for m in maclar if m["yarisma"] == "avrupa"]})
 
     # ---- tüm zamanlar rekorları
     sezon_sira = {s: i for i, s in enumerate(sorted(sez, key=lambda s: (s[:4], s)))}

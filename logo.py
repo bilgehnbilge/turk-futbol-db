@@ -210,9 +210,12 @@ def renkler(yol):
 
 def renk_hesapla():
     es = json.load(open(ESLESME, encoding="utf-8"))
-    wiki = os.path.join(KOK, "logo_wiki.json")
+    ek = set()
+    for ad in ("logo_wiki.json", "logo_uefa.json"):
+        if os.path.exists(os.path.join(KOK, ad)):
+            ek |= set(json.load(open(os.path.join(KOK, ad))).values())
     out = {}
-    for f in sorted({str(v) for v in es.values()} | (set(json.load(open(wiki)).values()) if os.path.exists(wiki) else set())):
+    for f in sorted({str(v) for v in es.values()} | ek):
         yol = os.path.join(CIKTI, f"{f}.png")
         if os.path.exists(yol):
             out[str(f)] = renkler(yol)
