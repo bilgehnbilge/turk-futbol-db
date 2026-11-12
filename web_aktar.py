@@ -85,6 +85,7 @@ def mac_detay(maclar, okunur):
     m_ = {m["id"]: m for m in maclar}
     out = []
     oyuncular = {}       # UEFA oyuncu no -> [ad, doğum, ülke]
+    td_bilgi, td_mac = {}, []   # teknik direktör: UEFA kişi no -> ad; [kişi, maç, kulüp, diziliş]
     katilim = []         # [oyuncu, maç, kulüp, ilk11, gol, sarı, kırmızı, giriş dk, çıkış dk]
     for pid, ad, dogum, ulke in u.execute("SELECT oyuncu, ad, MAX(dogum), MAX(ulke) FROM kadro WHERE oyuncu IS NOT NULL GROUP BY oyuncu"):
         oyuncular[pid] = [ad, dogum, ulke]
@@ -98,8 +99,12 @@ def mac_detay(maclar, okunur):
                 "SELECT taraf, oyuncu, ad, forma, ilk11, kaptan FROM kadro WHERE uefa_id=? ORDER BY taraf, ilk11 DESC, CAST(forma AS INTEGER)", (uid,)):
             kadro[taraf].append([forma, ad, ilk11, kaptan, oyuncu])
         teknik = {1: [], 2: []}
-        for taraf, ad in u.execute("SELECT taraf, ad FROM teknik WHERE uefa_id=?", (uid,)):
-            teknik[taraf].append(ad)
+        for taraf, ad, kisi in u.execute("SELECT taraf, ad, kisi FROM teknik WHERE uefa_id=?", (uid,)):
+            teknik[taraf].append([ad, kisi])
+            td_bilgi.setdefault(kisi, ad)
+        dizilis = {1: None, 2: None}
+        for taraf, dz in u.execute("SELECT taraf, dizilis FROM dizilis WHERE uefa_id=?", (uid,)):
+            dizilis[taraf] = dz
         olay = [[taraf, tur, dk, ek, ad, ad2, ay, o1, o2] for taraf, tur, dk, ek, ad, ad2, ay, o1, o2 in u.execute(
             "SELECT taraf, tur, dk, ek, ad, ad2, ayrinti, oyuncu, oyuncu2 FROM olay WHERE uefa_id=? ORDER BY dk, ek", (uid,))]
         # UEFA'da ev/deplasman bizimkinin tersi olabilir (ör. tarafsız saha): takım adına göre değil, skora göre değil,
@@ -107,7 +112,7 @@ def mac_detay(maclar, okunur):
         ters = u.execute("SELECT ev_gol, dep_gol FROM mac WHERE uefa_id=?", (uid,)).fetchone() != (m["ev_gol"], m["dep_gol"]) \
             and u.execute("SELECT dep_gol, ev_gol FROM mac WHERE uefa_id=?", (uid,)).fetchone() == (m["ev_gol"], m["dep_gol"])
         if ters:
-            kadro = {1: kadro[2], 2: kadro[1]}; teknik = {1: teknik[2], 2: teknik[1]}
+            kadro = {1: kadro[2], 2: kadro[1]}; teknik = {1: teknik[2], 2: teknik[1]}; dizilis = {1: dizilis[2], 2: dizilis[1]}
             olay = [[3 - o[0], *o[1:]] for o in olay]
         # takım ve oyuncu istatistikleri (uefa_detay.py istat): ev/deplasman sırasıyla
         istat, oy_istat = None, {}
@@ -134,6 +139,8 @@ def mac_detay(maclar, okunur):
                     p_.append(oy_istat[p_[4]])
         for taraf in (1, 2):
             kid = m["ev_kulup"] if taraf == 1 else m["dep_kulup"]
+            for ad_, kisi in teknik[taraf]:
+                td_mac.append([kisi, mid, kid])
             for forma, ad, ilk11, kaptan, pid, *_ in kadro[taraf]:
                 if not pid:
                     continue
@@ -156,10 +163,60 @@ def mac_detay(maclar, okunur):
             "olay_alanlar": ["taraf", "tur", "dk", "ek", "oyuncu", "oyuncu2", "ayrinti", "oyuncu_no", "oyuncu2_no"], "olay": olay})
         out.append(mid)
     kullanilan = {k[0] for k in katilim}
+    # teknik direktörü oyuncu kaydına bağla: adı (büyük/küçük harf ve aksan farkı gözetmeden) tek bir oyuncuyla tutuyorsa
+    import unicodedata
+    sade = lambda s: "".join(c for c in unicodedata.normalize("NFKD", (s or "").replace("ı", "i").lower()) if not unicodedata.combining(c)).strip()
+    ad_oy = collections.defaultdict(list)
+    for p_, v in oyuncular.items():
+        if p_ in kullanilan:
+            ad_oy[sade(v[0])].append(p_)
+    td_oyuncu = {k: ad_oy[sade(a)][0] for k, a in td_bilgi.items() if len(ad_oy.get(sade(a), [])) == 1}
     yaz(os.path.join(CIKTI, "oyuncu_uefa.json"), {
         "oyuncu": {p: v for p, v in oyuncular.items() if p in kullanilan},
-        "alanlar": ["oyuncu", "mac", "kulup", "ilk11", "gol", "sari", "kirmizi", "giris", "cikis", "dakika", "asist"], "katilim": katilim})
+        "alanlar": ["oyuncu", "mac", "kulup", "ilk11", "gol", "sari", "kirmizi", "giris", "cikis", "dakika", "asist"], "katilim": katilim,
+        "td": td_bilgi, "td_oyuncu": td_oyuncu, "td_alanlar": ["kisi", "mac", "kulup"], "td_mac": td_mac})
     return sorted(out)
+
+
+def teknik_aktar(maclar, okunur):
+    """Kişi anahtarı: UEFA teknik direktör no ("t…") ya da TFF antrenör no ("a…"); ikisi aynı kişiyse adla birleşir.
+    Satırlar: [kişi, maç, kulüp, sezon, yarışma (L/K/A/T), attığı, yediği, tarih]."""
+    import unicodedata
+    sade = lambda s: " ".join("".join(c for c in unicodedata.normalize("NFKD", (s or "").replace("İ", "i").replace("I", "ı").replace("ı", "i").lower())
+                                       if not unicodedata.combining(c)).split())
+    m_ = {m["id"]: m for m in maclar}
+    kisi, satir, ant_ = {}, [], {}
+    uefa_oy = json.load(open(os.path.join(CIKTI, "oyuncu_uefa.json"), encoding="utf-8")) if os.path.exists(os.path.join(CIKTI, "oyuncu_uefa.json")) else {}
+    td_ad = {sade(a): k for k, a in uefa_oy.get("td", {}).items()}
+    def ekle(anahtar, mid, kid):
+        m = m_.get(mid)
+        if not m or m["ev_gol"] is None or m["durum"] in ("Hük.", "Çifte H") or m["asama"] == "gecersiz":
+            return
+        ev = m["ev_kulup"] == kid
+        satir.append([anahtar, mid, kid, m["sezon"], YAR[m["yarisma"]], m["ev_gol"] if ev else m["dep_gol"], m["dep_gol"] if ev else m["ev_gol"], m["tarih"]])
+    # UEFA (Avrupa)
+    for k, mid, kid in uefa_oy.get("td_mac", []):
+        kisi.setdefault("t" + k, [uefa_oy["td"][k], uefa_oy.get("td_oyuncu", {}).get(k)])
+        ekle("t" + k, mid, kid)
+    # TFF (lig/kupa): maç no = kaynak_id, taraf 1 = ev sahibi
+    oy = os.path.join(KOK, "raw", "oyuncu.db")
+    if os.path.exists(oy):
+        tff = {}
+        for m in maclar:
+            if m["kaynak"] == "tff" and m["kaynak_id"]:
+                tff[m["kaynak_id"]] = m
+        o = sqlite3.connect(oy)
+        for mac, taraf, ant, ad in o.execute("SELECT mac, taraf, kisi, ad FROM teknik"):
+            m = tff.get(str(mac))
+            if not m:
+                continue
+            anahtar = "t" + td_ad[sade(ad)] if sade(ad) in td_ad else "a" + str(ant)
+            ant_[str(ant)] = anahtar
+            if anahtar not in kisi:
+                kisi[anahtar] = [okunur(ad), None]
+            ekle(anahtar, m["id"], m["ev_kulup"] if taraf == 1 else m["dep_kulup"])
+    yaz(os.path.join(CIKTI, "teknik.json"), {"kisi": kisi, "tff": ant_, "alanlar": ["kisi", "mac", "kulup", "sezon", "yarisma", "attigi", "yedigi", "tarih"],
+                                             "maclar": sorted(satir, key=lambda x: (x[0], x[7] or ""))})
 
 
 def main():
@@ -273,6 +330,9 @@ def main():
 
     # ---- maç ayrıntıları (şimdilik Avrupa: UEFA; uefa_detay.py) -> data/mac/<id>.json
     detayli = mac_detay(maclar, okunur)
+
+    # ---- teknik direktörler: TFF maç sayfaları (lig, kupa) + UEFA (Avrupa) -> data/teknik.json
+    teknik_aktar(maclar, okunur)
 
     # ---- tüm zamanlar rekorları
     sezon_sira = {s: i for i, s in enumerate(sorted(sez, key=lambda s: (s[:4], s)))}

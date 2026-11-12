@@ -152,6 +152,8 @@ const yollar = [
   [/^#\/rekorlar(?:\/(\w+))?$/, k => rekorlarSayfa(k || "tum")],
   [/^#\/mac\/(\d+)$/, id => macSayfa(+id)],
   [/^#\/oyuncu\/u(\d+)$/, id => oyuncuSayfa(id)],
+  [/^#\/oyuncu\/t(\d+)$/, id => oyuncuSayfa(null, id)],
+  [/^#\/oyuncu\/(a\d+)$/, id => oyuncuSayfa(null, id)],
   [/^#\/karsilastir$/, karsilastirSayfa],
   [/^#\/hakkinda$/, hakkindaSayfa],
 ];
@@ -610,7 +612,7 @@ async function macSayfa(id) {
   const kadroHtml = (l, teknik) => `
     <div class="kadro-bolum">İlk 11</div>${l.filter(p => p[2]).map(p => `<div class="oyuncu"><span class="forma">${esc(p[0])}</span><span class="oad">${oy(p[4], p[1])}${p[3] ? ` <small class="soluk">(K)</small>` : ""}</span><span class="osimge">${simge.get(p[4]) || ""}</span></div>`).join("") || `<div class="soluk">—</div>`}
     ${l.some(p => !p[2]) ? `<div class="kadro-bolum">Yedekler</div>${l.filter(p => !p[2]).map(p => `<div class="oyuncu yedek"><span class="forma">${esc(p[0])}</span><span class="oad">${oy(p[4], p[1])}</span><span class="osimge">${simge.get(p[4]) || ""}</span></div>`).join("")}` : ""}
-    ${teknik.length ? `<div class="kadro-bolum">Teknik direktör</div><div class="oyuncu"><span class="forma"></span><span class="oad">${teknik.map(esc).join(", ")}</span></div>` : ""}`;
+    ${teknik.length ? `<div class="kadro-bolum">Teknik direktör</div><div class="oyuncu"><span class="forma"></span><span class="oad">${teknik.map(t => Array.isArray(t) ? `<a class="oyuncu-bag" href="#/oyuncu/t${t[1]}">${esc(t[0])}</a>` : esc(t)).join(", ")}</span></div>` : ""}`;
   const akis = d.olay.filter(o => o[1] !== "SUBSTITUTION" || true).map(o => {
     const [taraf, tur, , , a1, a2, ay, n1, n2] = o, [s, adi] = OLAY[tur] || ["•", tur];
     const metin = tur === "SUBSTITUTION" ? `<span class="gir">↑ ${oy(n2, a2)}</span> <span class="cik">↓ ${oy(n1, a1)}</span>`
@@ -689,11 +691,19 @@ async function avrupaOyunculari(hedef, kid) {
 }
 
 // ---------------------------------------------------------------- oyuncu sayfası (şimdilik UEFA: Avrupa maçları)
-async function oyuncuSayfa(no) {
-  icerik.innerHTML = `<div class="yukleniyor">Oyuncu yükleniyor…</div>`;
+async function oyuncuSayfa(no, tdNo) {
+  icerik.innerHTML = `<div class="yukleniyor">Yükleniyor…</div>`;
   const [d, av] = await Promise.all([al(`data/oyuncu_uefa.json?s=${OZET.surum || ""}`), al(`data/avrupa.json?s=${OZET.surum || ""}`)]);
-  const o = d.oyuncu[no];
-  if (!o) { icerik.innerHTML = `<div class="bos">Oyuncu bulunamadı.</div>`; return; }
+  // teknik direktör sayfası oyuncu kaydına bağlıysa oyuncu sayfasına yönlen; oyuncunun teknik direktörlük kaydını bul
+  if (tdNo?.startsWith("a")) {   // TFF antrenör no: UEFA kaydıyla birleşmişse oraya git
+    const T1 = await al(`data/teknik.json?s=${OZET.surum || ""}`), k = T1.tff?.[tdNo.slice(1)];
+    if (k && k !== tdNo) { location.replace(`#/oyuncu/${k.startsWith("t") ? "t" + k.slice(1) : k}`); return; }
+  }
+  if (tdNo && d.td_oyuncu[tdNo]) { location.replace(`#/oyuncu/u${d.td_oyuncu[tdNo]}`); return; }
+  if (!tdNo) tdNo = Object.keys(d.td_oyuncu).find(k => d.td_oyuncu[k] === no) || null;
+  const T0 = tdNo?.startsWith("a") ? await al(`data/teknik.json?s=${OZET.surum || ""}`) : null;
+  const o = no ? d.oyuncu[no] : d.td[tdNo] ? [d.td[tdNo], null, null] : T0?.kisi[tdNo] ? [T0.kisi[tdNo][0], null, null] : null;
+  if (!o) { icerik.innerHTML = `<div class="bos">Kişi bulunamadı.</div>`; return; }
   const [ad, dogum, ulke] = o;
   document.title = `${ad} · Türk Futbol Arşivi`;
   const mac = new Map(av.maclar.map(r => [r[0], r]));
@@ -706,17 +716,50 @@ async function oyuncuSayfa(no) {
   const top = ks.reduce((t, k) => (t.mac++, t.ilk += k.ilk11, t.gol += k.gol, t.sari += k.sari, t.kirmizi += k.kirmizi, t.dk += k.dakika || 0, t), { mac: 0, ilk: 0, gol: 0, sari: 0, kirmizi: 0, dk: 0 });
   const kulupler = [...ks.reduce((m, k) => m.set(k.kulup, [...(m.get(k.kulup) || []), k]), new Map())];
   const yas = dogum && dogum.slice(5) !== "01-01" ? tarihYaz(dogum) : dogum ? dogum.slice(0, 4) : null;
+  // teknik direktörlük (data/teknik.json: TFF lig/kupa + UEFA Avrupa)
+  const T = await al(`data/teknik.json?s=${OZET.surum || ""}`);
+  const tKey = tdNo ? (tdNo.startsWith("a") ? tdNo : "t" + tdNo) : null;
+  const td = tKey ? T.maclar.filter(x => x[0] === tKey).map(x => ({ id: x[1], kulup: x[2], sezon: x[3], yar: x[4], a: x[5], y: x[6], tarih: x[7], s: sonuc(x[5], x[6]) })) : [];
+  const ozetle = l => l.reduce((t, m) => (t.O++, t[m.s]++, t), { O: 0, G: 0, B: 0, M: 0 });
+  const pm = t => t.O ? ((3 * t.G + t.B) / t.O).toFixed(2) : "–";
+  const satirT = (bas, t, ek = "") => `<tr><td class="ad">${bas}</td>${ek}<td class="s">${t.O}</td><td class="s">${t.G}</td><td class="s">${t.B}</td><td class="s">${t.M}</td>
+    <td class="s">%${yuzde(t.G, t.O)}</td><td class="s"><b>${pm(t)}</b></td></tr>`;
+  const bas = ek => `<thead><tr><th>${ek[0]}</th>${ek.slice(1).map(x => `<th>${x}</th>`).join("")}<th class="s">O</th><th class="s">G</th><th class="s">B</th><th class="s">M</th><th class="s">G%</th><th class="s" title="Maç başı puan (galibiyet 3 puan)">P/M</th></tr></thead>`;
+  const YAR_TD = { L: "Lig", K: "Türkiye Kupası", A: "Avrupa", T: "Terfi" };
+  const tdHtml = !td.length ? "" : (() => {
+    const t = ozetle(td);
+    const yarlar = ["L", "K", "A", "T"].filter(y => td.some(m => m.yar === y));
+    const sezon = [...td.reduce((m, x) => { const k = `${x.sezon}|${x.kulup}`; return m.set(k, [...(m.get(k) || []), x]); }, new Map())]
+      .sort((a, b) => b[0].localeCompare(a[0]));
+    const kul = [...td.reduce((m, x) => m.set(x.kulup, [...(m.get(x.kulup) || []), x]), new Map())].sort((a, b) => b[1].length - a[1].length);
+    return `<h2 class="bolum">Teknik direktör olarak</h2>
+    <div class="kart"><div class="ozet-sat">
+      <div><b>${t.O}</b><span>Maç</span></div><div><b>${t.G}</b><span>Galibiyet</span></div><div><b>${t.B}</b><span>Beraberlik</span></div>
+      <div><b>${t.M}</b><span>Mağlubiyet</span></div><div><b>%${yuzde(t.G, t.O)}</b><span>Kazanma</span></div><div><b>${pm(t)}</b><span>Maç başı puan</span></div></div>
+      <div class="cubuk"><i class="g" style="width:${yuzde(t.G, t.O)}%"></i><i class="b" style="width:${yuzde(t.B, t.O)}%"></i><i class="m" style="width:${yuzde(t.M, t.O)}%"></i></div></div>
+    <div class="izgara iki bolum ust-hiza">
+      <div class="tablo-kap"><table class="tablo">${bas(["Yarışma"])}<tbody>${yarlar.map(y => satirT(YAR_TD[y], ozetle(td.filter(m => m.yar === y)))).join("")}${yarlar.length > 1 ? satirT("<b>Toplam</b>", t) : ""}</tbody></table></div>
+      <div class="tablo-kap"><table class="tablo">${bas(["Kulüp"])}<tbody>${kul.map(([kid, l]) => satirT(kulupBag(kid), ozetle(l))).join("")}</tbody></table></div>
+    </div>
+    <div class="tablo-kap bolum"><table class="tablo">${bas(["Sezon", "Kulüp", "Yarışma"])}<tbody>${sezon.map(([k, l]) => {
+      const [sz, kid] = k.split("|");
+      return satirT(`<a class="bag" href="#/sezon/${sz}">${sz}</a>`, ozetle(l), `<td class="ad">${kulupBag(+kid)}</td><td class="soluk">${[...new Set(l.map(m => YAR_TD[m.yar]))].join(", ")}</td>`);
+    }).join("")}</tbody></table></div>
+    <p class="soluk not">Lig ve kupa maçları TFF maç sayfalarından (şimdilik Süper Lig; diğer ligler indirildikçe eklenecek), Avrupa maçları UEFA'dan. Maç başı puan bütün sezonlarda galibiyet 3 puanla hesaplandı; hükmen maçlar dahil değil.</p>`;
+  })();
   icerik.innerHTML = `
   <div class="sayfa-bas"><div><h1>${esc(ad)}</h1>
     <p class="soluk">${ulke ? `${ULKE[ulke] ? ULKE[ulke][1] + " " + ULKE[ulke][0] : ulke === "TUR" ? "🇹🇷 Türkiye" : esc(ulke)}` : ""}${yas ? ` · Doğum: ${yas}` : ""}</p></div></div>
-  <div class="kart"><div class="ozet-sat">
+  ${ks.length ? `<h2 class="bolum">Oyuncu olarak</h2>` : ""}
+  ${ks.length ? `<div class="kart"><div class="ozet-sat">
     <div><b>${top.mac}</b><span>Avrupa maçı</span></div><div><b>${top.ilk}</b><span>İlk 11</span></div><div><b>${top.gol}</b><span>Gol</span></div>
     <div><b>${top.sari}</b><span>Sarı kart</span></div><div><b>${top.kirmizi}</b><span>Kırmızı kart</span></div>
     ${top.dk ? `<div><b>${sayiYaz(top.dk)}</b><span>Dakika*</span></div>` : ""}</div>
-    ${top.dk ? `<p class="soluk not" style="margin:8px 0 0">* Dakika bilgisi UEFA'nın istatistik tuttuğu maçlardan.</p>` : ""}</div>
+    ${top.dk ? `<p class="soluk not" style="margin:8px 0 0">* Dakika bilgisi UEFA'nın istatistik tuttuğu maçlardan.</p>` : ""}</div>` : ""}
   <div class="izgara iki bolum ust-hiza">${kulupler.map(([kid, l]) => `<div class="kart"><h3>${kid != null && KULUP.has(kid) ? kulupBag(kid) : esc(kulupAd(kid))}</h3>
     <p class="soluk" style="margin:0 0 6px;font-size:13px">${l.length} maç · ${l.reduce((s, k) => s + k.gol, 0)} gol · ${l.at(-1).sezon} – ${l[0].sezon}</p>
     <div class="tabelalar">${l.map(m => `${tabelaSatir(m, true)}<div class="katki">${m.ilk11 ? "İlk 11" : `${m.giris}'de girdi`}${m.cikis != null ? ` · ${m.cikis}'de çıktı` : ""}${m.gol ? ` · ${"⚽".repeat(m.gol)}` : ""}${m.sari ? " · 🟨" : ""}${m.kirmizi ? " · 🟥" : ""}</div>`).join("")}</div></div>`).join("")}</div>
+  ${tdHtml}
   <p class="soluk not bolum">Kaynak: UEFA. Şimdilik yalnız Türk takımlarının Avrupa kupası maçları; lig maçları TFF verisi işlendikten sonra eklenecek.</p>`;
 }
 

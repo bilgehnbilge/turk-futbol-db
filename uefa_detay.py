@@ -107,10 +107,32 @@ SEMA = """
 CREATE TABLE mac(uefa_id TEXT PRIMARY KEY, mac_id INTEGER, tarih TEXT, yarisma TEXT, tur TEXT, ev TEXT, dep TEXT, ev_uefa TEXT, dep_uefa TEXT,
   ev_gol INTEGER, dep_gol INTEGER, stad TEXT, sehir TEXT, seyirci INTEGER, hakem TEXT, hakem_ulke TEXT);
 CREATE TABLE kadro(uefa_id TEXT, taraf INTEGER, oyuncu TEXT, ad TEXT, forma TEXT, ilk11 INTEGER, kaptan INTEGER, dogum TEXT, ulke TEXT, mevki TEXT);
-CREATE TABLE teknik(uefa_id TEXT, taraf INTEGER, kisi TEXT, ad TEXT);
+CREATE TABLE teknik(uefa_id TEXT, taraf INTEGER, kisi TEXT, ad TEXT, dogum TEXT, ulke TEXT);
+CREATE TABLE dizilis(uefa_id TEXT, taraf INTEGER, dizilis TEXT);
 CREATE TABLE olay(uefa_id TEXT, taraf INTEGER, tur TEXT, oyuncu TEXT, ad TEXT, dk INTEGER, ek INTEGER, oyuncu2 TEXT, ad2 TEXT, ayrinti TEXT);
 CREATE INDEX k1 ON kadro(oyuncu); CREATE INDEX o1 ON olay(oyuncu); CREATE INDEX m1 ON mac(mac_id);
 """
+
+
+def dizilis_hesapla(saha):
+    """İlk 11'in saha koordinatlarından diziliş (ör. 4-2-3-1): kaleci dışındakiler kaleye uzaklığa (y) göre sıralanır,
+    aralarında belirgin boşluk olan gruplar birer hat sayılır. Eski çizimlerde (2010 öncesi) bekler stoperlerden ileride
+    durduğundan: 2 kişilik ilk hattın hemen önündeki 2 kişi kenardaysa (x) savunmaya katılır. Koordinat yoksa None."""
+    xy = sorted(((p.get("fieldCoordinate") or {}).get("y"), (p.get("fieldCoordinate") or {}).get("x")) for p in saha
+                if (p.get("fieldCoordinate") or {}).get("y") is not None)
+    if len(xy) != 11:
+        return None
+    hat, onceki = [], None
+    for y, x in xy[1:]:   # en küçük y: kaleci
+        if onceki is None or y - onceki > 90:
+            hat.append([])
+        hat[-1].append(x)
+        onceki = y
+    kenar = lambda l: all(x < 320 or x > 680 for x in l)
+    if len(hat) >= 4 and len(hat[0]) in (2, 3) and len(hat[1]) == 2 and kenar(hat[1]):
+        hat = [hat[0] + hat[1]] + hat[2:]
+    sayi = [len(h) for h in hat]
+    return "-".join(map(str, sayi)) if 3 <= len(sayi) <= 5 and sum(sayi) == 10 else None
 
 
 def ayikla():
@@ -174,7 +196,11 @@ def ayikla():
                               pl.get("fieldPosition")))
             for co in x.get("coaches") or []:
                 pe = co.get("person") or {}
-                c.execute("INSERT INTO teknik VALUES(?,?,?,?)", (uid, taraf, pe.get("id"), en(pe)))
+                if co.get("role", "COACH") == "COACH":
+                    c.execute("INSERT INTO teknik VALUES(?,?,?,?,?,?)", (uid, taraf, pe.get("id"), en(pe), pe.get("birthDate"), pe.get("countryCode")))
+            dz = dizilis_hesapla(x.get("field") or [])
+            if dz:
+                c.execute("INSERT INTO dizilis VALUES(?,?,?)", (uid, taraf, dz))
         for e in d["olay"] or []:
             pa = (e.get("primaryActor") or {})
             sa = (e.get("secondaryActor") or {})
