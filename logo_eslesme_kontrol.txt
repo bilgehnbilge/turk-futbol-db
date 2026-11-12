@@ -1,0 +1,381 @@
+Emin olunamayan eşlemeler (kelime alt kümesi; logo_eslesme.json'a ALINMADI): kulüp -> FM takımı
+  0.90  Şehit Kamil Bld.Spor [tff:4124] 1996-1996 -> Gaziantep Şehit Kamil Belediye Spor (70054210) 70086164
+  0.90  Kestelspor [tff:3929] 1998-2003 -> Kestel Belediyespor (470805) 70086168
+  0.90  Bağlum Bld.Spor [tff:1000] 2006-2007 -> Keçiören Belediyesi Bağlum Spor (70005475) 70086163
+  0.90  Fırat Üniversitesi [tff:394] 1996-1999 -> Fırat Üniversitesi Gençlik ve Spor (454005) 70086159
+  0.90  Bekirpaşaspor [tff:745] 1996-2002 -> Çaybaşı Bekirpaşa Spor (70081646) 70084836
+  0.90  Ormanspor [tff:5339] 1991-1993 -> Mersin Orman Spor (70108696) 70084836
+  0.90  Vezirköprüspor [tff:5334] 1991-1992 -> Vezirköprü Beldespor (70081668) 70084836
+  0.90  Suluovaspor [tff:5329] 1990-1991 -> Suluova Sebat Spor (70135938) 70084836
+  0.90  Sarıkamışspor [tff:5325] 1991-1991 -> Sarıkamış Gençler Birliği Spor (70120261) 70027104
+  0.90  Ereğlispor [tff:5323] 1990-1992 -> Ereğli Demir Çelik Spor (2000070998) 70027104
+  0.90  Yeniköyspor [tff:4636] 2003-2004 -> İzmir Yeniköyspor (2000066700) 70027104
+  0.90  Gaziemirspor [tff:4301] 1997-1998 -> Gaziemir NFK Spor Kulübü (70137344) 70027104
+  0.90  Antakyaspor [tff:4263] 2004-2007 -> Antakya Gençlik ve Spor (70105044) 70027104
+  0.90  Silifkespor [tff:3669] 1992-2001 -> Silifke İdmanyurduspor (2000066532) 70084836
+  0.90  Küçükçekmecespor [tff:3619] 1990-2011 -> Küçükçekmece Tokat Bereketlispor (2000066741) 70084836
+  0.90  Hakkarispor [tff:319] 1991-2003 -> Hakkari Gençlik ve Sportif Faaliyetler (70136034) 70027104
+  0.90  Kastamonuspor [tff:101] 1967-2012 -> Kastamonu Mavi Yıldız Spor Kulübü (2000066888) 70027104
+  0.90  Alibeyköy [mackolik_arsiv:647] 1965-1988 -> Öz Alibeyköy (70043142) 70027104
+  0.90  Çankırıspor [tff:97] 1984-1991 -> Çankırı Maruf Spor (70105025) 70027104
+  0.90  Adalet [mackolik_arsiv:1647] 1959-1964 -> Elazığ Adalet Spor (70108515) 70027104
+  0.90  Gümüşhanespor [mackolik_arsiv:1611] 1984-1987 -> Esenyurt Gümüşhane Spor (70138582) 70027104
+  0.90  Ercişspor [tff:24] 1988-1994 -> Erciş Gençlik Belediye Spor (70081767) 70084836
+  0.90  Tuncelispor [tff:28] 1984-1992 -> Tunceli Gençlik ve Spor (70081741) 70027104
+  0.90  Turhalspor [tff:78] 1986-2000 -> Turhal Gençlerbirliği Spor (70081718) 70084836
+  0.90  Viranşehirspor [mackolik_arsiv:13566] 1985-1988 -> Viranşehir Gücü Spor (70101899) 70084836
+  0.90  Afşinspor [tff:5331] 1985-1990 -> Afşin Belediyespor (70081391) 70084836
+  0.90  Menemen Spor [tff:5289] 1984-1990 -> Menemen Gençlik Spor (2000067054) 70084836
+  0.90  Sahilspor [tff:5290] 1987-1992 -> Maltepe Sahilspor (70119688) 70027104
+  0.90  İslahiyespor [tff:122] 1984-1999 -> İslahiye Belediye Gençlik Spor (70136025) 70027104
+  0.90  Karacabeyspor [tff:140] 1966-1993 -> Karacabey Gençlerbirliği Spor (70081148) 70027104
+  0.90  Nazillispor [mackolik_arsiv:13305] 1967-1973 -> Nazilli Altın Efe Spor Kulübü (2000066927) 70027104
+  0.90  Artvinspor [tff:3632] 1984-1994 -> Artvin Çoruh Spor (70108416) 70084836
+  0.90  Yenişehir [mackolik_arsiv:13267] 1962-1983 -> Pendik Yenişehir Gençlik Spor (2000066943) 70027104
+  0.90  Altındağ [mackolik_arsiv:13245] 1962-1971 -> Altındağ Altınırmak Spor Kulübü (70056058) 70027104
+  0.90  Afyonspor [mackolik_arsiv:13184-once] 1967-1973 -> Afyonspor Gençlik Kulübü (2000066760) 70027104
+  0.90  Afyonspor [tff:54] 1980-2003 -> Afyon Eğitim Vakfı Spor (2000066618) 70027104
+  0.90  İskenderunspor [tff:117] 1967-2001 -> İskenderun Yükseliş Koleji Spor (2000067020) 70027104
+  0.90  Sarayköyspor [tff:92] 1985-1990 -> Denizli Sarayköy Spor (70054208) 70084836
+  0.90  Cizrespor [tff:36] 1988-2007 -> Cizre Botan Spor (70108779) 70027104
+  0.90  Çerkezköyspor [tff:3689] 1994-2012 -> Çerkezköy Samsunlular Yaşar Doğu Gençlik Spor (2000066936) 70027104
+  0.90  Kurtalanspor [tff:3679] 1994-2000 -> Kurtalan Kültür Spor (70108768) 70084836
+  0.90  Edirne Su Spor [mackolik:cd6r3ba7x130j0rujfkqm74ve] 1964-1964 -> Edirne Devlet Su İşleri Spor (70054198) 70027104
+  0.90  Türk Telekom [tff:8] 1990-2010 -> İstanbul Türk Telekomspor (2000066940) 70027104
+  0.90  Çorum Kültür [mackolik:brnopeih4d379p2jq862x8nl6] 1980-1980 -> Çorum Halk Eğitimi Kültür Gençlik ve Spor (70043731) 70084836
+  0.90  Iğdırspor [tff:321] 1984-2006 -> Iğdır Yurdum Gençlik ve Spor (70136044) 70084836
+  0.90  Van Gençlik [mackolik:azfzb4zky8s7jquvcl03rsokq] 1966-1966 -> Van Gençlik ve Spor İl Müdürlüğü Spor (70136218) 70027104
+  0.90  Kemerspor [tff:3647] 1990-2000 -> Kemer Belediye Spor Kulübü (2000071964) 70084836
+  0.90  Bingölspor [tff:22] 1982-1999 -> Bingöl Genç Demir Spor (70108452) 70084836
+  0.90  Ardahanspor [mackolik:8toaos56h7w8jbd7z2h94033c] 2012-2012 -> Ardahan Kalespor (70081038) 70027104
+  0.90  Marmaraspor [mackolik:8rhfmuuyby6cypj5jdowb4s4q] 1964-1964 -> Marmara Karayollarıspor (2000066698) 70027104
+  0.90  Beypazarı Bld.Spor [tff:12] 1986-1998 -> Beypazarı Belediyesi Gençlik (70057297) 70084836
+  0.90  Şirinköy [mackolik:5zt0b5qshrm14f1o8784bxii] 1985-1986 -> Gölcük Şirinköyspor (2000066801) 70027104
+  0.90  Amasyaspor [tff:69] 1968-2004 -> Amasya Belediyespor (70101817) 70027104
+  0.90  Düzce Gençlik [mackolik:5uej0126mtyt9jvqcj6qfd562] 1966-1967 -> Düzce Çamlı Gençlik ve Spor (70136004) 70027104
+  0.90  Zonguldakspor [tff:103] 1962-2007 -> Zonguldak İhsaniyespor (70136229) 70084836
+  0.90  Kadıköy [mackolik:5kfk37cte4v4wg5rv0ll2one2] 1992-1992 -> Konya Kadıköyspor (70122287) 70027104
+  0.90  Doğubayazıtspor [tff:3772] 1998-2000 -> Doğubayazıt Belediyesi Gençlik Spor (70101816) 70027104
+  0.90  Bafra [tff:3633] 1982-1993 -> İstanbul Bafraspor (70076217) 70084836
+  0.90  Niğdespor [tff:68] 1984-2004 -> Niğde Çiftlikspor (70108727) 70027104
+  0.90  Yozgatspor AŞ [tff:79] 1986-2013 -> Yozgat Divanlı Gençlerbirliği Spor (70136227) 70027104
+  0.90  Küçükköyspor [tff:3659] 1990-2009 -> Balıkesir Küçükköy Spor (70061786) 70084836
+  0.90  Yıldızspor [mackolik:3jqku8uxxo064m1onoypp57je] 1980-1980 -> Denizli Yıldız Spor (2000072918) 70027104
+  0.90  Çeşmespor [tff:5336] 1986-1991 -> Arap Çeşmespor (70108660) 70027104
+  0.90  Bayburtspor [tff:20] 1981-2026 -> Bayburt Kurtuluşspor (70108438) 70084836
+  0.90  Kartalspor [tff:3612] 1984-2016 -> Mahmut Köyü Kartal Gençlik ve Spor (2000067004) 70027104
+  0.90  Eğirdirspor [mackolik:1j0bpewuzei5emnq2f8rt9zh1] 2014-2016 -> Eğirdir Belediye Spor (2000066782) 70027104
+  0.90  Bucak Oğuzhan [mackolik:axay1jm0jno9vwjw8y6t2yyf4] 2012-2026 -> Bucak Belediye Oğuzhanspor (70055735) 70086165
+  0.90  Çerkezköy 1911 [mackolik:6di40koutcu3zy9cczzq5yvsa] 2018-2018 -> Çerkezköy 1911 Doğan Spor (70081705) 70086166
+  0.90  Beylerbeyispor [tff:3614] 1962-2018 -> Beylerbeyi Spor Kulübü Spor Faaliyetleri A.Ş (458638) 463479
+  0.90  Sarayköy 1926 [tff:3687] 1994-2016 -> Sarayköy 1926 Futbol Kulübü (8475278) 70043164
+  0.90  Tavşanlı Linyit [tff:141] 1963-2019 -> Türkiye Kömür İşl. Tavşanlı Linyitspor (70014468) 70043164
+
+Logosu bulunamayan 307 kulüp (maç sayısına göre):
+  Mersin İ.Y. [tff:118] 1962-2017 1940 maç
+  Ç. Dardanelspor [tff:137] 1967-2017 1585 maç
+  MKE Kırıkkalespor [tff:15] 1967-2017 1492 maç
+  A.Sebatspor [tff:75] 1968-2011 1388 maç
+  Bucaspor [tff:109] 1984-2018 1213 maç
+  Uşakspor [tff:94] 1967-2008 1197 maç
+  Ofspor [tff:3693] 1994-2022 963 maç
+  PTT [mackolik_arsiv:565] 1959-1989 835 maç
+  M.Kemalpaşaspor [tff:142] 1982-2008 764 maç
+  Tirespor [tff:112] 1970-1992 673 maç
+  Ödemişspor [tff:3651] 1970-1994 668 maç
+  Çubukspor [tff:13] 1985-2005 656 maç
+  Çankırı Belediyespor [tff:379] 1996-2014 639 maç
+  Y.Salihlispor [tff:84] 1980-2001 636 maç
+  Defne Anadolu [tff:4262] 1995-2015 599 maç
+  Oyak Renaultspor [tff:3922] 2001-2017 580 maç
+  Ağrıspor [tff:19] 1981-2002 532 maç
+  Esk.Şekerspor [tff:14] 1962-2003 524 maç
+  Yalıspor [tff:3636] 1987-2014 510 maç
+  Y.Milasspor [tff:90] 1984-2000 507 maç
+  Erdemir Ereğlispor [tff:100] 1974-1999 503 maç
+  GMG Kastamonuspor [tff:4342] 1993-2026 477 maç
+  Petkimspor [tff:3649] 1990-2004 466 maç
+  Anadolu Hisarı İ.Y. [tff:3613] 1984-1998 461 maç
+  Çanspor [tff:3626] 1985-2000 459 maç
+  Beyoğlu Y.Çarşı [tff:3096] 2014-2026 436 maç
+  Mudurnuspor [tff:99] 1984-2000 428 maç
+  Ülküspor [mackolik_arsiv:13682] 1962-1986 421 maç
+  Nizip Bld.Spor [tff:126] 1984-1997 413 maç
+  Davutpaşa [mackolik_arsiv:11587] 1962-1986 412 maç
+  Aliağa (Göztepe A.Ş. Aliağa) [tff:3688-once] 1994-2006 403 maç
+  Y.Kırşehirspor [tff:4508] 1999-2010 393 maç
+  Y.Sincanspor [tff:10] 1985-1996 378 maç
+  Yüksekova Bld.Spor [tff:23] 1990-2001 374 maç
+  Soma Linyitspor [tff:3650] 1990-2000 365 maç
+  Sönmez Filamentspor [tff:144] 1984-1995 359 maç
+  Edremitspor [tff:89] 1984-1996 346 maç
+  Nusaybin Demirspor [tff:505] 1997-2007 338 maç
+  Kdz.Ereğli 1980 [tff:3690] 1994-2026 321 maç
+  Ş.Urfa Bld.Spor [tff:4511] 2000-2009 318 maç
+  D.Ç.Divriğispor [tff:5026] 1999-2008 310 maç
+  Malkaraspor [tff:3638] 1985-1994 295 maç
+  Sidespor [tff:4156] 1998-2006 290 maç
+  Yeşil Beyaz FFAŞ [mackolik:cwqpchb7xze66h0lzdnh9w969] 1980-1993 285 maç
+  Selçuk Üniversitesi [tff:3685] 1994-2002 283 maç
+  S.Efesspor [tff:3652] 1990-1999 280 maç
+  Kocasinan Belediyespor [tff:3684] 1994-2002 278 maç
+  Etibank Sas [tff:57] 1990-2000 270 maç
+  Y. Akşehirspor [tff:55] 1984-1992 262 maç
+  Silopi Cudispor [tff:2003] 1996-2003 257 maç
+  Toprakofis [mackolik_arsiv:13260] 1960-1972 255 maç
+  THY [tff:3620] 1984-1991 246 maç
+  Burhaniyespor [tff:88] 1985-1992 241 maç
+  Bitlis Spor 1916 [tff:3840] 1982-2026 233 maç
+  Süleymaniye [mackolik_arsiv:11577] 1962-1977 232 maç
+  A.S.K.İ. Spor [tff:4412] 1995-2001 224 maç
+  Adana Polisgücü [tff:120] 1988-1994 221 maç
+  12 Mart [tff:25] 1975-1993 216 maç
+  Yeni Ereğlispor [tff:2258] 2001-2007 216 maç
+  Ant.Köy Hiz.Spor [tff:3648] 1990-1996 210 maç
+  Bismil Birlikspor [tff:3676] 1993-2000 209 maç
+  Sanayi Barbaros [mackolik_arsiv:625] 1962-1982 206 maç
+  A.B.Kızılcahamam Belediyespor [tff:3683] 1994-2005 204 maç
+  Etibank SAS [mackolik:3uljqeenhn43ir4fu5g1jxc2y] 1980-1992 189 maç
+  Eski Spor [tff:2840] 2000-2005 188 maç
+  Galatasaray (2P) [mackolik_arsiv:13192] 1984-1989 185 maç
+  Ank.Köy Hiz.Spor [tff:3664] 1991-1997 178 maç
+  Sakarya Karadenizspor [mackolik_arsiv:13546] 1984-1989 170 maç
+  Sidespor [tff:3807] 1996-2000 160 maç
+  Konya Yolspor [tff:4678] 1991-2000 160 maç
+  Trabzonspor (2P) [mackolik_arsiv:13194] 1976-1989 149 maç
+  Ank.Emniyetspor [tff:3644] 1990-1994 148 maç
+  Esk.Demirspor [tff:3667] 1991-1998 146 maç
+  Van DSİ Spor [tff:3663] 1991-1995 142 maç
+  Kocaeli SEKA Kağıtspor [mackolik_arsiv:9743] 1964-1987 137 maç
+  Dalaman Kağıtspor [tff:4845] 1999-2002 128 maç
+  Yüksekova Cilospor [mackolik_arsiv:9646] 1986-1989 121 maç
+  Karşıyaka (2P) [mackolik_arsiv:13193] 1986-1989 119 maç
+  Bursaspor (2P) [mackolik_arsiv:13195] 1976-1988 115 maç
+  K.Maraş İstiklal [tff:9908] 2024-2026 109 maç
+  Y.Bornovaspor [tff:3675] 1993-1997 108 maç
+  Bahçeli Gençlik [mackolik_arsiv:13242] 1962-1987 104 maç
+  Kadirli İ.Y.Belediyespor [tff:123] 1990-1992 100 maç
+  Köy Hiz.Sinopspor [tff:5293] 1990-1992 100 maç
+  Gümüşhane Köy Hiz.Spor [tff:5330] 1990-1992 100 maç
+  Rize Çayspor [tff:3024] 2000-2002 94 maç
+  Diyarbakır Köy Hiz.Ay Spor [tff:4016] 1997-1999 94 maç
+  Hayraboluspor [mackolik_arsiv:13569] 1985-1987 93 maç
+  Gazi Belediyespor [tff:5099] 2005-2007 90 maç
+  Çine Madranspor [mackolik_arsiv:9710] 1980-1986 89 maç
+  Bursa Kültürspor [mackolik_arsiv:13338] 1982-1986 86 maç
+  İçel Demirspor [mackolik_arsiv:13516] 1975-1986 86 maç
+  Kütahya Termikspor [mackolik_arsiv:13505] 1983-1986 84 maç
+  Yozgat Bozokspor [mackolik_arsiv:15019] 1980-1986 83 maç
+  Borspor [mackolik_arsiv:13525] 1984-1986 81 maç
+  Denizli Emsan Şirinköy [mackolik_arsiv:13374] 1984-1986 80 maç
+  Sümerbankspor [tff:3671] 1992-1994 80 maç
+  Denizli İY [tff:384] 2025-2026 67 maç
+  Dardanel Kepezspor [tff:3960] 1996-1997 66 maç
+  Y.Anamurspor [tff:4451] 1998-1999 64 maç
+  Van İskelespor [mackolik_arsiv:13589] 1983-1986 63 maç
+  İstanbul DSİ [mackolik_arsiv:15187] 1987-1988 62 maç
+  Akseki Aroma Gençlik VE Spor [tff:3779] 2004-2005 61 maç
+  Edirne Dsi.Spor [tff:4029] 1995-1996 60 maç
+  Murgul Bakırspor [tff:4534] 2002-2003 60 maç
+  Muş Adaletgücüspor [tff:4890] 1995-1996 60 maç
+  Tekirdağ Büyük Salatspor [mackolik_arsiv:15176] 1988-1989 58 maç
+  DSİ Spor [tff:3670] 1992-1993 54 maç
+  Ağrı Köy Hizmetleri [tff:3677] 1994-1995 52 maç
+  DHMİ [tff:3682] 1994-1995 52 maç
+  İst. Özel İdare İhtisas Spor [tff:3674] 1993-1994 50 maç
+  Hatay Polisgücü [tff:3695] 1994-1995 50 maç
+  1922 Akşehir Spor Kulübü [tff:6835] 2026-2026 34 maç
+  Adana Adaletgücü Spor Sportif Faaliyetler A.Ş. [tff:8742] 2026-2026 34 maç
+  Mamakspor [mackolik:aht9xe7n0z428nzw912k4f9m2] 1986-1986 33 maç
+  Viranşehir Bld [tff:4515] 2024-2024 32 maç
+  Elazığ Ferrokromspor [mackolik_arsiv:13409] 1986-1986 32 maç
+  Bağlar Vuralspor [tff:2006] 2008-2008 32 maç
+  Karabulak Gençlikspor [tff:3233] 2000-2000 32 maç
+  Ziraat Bankasıspor [tff:4352] 1996-1996 32 maç
+  Batman Demirspor [tff:223] 2000-2000 30 maç
+  Tofaş Spor [tff:3958] 2000-2000 30 maç
+  Denizgücü [mackolik:6tk0ntynl2srpn0otmiwcjiwa] 1967-1983 26 maç
+  Bursa Belediyespor [mackolik_arsiv:15193] 1984-1984 26 maç
+  Tunceli Belediyespor [tff:2095] 1995-1995 26 maç
+  Adana Köy Hizmetleri [tff:3680] 1994-1994 26 maç
+  Sivas TEK Çayspor [tff:3692] 1994-1994 26 maç
+  Giresun Köy Hizmetleri [tff:3694] 1994-1994 26 maç
+  Denizcilik İşletmeleri [tff:4691] 1995-1995 26 maç
+  Çarşamba Beldespor [tff:5299] 1993-1993 24 maç
+  Egespor [mackolik_arsiv:13469] 1962-1968 18 maç
+  Muhafızgücü [mackolik:5m5e31ln6ny1xvl6ia4uunyl1] 1962-1980 17 maç
+  Eskişehir Havagücü [mackolik:281u6ti429eeslb4prtnhswve] 1964-1981 15 maç
+  Ankara Yolspor [mackolik_arsiv:13261] 1965-1966 14 maç
+  D Karagücü [mackolik:1bwxoe05fs0nebidm283rynhm] 1963-1965 13 maç
+  Erz. Karagücü [mackolik:9bpezm0y0kd3o47l9xyq20eay] 1964-1983 13 maç
+  Tatvan G.Birliği [mackolik:4gbdw8240tou6rk86wcfyf5g9] 2012-2017 11 maç
+  Yolspor [mackolik:8145vbaik66wfun47q6swdp7t] 1962-1966 10 maç
+  Adana Demir II [mackolik:9zhi9zzlj4cyaodqz44blgy96] 1978-1982 10 maç
+  Cerrahpaşa [mackolik:bdn5r1cdj75laall4297vesfe] 1982-1983 10 maç
+  Kayseri HG [mackolik:1damzxb5xsblwpgu7zteiqane] 1962-1965 9 maç
+  İzmir Karagücü [mackolik:dhaczc7htnl9oweo0lknd1mqy] 1962-1982 9 maç
+  Ankara D.S.İ. [mackolik:dvps7nlp8560x06lrdudixffu] 1980-1982 9 maç
+  İzmir Kültürspor [mackolik_arsiv:13471] 1960-1963 9 maç
+  Kocaeli Petkimspor [mackolik:4cyyiggxdutxlmdi6mr6dmzje] 1980-1983 8 maç
+  Karagücü [mackolik:6jy1puwdkbv9lonhkwaxf7joq] 1982-1983 8 maç
+  Artvin İÖİ [mackolik:7ij0iv3hxrhjnbx5n0dn6k0oa] 1985-1993 8 maç
+  Kuvvetler Gücü [mackolik:8edraqtl0x55y4i9209z8hmy2] 1982-1983 8 maç
+  Çamdibi GB [mackolik:e7h9v82q9xg9qks746kx7valm] 1985-1992 8 maç
+  Kayseri Sümer [mackolik:3j3cwc8r4q9mvykn3ft8nlnqi] 1963-1983 7 maç
+  Amasya Şeker [mackolik:5w983lkmdzzxnmmke0pow24bu] 1964-1964 7 maç
+  Seka Aksuspor [mackolik:969m7sxas3cc35hdg700n8xgq] 1980-1981 7 maç
+  Gaziantepspor II [mackolik:egyyq9iwtw75q89o4ln5cctwq] 1982-1983 7 maç
+  Çırçırspor [mackolik:1t319k4acvqklznkmkql8dbe] 1982-1982 6 maç
+  Altay II [mackolik:fs3tcokx66mgxfc4b9r1eiju] 1981-1983 6 maç
+  İskenderun II [mackolik:257fc7qnteaslq8ox4t5r50tm] 1981-1981 5 maç
+  Beşiktaş II [mackolik:283omx5wh847vh3ttx032o2ui] 1985-1988 5 maç
+  Konya G.Birliği [mackolik:2a6t99lpi2u6nfzwl9s8wwrca] 1964-1964 5 maç
+  DSİ Bentspor [mackolik:70fqw6gxux82y0hsgkt733cru] 1982-1983 5 maç
+  Tokatspor II [mackolik:7c3h3z2alok35jvszfjd0eh62] 1976-1981 5 maç
+  Tekelspor [mackolik:9n8zgggg9r3qpcbdbwctkezca] 1980-1982 5 maç
+  Burdur MAKÜ [mackolik:d4tdid9s77y1aafg1pabsibfu] 2022-2023 5 maç
+  Diyarbakır DSİ [mackolik:100ohsy0hvc6k2shza4f3ipuy] 1978-1983 4 maç
+  Gönyeli [mackolik:2m02ca97b7t7x7h4hh1pn2hyi] 1971-1972 4 maç
+  Dikilitaşspor [mackolik:2onuxpw2y732os6el1jjy0tbe] 1980-1983 4 maç
+  Adana Milli [mackolik:2zdjstaaztm3jgybkpv59yfze] 1967-1970 4 maç
+  Eskişehir II [mackolik:3jmxzs26asq9mx1ewk62bi99m] 1976-1980 4 maç
+  Trabzon GB [mackolik:407w6p6to94weuiu4fbayproq] 1972-1979 4 maç
+  Ç. Dardanelspor II [mackolik:4ejo83pkudkig5r90e6k6wgoa] 1981-1982 4 maç
+  Ankara JG [mackolik:4jiftsmxcltvdj1f4ustw29uy] 1964-1966 4 maç
+  Antalyaspor II [mackolik:58wn9ndunjsl4euq3dj4japgq] 1980-1981 4 maç
+  Dicle Gençlik [mackolik:7csnjx4x1q281cczwn2m0lx0q] 1962-1965 4 maç
+  Muş İY [mackolik:8wdv4l7rk1zjq2b46nj4hoewa] 1977-1981 4 maç
+  Ankara HG [mackolik:avec6lbphi1jobepmu06m3cyy] 1963-1963 4 maç
+  Mensucatspor [mackolik:awtdnpgfk9e5jjri3n3pznbsa] 1974-1993 4 maç
+  Denizlispor II [mackolik:bb0vffzancurs2cl6totwpg8a] 1978-1981 4 maç
+  Havagücü [mackolik:bcdyncsmwuaimnpv2w6oqojfu] 1983-1983 4 maç
+  Yıldız Gençlik [mackolik:cg8z4y5x2rviccp1kg7gkfvqi] 1963-1964 4 maç
+  Adıyaman GK [mackolik:d5k8kgsyuua9zbbc1vy9513sa] 1978-1981 4 maç
+  Edirnespor GK [mackolik:e9opkdjz2siu5l1njfmgy21h6] 2012-2014 4 maç
+  Eti Maden Eti [mackolik:ej0qer2awx0sru7ogb53bdkyy] 1978-1978 4 maç
+  Kars Kale [mackolik:1yhfduu1mrk23zmpftt4t6m3u] 1976-1976 3 maç
+  Reyhanlı GK [mackolik:4195eq1pezwd1yn1fek428fhm] 1963-1982 3 maç
+  Niğdegücü [mackolik:4irdzxucb71txb63ctpgp3wx6] 1980-1981 3 maç
+  Türkocağı [mackolik:5f1q4sj4r4m5wdvvqhvqsjtyi] 1981-1981 3 maç
+  Hatayspor II [mackolik:5gcy9eze5womfdijpfpmcewyy] 1978-1979 3 maç
+  Erzincanspor II [mackolik:73f36hsfgfx614ivu9eqzcbxm] 1978-1978 3 maç
+  Zonguldak Gençlik [mackolik:7ifedoyu2g13j9x8chz0ceve2] 1978-1980 3 maç
+  Antalya Orman [mackolik:83snveu42ia1inhdugpb1k4tm] 1992-1993 3 maç
+  Akyol Gençlik [mackolik:8sd0umwnpr13snqhnnl0dlje2] 1981-1981 3 maç
+  Malatyaspor II [mackolik:9nw5xutzn159ui9epuvsvatey] 1980-1980 3 maç
+  Adana Sümer [mackolik:a9khrmrv28x0ohhi1hc7pmzje] 1965-1969 3 maç
+  Ç. Rizespor II [mackolik:aus9as98rd0hd65943lub4qju] 1980-1981 3 maç
+  İzmir Tekel [mackolik:b4zfh3wx4z7oe1s4foc902vze] 1978-1979 3 maç
+  Sivas Karagücü [mackolik:bbuuypn6wwaboc43j7knw3t62] 1962-1964 3 maç
+  K.Maraş Gençlik [mackolik:bcx8zukvzjk9j0gxcn6ek5h7u] 1981-1981 3 maç
+  Konya Karagücü [mackolik:bk2vui1p68r5tw2ozzt8dknsa] 1978-1982 3 maç
+  Kırıkhan Gençlik [mackolik:ctg7uv7e2msubqlg9vyh70kfe] 1980-1983 3 maç
+  Erz Karagücü [mackolik:d3q1cn6y0mxlgwu81c8qwk2ne] 1962-1963 3 maç
+  Burdur YSE Yurt [mackolik:dm15zr9fo5vjnobrrw1we33hm] 1978-1980 3 maç
+  Afyon Şeker [mackolik:ejqvkm1hp8g7hlz66yb6yh2sq] 1983-1983 3 maç
+  İzmirspor II [mackolik:eydgwmxv4cgtk0p83phiiwvoq] 1983-1983 3 maç
+  Alpullu Şeker [mackolik:jl7pmx0xif1t6lsj0mol52sq] 1962-1965 3 maç
+  A.Adaletgücü [mackolik:13w2ywxj1aey74pz2jwpubfo4] 2026-2026 2 maç
+  Antalya Demir [mackolik:1ekznid76oa6j78y8qwku1yei] 1972-1972 2 maç
+  Kastamonu ÖİKH [mackolik:1g7754a0em2xk8y9muulz2fl6] 2019-2019 2 maç
+  Tütünçiftlik [mackolik:2fo8lwdmn5c37egdihpw9lwtm] 1983-1983 2 maç
+  Erzincan Şeker [mackolik:2h5i52d04oeb0lprv93nlsd4a] 1965-1965 2 maç
+  Elazığ Sus [mackolik:3aapnkpylfua0fo0t3rqpaw6i] 1963-1965 2 maç
+  Yeşilpamuk [mackolik:3bmvuj0229b5l1fmqjpmws5ey] 1962-1962 2 maç
+  K.Erciyesspor II [mackolik:3k37k5g7qzbb05kfdvs5in8tm] 1981-1981 2 maç
+  Çankırı BG [mackolik:3kj187sn6tgcbk9yj6skv8m3t] 1980-2015 2 maç
+  Antalya Ant [mackolik:3kldsh86qnwwndhbrr70c9lre] 1976-1976 2 maç
+  1923 Afyonspor [mackolik:3qepk5qiq8u0ybywf78g63ifo] 2026-2026 2 maç
+  Kütahya Havagücü [mackolik:4gj0uqpce3uzjrhmwdi4yczu2] 1962-1966 2 maç
+  Sivas Dört Eylül [mackolik:4iofznnd7luyts5polhtrrvb9-once] 1983-1983 2 maç
+  Afyon YSE [mackolik:5i8objumuyv4uuinnfwpsze5m] 1981-1981 2 maç
+  Kombinespor [mackolik:5pc8trwcry4spvlclxchghq3u] 1982-1982 2 maç
+  Turan İ.Y. [mackolik:63362lo4fz25px4zac6nijv56] 1980-1980 2 maç
+  Ertuğrul G. [mackolik:67r70j6yu89ynkfu560iazgx6] 1980-1980 2 maç
+  Soyaspor G [mackolik:6i9jbzxlf21zp90yjyw1rg31m] 1981-1981 2 maç
+  Iğdır Üniversitesi [mackolik:6mclz39ia5fmwcy9dlizhbs4o] 2012-2012 2 maç
+  Iğdır GB [mackolik:6nkdpv1i7l785577incmuzvhu] 2013-2013 2 maç
+  Orduspor II [mackolik:6q5blti0mgwe3g64kyy88nl2i] 1975-1985 2 maç
+  Osmaniye Hal [mackolik:6w5od7x8mx84thsj46wk7gnl6] 1982-1982 2 maç
+  Urfa BG [mackolik:7ah7t6uu8soeu91ray0724odm] 1983-1983 2 maç
+  Urfa Gençlik [mackolik:7gdz5kbcbax7epwig6jtijn8q] 1965-1966 2 maç
+  Edremit Gençlik [mackolik:7omzmblm6ls86ua7pu0kk7zai] 1980-1980 2 maç
+  Ferrokromspor [mackolik:7qm6ffccv95wzfxp4mal05lyi] 1986-1986 2 maç
+  Karagümrük II [mackolik:8g0xpuyw6mqq6ssmj93lc06sq] 1979-1986 2 maç
+  Bursa Tuna [mackolik:8z7wjf4mydq2x1m0o096zfo16] 1983-1983 2 maç
+  Arıt Kayadibi [mackolik:98mh0prs4efvc7x4zk90lmhas] 2026-2026 2 maç
+  Jandarmagücü [mackolik:9h00uy44d128rf3x8sythxylm] 1983-1983 2 maç
+  Şiran Yıldızspor [mackolik:aakj25sv87r6cdu9vlalsm8t0] 2025-2025 2 maç
+  Ağrı Demir [mackolik:ads7lo9ykvrtwqi8l1fxp95re] 1983-1983 2 maç
+  Çorlu Kültürspor [mackolik:aoxgut1d6ynir29k29dkq8wve] 1980-1980 2 maç
+  Başkarcı İY [mackolik:c36haxckbv7lb17ayfgw5v5gq] 1983-1983 2 maç
+  Adanaspor II [mackolik:cedxnsywcr8i80p7n9f024e3u] 1980-1980 2 maç
+  Urfa Et Balık [mackolik:cmfqj1kiic8hlo5s7gul64vhm] 1982-1982 2 maç
+  Siirtspor FK [mackolik:crwr1m935iwad9cm0p70etw5w] 2026-2026 2 maç
+  Düzcespor II [mackolik:dcc6pnos3jhvrbr1le2pjgtwq] 1979-1979 2 maç
+  Bursa Fethiye 1973 [mackolik:ds4wxucec6swihg7km0ix6q22] 1978-1978 2 maç
+  Ankaragücü II [mackolik:dtkge32453fzbmij3w82fveju] 1983-1983 2 maç
+  Emniyetspor [mackolik:e2f87j88mvv0o1ramkau7aaga] 1993-1993 2 maç
+  Kozlu Bld [mackolik:eetk5bjtpfez2vint7to95kyy] 1982-1982 2 maç
+  Sarıkamış GB [mackolik:elax5nrid7mca7p3tf2dle9uy] 2018-2018 2 maç
+  Bursa Demirtaş [mackolik:em56q00ism9i0j8q7kp5vhbe] 1982-1982 2 maç
+  Kendirgücü [mackolik:eu08yol1p2r3ppmewz9ymgcq2] 1980-1981 2 maç
+  Gümüşhane İÖİ [mackolik:faf4w00c39qnbnfvve1opkyy] 1983-1983 2 maç
+  Amasya Gençlik [mackolik:iu5gpb644wtdbnnmpty74o6i] 1982-1982 2 maç
+  Cizre Bld [mackolik:18i5nsab5948a35jgb0xm8hsk] 2026-2026 1 maç
+  Kocaeli Boru [mackolik:1g19tds2mgptd27j9c555fbsa] 1966-1966 1 maç
+  Vefa II [mackolik:1hihmiumopg85a7njhslcookq] 1980-1980 1 maç
+  Öz Van Gençlik [mackolik:1i10yjmn1qe7r78h37ewdh8iy] 1979-1979 1 maç
+  Çankırı Saray [mackolik:1wuwiib74nfo1dqk9mojafw2c] 2023-2023 1 maç
+  İstanbul II [mackolik:1yxag2t2y5yox1ug1kkhy5oq2] 1980-1980 1 maç
+  İzmir Hilal [mackolik:21vv5jrocmu7at2s1mw78am3u] 1983-1983 1 maç
+  1955 Seydişehir ASK [mackolik:2d3txsgjyxitxylfcrvxv8rxm] 2019-2019 1 maç
+  Şair Zihnispor [mackolik:2pvf3yanm32071py60uqdxisq] 1980-1980 1 maç
+  Merzifon G [mackolik:2uv4rkjgf48hmjpz6fcsjjxbe] 1980-1980 1 maç
+  Mersin İY II [mackolik:3c9vru8i6t7owa0b62pmni6wa] 1978-1978 1 maç
+  Amasya II [mackolik:3e0mxbazgrded3hnrb3xjsuwa] 1981-1981 1 maç
+  Rize Güneş [mackolik:3wydmtlo5gm1r8ftrffmw9d2i] 1965-1965 1 maç
+  Bilecik İÖİ [mackolik:42yr2xgpj4oxt046gdwf0yvop] 2015-2015 1 maç
+  Erzurumspor II [mackolik:4qyxvovdqs6gpf31hzj0gg962] 1978-1978 1 maç
+  Sarayköy GK [mackolik:4xzu30n6kqwf047uoargxk76y] 1976-1976 1 maç
+  Antalya Merkez [mackolik:50knvg3ywoxvba4hxzk9ddizu] 1980-1980 1 maç
+  Balıkesir Karagücü [mackolik:5cgltn6tnzamyaz3xho9k3hbe] 1965-1965 1 maç
+  Abana GB [mackolik:5hc6dgh80mncbraovgcdcutt6] 1982-1982 1 maç
+  Kilis Birlikgücü [mackolik:5nt6eysh645kuyz1vvu5ysvtg] 2026-2026 1 maç
+  Adıyaman İÖİ [mackolik:6i95ssjnkynk10e9a2dwp2j02] 2014-2014 1 maç
+  Isparta KG [mackolik:773155ep1hi24912c5xgdb04q] 1962-1962 1 maç
+  Kelkit G.Birliği [mackolik:7fh6eclqd0l8an5sqeh3di4x6] 1979-1979 1 maç
+  Karacadağ G [mackolik:7h8p13kzyo1twjlai4b8ui3xm] 1977-1977 1 maç
+  Malatya Akın [mackolik:7iz97jjnco9wg7xqp4abyrfu] 1966-1966 1 maç
+  Mardin Sağlık [mackolik:82ivimvc5ekrrpy76grtbn0q2] 1981-1981 1 maç
+  Gölespor [mackolik:8gpszm7cha1n4nwnrbp4ue39w] 2026-2026 1 maç
+  Uşak G.Birliği [mackolik:8q7sidudn2kx1ffi1inc0xmy2] 1981-1981 1 maç
+  Söke Gençlik [mackolik:8vqs286akuvykslenfsjavre2] 1965-1965 1 maç
+  Urfa Tektek [mackolik:9bp0o2b1kvvrq4ajjtoqgwga2] 1962-1962 1 maç
+  Muş Demir [mackolik:9dt96r7vvox77yhg4xhz1r5d5] 2015-2015 1 maç
+  Bitlis Güzeldere [mackolik:9hu9enm9c5rsud9n0eo3gsx2i] 1979-1979 1 maç
+  Turhal Şeker [mackolik:9o8mxwogip8o1da5opj5kabu2] 1962-1962 1 maç
+  Çankırı Demir [mackolik:9pe1ewz73vymxqatiks1jo7e2] 1981-1981 1 maç
+  Torul Bld [mackolik:9yv4zs6f665w8zxqxid6s14ru] 2026-2026 1 maç
+  Mut İ.Y.Bld [mackolik:9z3c8vzg37ihf6hd0fkf22e7e] 2018-2018 1 maç
+  Çankırıgücü [mackolik:a0qsbwy6qj90eynybtu2276dw] 2026-2026 1 maç
+  Fatsa Gençlik [mackolik:akp10mhcz8e6xkbaxtk4658x6] 1979-1979 1 maç
+  Çorumgücü [mackolik:auk4ioz64q4puzsgkzhow1roq] 1981-1981 1 maç
+  Seyhanspor [mackolik:b7ey4j3clz72m6cah9jx728h6] 1964-1964 1 maç
+  Torbalı Gençlik [mackolik:bsv3z4k2atjn57vk1zzeivdyi] 1966-1966 1 maç
+  Tekirdağ Tekel [mackolik:bzax51ecs51ug5xte03ghkacq] 1978-1978 1 maç
+  1922 Akşehirspor [mackolik:c2h3q0yvv2n00i9f0ngc1rok4] 2026-2026 1 maç
+  Sakarya Donatım [mackolik:cditmynq3g0i818v541yyod4a] 1979-1979 1 maç
+  Büyükçekmece Gücü [mackolik:chq8kzws82vjlv43pa9l6ixw4] 2026-2026 1 maç
+  Afyon Çimento [mackolik:cunys886uwycahs7mla3z9i0a] 1982-1982 1 maç
+  Bitlis Yıldırım [mackolik:ddq5zyvq7xbbia1nwwg4zfg4q] 1980-1980 1 maç
+  Erzincan Kızılay [mackolik:djkcc6patd41p2a8ghh9e3rze] 1981-1981 1 maç
+  Dağcılıkspor [mackolik:dptk45vp82nv1brxuvh70tvu2] 1980-1980 1 maç
+  Boluspor II [mackolik:dyb4rn4gsgxwmeo2xgpw0oley] 1978-1978 1 maç
+  Eskişehir DS2 [mackolik:e0smup4y3x4awjulls6zhnzvu] 1979-1979 1 maç
+  Adz. Şekerspor [mackolik:e74eqc1q73zglwmmcfre4lze2] 1965-1965 1 maç
+  İstanbul DG [mackolik:efm4jc6hrcbt4ipkxr3nrrzai] 1963-1963 1 maç
+  Şanlıurfa II [mackolik:escchacwecckschkekhxlwj8q] 1976-1976 1 maç
+  Karıncalıspor [mackolik:eys8ufizgj7zzqm3zlutmtjl6] 1981-1981 1 maç
+  Nizip Bld Olimpiyat [mackolik:macko17827531952775264769] 1977-1977 1 maç
+  Girmeli Bld [mackolik:n11cg6u172xkbdywdfbgmose] 2013-2013 1 maç

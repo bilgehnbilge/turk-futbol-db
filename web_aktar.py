@@ -110,6 +110,13 @@ def main():
     for r in c.execute("SELECT onceki_kulup, sonraki_kulup, sezon, tur, aciklama FROM kulup_ardil"):
         ardil[r[0]].append({"yon": "sonraki", "kulup": r[1], "sezon": r[2], "tur": r[3], "aciklama": r[4]})
         ardil[r[1]].append({"yon": "onceki", "kulup": r[0], "sezon": r[2], "tur": r[3], "aciklama": r[4]})
+    # logo: logo_eslesme.json {"tff:3661": <FM kimligi>, ...} -> docs/logo/<FM kimligi>.png
+    logo_es = json.load(open(os.path.join(KOK, "logo_eslesme.json"), encoding="utf-8")) if os.path.exists(os.path.join(KOK, "logo_eslesme.json")) else {}
+    logo = {}
+    for r in c.execute("SELECT kulup_id, kaynak || ':' || kaynak_id FROM kulup_kimlik ORDER BY kaynak <> 'tff', son_sezon DESC"):
+        fm = logo_es.get(r[1])
+        if fm and r[0] not in logo and os.path.exists(os.path.join(KOK, "docs", "logo", f"{fm}.png")):
+            logo[r[0]] = fm
     tff = collections.defaultdict(list)
     for r in c.execute("SELECT kulup_id, kaynak_id FROM kulup_kimlik WHERE kaynak='tff' AND kaynak_id NOT LIKE '%-once'"):
         tff[r[0]].append(r[1])
@@ -135,7 +142,8 @@ def main():
         sezonlar = sorted({x[2] for x in ms})
         en_ust = min((x[5] for x in ms if x[3] == "L" and x[5]), default=None)
         liste.append({"id": k, "ad": gorunen(ad, adlar.get(k, [])), "adlar": adlar.get(k, []), "ilk": sezonlar[0], "son": sezonlar[-1], "mac": len(ms),
-                      "yerli": k in yerli, "enust": en_ust, "tff": tff.get(k, []), "ardil": ardil.get(k, [])})
+                      "yerli": k in yerli, "enust": en_ust, "tff": tff.get(k, []), "ardil": ardil.get(k, []),
+                      **({"logo": logo[k]} if k in logo else {})})
         yaz(os.path.join(CIKTI, "kulup", f"{k}.json"), {
             "alanlar": ["id", "tarih", "sezon", "yarisma", "lig", "kademe", "grup_tur", "playoff", "saha", "takim", "rakip_id",
                         "rakip", "attigi", "yedigi", "pen_a", "pen_y", "durum", "not"],

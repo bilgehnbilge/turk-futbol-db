@@ -22,7 +22,8 @@ async function al(yol, secenek) {
   try { return await p; } catch (e) { onbellek.delete(yol); throw e; }
 }
 const kulupAd = id => KULUP.get(id)?.ad ?? "?";
-const kulupBag = (id, ad) => id != null && KULUP.has(id) ? `<a class="bag" href="#/kulup/${id}">${esc(ad ?? kulupAd(id))}</a>` : esc(ad ?? "?");
+const logoImg = (id, cls = "logo-k") => { const l = KULUP.get(id)?.logo; return l ? `<img class="${cls}" src="logo/${l}.png" alt="" loading="lazy" onerror="this.remove()">` : ""; };
+const kulupBag = (id, ad) => id != null && KULUP.has(id) ? `<a class="bag" href="#/kulup/${id}">${logoImg(id)}${esc(ad ?? kulupAd(id))}</a>` : esc(ad ?? "?");
 function sonuc(a, y) { if (a == null || y == null) return "N"; return a > y ? "G" : a < y ? "M" : "B"; }
 function skorYaz(a, y, pa, py, durum) {
   if (a == null && durum === "Çifte H") return `0-3 / 3-0 <small class="soluk" title="İki takım da hükmen yenik">(çifte H)</small>`;
@@ -89,7 +90,7 @@ function oneriKutusu(input, kutu, secince) {
     liste = kulupAra(input.value, 10);
     if (!liste.length) { kutu.hidden = true; return; }
     kutu.innerHTML = liste.map((k, i) => `<a href="#/kulup/${k.id}" data-i="${i}" class="${i === secili ? "sec" : ""}">
-      <span>${esc(k.ad)}${eskiAdIpucu(k, input.value)}</span><small>${esc(kulupAltYazi(k))}</small></a>`).join("");
+      <span>${logoImg(k.id)}${esc(k.ad)}${eskiAdIpucu(k, input.value)}</span><small>${esc(kulupAltYazi(k))}</small></a>`).join("");
     kutu.hidden = false;
   };
   input.addEventListener("input", () => { secili = -1; ciz(); });
@@ -233,7 +234,7 @@ async function kulupSayfa(id, sekme) {
   icerik.innerHTML = `
   <div class="kulup-bas">
     <div>
-      <h1>${esc(k.ad)}</h1>
+      <h1>${logoImg(id, "logo-b")}${esc(k.ad)}</h1>
       <div class="alt-bilgi">${esc(k.ilk)} – ${esc(k.son)} · ${sayiYaz(k.mac)} maç ${k.tff.length ? `· <span class="rozet">TFF ${k.tff.map(esc).join(", ")}</span>` : ""}${!k.yerli ? `<span class="rozet vurgu">Avrupa rakibi</span>` : ""}</div>
       ${adlar.length > 1 ? `<div class="adlar">${adlar.map(a => `<span>${esc(a[0])}<em>${a[1].slice(0, 4)}–${a[2].slice(0, 4)}</em></span>`).join("")}</div>` : ""}
     </div>
@@ -697,6 +698,7 @@ function hakkindaSayfa() {
     <li><b>TFF</b>: 1984-85'ten bugüne Süper Lig, 1990-91'den bugüne alt ligler ve 1994-95'ten sonraki kupa eşleşmeleri.</li>
     <li><b>Maçkolik</b> (yeni site ve arşiv): 1959-1990 arası ligler, Türkiye Kupası ve Avrupa kupaları.</li>
     <li><b>RSSSF ve Vikipedi</b>: 1995-2003 Intertoto maçları; kulüp ardıllıkları ve eski adlar.</li>
+    <li><b>Kulüp logoları</b>: Football Manager topluluk logo paketi (TCM), kulüplerin bugünkü logoları; FM kimlikleri Sortitoutsi'den eşlendi. Logolar kulüplerin tescilli markasıdır.</li>
   </ul>
   <h2 class="bolum">Kulüpler nasıl eşlendi</h2>
   <p>Her kulüp TFF kulüp numarasına göre tanımlanır. 1990 öncesi kayıtlar, puan tablosu imzası ve ad benzerliğiyle TFF numarasına bağlandı. Aynı adı taşıyan ama farklı olan kulüpler (ör. 1984 Muşspor ile 2015 Muşspor) ayrı tutulur; bir kulübün yerine kurulan ya da hakkını devralan kulüp "ardıl" olarak gösterilir. Maçlarda takımın o dönemki adı yazar.</p>
