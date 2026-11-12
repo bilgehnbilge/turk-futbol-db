@@ -144,8 +144,9 @@ def mac_detay(maclar, okunur):
                 giris = next((o[2] for o in ol if o[1] == "SUBSTITUTION" and o[8] == pid), None)
                 cikis = next((o[2] for o in ol if o[1] == "SUBSTITUTION" and o[7] == pid), None)
                 if ilk11 or giris is not None:   # yedek kulübesinde kalanlar katılım sayılmaz
-                    dk = oy_istat.get(pid, {}).get("dk")
-                    katilim.append([pid, mid, kid, ilk11, gol, sari, kirmizi, giris, cikis, int(dk) if dk and str(dk).isdigit() else None])
+                    dk, asist = oy_istat.get(pid, {}).get("dk"), oy_istat.get(pid, {}).get("a")
+                    katilim.append([pid, mid, kid, ilk11, gol, sari, kirmizi, giris, cikis, int(dk) if dk and str(dk).isdigit() else None,
+                                    int(asist) if asist and str(asist).isdigit() else 0])
         yaz(os.path.join(CIKTI, "mac", f"{mid}.json"), {
             "id": mid, "tarih": m["tarih"], "saat": m["saat"], "sezon": m["sezon"], "lig": m["lig"], "tur": m["tur"] or m["grup"],
             "ev": [m["ev_kulup"], okunur(m["ev_adi"])], "dep": [m["dep_kulup"], okunur(m["dep_adi"])],
@@ -157,7 +158,7 @@ def mac_detay(maclar, okunur):
     kullanilan = {k[0] for k in katilim}
     yaz(os.path.join(CIKTI, "oyuncu_uefa.json"), {
         "oyuncu": {p: v for p, v in oyuncular.items() if p in kullanilan},
-        "alanlar": ["oyuncu", "mac", "kulup", "ilk11", "gol", "sari", "kirmizi", "giris", "cikis", "dakika"], "katilim": katilim})
+        "alanlar": ["oyuncu", "mac", "kulup", "ilk11", "gol", "sari", "kirmizi", "giris", "cikis", "dakika", "asist"], "katilim": katilim})
     return sorted(out)
 
 

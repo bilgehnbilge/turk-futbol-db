@@ -295,7 +295,7 @@ async function kulupSayfa(id, sekme) {
     filtreBagla(durum, () => { kulupSayfa(id, sekme); }, ciz);
     const ms = filtrele(tum, durum, sekme);
     const hedef = $("#sekmeIcerik");
-    if (sekme === "ozet") hedef.innerHTML = ozetHtml(tum, durum);
+    if (sekme === "ozet") { hedef.innerHTML = ozetHtml(tum, durum); if (tum.some(m => m.yar === "A")) avrupaOyunculari(hedef, id); }
     else if (sekme === "rekorlar") hedef.innerHTML = rekorHtml(ms);
     else if (sekme === "maclar") macTablosu(hedef, ms, durum);
     else if (sekme === "rakipler") rakipTablosu(hedef, ms, id);
@@ -657,6 +657,35 @@ function istatHtml(d) {
   if (satir.filter(Boolean).length < 2) return "";
   const [ta, tb] = [takimTema(KULUP.get(d.ev[0])), takimTema(KULUP.get(d.dep[0]))];
   return `<div class="kart bolum istatlar" style="--ia:${ta ? ta["--tv-acik"] : "var(--yazi2)"};--ib:${tb ? tb["--tv-acik"] : "var(--soluk)"}"><h3>İstatistikler</h3>${satir.join("")}</div>`;
+}
+
+// kulüp özeti: Avrupa'da en çok gol atan ve en çok maça çıkan oyuncular (UEFA)
+async function avrupaOyunculari(hedef, kid) {
+  const kap = document.createElement("section");
+  kap.className = "bolum";
+  hedef.appendChild(kap);
+  const d = await al(`data/oyuncu_uefa.json?s=${OZET.surum || ""}`);
+  const t = new Map();
+  for (const k of d.katilim) if (k[2] === kid) {
+    const x = t.get(k[0]) || { no: k[0], mac: 0, ilk: 0, gol: 0, asist: 0, dk: 0 };
+    x.mac++; x.ilk += k[3]; x.gol += k[4]; x.asist += k[10] || 0; x.dk += k[9] || 0; t.set(k[0], x);
+  }
+  if (!t.size) { kap.remove(); return; }
+  const l = [...t.values()];
+  const satir = (x, deger) => `<li><span class="kim"><a class="bag" href="#/oyuncu/u${x.no}">${esc(d.oyuncu[x.no][0])}</a>
+    <small class="soluk">${x.mac} maç${x.gol ? ` · ${x.gol} gol` : ""}${x.asist ? ` · ${x.asist} asist` : ""}</small></span><b class="n">${deger}</b></li>`;
+  const sira = (l, f) => { let r = 0, onc; return l.map((x, i) => { const v = f(x); if (v !== onc) { r = i + 1; onc = v; } return [r, x]; }); };
+  const liste = (l, f, g) => `<ol class="sirali">${sira(l, f).map(([r, x]) => satir(x, g(x)).replace("<li>", `<li><span class="sira">${r}</span>`)).join("")}</ol>`;
+  const gol = l.filter(x => x.gol).sort((a, b) => b.gol - a.gol || b.asist - a.asist || a.mac - b.mac).slice(0, 15);
+  const asist = l.filter(x => x.asist).sort((a, b) => b.asist - a.asist || b.gol - a.gol).slice(0, 10);
+  const mac = [...l].sort((a, b) => b.mac - a.mac || b.gol - a.gol).slice(0, 15);
+  kap.innerHTML = `<h2>Avrupa'da oyuncular</h2>
+    <div class="izgara k3 ust-hiza">
+      <div class="kart rekor-kart"><h3>En çok gol atanlar</h3><p class="soluk aciklama">Kendi kalesine goller hariç</p>${liste(gol, x => x.gol, x => x.gol) || `<p class="soluk">—</p>`}</div>
+      ${asist.length ? `<div class="kart rekor-kart"><h3>En çok asist yapanlar</h3><p class="soluk aciklama">Yalnız UEFA'nın asist kaydettiği maçlar; eski maçlarda asist bilgisi yok</p>${liste(asist, x => x.asist, x => x.asist)}</div>` : ""}
+      <div class="kart rekor-kart"><h3>En çok maça çıkanlar</h3><p class="soluk aciklama">İlk 11 ya da oyuna sonradan girerek</p>${liste(mac, x => x.mac, x => x.mac)}</div>
+    </div>
+    <p class="soluk not">Kaynak: UEFA. Fuar Şehirleri Kupası ve Intertoto maçları dahil değil.</p>`;
 }
 
 // ---------------------------------------------------------------- oyuncu sayfası (şimdilik UEFA: Avrupa maçları)
