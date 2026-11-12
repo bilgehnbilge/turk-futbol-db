@@ -117,6 +117,10 @@ def main():
         fm = logo_es.get(r[1])
         if fm and r[0] not in logo and os.path.exists(os.path.join(KOK, "docs", "logo", f"{fm}.png")):
             logo[r[0]] = fm
+    renk = {}
+    for f in ("logo_renk.json", "logo_renk_elle.json"):   # elle olan üstüne yazar
+        if os.path.exists(os.path.join(KOK, f)):
+            renk.update({k: v for k, v in json.load(open(os.path.join(KOK, f), encoding="utf-8")).items() if not k.startswith("_")})
     tff = collections.defaultdict(list)
     for r in c.execute("SELECT kulup_id, kaynak_id FROM kulup_kimlik WHERE kaynak='tff' AND kaynak_id NOT LIKE '%-once'"):
         tff[r[0]].append(r[1])
@@ -143,7 +147,8 @@ def main():
         en_ust = min((x[5] for x in ms if x[3] == "L" and x[5]), default=None)
         liste.append({"id": k, "ad": gorunen(ad, adlar.get(k, [])), "adlar": adlar.get(k, []), "ilk": sezonlar[0], "son": sezonlar[-1], "mac": len(ms),
                       "yerli": k in yerli, "enust": en_ust, "tff": tff.get(k, []), "ardil": ardil.get(k, []),
-                      **({"logo": logo[k]} if k in logo else {})})
+                      **({"logo": logo[k]} if k in logo else {}),
+                      **({"renk": [x for x in renk[str(logo[k])] if x]} if k in logo and str(logo[k]) in renk else {})})
         yaz(os.path.join(CIKTI, "kulup", f"{k}.json"), {
             "alanlar": ["id", "tarih", "sezon", "yarisma", "lig", "kademe", "grup_tur", "playoff", "saha", "takim", "rakip_id",
                         "rakip", "attigi", "yedigi", "pen_a", "pen_y", "durum", "not"],

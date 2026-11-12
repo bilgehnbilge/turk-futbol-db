@@ -140,5 +140,84 @@ def kopyala():
     print(f"{len(gerekli)} logo ({yeni} yeni) -> {CIKTI} ({boyut / 1e6:.1f} MB)")
 
 
+# ---------------------------------------------------------------- renkler
+def png_oku(yol):
+    """8 bit RGB/RGBA, taramasız PNG -> [(r, g, b, a), ...] (yalnız standart kütüphane)."""
+    import struct, zlib
+    d = open(yol, "rb").read()
+    i, idat, w = 8, b"", None
+    while i < len(d):
+        n, tur = struct.unpack(">I4s", d[i:i + 8])
+        veri = d[i + 8:i + 8 + n]
+        if tur == b"IHDR":
+            w, h, derinlik, renk_turu = struct.unpack(">IIBB", veri[:10])
+            if derinlik != 8 or renk_turu not in (2, 6):
+                return []
+            bpp = 4 if renk_turu == 6 else 3
+        elif tur == b"IDAT":
+            idat += veri
+        i += 12 + n
+    ham, satir, onceki, px = zlib.decompress(idat), w * bpp, bytearray(w * bpp), []
+    for y in range(h):
+        f, s = ham[y * (satir + 1)], bytearray(ham[y * (satir + 1) + 1:(y + 1) * (satir + 1)])
+        for x in range(satir):
+            a = s[x - bpp] if x >= bpp else 0
+            b = onceki[x]
+            c = onceki[x - bpp] if x >= bpp else 0
+            if f == 1: s[x] = (s[x] + a) & 255
+            elif f == 2: s[x] = (s[x] + b) & 255
+            elif f == 3: s[x] = (s[x] + (a + b) // 2) & 255
+            elif f == 4:
+                p_ = a + b - c; pa, pb, pc = abs(p_ - a), abs(p_ - b), abs(p_ - c)
+                s[x] = (s[x] + (a if pa <= pb and pa <= pc else b if pb <= pc else c)) & 255
+        px += [tuple(s[x:x + bpp]) + ((255,) if bpp == 3 else ()) for x in range(0, satir, bpp)]
+        onceki = s
+    return px
+
+
+def renkler(yol):
+    """Logonun ana rengi ve ikinci rengi (#rrggbb). Beyaz/gri/siyah zemin ve kenarlar elenir;
+    renkli piksel yoksa (siyah-beyaz logo) koyu gri."""
+    import colorsys
+    kutu = {}
+    for r_, g, b, a in png_oku(yol):
+        if a < 200:
+            continue
+        h, l, s = colorsys.rgb_to_hls(r_ / 255, g / 255, b / 255)
+        if s < 0.25 or l > 0.92 or l < 0.08:
+            continue
+        k = (round(h * 24) % 24, round(l * 4))
+        x = kutu.setdefault(k, [0, 0, 0, 0]); x[0] += 1; x[1] += r_; x[2] += g; x[3] += b
+    sec = sorted(kutu.items(), key=lambda kv: -kv[1][0])
+    toplam = sum(v[0] for v in kutu.values())
+    out = []
+    for (hb, lb), (n, r_, g, b) in sec:
+        if toplam and n / toplam < 0.06:
+            break
+        renk = (r_ // n, g // n, b // n)
+        if all(abs(hb - h2) > 1 and abs(hb - h2) < 23 for h2, _ in [k for k, _ in out]):
+            out.append(((hb, lb), renk))
+        if len(out) == 2:
+            break
+    def hexle(c):   # kenar yumuşatmasının açtığı rengi toparla: çok açık ya da soluk olmasın
+        h, l, s = colorsys.rgb_to_hls(*(v / 255 for v in c))
+        l, s = min(l, 0.52), max(s, 0.6)
+        return "#%02x%02x%02x" % tuple(round(v * 255) for v in colorsys.hls_to_rgb(h, l, s))
+    if not out:
+        return ["#2b2f36", None]
+    return [hexle(out[0][1]), hexle(out[1][1]) if len(out) > 1 else None]
+
+
+def renk_hesapla():
+    es = json.load(open(ESLESME, encoding="utf-8"))
+    out = {}
+    for f in sorted(set(es.values())):
+        yol = os.path.join(CIKTI, f"{f}.png")
+        if os.path.exists(yol):
+            out[str(f)] = renkler(yol)
+    json.dump(out, open(os.path.join(KOK, "logo_renk.json"), "w", encoding="utf-8"), indent=0)
+    print(len(out), "logo rengi -> logo_renk.json")
+
+
 if __name__ == "__main__":
-    {"esle": esle, "kopyala": kopyala}[sys.argv[1]]()
+    {"esle": esle, "kopyala": kopyala, "renk": renk_hesapla}[sys.argv[1]]()
