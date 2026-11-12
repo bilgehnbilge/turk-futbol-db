@@ -7,10 +7,13 @@ Uretilen dosyalar:
   docs/data/kulupler.json      kulup listesi (arama icin): id, ad, donem adlari, ilk/son sezon, mac sayisi, ardillik
   docs/data/kulup/<id>.json    kulubun tum maclari (takim bakis acisiyla)
   docs/data/sezon/<sezon>.json sezonun tum maclari (puan tablosu ve fikstur icin)
+  docs/data/rekorlar.json      tum zamanlar rekorlari, seriler ve tablolar (rekor.py)
 
 Satir bicimleri dosyalarin "alanlar" anahtarinda yazar.
 """
 import collections, json, os, shutil, sqlite3
+
+import rekor
 
 KOK = os.path.dirname(os.path.abspath(__file__))
 DB = os.path.join(KOK, "futbol.db")
@@ -150,6 +153,10 @@ def main():
             "alanlar": ["id", "tarih", "yarisma", "lig", "kademe", "grup_tur", "playoff", "ev_id", "ev", "dep_id", "dep",
                         "ev_gol", "dep_gol", "ev_pen", "dep_pen", "durum", "not"],
             "maclar": ms})
+
+    # ---- tüm zamanlar rekorları
+    sezon_sira = {s: i for i, s in enumerate(sorted(sez, key=lambda s: (s[:4], s)))}
+    yaz(os.path.join(CIKTI, "rekorlar.json"), rekor.hesapla(maclar, sezon_sira, okunur))
 
     say = {r[0]: r[1] for r in c.execute("SELECT yarisma, COUNT(*) FROM mac GROUP BY 1")}
     kapsam = [list(r) for r in c.execute("SELECT kademe, sezon, grup, takim, bulunan, beklenen FROM kapsam")]

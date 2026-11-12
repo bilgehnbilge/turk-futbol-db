@@ -120,6 +120,7 @@ const yollar = [
   [/^#\/h2h\/(\d+)\/(\d+)$/, (a, b) => ikiliSayfa(+a, +b)],
   [/^#\/sezonlar$/, sezonlarSayfa],
   [/^#\/sezon\/([\d-]+)$/, s => sezonSayfa(s)],
+  [/^#\/rekorlar(?:\/(\w+))?$/, k => rekorlarSayfa(k || "1")],
   [/^#\/karsilastir$/, karsilastirSayfa],
   [/^#\/hakkinda$/, hakkindaSayfa],
 ];
@@ -160,6 +161,7 @@ function anaSayfa() {
   </section>
   <section class="bolum izgara k3">
     <a class="kart" href="#/sezonlar"><h3>Sezonlar →</h3><p class="soluk">Her sezonun puan tabloları, kupa turları ve Avrupa maçları.</p></a>
+    <a class="kart" href="#/rekorlar"><h3>Tüm zamanlar rekorları →</h3><p class="soluk">En farklı skorlar, en uzun seriler ve tüm zamanlar puan tabloları.</p></a>
     <a class="kart" href="#/karsilastir"><h3>İki kulübü karşılaştır →</h3><p class="soluk">Aralarındaki bütün maçlar ve genel denge.</p></a>
     <a class="kart" href="#/hakkinda"><h3>Veri hakkında →</h3><p class="soluk">Kaynaklar, kapsam ve bilinen sınırlar.</p></a>
   </section>`;
@@ -581,6 +583,105 @@ function macListesi(ms) {
   if (!ms.length) return `<div class="bos">Maç yok.</div>`;
   return `<div style="overflow-x:auto"><table class="tablo"><tbody>${ms.map(m => `<tr><td>${tarihYaz(m.tarih)}</td>
     <td class="ad" style="text-align:right">${kulupBag(m.ev, m.evAd)}</td><td class="o skor">${skorYaz(m.eg, m.dg, m.ep, m.dp, m.durum)}</td><td class="ad">${kulupBag(m.dep, m.depAd)}</td></tr>`).join("")}</tbody></table></div>`;
+}
+
+// ---------------------------------------------------------------- tüm zamanlar rekorları
+const SERI_AD = {
+  yenilmez: ["Yenilmezlik serisi", "Art arda yenilmediği maç"],
+  ic_yenilmez: ["İç sahada yenilmezlik", "İç sahada art arda yenilmediği maç"],
+  dis_yenilmez: ["Deplasmanda yenilmezlik", "Deplasmanda art arda yenilmediği maç"],
+  galibiyet: ["Galibiyet serisi", "Art arda kazandığı maç"],
+  galibiyetsiz: ["Galibiyetsiz seri", "Art arda kazanamadığı maç"],
+  golyemeden: ["Gol yemeden seri", "Kalesini art arda gole kapattığı maç"],
+  golsuz: ["Gol atamama serisi", "Art arda gol atamadığı maç"],
+};
+const rekorDurum = { tablo: 20, acik: new Set() };
+
+async function rekorlarSayfa(kap) {
+  document.title = "Tüm zamanlar rekorları · Türk Futbol Arşivi";
+  icerik.innerHTML = `<div class="yukleniyor">Rekorlar yükleniyor…</div>`;
+  const R = await al("data/rekorlar.json");
+  const v = R.veri[kap];
+  if (!v) { location.hash = "#/rekorlar"; return; }
+  const kapAd = Object.fromEntries(R.kapsamlar)[kap];
+  const lig = kap !== "kupa";
+  const sira = (l, f) => { let r = 0, onceki; return l.map((x, i) => { const d = f(x); if (d !== onceki) { r = i + 1; onceki = d; } return r; }); };
+
+  const macTablo = (l, id) => {
+    const r = sira(l, m => id === "gollu" ? m[8] + m[9] : `${Math.abs(m[8] - m[9])}|${Math.max(m[8], m[9])}`);
+    const acik = rekorDurum.acik.has(id), n = acik ? l.length : 10;
+    return `<div class="tablo-kap"><table class="tablo rekor-tablo"><tbody>${l.slice(0, n).map((m, i) => `<tr>
+      <td class="s sira">${r[i]}</td><td>${tarihYaz(m[0])}<br><a class="bag soluk" href="#/sezon/${m[1]}">${esc(m[1])}</a></td>
+      <td class="ad" style="text-align:right">${kulupBag(m[4], m[5])}</td><td class="o skor">${skorYaz(m[8], m[9], m[10], m[11], m[12])}</td><td class="ad">${kulupBag(m[6], m[7])}</td>
+      <td class="gizle-mobil soluk">${esc(m[2] || "")}${m[3] ? ` · ${esc(m[3])}` : ""}</td></tr>`).join("")}</tbody></table></div>
+      ${l.length > 10 ? `<button class="dugme daha" data-ac="${id}">${acik ? "Daha az göster" : `İlk ${l.length}'i göster`}</button>` : ""}`;
+  };
+  const seriKart = k => {
+    const l = v.seriler[k] || [], r = sira(l, s => s[1]);
+    const acik = rekorDurum.acik.has(k), n = acik ? l.length : 10;
+    return `<div class="kart rekor-kart"><h3>${SERI_AD[k][0]}</h3><p class="soluk aciklama">${SERI_AD[k][1]}</p>
+      <ol class="sirali">${l.slice(0, n).map((s, i) => `<li><span class="sira">${r[i]}</span><span class="kim">${kulupBag(s[0])}
+        <small class="soluk">${tarihYaz(s[2])} – ${s[6] ? "sürüyor" : tarihYaz(s[3])}${s[4] !== s[5] ? ` · ${s[4].slice(0, 4)}–${s[5].slice(-4)}` : ` · ${esc(s[4])}`}</small></span>
+        <b class="n">${s[1]}</b></li>`).join("") || `<li class="soluk">—</li>`}</ol>
+      ${l.length > 10 ? `<button class="dugme daha" data-ac="${k}">${acik ? "Daha az" : `İlk ${l.length}`}</button>` : ""}</div>`;
+  };
+  const sayimKart = (id, baslik, aciklama, l) => {
+    const r = sira(l, x => x[1]);
+    const acik = rekorDurum.acik.has(id), n = acik ? l.length : 10;
+    return `<div class="kart rekor-kart"><h3>${baslik}</h3><p class="soluk aciklama">${aciklama}</p>
+      <ol class="sirali">${l.slice(0, n).map((x, i) => `<li><span class="sira">${r[i]}</span><span class="kim">${kulupBag(x[0])}
+        <small class="soluk">${sayiYaz(x[2])} maçta · %${yuzde(x[1], x[2])}</small></span><b class="n">${sayiYaz(x[1])}</b></li>`).join("")}</ol>
+      ${l.length > 10 ? `<button class="dugme daha" data-ac="${id}">${acik ? "Daha az" : `İlk ${l.length}`}</button>` : ""}</div>`;
+  };
+  const tablo = () => {
+    const l = v.tablo, n = Math.min(rekorDurum.tablo, l.length);
+    return `<div class="tablo-kap"><table class="tablo"><thead><tr><th class="s">#</th><th>Kulüp</th><th class="s" title="Sezon">Sz</th><th class="s">O</th><th class="s">G</th><th class="s">B</th><th class="s">M</th>
+      <th class="s">AG</th><th class="s">YG</th><th class="s">Av</th><th class="s">P</th></tr></thead>
+      <tbody>${l.slice(0, n).map((x, i) => `<tr><td class="s">${i + 1}</td><td class="ad">${kulupBag(x[0])}</td><td class="s">${x[1]}</td><td class="s">${sayiYaz(x[2])}</td>
+        <td class="s">${sayiYaz(x[3])}</td><td class="s">${sayiYaz(x[4])}</td><td class="s">${sayiYaz(x[5])}</td><td class="s">${sayiYaz(x[6])}</td><td class="s">${sayiYaz(x[7])}</td>
+        <td class="s">${x[6] - x[7] > 0 ? "+" : ""}${sayiYaz(x[6] - x[7])}</td><td class="s"><b>${sayiYaz(x[8])}</b></td></tr>`).join("")}</tbody></table></div>
+      ${l.length > n ? `<button class="dugme daha" data-tablo="1">${sayiYaz(l.length - n)} kulüp daha göster</button>` : ""}`;
+  };
+
+  const ciz = () => {
+    icerik.innerHTML = `
+    <h1>Tüm zamanlar rekorları</h1>
+    <nav class="sekmeler">${R.kapsamlar.map(([k, ad]) => `<a href="#/rekorlar/${k}" class="${k === kap ? "aktif" : ""}">${esc(ad)}</a>`).join("")}</nav>
+    <p class="soluk">${esc(kapAd)} · ${esc(v.sezon[0])} – ${esc(v.sezon[1])} · ${sayiYaz(v.mac)} maç.
+      ${kap === "pro" ? "Bütün lig seviyeleri bir arada: bir kulübün Süper Lig'den alt lige geçişi seriyi bozmaz." : ""}</p>
+
+    <h2 class="bolum">Tüm zamanlar tablosu</h2>
+    <p class="soluk not">Galibiyet bütün sezonlar için 3 puan sayıldı. ${lig ? "Play-off maçları ve puan silme cezaları dahil değil; hükmen sonuçlar dahil." : "Uzatmada biten maçlar skora göre, penaltıyla biten maçlar beraberlik sayıldı."}</p>
+    ${tablo()}
+
+    <h2 class="bolum">Maç rekorları</h2>
+    <div class="izgara genis">
+      <div><h3>En farklı galibiyetler</h3>${macTablo(v.fark, "fark")}</div>
+      <div><h3>En gollü maçlar</h3>${macTablo(v.gollu, "gollu")}</div>
+      <div><h3>Deplasmanda en farklı galibiyetler</h3>${macTablo(v.dep_fark, "dep_fark")}</div>
+    </div>
+
+    <h2 class="bolum">Seriler</h2>
+    <div class="izgara k3">${["yenilmez", "ic_yenilmez", "dis_yenilmez", "galibiyetsiz", "galibiyet", "golyemeden", "golsuz"].map(seriKart).join("")}</div>
+
+    <h2 class="bolum">Toplam maç sayıları</h2>
+    <div class="izgara k2">
+      ${sayimKart("gy", "Kalesini en çok gole kapatanlar", "Gol yemediği maç sayısı", v.golyemedi)}
+      ${sayimKart("gs", "En çok maçta gol atamayanlar", "Gol atamadığı maç sayısı", v.golatamadi)}
+    </div>
+    <p class="soluk not bolum">Seriler kulübün bu kapsamdaki maçlarının tarih sırasıyla sayılır ve sezonlar arası sürer; kulüp bir sezon bu kapsamda yer almazsa seri kesilir.
+      Hükmen sonuçlar ile tarihi bilinmeyen maçlar serilere, maç rekorlarına ve gol sayımlarına girmez. Kulüpler bugünkü adlarıyla, maçlar dönemin adlarıyla gösterilir.
+      Eski sezonlardaki çok farklı skorlar kaynaklarda yazdığı gibidir.</p>`;
+    icerik.querySelectorAll("[data-ac]").forEach(b => b.addEventListener("click", () => {
+      const k = b.dataset.ac; rekorDurum.acik.has(k) ? rekorDurum.acik.delete(k) : rekorDurum.acik.add(k);
+      const y = scrollY; ciz(); scrollTo(0, y);
+    }));
+    const nav = icerik.querySelector(".sekmeler"), ak = nav.querySelector(".aktif");
+    nav.scrollLeft = ak.offsetLeft - (nav.clientWidth - ak.offsetWidth) / 2;
+    icerik.querySelector("[data-tablo]")?.addEventListener("click", () => { rekorDurum.tablo += 100; const y = scrollY; ciz(); scrollTo(0, y); });
+  };
+  rekorDurum.tablo = 20;
+  ciz();
 }
 
 // ---------------------------------------------------------------- hakkında
