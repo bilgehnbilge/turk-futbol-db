@@ -362,3 +362,7 @@ a.skor.bagli:hover { color: var(--vurgu); }
 .oyuncu .osimge { display: flex; gap: 4px; font-size: 12px; white-space: nowrap; }
 .oyuncu .gir { color: var(--g); font-weight: 600; } .oyuncu .cik { color: var(--m); font-weight: 600; }
 @media (max-width: 720px) { .mac-bas { padding: 14px 14px 16px; } .akis-satir { grid-template-columns: 1fr 40px 1fr; font-size: 13px; } }
+
+a.oyuncu-bag { color: inherit; }
+a.oyuncu-bag:hover { color: var(--vurgu); text-decoration: underline; text-underline-offset: 3px; }
+.katki { font-size: 12.5px; color: var(--soluk); padding: 0 0 6px; margin-top: -2px; text-align: right; }

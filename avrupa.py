@@ -322,8 +322,11 @@ def uefa_tamamla():
             kim = kimlik.get(tid) or (ad_kim.get(" ".join(_ad_norm(ad))) if tk.get("countryCode") == "TUR" else None)
             satir[s + "_id"] = kim or f"uefa:{tid}"
             satir[s + "_adi"] = kim_ad.get(kim, ad)
-        dt = datetime.datetime.strptime(m["kickOffTime"]["dateTime"][:19], "%Y-%m-%dT%H:%M:%S").replace(tzinfo=datetime.timezone.utc).astimezone(M.TR)
-        satir["tarih"], satir["saat"] = dt.date().isoformat(), dt.strftime("%H:%M")
+        if m["kickOffTime"].get("dateTime"):
+            dt = datetime.datetime.strptime(m["kickOffTime"]["dateTime"][:19], "%Y-%m-%dT%H:%M:%S").replace(tzinfo=datetime.timezone.utc).astimezone(M.TR)
+            satir["tarih"], satir["saat"] = dt.date().isoformat(), dt.strftime("%H:%M")
+        else:
+            satir["tarih"] = m["kickOffTime"]["date"]
         tur = (m.get("round") or {}).get("metaData", {}).get("name", "")
         satir["tur"] = UEFA_TUR.get(tur.lower(), "Grup Aşaması" if tur == m["competition"].get("metaData", {}).get("name") else tur)
         sk = m.get("score") or {}

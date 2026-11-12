@@ -151,6 +151,7 @@ const yollar = [
   [/^#\/sezon\/([\d-]+)$/, s => sezonSayfa(s)],
   [/^#\/rekorlar(?:\/(\w+))?$/, k => rekorlarSayfa(k || "tum")],
   [/^#\/mac\/(\d+)$/, id => macSayfa(+id)],
+  [/^#\/oyuncu\/u(\d+)$/, id => oyuncuSayfa(id)],
   [/^#\/karsilastir$/, karsilastirSayfa],
   [/^#\/hakkinda$/, hakkindaSayfa],
 ];
@@ -605,14 +606,15 @@ async function macSayfa(id) {
     else if (tur === "SUBSTITUTION") { ekle(no, `<span class="cik" title="Çıktı ${dakika(o)}">↓${dakika(o)}</span>`); ekle(no2, `<span class="gir" title="Girdi ${dakika(o)}">↑${dakika(o)}</span>`); }
     else if (OLAY[tur] && tur !== "PENALTY") ekle(no, `<span title="${OLAY[tur][1]} ${dakika(o)}">${OLAY[tur][0]}</span>`);
   }
+  const oy = (no, ad) => no ? `<a class="oyuncu-bag" href="#/oyuncu/u${no}">${esc(ad || "")}</a>` : esc(ad || "");
   const kadroHtml = (l, teknik) => `
-    <div class="kadro-bolum">İlk 11</div>${l.filter(p => p[2]).map(p => `<div class="oyuncu"><span class="forma">${esc(p[0])}</span><span class="oad">${esc(p[1])}${p[3] ? ` <small class="soluk">(K)</small>` : ""}</span><span class="osimge">${simge.get(p[4]) || ""}</span></div>`).join("") || `<div class="soluk">—</div>`}
-    ${l.some(p => !p[2]) ? `<div class="kadro-bolum">Yedekler</div>${l.filter(p => !p[2]).map(p => `<div class="oyuncu yedek"><span class="forma">${esc(p[0])}</span><span class="oad">${esc(p[1])}</span><span class="osimge">${simge.get(p[4]) || ""}</span></div>`).join("")}` : ""}
+    <div class="kadro-bolum">İlk 11</div>${l.filter(p => p[2]).map(p => `<div class="oyuncu"><span class="forma">${esc(p[0])}</span><span class="oad">${oy(p[4], p[1])}${p[3] ? ` <small class="soluk">(K)</small>` : ""}</span><span class="osimge">${simge.get(p[4]) || ""}</span></div>`).join("") || `<div class="soluk">—</div>`}
+    ${l.some(p => !p[2]) ? `<div class="kadro-bolum">Yedekler</div>${l.filter(p => !p[2]).map(p => `<div class="oyuncu yedek"><span class="forma">${esc(p[0])}</span><span class="oad">${oy(p[4], p[1])}</span><span class="osimge">${simge.get(p[4]) || ""}</span></div>`).join("")}` : ""}
     ${teknik.length ? `<div class="kadro-bolum">Teknik direktör</div><div class="oyuncu"><span class="forma"></span><span class="oad">${teknik.map(esc).join(", ")}</span></div>` : ""}`;
   const akis = d.olay.filter(o => o[1] !== "SUBSTITUTION" || true).map(o => {
-    const [taraf, tur, , , a1, a2, ay] = o, [s, adi] = OLAY[tur] || ["•", tur];
-    const metin = tur === "SUBSTITUTION" ? `<span class="gir">↑ ${esc(a2 || "")}</span> <span class="cik">↓ ${esc(a1 || "")}</span>`
-      : `<b>${esc(a1 || "")}</b>${tur === "GOAL" && ay === "PENALTY" ? ` <small class="soluk">(penaltı)</small>` : ""}${ay === "OWN" ? ` <small class="soluk">(kendi kalesine)</small>` : ""}${tur === "PENALTY" ? ` <small class="soluk">penaltı kaçırdı</small>` : ""}`;
+    const [taraf, tur, , , a1, a2, ay, n1, n2] = o, [s, adi] = OLAY[tur] || ["•", tur];
+    const metin = tur === "SUBSTITUTION" ? `<span class="gir">↑ ${oy(n2, a2)}</span> <span class="cik">↓ ${oy(n1, a1)}</span>`
+      : `<b>${oy(n1, a1)}</b>${tur === "GOAL" && ay === "PENALTY" ? ` <small class="soluk">(penaltı)</small>` : ""}${ay === "OWN" ? ` <small class="soluk">(kendi kalesine)</small>` : ""}${tur === "PENALTY" ? ` <small class="soluk">penaltı kaçırdı</small>` : ""}`;
     return `<div class="akis-satir ${taraf === 1 ? "ev" : "dep"} ${tur === "GOAL" ? "gol" : ""}"><span class="akis-ic">${taraf === 1 ? `${metin} <span class="s" title="${adi}">${s}</span>` : `<span class="s" title="${adi}">${s}</span> ${metin}`}</span><span class="akis-dk">${dakika(o)}</span></div>`;
   }).join("");
   icerik.innerHTML = `
@@ -632,6 +634,36 @@ async function macSayfa(id) {
     <div class="kart"><h3>${ad(d.dep)}</h3>${kadroHtml(d.kadro[1], d.teknik[1])}</div>
   </div>
   <p class="soluk not bolum">Kadro ve olaylar: ${esc(d.kaynak)}. Oyuncu adları kaynakta yazıldığı gibidir.</p>`;
+}
+
+// ---------------------------------------------------------------- oyuncu sayfası (şimdilik UEFA: Avrupa maçları)
+async function oyuncuSayfa(no) {
+  icerik.innerHTML = `<div class="yukleniyor">Oyuncu yükleniyor…</div>`;
+  const [d, av] = await Promise.all([al(`data/oyuncu_uefa.json?s=${OZET.surum || ""}`), al(`data/avrupa.json?s=${OZET.surum || ""}`)]);
+  const o = d.oyuncu[no];
+  if (!o) { icerik.innerHTML = `<div class="bos">Oyuncu bulunamadı.</div>`; return; }
+  const [ad, dogum, ulke] = o;
+  document.title = `${ad} · Türk Futbol Arşivi`;
+  const mac = new Map(av.maclar.map(r => [r[0], r]));
+  const ks = d.katilim.filter(k => k[0] === no).map(k => {
+    const r = mac.get(k[1]); const ev = r[5] === k[2];
+    return { id: k[1], kulup: k[2], ilk11: k[3], gol: k[4], sari: k[5], kirmizi: k[6], giris: k[7], cikis: k[8], tarih: r[1], sezon: r[2], lig: r[3], tur: r[4],
+      saha: ev ? "E" : "D", rakipId: ev ? r[6] : r[5], rakip: kulupAd(ev ? r[6] : r[5]) || (ev ? r[13] : r[12]), takim: kulupAd(k[2]),
+      a: ev ? r[7] : r[8], y: ev ? r[8] : r[7], pa: ev ? r[9] : r[10], py: ev ? r[10] : r[9], durum: r[11] };
+  }).map(m => ({ ...m, s: sonuc(m.a, m.y) })).sort((a, b) => b.tarih.localeCompare(a.tarih));
+  const top = ks.reduce((t, k) => (t.mac++, t.ilk += k.ilk11, t.gol += k.gol, t.sari += k.sari, t.kirmizi += k.kirmizi, t), { mac: 0, ilk: 0, gol: 0, sari: 0, kirmizi: 0 });
+  const kulupler = [...ks.reduce((m, k) => m.set(k.kulup, [...(m.get(k.kulup) || []), k]), new Map())];
+  const yas = dogum && dogum.slice(5) !== "01-01" ? tarihYaz(dogum) : dogum ? dogum.slice(0, 4) : null;
+  icerik.innerHTML = `
+  <div class="sayfa-bas"><div><h1>${esc(ad)}</h1>
+    <p class="soluk">${ulke ? `${ULKE[ulke] ? ULKE[ulke][1] + " " + ULKE[ulke][0] : ulke === "TUR" ? "🇹🇷 Türkiye" : esc(ulke)}` : ""}${yas ? ` · Doğum: ${yas}` : ""}</p></div></div>
+  <div class="kart"><div class="ozet-sat">
+    <div><b>${top.mac}</b><span>Avrupa maçı</span></div><div><b>${top.ilk}</b><span>İlk 11</span></div><div><b>${top.gol}</b><span>Gol</span></div>
+    <div><b>${top.sari}</b><span>Sarı kart</span></div><div><b>${top.kirmizi}</b><span>Kırmızı kart</span></div></div></div>
+  <div class="izgara iki bolum ust-hiza">${kulupler.map(([kid, l]) => `<div class="kart"><h3>${kid != null && KULUP.has(kid) ? kulupBag(kid) : esc(kulupAd(kid))}</h3>
+    <p class="soluk" style="margin:0 0 6px;font-size:13px">${l.length} maç · ${l.reduce((s, k) => s + k.gol, 0)} gol · ${l.at(-1).sezon} – ${l[0].sezon}</p>
+    <div class="tabelalar">${l.map(m => `${tabelaSatir(m, true)}<div class="katki">${m.ilk11 ? "İlk 11" : `${m.giris}'de girdi`}${m.cikis != null ? ` · ${m.cikis}'de çıktı` : ""}${m.gol ? ` · ${"⚽".repeat(m.gol)}` : ""}${m.sari ? " · 🟨" : ""}${m.kirmizi ? " · 🟥" : ""}</div>`).join("")}</div></div>`).join("")}</div>
+  <p class="soluk not bolum">Kaynak: UEFA. Şimdilik yalnız Türk takımlarının Avrupa kupası maçları; lig maçları TFF verisi işlendikten sonra eklenecek.</p>`;
 }
 
 // ---------------------------------------------------------------- Avrupa: ülkelere göre

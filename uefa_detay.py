@@ -86,7 +86,8 @@ def ayikla():
     f = sqlite3.connect(os.path.join(KOK, "futbol.db"))
     # bizim kulüp -> UEFA takım no (logo_uefa.json: yabancı rakipler); aynı gün aynı skorlu iki maçı ayırmak için
     lu = json.load(open(os.path.join(KOK, "logo_uefa.json")))
-    k_uefa = {kid: lu[k][1:] for kid, k in f.execute("SELECT kulup_id, kaynak || ':' || kaynak_id FROM kulup_kimlik") if k in lu}
+    turk = {r[0] for r in f.execute("SELECT ev_kulup FROM mac WHERE yarisma='lig' UNION SELECT dep_kulup FROM mac WHERE yarisma='lig'")}
+    k_uefa = {kid: lu[k][1:] for kid, k in f.execute("SELECT kulup_id, kaynak || ':' || kaynak_id FROM kulup_kimlik") if k in lu and kid not in turk}
     bizim = collections.defaultdict(list)
     for mid, tarih, eg, dg, ev, dep in f.execute("SELECT id, tarih, ev_gol, dep_gol, ev_kulup, dep_kulup FROM mac WHERE yarisma='avrupa' AND tarih IS NOT NULL"):
         bizim[tarih].append((mid, eg, dg, k_uefa.get(ev), k_uefa.get(dep)))
@@ -99,6 +100,9 @@ def ayikla():
         sk = (m.get("score") or {}).get("total") or {}
         t = m["kickOffTime"]["date"]
         gunler = [x for g in (0, -1, 1) for x in bizim.get(str(datetime.date.fromisoformat(t) + datetime.timedelta(days=g)), [])]
+        # bizim maçta rakibin UEFA numarası biliniyorsa ve bu maçtaki takımlardan biri değilse: başka maç
+        uygun = lambda x: all(v is None or v in (ev_id, dep_id) for v in (x[3], x[4]))
+        gunler = [x for x in gunler if uygun(x)]
         rakip_tutan = [x for x in gunler if x[3] == ev_id or x[4] == dep_id]
         aday = [x for x in (rakip_tutan or gunler) if (x[1], x[2]) == (sk.get("home"), sk.get("away"))]
         if not aday and len(rakip_tutan) == 1:   # skor farklı yazılmış (uzatma/penaltı) ama rakip ve gün tutuyor
