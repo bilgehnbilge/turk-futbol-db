@@ -205,7 +205,9 @@ async function kulupMaclari(id) {
     id: r[0], tarih: r[1], sezon: r[2], yar: r[3], lig: r[4], kademe: r[5], tur: r[6], po: r[7] === "p", saha: r[8],
     takim: r[9], rakipId: r[10], rakip: r[11], a: r[12], y: r[13], pa: r[14], py: r[15], durum: r[16], not: r[17], kulup: id,
     iptal: r[7] === "x", s: r[7] === "x" ? "N" : sonuc(r[12], r[13]),   // geçersiz maç istatistiğe girmez
-  }));
+  }))   // tarihsiz maçlar (sonradan eklenen hükmenler) kendi sezonlarının sonuna
+    .map((m, i) => ({ m, i, k: m.tarih || `${m.sezon.slice(-4)}-07-01` }))
+    .sort((a, b) => a.k.localeCompare(b.k) || a.i - b.i).map(x => x.m);
 }
 function oncul(id, gor = new Set()) {   // öncül kulüpler (kulup_ardil), özyinelemeli
   if (gor.has(id)) return []; gor.add(id);
@@ -349,7 +351,7 @@ function ozetHtml(ms) {
     const alt = ms.filter(m => !y || m.yar === y); if (!alt.length) return "";
     return `<div class="kart"><h3>${ad}</h3>${ozetSatir(toplam(alt))}</div>`;
   }).join("");
-  const son = ms.filter(m => m.s !== "N").slice(-10).reverse();
+  const son = ms.filter(m => m.s !== "N" && m.tarih).slice(-10).reverse();
   const ligBas = {}, eskiAd = {};
   for (const m of ms) if (m.yar === "L" && m.kademe) {
     (ligBas[m.kademe] ||= new Set()).add(m.sezon);
