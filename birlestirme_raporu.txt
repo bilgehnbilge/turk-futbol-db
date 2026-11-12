@@ -1,4 +1,4 @@
-Kaynaklar: Mackolik 51875 mac, Avrupa 1504, TFF 99223
+Kaynaklar: Mackolik 51875 mac, Avrupa 1506, TFF 99223
 1) Mackolik<->TFF: 4636 ortak mac adayi, 394 Mackolik kulubu TFF numarasina baglandi
 2) Arsiv<->Mackolik: puan tablosundaki 2907 takim satirinin 2803'i imzayla eslendi, 274 arsiv kimligi
    Mackolik'ten TFF'de de bulunan lig sezonlari cikarildi: 884 mac
@@ -10,8 +10,8 @@ Kaynaklar: Mackolik 51875 mac, Avrupa 1504, TFF 99223
    Resmi tabloda sayilmayan maclar: 47 play-off, 6 gecersiz
    Hukmen: 5 skorsuz maca resmi tablodan sonuc yazildi, 85 oynanmamis mac eklendi
 
-futbol.db: 151794 mac, 1148 kulup
-   avrupa 1504 1956-1957 2026-2027
+futbol.db: 151796 mac, 1148 kulup
+   avrupa 1506 1956-1957 2026-2027
    kupa 7901 1962-1963 2026-2027
    lig 141738 1959 2026-2027
    terfi 651 1959-1960 1982-1983

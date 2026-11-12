@@ -5,7 +5,7 @@
 
 Maç listesi: Türk takımlarının UEFA takım numaralarıyla (raw/uefa_maclar.json'dan) teamId sorgusu.
 """
-import collections, datetime, glob, gzip, json, os, sqlite3, subprocess, sys, time
+import collections, datetime, glob, gzip, json, os, re, sqlite3, subprocess, sys, time
 
 KOK = os.path.dirname(os.path.abspath(__file__))
 API = "https://match.uefa.com/v5/matches"
@@ -89,8 +89,15 @@ def ayikla():
     turk = {r[0] for r in f.execute("SELECT ev_kulup FROM mac WHERE yarisma='lig' UNION SELECT dep_kulup FROM mac WHERE yarisma='lig'")}
     k_uefa = {kid: lu[k][1:] for kid, k in f.execute("SELECT kulup_id, kaynak || ':' || kaynak_id FROM kulup_kimlik") if k in lu and kid not in turk}
     bizim = collections.defaultdict(list)
-    for mid, tarih, eg, dg, ev, dep in f.execute("SELECT id, tarih, ev_gol, dep_gol, ev_kulup, dep_kulup FROM mac WHERE yarisma='avrupa' AND tarih IS NOT NULL"):
-        bizim[tarih].append((mid, eg, dg, k_uefa.get(ev), k_uefa.get(dep)))
+    import unicodedata
+    kel = lambda s: {w[:5] for w in re.sub(r"[^a-z0-9 ]", " ", "".join(c for c in unicodedata.normalize("NFKD", (s or "").replace("ı", "i").lower())
+                                                                     if not unicodedata.combining(c))).split() if len(w) >= 3}
+    adlar_kel = collections.defaultdict(set)   # Türk kulübünün bütün dönem adlarının kelimeleri
+    for kid, ad in f.execute("SELECT kulup_id, ad FROM kulup_adi UNION SELECT id, ad FROM kulup"):
+        adlar_kel[kid] |= kel(ad)
+    for mid, tarih, eg, dg, ev, dep, eva, depa in f.execute("SELECT id, tarih, ev_gol, dep_gol, ev_kulup, dep_kulup, ev_adi, dep_adi FROM mac WHERE yarisma='avrupa' AND tarih IS NOT NULL"):
+        bizim[tarih].append((mid, eg, dg, None if ev in turk else k_uefa.get(ev), None if dep in turk else k_uefa.get(dep),
+                             adlar_kel.get(ev) if ev in turk else None, adlar_kel.get(dep) if dep in turk else None))
     en = lambda x: ((x or {}).get("translations") or {}).get("name", {}).get("EN") or (x or {}).get("internationalName")
     say = collections.Counter()
     for yol in sorted(glob.glob(os.path.join(HAM, "*.json.gz"))):
@@ -101,10 +108,15 @@ def ayikla():
         t = m["kickOffTime"]["date"]
         gunler = [x for g in (0, -1, 1) for x in bizim.get(str(datetime.date.fromisoformat(t) + datetime.timedelta(days=g)), [])]
         # bizim maçta rakibin UEFA numarası biliniyorsa ve bu maçtaki takımlardan biri değilse: başka maç
-        uygun = lambda x: all(v is None or v in (ev_id, dep_id) for v in (x[3], x[4]))
+        # Türk tarafının adı da tutmalı (aynı gün aynı skorlu iki Türk takımı maçı)
+        u_ev, u_dep = kel(m["homeTeam"].get("internationalName")), kel(m["awayTeam"].get("internationalName"))
+        uygun = lambda x: all(v is None or v in (ev_id, dep_id) for v in (x[3], x[4])) and ad_tutar(x)
+        ad_tutar = lambda x: all(v is None or bool(v & (u_ev | u_dep)) for v in (x[5], x[6]))
         gunler = [x for x in gunler if uygun(x)]
         rakip_tutan = [x for x in gunler if x[3] == ev_id or x[4] == dep_id]
         aday = [x for x in (rakip_tutan or gunler) if (x[1], x[2]) == (sk.get("home"), sk.get("away"))]
+        if len(aday) > 1:   # aynı gün aynı skorlu birden çok aday: Türk takımının adına bak
+            aday = [x for x in aday if ad_tutar(x)]
         if not aday and len(rakip_tutan) == 1:   # skor farklı yazılmış (uzatma/penaltı) ama rakip ve gün tutuyor
             aday = rakip_tutan
         hakem = next((r for r in m.get("referees") or [] if r.get("role") == "REFEREE"), None)
@@ -136,6 +148,8 @@ def ayikla():
             c.execute("INSERT INTO olay VALUES(?,?,?,?,?,?,?,?,?,?)", (uid, taraf, e.get("type"), (pa.get("person") or {}).get("id"),
                       (pa.get("person") or {}).get("internationalName"), tm.get("minute"), tm.get("injuryMinute"),
                       (sa.get("person") or {}).get("id"), (sa.get("person") or {}).get("internationalName"), e.get("subType") or e.get("goalType")))
+    for (mid,) in c.execute("SELECT mac_id FROM mac WHERE mac_id IS NOT NULL GROUP BY mac_id HAVING COUNT(*) > 1").fetchall():
+        c.execute("UPDATE mac SET mac_id=NULL WHERE mac_id=?", (mid,)); say["cakisan"] += 1
     c.commit()
     s = {t: c.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0] for t in ("mac", "kadro", "teknik", "olay")}
     print(s, dict(say), "olay türleri:", dict(c.execute("SELECT tur, COUNT(*) FROM olay GROUP BY 1").fetchall()))
