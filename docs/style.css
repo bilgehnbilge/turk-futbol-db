@@ -297,3 +297,15 @@ details.rekor[open] summary::after { content: "Gizle ▴"; }
 .izgara.iki { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (max-width: 720px) { .izgara.iki { grid-template-columns: 1fr; } }
 .rekor .detay .biz { color: var(--yazi2); }
+
+/* skor tabelası satırı: tarih · ev (logo + ad) · skor · deplasman (ad + logo) */
+.tabelalar { display: flex; flex-direction: column; margin-top: 4px; }
+.tabela { display: grid; grid-template-columns: 78px minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 10px; padding: 7px 0; border-top: 1px solid var(--cizgi); font-size: 14px; }
+.tabela .tarih { color: var(--soluk); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.tabela .ev { display: flex; align-items: center; justify-content: flex-end; min-width: 0; text-align: right; }
+.tabela .dep { display: flex; align-items: center; min-width: 0; }
+.tabela .ev > :not(img), .tabela .dep > :not(img) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tabela .ev .logo-k { flex: none; }
+.tabela .dep .logo-k { flex: none; margin: 0 0 0 7px; }
+.tabela .skor { font-size: 15px; padding: 2px 8px; background: var(--yuzey2); border-radius: 7px; white-space: nowrap; }
+@media (max-width: 520px) { .tabela { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); } .tabela .tarih { grid-column: 1 / -1; } }
