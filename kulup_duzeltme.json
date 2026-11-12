@@ -99,7 +99,7 @@
   "donem_adi": [
     {"kim": "tff:8722", "ilk": "2015-2016", "son": "2020-2021", "ad": "Muş Menderesspor", "kaynak": "tr.wikipedia Muşspor (2015)"},
     {"kim": "tff:8722", "ilk": "2021-2022", "son": "2023-2024", "ad": "Muş 1984 Muşspor", "kaynak": "tr.wikipedia Muşspor (2015)"},
-    {"kim": "tff:103", "ilk": "1959", "son": "1965-1966", "eski": "Zonguldak Fenerspor", "ad": "Kömürspor", "kaynak": "tr.wikipedia Fenerspor"},
+    {"kim": "tff:103", "ilk": "1959", "son": "1965-1966", "ad": "Kömürspor", "kaynak": "tr.wikipedia Fenerspor: 1942 Kömürspor, 16.07.1966 Esnafspor ile birleşip Zonguldakspor"},
     {"kim": "tff:103", "ilk": "1966-1967", "son": "2010-2011", "eski": "Zonguldak Fenerspor", "ad": "Zonguldakspor", "kaynak": "tr.wikipedia Fenerspor"}
   ],
 
