@@ -470,3 +470,7 @@ a.oyuncu-bag:hover { color: var(--vurgu); text-decoration: underline; text-under
 .rozet.final { background: var(--vurgu); color: #fff; border-color: transparent; }
 .po-agac { font-size: 14px; color: var(--yazi2); margin: 16px 0 2px; padding-top: 10px; border-top: 1px solid var(--cizgi); }
 .po-agac:first-of-type { border-top: 0; padding-top: 0; margin-top: 6px; }
+
+/* kırmızı kart grafikleri */
+.grafik-svg .ga-cizgi { stroke: var(--yazi2); stroke-width: 1.5; }
+.grafik-svg .model-nokta { fill: var(--yazi); }

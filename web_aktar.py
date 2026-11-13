@@ -343,6 +343,9 @@ def main():
     sy, yol = sayilar.hesapla(maclar, c)
     yaz(os.path.join(CIKTI, "sayilar.json"), sy)
     yaz(os.path.join(CIKTI, "yolculuk.json"), yol)
+    # kırmızı kart analizi: kirmizi.py yerelde (TFF maç sayfalarıyla) üretir; depodaki sonuç dosyası siteye kopyalanır
+    if os.path.exists(os.path.join(KOK, "kirmizi_kart.json")):
+        shutil.copy(os.path.join(KOK, "kirmizi_kart.json"), os.path.join(CIKTI, "kirmizi.json"))
 
     say = {r[0]: r[1] for r in c.execute("SELECT yarisma, COUNT(*) FROM mac GROUP BY 1")}
     kapsam = [list(r) for r in c.execute("SELECT kademe, sezon, grup, takim, bulunan, beklenen FROM kapsam")]

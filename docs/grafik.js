@@ -163,6 +163,9 @@ async function sayilarSayfa() {
   <p class="soluk not">Lig, Türkiye Kupası ve Cumhurbaşkanlığı/Süper Kupa maçları. Çizgi, iki kulübün galibiyet farkının maç maç nasıl değiştiğini gösterir: çizgi yukarıdaysa soldaki kulüp, aşağıdaysa sağdaki kulüp önde. Penaltıyla biten maçlar beraberlik sayılır.</p>
   <div id="derbiler" class="izgara k2"></div>
 
+  <h2 class="bolum">Kırmızı kartın etkisi</h2>
+  <div id="kirmizi"><div class="yukleniyor">Hazırlanıyor…</div></div>
+
   <h2 class="bolum">Süper Lig'de oynamış kulüpler</h2>
   <p class="soluk not">Her satır bir kulüp, her kare bir sezon. Koyu kare Süper Lig, açıldıkça alt ligler; noktalı kare şampiyonluk. Süper Lig'de en çok sezon geçirenden en aza sıralı.</p>
   <div class="kart viz" id="matris"></div>`;
@@ -173,6 +176,98 @@ async function sayilarSayfa() {
   skorBolumu($("#skorBolum"), S, xler, A);
   derbiCiz($("#derbiler"), S);
   matrisCiz($("#matris"), Y, xler);
+  al(`data/kirmizi.json?s=${OZET.surum || ""}`).then(K => kirmiziBolumu($("#kirmizi"), K)).catch(() => { $("#kirmizi").innerHTML = `<p class="soluk">Kırmızı kart verisi yüklenemedi.</p>`; });
+}
+
+// ---------------------------------------------------------------- kırmızı kart
+const kirmiziDurum = { gecis: 0, saha: 0 };
+function kirmiziBolumu(kap, K) {
+  const md = K.model, kp = K.kapsam;
+  const c = (x, b = 2) => ondalik(x, b);
+  const ilk = K.durumlar.find(d => d.kendi === 10 && d.rakip === 11);
+  const gecisAd = ["İlk kırmızı (11'e 11 → 10'a 11)", "İkinci kırmızı (10'a 11 → 9'a 11)", "Rakip 10 kişiyken (11'e 10 → 10'a 10)", "Üçüncü kırmızı (9'a 11 → 8'e 11)"];
+  const P = K.puan_alanlar.reduce((o, a, i) => (o[a] = i, o), {});
+  const ber15 = K.puan.find(r => r[P.gecis] === 0 && r[P.dakika] === 15 && !r[P.uzatma] && r[P.saha] === 0 && r[P.fark] === 0);
+  kap.innerHTML = `
+    <p class="soluk not">Süper Lig ${esc(kp.sezon_ilk)}–${esc(kp.sezon_son.slice(5))}, gol ve kart dakikaları TFF maç sayfalarından: ${sayiYaz(kp.mac)} maç, ${sayiYaz(kp.kirmizili)} maçta ${sayiYaz(kp.kirmizi)} kırmızı kart (ikinci sarıdan olanlar dahil). Gol listesi skorla tutmayan ya da dakikası eksik ${sayiYaz(Object.values(kp.cikarilan).reduce((a, b) => a + b, 0))} maç çıkarıldı.</p>
+    <div class="izgara k4 bolum-ic">
+      <div class="kart stat"><span class="soluk">10 kişi kalan takımın attığı gol</span><b>×${c(md.kendi[0].carpan)}</b><small class="soluk">11'e 11'e göre (%95 aralık ${c(md.kendi[0].alt)}–${c(md.kendi[0].ust)})</small></div>
+      <div class="kart stat"><span class="soluk">10 kişi kalan takımın yediği gol</span><b>×${c(md.rakip[0].carpan)}</b><small class="soluk">rakibin attığı gol (${c(md.rakip[0].alt)}–${c(md.rakip[0].ust)})</small></div>
+      <div class="kart stat"><span class="soluk">Her eksik oyuncu</span><b>×${c(md.oyuncu_basina.kendi)} / ×${c(md.oyuncu_basina.rakip)}</b><small class="soluk">attığı / yediği gol çarpanı</small></div>
+      <div class="kart stat"><span class="soluk">15. dakikada berabereyken kırmızı</span><b>−${c(ber15[P.puan_once] - ber15[P.puan_sonra])} puan</b><small class="soluk">ev sahibinin beklenen puanı ${c(ber15[P.puan_once])} → ${c(ber15[P.puan_sonra])}</small></div>
+    </div>
+    <div class="izgara k2 bolum-ic">
+      <div class="kart viz"><h3>Kırmızının dakikasına göre maç sonu gol farkına etkisi</h3>
+        <p class="soluk aciklama">Yalnız bir kırmızı kartın çıktığı ${sayiYaz(kp.tek)} maç. Kırmızı gören takımın kart sonrası gol farkı, aynı dakikada aynı skor durumunda (önde/berabere/geride) ve aynı sahadaki 11'e 11 maçlarla karşılaştırıldı. Çubuk: gözlenen ortalama, çizgi: %95 güven aralığı, nokta: model. 1-15 diliminde maç az, aralık geniş; 90+ diliminde model etkiyi gözlenenden küçük buluyor (uzatmalardaki kartlı maçlar daha uzun sürüyor olabilir).</p>
+        ${lejant([{ ad: "Gözlenen", renk: "var(--s2)" }], false)}<div id="kSutun"></div>
+        ${tabloGorunum("Tablo olarak göster", ["Kart dakikası", "Maç", "Gol farkına etki", "%95 aralık", "Kart sonrası attığı (beklenen)", "Yediği (beklenen)", "Model"],
+          K.gozlenen.map(g => [g.kova, g.n, (g.etki > 0 ? "+" : "") + c(g.etki), `±${c(g.ga)}`, `${c(g.atilan)} (${c(g.atilan_bek)})`, `${c(g.yenen)} (${c(g.yenen_bek)})`, c(g.model)]))}</div>
+      <div class="kart viz"><h3>Kırmızı kartın beklenen puan maliyeti</h3>
+        <p class="soluk aciklama">Kart gören takımın maç sonunda alacağı beklenen puan, kart görmeseydi alacağından ne kadar az? Gol modelinden: dakika, skor durumu, saha ve sahadaki oyuncu sayısına göre.</p>
+        <div class="filtre"><div class="cipler">${gecisAd.map((a, i) => `<button class="cip ${kirmiziDurum.gecis === i ? "aktif" : ""}" data-gecis="${i}">${esc(a)}</button>`).join("")}</div>
+          <div class="cipler">${["Ev sahibi", "Deplasman"].map((a, i) => `<button class="cip ${kirmiziDurum.saha === i ? "aktif" : ""}" data-ksaha="${i}">${a}</button>`).join("")}</div></div>
+        <div id="kPuanLejant"></div><div id="kPuan"></div><div id="kPuanTablo"></div></div>
+    </div>
+    <div class="kart viz bolum-ic"><h3>Sahadaki oyuncu sayısına göre gol</h3>
+      <p class="soluk aciklama">Maçların hangi oyuncu sayısıyla kaç dakika oynandığı ve o sürede atılan goller (takım bakışıyla, 90 dakikaya oranlanmış). Az oynanmış durumlarda sayılar güvenilir değildir; 3 ve 4 kart için model "her eksik oyuncu aynı çarpan" varsayımıyla tahmin eder. Sahada 7'den az oyuncu kalırsa maç tatil edilir.</p>
+      <div class="tablo-kap"><table class="tablo"><thead><tr><th>Durum</th><th class="s">Oynanan dakika</th><th class="s">Attığı / 90 dk</th><th class="s">Yediği / 90 dk</th><th class="s">Gol</th></tr></thead><tbody>
+      ${K.durumlar.filter(d => d.kendi <= d.rakip).sort((a, b) => (11 - a.kendi) + (11 - a.rakip) - ((11 - b.kendi) + (11 - b.rakip)) || a.kendi - b.kendi).map(d => `<tr${d.dakika < 1000 ? ' class="soluk"' : ""}>
+        <td>${esc(d.durum)}${d.dakika < 1000 ? " <small>(az veri)</small>" : ""}</td><td class="s">${sayiYaz(d.dakika)}</td><td class="s">${c(d.atilan90)}</td><td class="s">${c(d.yenen90)}</td><td class="s">${d.kendi === d.rakip ? `${sayiYaz(d.atilan * 2)} toplam` : `${d.atilan}–${d.yenen}`}</td></tr>`).join("")}
+      </tbody></table></div>
+      <p class="soluk aciklama" style="margin-top:10px">Örnek okuma: "10'a 11" satırı, 10 kişi kalan takımın bakışıyla. 11'e 11'de takım başına 90 dakikada ${c(K.durumlar.find(d => d.kendi === 11 && d.rakip === 11).atilan90)} gol atılırken, 10 kişi kalan takım ${c(ilk.atilan90)} atıp ${c(ilk.yenen90)} yiyor. İki takımın da 10 kişi kaldığı maçlar daha açık geçiyor.</p>
+      <p class="soluk aciklama">Puan maliyeti tablosunun tamamı (bütün dakikalar, skor farkları ve geçişler) <a class="bag" href="https://github.com/bilgehnbilge/turk-futbol-db/blob/main/kirmizi_kart_puan.csv">kirmizi_kart_puan.csv</a> dosyasında.</p>
+    </div>`;
+  sutunGrafik($("#kSutun", kap), K.gozlenen);
+  const ciz = () => {
+    const sat = K.puan.filter(r => r[P.gecis] === kirmiziDurum.gecis && r[P.saha] === kirmiziDurum.saha);
+    const xler = [...new Set(sat.map(r => r[P.uzatma] ? `${r[P.dakika]}+${r[P.uzatma]}` : String(r[P.dakika])))];
+    const seri = [[-1, "1 gol geride"], [0, "Berabere"], [1, "1 gol önde"]].map(([f, ad], i) => {
+      const m = new Map(sat.filter(r => r[P.fark] === f).map(r => [r[P.uzatma] ? `${r[P.dakika]}+${r[P.uzatma]}` : String(r[P.dakika]), r[P.puan_once] - r[P.puan_sonra]]));
+      return { ad, renk: SERI_RENK[i], d: xler.map(x => m.get(x) ?? null) };
+    });
+    $("#kPuanLejant", kap).innerHTML = lejant(seri);
+    const g = $("#kPuan", kap); g.replaceChildren();
+    cizgiGrafik(g, { xler, seriler: seri, bicim: (v, eksen) => ondalik(v, eksen ? 1 : 2), yMin: 0, yukseklik: 240, xEtiket: s => s, ipucuBas: s => `${s}. dakikada kırmızı · puan kaybı` });
+    const ornek = ["15", "30", "45", "60", "75", "85", "90+3"];
+    $("#kPuanTablo", kap).innerHTML = tabloGorunum("Tablo olarak göster", ["Dakika", ...seri.map(s => s.ad)], ornek.map(x => [x, ...seri.map(s => { const v = s.d[xler.indexOf(x)]; return v == null ? "—" : ondalik(v); })]));
+  };
+  ciz();
+  kap.querySelectorAll("[data-gecis]").forEach(b => b.addEventListener("click", () => { kirmiziDurum.gecis = +b.dataset.gecis; kap.querySelectorAll("[data-gecis]").forEach(x => x.classList.toggle("aktif", x === b)); ciz(); }));
+  kap.querySelectorAll("[data-ksaha]").forEach(b => b.addEventListener("click", () => { kirmiziDurum.saha = +b.dataset.ksaha; kap.querySelectorAll("[data-ksaha]").forEach(x => x.classList.toggle("aktif", x === b)); ciz(); }));
+}
+
+// sütun grafik: negatif değerler sıfırdan aşağı; güven aralığı çizgisi ve model noktası
+function sutunGrafik(kap, l) {
+  kap.classList.add("grafik");
+  const W = genislik(kap, 380), H = 240, sol = 40, sag = 10, ust = 12, alt = 26;
+  const lo = Math.min(...l.map(g => g.etki - g.ga), ...l.map(g => g.model), 0), hi = Math.max(0, ...l.map(g => g.etki + g.ga));
+  const adim = guzelAdim(hi - lo, 4), ymin = Math.floor(lo / adim) * adim, ymax = Math.ceil(hi / adim) * adim || adim / 2;
+  const Y = v => ust + (ymax - v) / (ymax - ymin) * (H - ust - alt);
+  const bw = (W - sol - sag) / l.length, cub = Math.min(24, bw * .5);
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, class: "grafik-svg", role: "img", "aria-label": "Kırmızının dakikasına göre gol farkı etkisi" });
+  for (let v = ymin; v <= ymax + adim / 2; v += adim) {
+    el("line", { x1: sol, x2: W - sag, y1: Y(v), y2: Y(v), class: Math.abs(v) < 1e-9 ? "eksen" : "izgara-cizgi" }, svg);
+    el("text", { x: sol - 5, y: Y(v) + 4, class: "eksen-yazi", "text-anchor": "end" }, svg).textContent = ondalik(v, 1);
+  }
+  const ip = ipucuKur(kap);
+  l.forEach((g, i) => {
+    const x = sol + bw * i + bw / 2, y0 = Y(0), y1 = Y(g.etki), r = 4;
+    const h = Math.abs(y1 - y0);
+    // veri ucu aşağıda: alt köşeler yuvarlak, sıfır çizgisinde düz
+    el("path", { d: `M${x - cub / 2},${y0}V${y1 - Math.min(r, h)}Q${x - cub / 2},${y1} ${x - cub / 2 + Math.min(r, h)},${y1}H${x + cub / 2 - Math.min(r, h)}Q${x + cub / 2},${y1} ${x + cub / 2},${y1 - Math.min(r, h)}V${y0}Z`, style: "fill:var(--s2)" }, svg);
+    el("line", { x1: x, x2: x, y1: Y(g.etki - g.ga), y2: Y(g.etki + g.ga), class: "ga-cizgi" }, svg);
+    for (const v of [g.etki - g.ga, g.etki + g.ga]) el("line", { x1: x - 5, x2: x + 5, y1: Y(v), y2: Y(v), class: "ga-cizgi" }, svg);
+    el("circle", { cx: x, cy: Y(g.model), r: 4.5, class: "nokta model-nokta" }, svg);
+    el("text", { x, y: H - 6, class: "eksen-yazi", "text-anchor": "middle" }, svg).textContent = g.kova;
+    const hit = el("rect", { x: sol + bw * i, y: ust, width: bw, height: H - ust - alt, fill: "transparent", tabindex: 0, class: "hit" }, svg);
+    const goster = () => { const o = svg.getBoundingClientRect().width / W; ip.goster(x * o, Y(Math.min(g.etki + g.ga, 0)) * o, `${g.kova}. dakikada kırmızı · ${sayiYaz(g.n)} maç`, [
+      { deger: `${g.etki > 0 ? "+" : ""}${ondalik(g.etki)} (±${ondalik(g.ga)})`, ad: "gözlenen gol farkı etkisi", renk: "var(--s2)", kare: true },
+      { deger: ondalik(g.model), ad: "model" },
+      { deger: `${ondalik(g.atilan)} / ${ondalik(g.yenen)}`, ad: `kart sonrası attığı / yediği (beklenen ${ondalik(g.atilan_bek)} / ${ondalik(g.yenen_bek)})` }]); };
+    hit.addEventListener("pointerenter", goster); hit.addEventListener("focus", goster);
+    hit.addEventListener("pointerleave", () => ip.gizle()); hit.addEventListener("blur", () => ip.gizle());
+  });
+  kap.appendChild(svg);
 }
 
 // ---------------------------------------------------------------- skor ısı haritası + 1-0 / 1-1 / 0-0 payı
