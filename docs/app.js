@@ -196,6 +196,7 @@ function anaSayfa() {
   </section>
   <section class="bolum izgara k3">
     <a class="kart" href="#/sezonlar"><h3>Sezonlar →</h3><p class="soluk">Her sezonun puan tabloları, kupa turları ve Avrupa maçları.</p></a>
+    <a class="kart" href="#/sayilar"><h3>Sayılarla Türk futbolu →</h3><p class="soluk">Dönemlere göre gol ortalaması, skorlar, derbiler ve Süper Lig'de oynamış bütün kulüpler.</p></a>
     <a class="kart" href="#/rekorlar"><h3>Tüm zamanlar rekorları →</h3><p class="soluk">En farklı skorlar, en uzun seriler ve tüm zamanlar puan tabloları.</p></a>
     <a class="kart" href="#/karsilastir"><h3>İki kulübü karşılaştır →</h3><p class="soluk">Aralarındaki bütün maçlar ve genel denge.</p></a>
     <a class="kart" href="#/hakkinda"><h3>Veri hakkında →</h3><p class="soluk">Kaynaklar, kapsam ve bilinen sınırlar.</p></a>
@@ -298,7 +299,7 @@ async function kulupSayfa(id, sekme) {
     filtreBagla(durum, () => { kulupSayfa(id, sekme); }, ciz);
     const ms = filtrele(tum, durum, sekme);
     const hedef = $("#sekmeIcerik");
-    if (sekme === "ozet") { hedef.innerHTML = ozetHtml(tum, durum); if (tum.some(m => m.yar === "A")) avrupaOyunculari(hedef, id); }
+    if (sekme === "ozet") { hedef.innerHTML = ozetHtml(tum, durum); if (typeof yolculukCiz === "function") yolculukCiz(hedef, id); if (tum.some(m => m.yar === "A")) avrupaOyunculari(hedef, id); }
     else if (sekme === "rekorlar") hedef.innerHTML = rekorHtml(ms);
     else if (sekme === "maclar") macTablosu(hedef, ms, durum);
     else if (sekme === "rakipler") rakipTablosu(hedef, ms, id);
@@ -369,6 +370,7 @@ function ozetHtml(ms) {
       ${eski.length ? `<br><small class="soluk">Dönemin adıyla: ${eski.map(esc).join(", ")}</small>` : ""}</p>`;
   };
   return `<div class="izgara k2">${kartlar}</div>
+  <div class="kart viz" id="yolculuk" hidden></div>
   <div class="bolum izgara k2">
     <div class="kart"><h3>Liglerde geçirdiği sezonlar</h3>
       ${Object.keys(ligBas).sort().map(ligSatiri).join("") || `<p class="soluk">Lig maçı yok.</p>`}

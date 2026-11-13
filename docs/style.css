@@ -378,3 +378,87 @@ a.oyuncu-bag:hover { color: var(--vurgu); text-decoration: underline; text-under
 .istat .iscubuk.sag { justify-content: flex-start; }
 .istat .iscubuk i { display: block; height: 100%; background: var(--ia); border-radius: 99px; }
 .istat .iscubuk.sag i { background: var(--ib); }
+
+/* ---------------------------------------------------------------- grafikler (grafik.js)
+   Seri renkleri: kategorik 4'lü sıra (mavi, turuncu, su yeşili, sarı) açık/koyu zeminde doğrulandı;
+   kademe matrisi tek tonlu sıralı mavi; derbi farkı iki yönlü mavi ↔ kırmızı. */
+:root {
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+  --kd1: #104281; --kd2: #256abf; --kd3: #5598e7; --kd4: #86b6ef;
+  --div-a: #2a78d6; --div-b: #e34948;
+  --grafik-izgara: #eceef2; --grafik-eksen: #c3c8d0;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+    --kd1: #9ec5f4; --kd2: #5598e7; --kd3: #256abf; --kd4: #184f95;
+    --div-a: #3987e5; --div-b: #e66767;
+    --grafik-izgara: #20252d; --grafik-eksen: #3a414c;
+  }
+}
+:root[data-theme="dark"] {
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+  --kd1: #9ec5f4; --kd2: #5598e7; --kd3: #256abf; --kd4: #184f95;
+  --div-a: #3987e5; --div-b: #e66767;
+  --grafik-izgara: #20252d; --grafik-eksen: #3a414c;
+}
+.grafik { position: relative; }
+.grafik-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.grafik-svg .izgara-cizgi { stroke: var(--grafik-izgara); stroke-width: 1; }
+.grafik-svg .eksen { stroke: var(--grafik-eksen); stroke-width: 1; }
+.grafik-svg .eksen-yazi { fill: var(--soluk); font-size: 11px; font-variant-numeric: tabular-nums; }
+.grafik-svg .cizgi { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.grafik-svg .cizgi.ince { stroke-width: 1.5; }
+.grafik-svg .alan { opacity: .14; }
+.grafik-svg .imlec { stroke: var(--soluk); stroke-width: 1; }
+.grafik-svg .nokta { stroke: var(--yuzey); stroke-width: 2; }
+.grafik-svg .nokta.sampiyon { stroke: var(--yazi); stroke-width: 1.5; }
+.grafik-svg .nokta.secili { r: 6.5; }
+.grafik-svg .bant { fill: var(--yuzey2); }
+.grafik-svg .bant.b2 { fill: var(--yuzey3); opacity: .55; }
+.grafik-svg .hit { cursor: crosshair; outline: none; }
+.grafik-svg .hit:focus-visible { stroke: var(--vurgu); stroke-width: 1; }
+.ipucu { position: absolute; z-index: 5; pointer-events: none; background: var(--yuzey); border: 1px solid var(--cizgi); border-radius: 10px;
+  box-shadow: var(--golge2); padding: 8px 11px; font-size: 13px; min-width: 140px; max-width: 280px; }
+.ipucu-bas { color: var(--soluk); font-size: 12px; margin-bottom: 4px; }
+.ipucu-satir { display: flex; align-items: center; gap: 7px; line-height: 1.6; }
+.ipucu-satir b { font-variant-numeric: tabular-nums; }
+.anahtar { display: inline-block; width: 14px; height: 3px; border-radius: 2px; flex: none; }
+.anahtar.kare { width: 11px; height: 11px; border-radius: 3px; }
+.lejant { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--yazi2); margin: 2px 0 10px; }
+.lejant span { display: inline-flex; align-items: center; gap: 6px; }
+.tablo-gorunum { margin-top: 10px; font-size: 13px; }
+.tablo-gorunum summary { cursor: pointer; color: var(--soluk); }
+.tablo-gorunum .tablo-kap { max-height: 320px; overflow: auto; margin-top: 8px; }
+.viz h3 { margin-bottom: 6px; }
+.viz .aciklama { font-size: 13px; margin: 0 0 10px; }
+.bolum-ust { margin-top: 18px; }
+.bolum-ic { margin-top: 16px; }
+.kart.stat { display: flex; flex-direction: column; gap: 4px; }
+.kart.stat b { font-size: 28px; font-weight: 650; letter-spacing: -.01em; }
+.kart.stat span { font-size: 13px; }
+/* skor ısı haritası */
+.isi { position: relative; display: grid; grid-template-columns: 22px repeat(var(--n), 1fr); gap: 2px; max-width: 460px; }
+.isi-bas { font-size: 12px; color: var(--soluk); display: grid; place-items: center; min-height: 22px; font-variant-numeric: tabular-nums; }
+.hucre { aspect-ratio: 1.25; border: 0; border-radius: 4px; font: inherit; font-size: 11.5px; color: var(--yazi); cursor: default;
+  background: color-mix(in oklab, var(--s1) var(--t), var(--yuzey2)); font-variant-numeric: tabular-nums; padding: 0; }
+.hucre.koyu { color: #fff; }
+.hucre:hover, .hucre:focus-visible { outline: 2px solid var(--yazi); outline-offset: -2px; }
+.isi-lejant { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 12px; margin-top: 10px; max-width: 460px; }
+.isi-lejant .olcek { display: inline-flex; align-items: center; gap: 6px; }
+.isi-lejant .olcek i { width: 90px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--yuzey2), var(--s1)); }
+/* derbiler */
+.derbi-ozet { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; margin-bottom: 8px; flex-wrap: wrap; }
+.derbi-ozet b { font-size: 17px; }
+/* Süper Lig matrisi */
+.matris-kap { position: relative; overflow-x: auto; }
+.matris { display: grid; grid-template-columns: 150px repeat(var(--sutun), minmax(7px, 1fr)); gap: 1px; min-width: 640px; font-size: 12px; }
+.m-ad { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 8px; line-height: 12px; display: flex; justify-content: space-between; gap: 4px; }
+.m-ad small { font-size: 10.5px; }
+.m-yil { font-size: 10px; color: var(--soluk); white-space: nowrap; overflow: visible; line-height: 14px; }
+.m-h { height: 12px; border-radius: 2px; }
+.m-h[data-k] { cursor: default; }
+.kd1 { background: var(--kd1); } .kd2 { background: var(--kd2); } .kd3 { background: var(--kd3); } .kd4 { background: var(--kd4); }
+.m-h.sampiyon, .anahtar.sampiyon { background-image: radial-gradient(circle, var(--yuzey) 0 28%, transparent 32%); }
+.matris-lejant { margin-bottom: 12px; }
+#yolculuk { margin-top: 16px; }

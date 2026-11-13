@@ -14,6 +14,7 @@ Satir bicimleri dosyalarin "alanlar" anahtarinda yazar.
 import collections, datetime, json, os, shutil, sqlite3
 
 import rekor
+import sayilar
 
 KOK = os.path.dirname(os.path.abspath(__file__))
 DB = os.path.join(KOK, "futbol.db")
@@ -337,6 +338,11 @@ def main():
     # ---- tüm zamanlar rekorları
     sezon_sira = {s: i for i, s in enumerate(sorted(sez, key=lambda s: (s[:4], s)))}
     yaz(os.path.join(CIKTI, "rekorlar.json"), rekor.hesapla(maclar, sezon_sira, okunur))
+
+    # ---- Sayılarla Türk futbolu + kulüplerin lig yolculuğu
+    sy, yol = sayilar.hesapla(maclar, c)
+    yaz(os.path.join(CIKTI, "sayilar.json"), sy)
+    yaz(os.path.join(CIKTI, "yolculuk.json"), yol)
 
     say = {r[0]: r[1] for r in c.execute("SELECT yarisma, COUNT(*) FROM mac GROUP BY 1")}
     kapsam = [list(r) for r in c.execute("SELECT kademe, sezon, grup, takim, bulunan, beklenen FROM kapsam")]
