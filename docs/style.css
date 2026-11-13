@@ -42,6 +42,7 @@
 :root[data-theme="dark"] .tema-kulup { --vurgu: var(--tv-koyu); }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }   /* .izgara gibi display veren sınıflar gizlemeyi ezmesin */
 html, body { margin: 0; }
 body {
   background: var(--bg); color: var(--yazi);

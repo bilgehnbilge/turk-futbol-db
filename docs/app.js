@@ -894,7 +894,9 @@ async function sezonSayfa(sezon) {
   <p class="soluk">${ms.length} maç · Puan tabloları sonuçlardan hesaplandı (galibiyet ${p} puan; puan silme ve averaj kuralı farkları dahil değil).</p>
   <nav class="sekmeler">${sirali.length ? `<a href="#lig" data-k="lig" class="aktif">Lig</a>` : ""}${po.length ? `<a href="#po" data-k="po">Play-off / baraj</a>` : ""}${kupa.length ? `<a href="#kupa" data-k="kupa">Türkiye Kupası</a>` : ""}${ozel.map(o => `<a href="#${o.k}" data-k="${o.k}">${esc(o.lig)}</a>`).join("")}${avrupa.length ? `<a href="#avrupa" data-k="avrupa">Avrupa</a>` : ""}</nav>
   <div id="sz-lig" class="izgara puan">${sirali.map(tabloHtml).join("") || ""}</div>
-  <div id="sz-po" hidden>${macListesi(po)}</div>
+  <div id="sz-po" hidden><p class="soluk not">Normal sezondan sonra oynanan yükselme play-off'ları, düşme/küme düşme barajları ve gruplar arası final maçları. Puan tablolarına girmez.</p>
+    ${turlara(po.map(m => ({ ...m, tur: m.lig }))).sort((a, b) => (po.find(m => m.lig === a[0])?.kademe ?? 9) - (po.find(m => m.lig === b[0])?.kademe ?? 9))
+      .map(([t, l]) => `<div class="kart" style="margin-bottom:12px"><h3>${esc(t)}</h3>${macListesi(l)}</div>`).join("")}</div>
   <div id="sz-kupa" hidden>${turlara(kupa).map(([t, l]) => `<div class="kart" style="margin-bottom:12px"><h3>${esc(t)}</h3>${macListesi(l)}</div>`).join("")}</div>
   ${ozel.map(o => `<div id="sz-${o.k}" hidden>${macListesi(o.ms)}</div>`).join("")}
   <div id="sz-avrupa" hidden>${turlara(avrupa.map(m => ({ ...m, tur: `${m.lig}${m.tur ? " · " + m.tur : ""}` }))).map(([t, l]) => `<div class="kart" style="margin-bottom:12px"><h3>${esc(t)}</h3>${macListesi(l)}</div>`).join("")}</div>`;
