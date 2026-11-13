@@ -609,6 +609,7 @@ def main():
         SELECT t.id FROM t JOIN n USING(kademe, sezon, g, k) JOIN buyuk USING(kademe, sezon, g) WHERE n.n <= 2)""")
     po = c.total_changes - once_deg
     yaz(f"   TFF grup sayfalarindaki tekil dis takim maclari play-off sayildi: {po}")
+    wiki_kupa(c)
     no_bul = lambda node: kok_no.get(bb.bul(node)) if node in bb.p else None
     mac_duzelt(c, dz, no_bul, kes_no)
     resmi_tablolar(c, no_bul, kes_no, dugum)
@@ -655,6 +656,47 @@ def main():
     yaz("\nKulubu bulunamayan mac tarafi:",
         c.execute("SELECT COUNT(*) FROM mac WHERE ev_kulup IS NULL OR dep_kulup IS NULL").fetchone()[0])
     open(RAPOR, "w", encoding="utf-8").write("\n".join(rapor) + "\n")
+
+
+# ---------------------------------------------------------------- ozel kupalar (Vikipedi)
+def wiki_kupa(c):
+    """TFF'de sayfasi olmayan Cumhurbaskanligi/Baskanlik/Devlet Baskanligi/Ataturk Kupasi ve TFF Super Kupa maclari
+    (wiki_kupa.py -> wiki_kupa_maclar.csv). TFF'den gelen ayni basim (sezon + kupa + takimlar) varsa o kalir.
+    Arsiv 1959'da basladigi icin daha eski basimlar alinmaz."""
+    yol, esl = os.path.join(KOK, "wiki_kupa_maclar.csv"), os.path.join(KOK, "wiki_kupa_kulup.json")
+    if not os.path.exists(yol):
+        return
+    harita = json.load(open(esl, encoding="utf-8"))
+
+    def kulup(w, sezon):
+        v = harita.get(w)
+        if isinstance(v, list):
+            v = next((n for n, ilk, son in v if ilk <= sezon <= son), None)
+        return v
+    var = {(r[0], r[1], frozenset(r[2:])) for r in c.execute("SELECT sezon, lig, ev_kulup, dep_kulup FROM mac WHERE yarisma='ozel_kupa'")}
+    eklenen, eslesmeyen = 0, set()
+    with open(yol, encoding="utf-8") as f:
+        for i, x in enumerate(csv.DictReader(f)):
+            if x["sezon"] < "1959":
+                continue
+            ek, dk = kulup(x["ev_wiki"], x["sezon"]), kulup(x["dep_wiki"], x["sezon"])
+            eslesmeyen |= {w for w, k in ((x["ev_wiki"], ek), (x["dep_wiki"], dk)) if k is None}
+            if (x["sezon"], x["kupa"], frozenset((ek, dk))) in var:
+                continue
+            def ad(k, yedek):   # kulubun o sezonki (yoksa en yakin sezondaki) lig adi
+                r = c.execute("""SELECT ad FROM (SELECT ev_adi ad, sezon FROM mac WHERE ev_kulup=:k AND yarisma IN ('lig','terfi')
+                                 UNION ALL SELECT dep_adi, sezon FROM mac WHERE dep_kulup=:k AND yarisma IN ('lig','terfi'))
+                                 GROUP BY ad, sezon ORDER BY ABS(CAST(SUBSTR(sezon,1,4) AS INT)-:y), COUNT(*) DESC LIMIT 1""",
+                              dict(k=k, y=int(x["sezon"][:4]))).fetchone() if k else None
+                return r[0] if r else yedek
+            sayi = lambda v: int(v) if v != "" else None
+            c.execute(f"INSERT INTO mac VALUES(NULL,{','.join('?' * 26)})", (
+                "wiki", f"{x['basim']}#{i}", "ozel_kupa", x["kupa"], None, x["sezon"], None, "final", x["tur"], x["tarih"] or None, None,
+                ek, dk, ad(ek, x["ev_adi"]), ad(dk, x["dep_adi"]), x["ev_adi"], x["dep_adi"], sayi(x["ev_gol"]), sayi(x["dep_gol"]),
+                None, None, sayi(x["ev_pen"]), sayi(x["dep_pen"]), x["durum"] or "MS", x["kazanan"] or None,
+                "Hükmen sonuç" if x["durum"] == "Hük." else None))
+            eklenen += 1
+    yaz(f"   Vikipedi'den ozel kupa maci: {eklenen}" + (f" (kulubu eslesmeyen: {sorted(eslesmeyen)})" if eslesmeyen else ""))
 
 
 # ---------------------------------------------------------------- resmi puan durumlari ve hukmen maclar

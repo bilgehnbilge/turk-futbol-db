@@ -351,7 +351,7 @@ function ozetSatir(t) {
   <p class="soluk" style="margin:8px 0 0;font-size:13px">Galibiyet oranı %${yuzde(t.G, t.O)} · Kalesini gole kapattığı maç %${yuzde(t.GY, t.O)} · Maç başı ${(t.AG / Math.max(t.O, 1)).toFixed(2)} – ${(t.YG / Math.max(t.O, 1)).toFixed(2)} gol</p>`;
 }
 function ozetHtml(ms) {
-  const bolumler = [["", "Bütün resmi maçlar"], ["L", "Lig"], ["K", "Türkiye Kupası"], ["O", "Diğer kupalar (Cumhurbaşkanlığı, Başbakanlık, Atatürk, TFF Süper Kupa)"], ["A", "Avrupa kupaları"], ["T", "Terfi maçları"]];
+  const bolumler = [["", "Bütün resmi maçlar"], ["L", "Lig"], ["K", "Türkiye Kupası"], ["O", "Diğer kupalar (Cumhurbaşkanlığı, Başbakanlık, Atatürk Kupası, TFF Süper Kupa)"], ["A", "Avrupa kupaları"], ["T", "Terfi maçları"]];
   const kartlar = bolumler.map(([y, ad]) => {
     const alt = ms.filter(m => !y || m.yar === y); if (!alt.length) return "";
     return `<div class="kart"><h3>${ad}</h3>${ozetSatir(toplam(alt))}</div>`;
@@ -1018,7 +1018,7 @@ function hakkindaSayfa() {
   <ul>
     <li><b>TFF</b>: 1984-85'ten bugüne Süper Lig, 1990-91'den bugüne alt ligler ve 1994-95'ten sonraki kupa eşleşmeleri.</li>
     <li><b>Maçkolik</b> (yeni site ve arşiv): 1959-1990 arası ligler, Türkiye Kupası ve Avrupa kupaları.</li>
-    <li><b>RSSSF ve Vikipedi</b>: 1995-2003 Intertoto maçları; kulüp ardıllıkları ve eski adlar.</li>
+    <li><b>RSSSF ve Vikipedi</b>: 1995-2003 Intertoto maçları; kulüp ardıllıkları ve eski adlar; 1966'dan bugüne Cumhurbaşkanlığı (1981-82'de Devlet Başkanlığı) Kupası, TFF Süper Kupa ve Başbakanlık Kupası maçları (1991-2006 arası TFF maç sayfalarından).</li>
     <li><b>Kulüp logoları</b>: Football Manager topluluk logo paketi (TCM), kulüplerin bugünkü logoları; FM kimlikleri Sortitoutsi'den eşlendi; pakette olmayan kulüplerde Türkçe Vikipedi'deki arma. Logolar kulüplerin tescilli markasıdır.</li>
   </ul>
   <h2 class="bolum">Kulüpler nasıl eşlendi</h2>
