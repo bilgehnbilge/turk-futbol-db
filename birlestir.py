@@ -112,6 +112,18 @@ def tff_oku():
                     cozulemeyen[m[s + "_adi"]] += 1
     if cozulemeyen:
         yaz("  TFF: kulupID'si olmayan ve adi baska sezonda gecmeyen:", dict(cozulemeyen))
+    # sezon sayfalarinda listelenmeyen TFF maclari (play-off/baraj, ozel kupalar): oyuncu.py ek -> tff_ek_maclar.csv
+    ek = os.path.join(KOK, "tff_ek_maclar.csv")
+    if os.path.exists(ek):
+        with open(ek, encoding="utf-8") as f:
+            for x in csv.DictReader(f):
+                sayi = lambda v: int(v) if v != "" else None
+                ms.append(dict(kaynak="tff", kaynak_id=x["kaynak_id"], yarisma=x["yarisma"], kademe=sayi(x["kademe"]),
+                               lig=x["lig"], sezon=x["sezon"], grup=None, asama="play-off" if x["yarisma"] == "lig" else "final",
+                               hafta=None, tarih=x["tarih"], saat=x["saat"] or None, ev_tff=x["ev_tff"], dep_tff=x["dep_tff"],
+                               ev_adi=x["ev_adi"], dep_adi=x["dep_adi"], ev_gol=sayi(x["ev_gol"]), dep_gol=sayi(x["dep_gol"]),
+                               ev_pen=sayi(x["ev_pen"]), dep_pen=sayi(x["dep_pen"]), ham_skor=None, durum=x["durum"]))
+        yaz(f"  TFF ek maclar (play-off/baraj, ozel kupalar): {sum(1 for m in ms if 'yarisma' in m)}")
     return ms
 
 
@@ -552,7 +564,16 @@ def main():
             return lig_adi[(no, min(ss, key=lambda z: (abs(int(z[:4]) - int(sezon[:4])), z)))]
         return ad
 
+    # Avrupa maclari once yazilir: numaralari (#/mac/<id> sayfalari, UEFA detay eslesmesi) her hafta eklenen
+    # lig maclariyla kaymasin
     satir = []
+    for x in av:
+        kk = x.get("kaynak_kimlik_ev", x["kaynak"]), x.get("kaynak_kimlik_dep", x["kaynak"])
+        ek = kulup_no(kk[0], x["ev_id"], x["sezon"], "", (x["kaynak_id"], "ev")) if x["ev_id"] else None
+        dk = kulup_no(kk[1], x["dep_id"], x["sezon"], "", (x["kaynak_id"], "dep")) if x["dep_id"] else None
+        satir.append((x["kaynak"], x["kaynak_id"], "avrupa", x["lig"], None, x["sezon"], None, "avrupa", x["tur"] or None,
+                      x["tarih"] or None, x["saat"] or None, ek, dk, x["ev_adi"], x["dep_adi"], x["ev_adi"], x["dep_adi"],
+                      *gol(x), x["durum"] or None, x["kazanan"] or None, x.get("not") or None))
     for x in mk:
         ek = kulup_no(x["kk"], x["ev_id"], x["sezon"], x["kademe"], (x["kaynak_id"], "ev"))
         dk = kulup_no(x["kk"], x["dep_id"], x["sezon"], x["kademe"], (x["kaynak_id"], "dep"))
@@ -566,20 +587,15 @@ def main():
                       x["grup"] or None, x["asama"], None, x["tarih"] or None, x["saat"] or None, ek, dk, ea, da,
                       x["ev_adi"], x["dep_adi"], *gol(x), x["durum"] or None, x["kazanan"] or None, None))
     for m in tff:
-        hafta_tur = m["asama"] if m["asama"] not in ("lig", "play-off") else None
-        satir.append(("tff", m["kaynak_id"], "lig", m["lig"], m["kademe"], m["sezon"], m["grup"],
-                      "lig" if m["asama"] == "lig" else "play-off", hafta_tur, m["tarih"], m["saat"],
+        hafta_tur = m["asama"] if m["asama"] not in ("lig", "play-off", "final") else None
+        if m.get("yarisma") == "ozel_kupa":
+            hafta_tur = "Final"
+        satir.append(("tff", m["kaynak_id"], m.get("yarisma", "lig"), m["lig"], m["kademe"], m["sezon"], m["grup"],
+                      m["asama"] if m["asama"] in ("lig", "final") else "play-off", hafta_tur, m["tarih"], m["saat"],
                       kulup_no("tff", m["ev_tff"]), kulup_no("tff", m["dep_tff"]),
                       kes_adi(m["ev_tff"], m["ev_adi"]), kes_adi(m["dep_tff"], m["dep_adi"]), m["ev_adi"], m["dep_adi"],
                       m["ev_gol"], m["dep_gol"], None, None, m["ev_pen"], m["dep_pen"],
-                      "MS" if m["ev_gol"] is not None else None, None, m["ham_skor"] if m["ev_gol"] is None and m["ham_skor"] else None))
-    for x in av:
-        kk = x.get("kaynak_kimlik_ev", x["kaynak"]), x.get("kaynak_kimlik_dep", x["kaynak"])
-        ek = kulup_no(kk[0], x["ev_id"], x["sezon"], "", (x["kaynak_id"], "ev")) if x["ev_id"] else None
-        dk = kulup_no(kk[1], x["dep_id"], x["sezon"], "", (x["kaynak_id"], "dep")) if x["dep_id"] else None
-        satir.append((x["kaynak"], x["kaynak_id"], "avrupa", x["lig"], None, x["sezon"], None, "avrupa", x["tur"] or None,
-                      x["tarih"] or None, x["saat"] or None, ek, dk, x["ev_adi"], x["dep_adi"], x["ev_adi"], x["dep_adi"],
-                      *gol(x), x["durum"] or None, x["kazanan"] or None, x.get("not") or None))
+                      m.get("durum") or ("MS" if m["ev_gol"] is not None else None), None, m["ham_skor"] if m["ev_gol"] is None and m["ham_skor"] else None))
     c.executemany(f"INSERT INTO mac VALUES(NULL,{','.join('?' * 26)})", satir)
     # TFF grup sayfalarinda tek tuk gorunen dis takim maclari (gruplar arasi final/baraj): grupta en fazla 2 maci olan
     # takimin maclari, grubun geri kalani tam bir lig ise (>=6 takim, takim basina >=10 mac) play-off sayilir.

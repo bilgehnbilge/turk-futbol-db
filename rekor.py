@@ -16,7 +16,7 @@ import collections
 
 ADET = 25
 KAPSAMLAR = [
-    ("tum", "Tüm maçlar (lig + kupa)", lambda m: m["yarisma"] in ("lig", "kupa")),
+    ("tum", "Tüm maçlar (lig + kupa)", lambda m: m["yarisma"] in ("lig", "kupa", "ozel_kupa")),
     ("1", "Süper Lig", lambda m: m["yarisma"] == "lig" and m["kademe"] == 1),
     ("2", "1. Lig", lambda m: m["yarisma"] == "lig" and m["kademe"] == 2),
     ("3", "TFF 2. Lig", lambda m: m["yarisma"] == "lig" and m["kademe"] == 3),

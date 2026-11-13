@@ -167,6 +167,88 @@ def ayikla():
     print(n, "mac sayfasi ->", OYUNCU_DB, say)
 
 
+# TFF sezon sayfalarinda listelenmeyen maclar (1990-2007 numara boslugu): lig play-off/baraj ve ozel kupalar
+EK_CSV = os.path.join(KOK, "tff_ek_maclar.csv")
+OZEL_KUPA = {"cumhurbaşkanlığı kupası": "Cumhurbaşkanlığı Kupası", "başbakanlık kupası": "Başbakanlık Kupası",
+             "atatürk kupası": "Atatürk Kupası", "süper kupa": "TFF Süper Kupa"}
+EK_LIG = ("Lig B", "Türk Telekom Lig A", "1. Lig", "2. Lig", "3. Lig")
+# 1996 Cumhurbaşkanlığı ve Başbakanlık kupaları Mart 1997'de oynandı: 1995-96 sezonunun kupaları
+EK_SEZON = {"43261": "1995-1996", "43348": "1995-1996"}
+EK_HARIC = {"51641": "1993-94 3. Lig: Hopaspor-Rize ligde zaten iki kez oynamış (3.10.1993, 13.3.1994); bu maçın niteliği belirsiz"}
+
+
+def ek_maclar():
+    import csv
+    t = sqlite3.connect(TFF_DB)
+    # (tff kulup no, sezon) -> {kademe: mac sayisi}; kademe -> lig adi
+    kd = collections.defaultdict(collections.Counter)
+    for k, sezon, kademe, n in t.execute("""SELECT k.tff_id, m.sezon, m.kademe, COUNT(*) FROM mac m JOIN kulup k ON k.id IN (m.ev_id, m.dep_id)
+                                             WHERE m.asama='lig' GROUP BY 1,2,3"""):
+        kd[(str(k), sezon)][kademe] += n
+    lig_adi = dict(t.execute("SELECT kademe, lig FROM mac GROUP BY kademe"))
+    var = {r[0] for r in t.execute("SELECT kaynak_id FROM mac WHERE kaynak='tff'")}
+    satir, sorun = [], []
+    for m in (l.strip() for l in open(os.path.join(KOK, "raw", "tff_mac_yoklama.txt"))):
+        if not m or not os.path.exists(yol(m)) or m in var or m in EK_HARIC:
+            continue
+        with gzip.open(yol(m), "rb") as g:
+            o = sayfa_oku(g.read().decode("cp1254", "replace"))
+        org, tarih, saat, et, ea, dt, da, eg, dg, kod = o["bilgi"]
+        org = (org or "").split(" (")[0].strip()
+        ozel = OZEL_KUPA.get(org.replace("CumhurBaşkanlığı", "Cumhurbaşkanlığı").lower())
+        if not ozel and org not in EK_LIG:
+            continue
+        if not (tarih and et and dt and eg is not None and dg is not None):
+            sorun.append((m, org, "eksik bilgi"))
+            continue
+        y, ay = int(tarih[:4]), int(tarih[5:7])
+        sezon = EK_SEZON.get(m) or (f"{y}-{y + 1}" if ay >= 7 else f"{y - 1}-{y}")
+        # seri penaltilar: TFF skoru penaltilarla birlikte yaziyor; 90+30 ve sonrasindaki penalti golleri atistir
+        sayi = {1: [0, 0], 2: [0, 0]}   # taraf -> [mac golu, seri penalti]
+        for taraf, _, _, _, d1, d2, tip in o["gol"]:
+            seri = tip in ("S",) or (tip == "P" and (d1 is None or (d1 == 90 and d2 >= 30)))   # dakikasiz penalti: seri (orn. 1995 Basbakanlik)
+            hedef = (3 - taraf) if tip == "K" else taraf
+            sayi[hedef][1 if seri else 0] += 1
+        ep = dp = None
+        durum = "MS"
+        if sayi[1][1] or sayi[2][1]:
+            if sayi[1][0] == sayi[2][0] and sayi[1][0] + sayi[1][1] == eg and sayi[2][0] + sayi[2][1] == dg:
+                eg, dg, ep, dp = sayi[1][0], sayi[2][0], sayi[1][1], sayi[2][1]
+            else:
+                sorun.append((m, org, f"penalti ayrilamadi {eg}-{dg} {sayi}"))
+                continue
+        elif o["gol"] and (sayi[1][0], sayi[2][0]) != (eg, dg):
+            if sayi[1][0] == sayi[2][0] and min(eg, dg) - sayi[1][0] >= 3 and abs(eg - dg) <= 2:
+                # seri penaltilar listede yok ama skor penaltilarla yazilmis (orn. 5-4, listede 1-1)
+                eg, dg, ep, dp = sayi[1][0], sayi[2][0], eg - sayi[1][0], dg - sayi[2][0]
+            elif {eg, dg} == {0, 3}:
+                durum = "Hük."   # skor 3-0 hukmen, sahadaki goller farkli
+            else:
+                sorun.append((m, org, f"gol listesi skorla tutmuyor {eg}-{dg} {sayi}"))
+        if ozel:
+            yarisma, lig, kademe = "ozel_kupa", ozel, ""
+        else:
+            ortak = kd[(str(et), sezon)].keys() & kd[(str(dt), sezon)].keys()
+            if len(ortak) != 1:   # iki takim ayni kademede degilse: ev sahibinin kademesi (baraj)
+                ortak = kd[(str(et), sezon)].keys() or kd[(str(dt), sezon)].keys()
+            if not ortak:
+                sorun.append((m, org, "kademe bulunamadi"))
+                continue
+            kademe = min(ortak)
+            yarisma, lig = "lig", lig_adi[kademe]
+        satir.append(dict(kaynak_id=m, yarisma=yarisma, lig=lig, kademe=kademe, sezon=sezon, organizasyon=org, tarih=tarih,
+                          saat=saat or "", ev_tff=et, ev_adi=topla.temiz(ea), dep_tff=dt, dep_adi=topla.temiz(da),
+                          ev_gol=eg, dep_gol=dg, ev_pen="" if ep is None else ep, dep_pen="" if dp is None else dp, durum=durum))
+    satir.sort(key=lambda r: (r["tarih"], int(r["kaynak_id"])))
+    with open(EK_CSV, "w", encoding="utf-8", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=list(satir[0]))
+        w.writeheader()
+        w.writerows(satir)
+    print(len(satir), "mac ->", EK_CSV, dict(collections.Counter((r["yarisma"], r["lig"]) for r in satir)))
+    for s in sorun:
+        print("  sorun:", *s)
+
+
 def durum():
     c = sqlite3.connect(TFF_DB)
     for kd, n in c.execute("SELECT kademe, COUNT(*) FROM mac WHERE kaynak='tff' AND kaynak_id<>'' AND ev_gol IS NOT NULL GROUP BY 1"):
@@ -176,9 +258,9 @@ def durum():
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("komut", choices=["indir", "ayikla", "durum"])
+    p.add_argument("komut", choices=["indir", "ayikla", "durum", "ek"])
     p.add_argument("--kademe", type=int)
     p.add_argument("--sezon")
     p.add_argument("--bekle", type=float, default=2.0)
     a = p.parse_args()
-    {"indir": lambda: indir(a.kademe, a.sezon, a.bekle), "ayikla": ayikla, "durum": durum}[a.komut]()
+    {"indir": lambda: indir(a.kademe, a.sezon, a.bekle), "ayikla": ayikla, "durum": durum, "ek": ek_maclar}[a.komut]()

@@ -54,6 +54,8 @@ def main():
     except Exception as e:
         print("Avrupa güncellenemedi:", e, flush=True)
     calistir(sys.executable, "-B", "birlestir.py")
+    if os.path.isdir(os.path.join(KOK, "raw", "uefa_mac")):   # UEFA maç detayları futbol.db maç numaralarına yeniden bağlanır
+        calistir(sys.executable, "-B", "uefa_detay.py", "ayikla")
     calistir(sys.executable, "-B", "web_aktar.py")
     if a.yayinla:
         # Yalnız site verisi ve rapor commit'lenir; futbol.db (37 MB) her hafta commit'lenirse depo şişer,

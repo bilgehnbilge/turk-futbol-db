@@ -18,7 +18,7 @@ import rekor
 KOK = os.path.dirname(os.path.abspath(__file__))
 DB = os.path.join(KOK, "futbol.db")
 CIKTI = os.path.join(KOK, "docs", "data")
-YAR = {"lig": "L", "kupa": "K", "avrupa": "A", "terfi": "T"}
+YAR = {"lig": "L", "kupa": "K", "ozel_kupa": "O", "avrupa": "A", "terfi": "T"}
 
 
 KISALTMA = {"MKE", "PTT", "DSİ", "YSE", "GSK", "TEK", "THY", "PTT", "TCDD", "SAİ", "TKİ", "DHMİ", "TSK", "İDSİ", "BŞB", "ASKİ", "İSKİ"}
