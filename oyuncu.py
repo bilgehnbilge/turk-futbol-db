@@ -44,7 +44,7 @@ def hedefler(kademe=None, sezon=None):
 def indir(kademe, sezon, bekle):
     liste = [m for m in hedefler(kademe, sezon) if not os.path.exists(yol(m)) and not os.path.exists(yol(m) + ".yok")]
     print(f"{len(liste)} sayfa indirilecek (~{len(liste) * (bekle + 0.6) / 3600:.1f} saat)", flush=True)
-    hata = 0
+    hata = kesinti = 0
     for i, m in enumerate(liste, 1):
         hedef = yol(m)
         os.makedirs(os.path.dirname(hedef), exist_ok=True)
@@ -66,7 +66,13 @@ def indir(kademe, sezon, bekle):
             with open(os.path.join(KOK, "hatalar.log"), "a") as f:
                 f.write(f"{time.strftime('%F %T')} oyuncu {kod} {m}\n")
             if hata >= 10:
-                sys.exit("Art arda 10 hata: TFF erişimi kesmiş olabilir, durdum (kaldığı yerden devam eder).")
+                # internet ya da TFF kesintisi: durmak yerine 30 dk bekleyip yeniden dene (gözetimsiz çalışma); 12 saat sürerse dur
+                kesinti += 1
+                if kesinti > 24:
+                    sys.exit("12 saattir art arda hata: durdum (aynı komut kaldığı yerden devam eder).")
+                print(f"  art arda 10 hata (son kod {kod or 'bağlantı yok'}), 30 dk bekleniyor ({time.strftime('%H:%M')})", flush=True)
+                time.sleep(1800)
+                hata = 0
             time.sleep(30 * hata)
         if i % 200 == 0:
             print(f"  {i}/{len(liste)} {time.strftime('%H:%M')}", flush=True)
