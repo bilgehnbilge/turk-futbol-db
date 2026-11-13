@@ -463,3 +463,10 @@ a.oyuncu-bag:hover { color: var(--vurgu); text-decoration: underline; text-under
 .m-h.sampiyon, .anahtar.sampiyon { background-image: radial-gradient(circle, var(--yuzey) 0 28%, transparent 32%); }
 .matris-lejant { margin-bottom: 12px; }
 #yolculuk { margin-top: 16px; }
+
+/* play-off turları */
+.po-tur { margin: 10px 0 4px; }
+.po-tur .rozet { display: inline-block; margin-bottom: 4px; }
+.rozet.final { background: var(--vurgu); color: #fff; border-color: transparent; }
+.po-agac { font-size: 14px; color: var(--yazi2); margin: 16px 0 2px; padding-top: 10px; border-top: 1px solid var(--cizgi); }
+.po-agac:first-of-type { border-top: 0; padding-top: 0; margin-top: 6px; }

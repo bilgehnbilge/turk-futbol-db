@@ -229,8 +229,8 @@ def main():
     sozluk_kur([m["ev_adi"] for m in maclar] + [m["dep_adi"] for m in maclar])
 
     def tur(m):
-        if m["yarisma"] == "lig" or m["yarisma"] == "terfi":
-            return m["grup"] or ""
+        if m["yarisma"] == "lig" or m["yarisma"] == "terfi":   # play-off: grup yoksa TFF'nin tur adı (Final Maçları...)
+            return m["grup"] or (m["tur"] if m["asama"] == "play-off" else "") or ""
         return m["tur"] or m["grup"] or ""   # kupa: tur adi Mackolik'te grup alaninda
 
     def asama(m):

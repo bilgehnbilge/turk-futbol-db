@@ -894,9 +894,8 @@ async function sezonSayfa(sezon) {
   <p class="soluk">${ms.length} maç · Puan tabloları sonuçlardan hesaplandı (galibiyet ${p} puan; puan silme ve averaj kuralı farkları dahil değil).</p>
   <nav class="sekmeler">${sirali.length ? `<a href="#lig" data-k="lig" class="aktif">Lig</a>` : ""}${po.length ? `<a href="#po" data-k="po">Play-off / baraj</a>` : ""}${kupa.length ? `<a href="#kupa" data-k="kupa">Türkiye Kupası</a>` : ""}${ozel.map(o => `<a href="#${o.k}" data-k="${o.k}">${esc(o.lig)}</a>`).join("")}${avrupa.length ? `<a href="#avrupa" data-k="avrupa">Avrupa</a>` : ""}</nav>
   <div id="sz-lig" class="izgara puan">${sirali.map(tabloHtml).join("") || ""}</div>
-  <div id="sz-po" hidden><p class="soluk not">Normal sezondan sonra oynanan yükselme play-off'ları, düşme/küme düşme barajları ve gruplar arası final maçları. Puan tablolarına girmez.</p>
-    ${turlara(po.map(m => ({ ...m, tur: m.lig }))).sort((a, b) => (po.find(m => m.lig === a[0])?.kademe ?? 9) - (po.find(m => m.lig === b[0])?.kademe ?? 9))
-      .map(([t, l]) => `<div class="kart" style="margin-bottom:12px"><h3>${esc(t)}</h3>${macListesi(l)}</div>`).join("")}</div>
+  <div id="sz-po" hidden><p class="soluk not">Normal sezondan sonra oynanan yükselme play-off'ları, düşme barajları ve gruplar arası final maçları. Puan tablolarına girmez. Turlar (yarı final, final...) TFF'nin yazdığı yerde ondan, yazmadığı yerde eşleşmelerden çıkarıldı.</p>
+    ${playoffHtml(po, ms)}</div>
   <div id="sz-kupa" hidden>${turlara(kupa).map(([t, l]) => `<div class="kart" style="margin-bottom:12px"><h3>${esc(t)}</h3>${macListesi(l)}</div>`).join("")}</div>
   ${ozel.map(o => `<div id="sz-${o.k}" hidden>${macListesi(o.ms)}</div>`).join("")}
   <div id="sz-avrupa" hidden>${turlara(avrupa.map(m => ({ ...m, tur: `${m.lig}${m.tur ? " · " + m.tur : ""}` }))).map(([t, l]) => `<div class="kart" style="margin-bottom:12px"><h3>${esc(t)}</h3>${macListesi(l)}</div>`).join("")}</div>`;
@@ -905,6 +904,79 @@ async function sezonSayfa(sezon) {
   icerik.querySelectorAll(".sekmeler a").forEach(a => a.addEventListener("click", e => { e.preventDefault(); goster(a.dataset.k); }));
   goster(ilk);
 }
+// ---------------------------------------------------------------- play-off turları
+// Aynı ligin play-off maçları, birbiriyle oynamış takım kümelerine (eşleşme ağaçlarına) ayrılır. Her ağaçta iki takımın
+// maçları bir eşleşmedir (tek maç ya da iki ayak); tur = takımların bir önceki eşleşmesinin turu + 1. En son tur final,
+// bir önceki yarı final... Son turda iki eşleşme varsa önceki turu kazananlarınki final, diğeri 3.lük maçı.
+// Takım sayısından çok eşleşme varsa (herkes herkesle) ağaç değil, play-off grubudur.
+const TFF_TUR = [[/^final/i, "Final"], [/^yar[ıi] ?final/i, "Yarı final"], [/^çeyrek ?final/i, "Çeyrek final"], [/^(\d)\. ?tur/i, m => `${m[1]}. tur`]];
+function tffTur(t) { for (const [re, ad] of TFF_TUR) { const m = String(t || "").match(re); if (m) return typeof ad === "function" ? ad(m) : ad; } return null; }
+function playoffHtml(po, ms) {
+  const takim = (m, s) => s === "ev" ? (m.ev ?? "a" + m.evAd) : (m.dep ?? "a" + m.depAd);
+  const grupOf = new Map();   // takımın normal sezondaki grubu
+  for (const m of ms) if (m.yar === "L" && !m.po && m.tur) for (const s of ["ev", "dep"]) grupOf.set(takim(m, s), m.tur);
+  const ligler = new Map();
+  for (const m of po) (ligler.get(m.lig) || ligler.set(m.lig, []).get(m.lig)).push(m);
+  const sirali = [...ligler].sort((a, b) => (a[1][0].kademe ?? 9) - (b[1][0].kademe ?? 9) || a[0].localeCompare(b[0], "tr"));
+  return sirali.map(([lig, l]) => {
+    l = [...l].sort((a, b) => (a.tarih || "").localeCompare(b.tarih || ""));
+    // eşleşme ağaçları: birlikte oynamış takımlar (birleşim-bul)
+    const ata = new Map(), bul = x => { while (ata.get(x) !== x) x = ata.get(x); return x; };
+    for (const m of l) for (const s of ["ev", "dep"]) if (!ata.has(takim(m, s))) ata.set(takim(m, s), takim(m, s));
+    for (const m of l) { const a = bul(takim(m, "ev")), b = bul(takim(m, "dep")); if (a !== b) ata.set(a, b); }
+    const agaclar = new Map();
+    for (const m of l) (agaclar.get(bul(takim(m, "ev"))) || agaclar.set(bul(takim(m, "ev")), []).get(bul(takim(m, "ev")))).push(m);
+    const bolumler = [...agaclar.values()].map(ml => {
+      const esl = new Map();   // eşleşme: takım çifti
+      for (const m of ml) { const k = [takim(m, "ev"), takim(m, "dep")].map(String).sort().join("|"); (esl.get(k) || esl.set(k, { ms: [] }).get(k)).ms.push(m); }
+      const es = [...esl.values()].sort((a, b) => a.ms[0].tarih.localeCompare(b.ms[0].tarih));
+      const takimlar = new Set(ml.flatMap(m => [takim(m, "ev"), takim(m, "dep")]));
+      const grupMu = es.length > takimlar.size;
+      const kazanan = e => {   // toplam skor, eşitse son maçın penaltıları
+        const t = new Map();
+        for (const m of e.ms) { if (m.eg == null) return null; t.set(takim(m, "ev"), (t.get(takim(m, "ev")) || 0) + m.eg); t.set(takim(m, "dep"), (t.get(takim(m, "dep")) || 0) + m.dg); }
+        const [[a, ga], [b, gb]] = [...t];
+        if (ga !== gb) return ga > gb ? a : b;
+        const s = e.ms.at(-1); if (s.ep == null) return null;
+        return s.ep > s.dp ? takim(s, "ev") : takim(s, "dep");
+      };
+      const son = new Map(), kazandi = new Map();
+      for (const e of es) {
+        const [a, b] = [takim(e.ms[0], "ev"), takim(e.ms[0], "dep")];
+        e.tur = 1 + Math.max(son.get(a) || 0, son.get(b) || 0);
+        e.onceKazandi = [a, b].every(x => kazandi.get(x) !== false && son.has(x));
+        son.set(a, e.tur); son.set(b, e.tur);
+        const w = kazanan(e); kazandi.set(a, w == null ? undefined : w === a); kazandi.set(b, w == null ? undefined : w === b);
+      }
+      const enUst = Math.max(...es.map(e => e.tur));
+      const sonTur = es.filter(e => e.tur === enUst);
+      for (const e of es) {
+        const tff = tffTur(e.ms.at(-1).tur);
+        if (grupMu) e.ad = "Play-off grubu";
+        else if (tff) e.ad = tff;
+        else if (es.length === 1) {
+          const g = [...takimlar].map(t => grupOf.get(t));
+          e.ad = g[0] && g[1] && g[0] !== g[1] ? "Final" : "Eşleşme";
+        } else if (e.tur === enUst) e.ad = sonTur.length === 2 && !e.onceKazandi && sonTur.some(x => x.onceKazandi) ? "3.lük maçı" : "Final";
+        else e.ad = enUst - e.tur === 1 ? "Yarı final" : enUst - e.tur === 2 ? "Çeyrek final" : `${e.tur}. tur`;
+      }
+      // grup adı: ağaçtaki takımların normal sezon grubu tekse
+      const gruplar = new Set([...takimlar].map(t => grupOf.get(t)).filter(Boolean));
+      const tarih = ml.at(-1).tarih;
+      return { es, baslik: gruplar.size === 1 ? `${[...gruplar][0]} play-off'u` : null, tarih };
+    }).sort((a, b) => (a.baslik || "").localeCompare(b.baslik || "", "tr", { numeric: true }) || a.tarih.localeCompare(b.tarih));
+    const SIRA = ["1. tur", "2. tur", "3. tur", "Çeyrek final", "Yarı final", "3.lük maçı", "Final", "Eşleşme", "Play-off grubu"];
+    const bolumHtml = b => {
+      const turlar = new Map();
+      for (const e of b.es) (turlar.get(e.ad) || turlar.set(e.ad, []).get(e.ad)).push(...e.ms);
+      return [...turlar].sort((x, y) => SIRA.indexOf(x[0]) - SIRA.indexOf(y[0]) || x[1][0].tarih.localeCompare(y[1][0].tarih))
+        .map(([ad, l2]) => `<div class="po-tur"><span class="rozet${ad === "Final" ? " final" : ""}">${esc(ad)}</span>${macListesi(l2.sort((a, c) => a.tarih.localeCompare(c.tarih)))}</div>`).join("");
+    };
+    return `<div class="kart" style="margin-bottom:12px"><h3>${esc(lig)}</h3>${bolumler.map((b, i) =>
+      `${bolumler.length > 1 ? `<h4 class="po-agac">${esc(b.baslik || `${i + 1}. eşleşme ağacı`)}</h4>` : ""}${bolumHtml(b)}`).join("")}</div>`;
+  }).join("");
+}
+
 function macListesi(ms) {
   if (!ms.length) return `<div class="bos">Maç yok.</div>`;
   return `<div style="overflow-x:auto"><table class="tablo mac-liste"><tbody>${ms.map(m => `<tr><td class="soluk">${tarihYaz(m.tarih)}</td>
