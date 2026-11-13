@@ -379,7 +379,7 @@ function ozetHtml(ms) {
     <div class="kart"><h3>Son maçlar</h3>
       ${son.map(m => `<div class="son-satir"><span class="son ${m.s}">${m.s}</span>
         <span class="tarih">${tarihYaz(m.tarih)}</span><span class="rakip">${kulupBag(m.rakipId, m.rakip)}${m.saha === "E" ? "" : ` <small class="soluk" title="Deplasman">(D)</small>`}</span>
-        <b class="skor">${skorYaz(m.a, m.y, m.pa, m.py, m.durum)}</b></div>`).join("")}
+        <b class="skor">${skorBag(m.id, skorYaz(m.a, m.y, m.pa, m.py, m.durum))}</b></div>`).join("")}
     </div>
   </div>`;
 }
@@ -558,7 +558,7 @@ async function ikiliSayfa(a, b) {
       const ev = m.saha === "E" ? logoImg(m.kulup) + esc(m.takim) : logoImg(m.rakipId) + esc(m.rakip), dep = m.saha === "E" ? logoImg(m.rakipId) + esc(m.rakip) : logoImg(m.kulup) + esc(m.takim);
       const sk = m.saha === "E" ? skorYaz(m.a, m.y, m.pa, m.py, m.durum) : skorYaz(m.y, m.a, m.py, m.pa, m.durum);
       return `<tr><td class="o"><span class="son ${m.s}">${m.s === "N" ? "–" : m.s}</span></td><td>${tarihYaz(m.tarih)}</td><td><a class="bag" href="#/sezon/${m.sezon}">${m.sezon}</a></td>
-        <td class="gizle-mobil">${esc(m.lig || "")}${m.tur ? ` <span class="soluk">· ${esc(m.tur)}</span>` : ""}</td><td class="ad">${ev}</td><td class="s skor">${sk}</td><td class="ad">${dep}</td></tr>`;
+        <td class="gizle-mobil">${esc(m.lig || "")}${m.tur ? ` <span class="soluk">· ${esc(m.tur)}</span>` : ""}</td><td class="ad">${ev}</td><td class="s skor">${skorBag(m.id, sk)}</td><td class="ad">${dep}</td></tr>`;
     }).join("")}</tbody></table></div>`;
     icerik.querySelectorAll("[data-y]").forEach(x => x.addEventListener("click", () => { d.yar = x.dataset.y; ciz(); }));
     icerik.querySelectorAll("[data-s]").forEach(x => x.addEventListener("click", () => { d.saha = x.dataset.s; ciz(); }));
@@ -589,6 +589,8 @@ function karsilastirSayfa() {
 // ---------------------------------------------------------------- maç sayfası
 let DETAYLI = null;
 const detayVar = id => (DETAYLI ||= new Set(OZET.detayli || [])).has(id);
+// ayrıntısı olan maçın skoru maç sayfasına bağlanır (ayrıntılı maçlar arttıkça kendiliğinden yayılır)
+const skorBag = (id, html) => id != null && detayVar(id) ? `<a class="skor bagli" href="#/mac/${id}" title="Maç ayrıntısı">${html}</a>` : html;
 const OLAY = {
   GOAL: ["⚽", "Gol"], PENALTY: ["✖", "Kaçan penaltı"], YELLOW_CARD: ["🟨", "Sarı kart"], YELLOW_CARD_SECOND: ["🟨🟥", "İkinci sarı"],
   RED_YELLOW_CARD: ["🟨🟥", "İkinci sarıdan kırmızı"], RED_CARD: ["🟥", "Kırmızı kart"], SUBSTITUTION: ["⇄", "Oyuncu değişikliği"],
@@ -980,7 +982,7 @@ function playoffHtml(po, ms) {
 function macListesi(ms) {
   if (!ms.length) return `<div class="bos">Maç yok.</div>`;
   return `<div style="overflow-x:auto"><table class="tablo mac-liste"><tbody>${ms.map(m => `<tr><td class="soluk">${tarihYaz(m.tarih)}</td>
-    <td class="ad" style="text-align:right">${kulupBag(m.ev, m.evAd)}</td><td class="o skor">${skorYaz(m.eg, m.dg, m.ep, m.dp, m.durum)}</td><td class="ad">${kulupBag(m.dep, m.depAd)}</td></tr>`).join("")}</tbody></table></div>`;
+    <td class="ad" style="text-align:right">${kulupBag(m.ev, m.evAd)}</td><td class="o skor">${skorBag(m.id, skorYaz(m.eg, m.dg, m.ep, m.dp, m.durum))}</td><td class="ad">${kulupBag(m.dep, m.depAd)}</td></tr>`).join("")}</tbody></table></div>`;
 }
 
 // ---------------------------------------------------------------- tüm zamanlar rekorları
@@ -1011,7 +1013,7 @@ async function rekorlarSayfa(kap) {
     const acik = rekorDurum.acik.has(id), n = acik ? l.length : 10;
     return `<div class="tablo-kap rekor-tablo-kap"><table class="tablo rekor-tablo"><tbody>${l.slice(0, n).map((m, i) => `<tr>
       <td class="s sira">${r[i]}</td><td class="tarih">${tarihYaz(m[0])}<br><a class="bag" href="#/sezon/${m[1]}">${esc(m[1])}</a></td>
-      <td class="ad" style="text-align:right" title="${esc(m[5])}">${kulupBag(m[4], m[5])}</td><td class="o skor">${skorYaz(m[8], m[9], m[10], m[11], m[12])}</td><td class="ad" title="${esc(m[7])}">${kulupBag(m[6], m[7])}</td>
+      <td class="ad" style="text-align:right" title="${esc(m[5])}">${kulupBag(m[4], m[5])}</td><td class="o skor">${skorBag(m[13], skorYaz(m[8], m[9], m[10], m[11], m[12]))}</td><td class="ad" title="${esc(m[7])}">${kulupBag(m[6], m[7])}</td>
       <td class="ek soluk" style="font-size:13px">${esc(m[2] || "")}${m[3] ? ` · ${esc(m[3])}` : ""}</td></tr>`).join("")}</tbody></table></div>
       ${l.length > 10 ? `<button class="dugme daha" data-ac="${id}">${acik ? "Daha az göster" : `İlk ${l.length}'i göster`}</button>` : ""}`;
   };

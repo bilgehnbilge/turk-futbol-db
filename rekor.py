@@ -49,7 +49,7 @@ def hesapla(maclar, sezon_sira, okunur):
 
 def mac_satir(m, okunur):
     return [m["tarih"], m["sezon"], m["lig"], m["tur"] or m["grup"] or "", m["ev_kulup"], okunur(m["ev_adi"]),
-            m["dep_kulup"], okunur(m["dep_adi"]), m["ev_gol"], m["dep_gol"], m["ev_pen"], m["dep_pen"], m["durum"]]
+            m["dep_kulup"], okunur(m["dep_adi"]), m["ev_gol"], m["dep_gol"], m["ev_pen"], m["dep_pen"], m["durum"], m["id"]]
 
 
 def kapsam(ms, sezon_sira, son_sezon, okunur, lig, sadece_mac=False):
