@@ -1,0 +1,16 @@
+{
+ "ayar": {
+  "K": 24.0,
+  "kupa": 1,
+  "playoff": 0.75,
+  "h0": 40,
+  "h_hiz": 0.04,
+  "cekim": 0.4,
+  "kademe_aralik": 100,
+  "yeni_eksi": 25,
+  "gol_carpani": 1
+ },
+ "brier": 0.14698,
+ "brier_esit_puan": 0.17273,
+ "aciklama": "Brier: 1965'ten sonraki maçlarda (sonuç - beklenen)^2 ortalaması; düşük daha iyi. brier_esit_puan: herkes aynı puanda, yalnız ev sahibi avantajıyla tahmin."
+}

@@ -15,6 +15,7 @@ import collections, datetime, json, os, shutil, sqlite3
 
 import rekor
 import sayilar
+import elo
 
 KOK = os.path.dirname(os.path.abspath(__file__))
 DB = os.path.join(KOK, "futbol.db")
@@ -343,6 +344,9 @@ def main():
     sy, yol = sayilar.hesapla(maclar, c)
     yaz(os.path.join(CIKTI, "sayilar.json"), sy)
     yaz(os.path.join(CIKTI, "yolculuk.json"), yol)
+    # ---- Elo puanları (elo.py; ayarlar elo_ayar.json)
+    c2 = sqlite3.connect(DB)
+    yaz(os.path.join(CIKTI, "elo.json"), elo.hesapla(c2))
     # kırmızı kart analizi: kirmizi.py yerelde (TFF maç sayfalarıyla) üretir; depodaki sonuç dosyası siteye kopyalanır
     if os.path.exists(os.path.join(KOK, "kirmizi_kart.json")):
         shutil.copy(os.path.join(KOK, "kirmizi_kart.json"), os.path.join(CIKTI, "kirmizi.json"))

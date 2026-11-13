@@ -496,6 +496,79 @@ async function yolculukCiz(hedef, id) {
   });
 }
 
+// ---------------------------------------------------------------- Elo
+const eloDurum = { kademe: "", kulupler: [846, 463, 95, 115] };
+async function eloSayfa() {
+  document.title = "Elo puan durumu · Türk Futbol Arşivi";
+  icerik.innerHTML = `<div class="yukleniyor">Elo puanları yükleniyor…</div>`;
+  const E = await al(`data/elo.json?s=${OZET.surum || ""}`);
+  const G = E.guncel_alanlar.reduce((o, a, i) => (o[a] = i, o), {});
+  const kademeler = [...new Set(E.guncel.map(r => r[G.kademe]))].sort();
+  const sezonlar = [...new Set(Object.values(E.kulup).flatMap(l => l.map(x => x[0])))].sort((a, b) => sezonYil(a) - sezonYil(b) || a.localeCompare(b));
+  icerik.innerHTML = `
+  <div class="sayfa-bas"><h1>Elo puan durumu</h1></div>
+  <p class="soluk not">Elo, her maçtan sonra güncellenen bir güç puanı: beklenenden iyi sonuç alan kazanır, kötü sonuç alan kaybeder; güçlü rakibi yenmek, zayıfı yenmekten çok puan getirir. 1959'dan bugüne ${sayiYaz(E.mac)} lig, play-off, Türkiye Kupası ve Cumhurbaşkanlığı/Süper Kupa maçından hesaplandı. Süper Lig'in ortalaması her sezon 1500 kabul edilir, yani puanlar dönemler arasında karşılaştırılabilir. Avrupa maçları dahil değil.</p>
+  <div class="izgara k2 bolum-ust">
+    <div class="kart"><h3>Bugünkü sıralama</h3><p class="soluk aciklama">${tarihYaz(E.son_tarih)} itibarıyla, bu sezon ligde oynayan kulüpler. Son sütun: son 10 maçtaki değişim.</p>
+      <div class="filtre"><div class="cipler">${[["", "Bütün ligler"], ...kademeler.map(k => [String(k), KADEME_AD[k]])].map(([v, a]) => `<button class="cip ${eloDurum.kademe === v ? "aktif" : ""}" data-ek="${v}">${esc(a)}</button>`).join("")}</div></div>
+      <div id="eloTablo"></div></div>
+    <div>
+      <div class="kart viz"><h3>Yıllara göre Elo (sezon sonu)</h3>
+        <div class="ust-ara" style="max-width:320px;margin:4px 0 8px"><input id="eloEkle" type="search" placeholder="Grafiğe kulüp ekle…" autocomplete="off"><div id="eloOneri" class="oneri" hidden></div></div>
+        <div id="eloLejant"></div><div id="eloGrafik"></div></div>
+      <div class="kart bolum-ic"><h3>Tüm zamanların zirveleri</h3><p class="soluk aciklama">Her kulübün ulaştığı en yüksek Elo.</p>
+        <ol class="sirali">${E.zirve.slice(0, 20).map((z, i) => `<li><span class="sira">${i + 1}</span><span class="kim">${kulupBag(z[0])}<small class="soluk">${tarihYaz(z[2])} · ${esc(z[3])}</small></span><b class="n">${z[1]}</b></li>`).join("")}</ol></div>
+    </div>
+  </div>
+  <div class="kart bolum"><h3>En büyük sürprizler</h3><p class="soluk aciklama">Maçtan önceki Elo'ya göre kazanma şansı en düşük olan takımın kazandığı maçlar (1965 sonrası).</p>
+    <div class="tablo-kap"><table class="tablo"><thead><tr><th>Tarih</th><th class="ad" style="text-align:right">Ev sahibi</th><th class="s">Skor</th><th>Deplasman</th><th class="s">Kazananın şansı</th></tr></thead><tbody>
+    ${E.surpriz.slice(0, 20).map(m => `<tr><td>${tarihYaz(m[1])}<br><a class="bag" href="#/sezon/${m[2]}">${esc(m[2])}</a></td>
+      <td class="ad" style="text-align:right">${kulupBag(m[3])} <small class="soluk">${m[7]}</small></td><td class="s skor">${skorBag(m[0], `${m[5]}-${m[6]}`)}</td>
+      <td class="ad">${kulupBag(m[4])} <small class="soluk">${m[8]}</small></td><td class="s">${yuzde(m[9], 1)}</td></tr>`).join("")}</tbody></table></div></div>
+  <p class="soluk not bolum">Hesap: maçtan önce beklenen sonuç = 1 / (1 + 10^(−(ev Elo + ev avantajı − deplasman Elo) / 400)); maçtan sonra puan, K (${E.ayar.K}) × gol farkı çarpanı × (sonuç − beklenen) kadar değişir. Ev avantajı maçlardan öğrenilir (bugün ${ondalik(E.ev_avantaji, 0)} puan). Yeni kulüp ilk ligin ortalamasının biraz altından başlar; her sezon başında puanın %${Math.round(E.ayar.cekim * 100)}'ı kulübün yeni liginin ortalamasına çekilir (yükselme/düşme, kadro değişimi). Ayarlar, geçmiş maçların sonucunu en iyi tahmin edecek şekilde seçildi.</p>`;
+  const tablo = () => {
+    const l = E.guncel.filter(r => !eloDurum.kademe || String(r[G.kademe]) === eloDurum.kademe);
+    $("#eloTablo").innerHTML = `<div class="tablo-kap" style="max-height:640px;overflow:auto"><table class="tablo"><thead><tr><th class="s">#</th><th>Kulüp</th><th class="gizle-mobil">Lig</th><th class="s">Elo</th><th class="s">Son 10</th></tr></thead><tbody>
+      ${l.map((r, i) => `<tr><td class="s soluk">${i + 1}</td><td class="ad elo-ad">${kulupBag(r[G.kulup])}</td><td class="gizle-mobil soluk">${esc(KADEME_AD[r[G.kademe]])}</td><td class="s p">${r[G.elo]}</td>
+        <td class="s ${r[G.son10] > 0 ? "artı" : r[G.son10] < 0 ? "eksi" : ""}">${r[G.son10] > 0 ? "+" : ""}${r[G.son10]}</td></tr>`).join("")}</tbody></table></div>`;
+  };
+  tablo();
+  icerik.querySelectorAll("[data-ek]").forEach(b => b.addEventListener("click", () => { eloDurum.kademe = b.dataset.ek; icerik.querySelectorAll("[data-ek]").forEach(x => x.classList.toggle("aktif", x === b)); tablo(); }));
+  const grafik = () => {
+    const seriler = eloDurum.kulupler.filter(k => E.kulup[k]).map((k, i) => {
+      const m = new Map(E.kulup[k].map(x => [x[0], x[1]]));
+      return { ad: kulupAd(k), renk: SERI_RENK[i], d: sezonlar.map(s => m.get(s) ?? null), id: k };
+    });
+    $("#eloLejant").innerHTML = `<div class="lejant">${seriler.map(s => `<span><i class="anahtar" style="background:${s.renk}"></i>${esc(s.ad)} <button class="kaldir" data-kal="${s.id}" aria-label="${esc(s.ad)} kaldır">×</button></span>`).join("")}</div>`;
+    const g = $("#eloGrafik"); g.replaceChildren();
+    if (seriler.length) cizgiGrafik(g, { xler: sezonlar, seriler, bicim: v => String(Math.round(v)), yukseklik: 280 });
+    icerik.querySelectorAll("[data-kal]").forEach(b => b.addEventListener("click", () => { eloDurum.kulupler = eloDurum.kulupler.filter(k => k !== +b.dataset.kal); grafik(); }));
+  };
+  grafik();
+  oneriKutusu($("#eloEkle"), $("#eloOneri"), k => {
+    if (!E.kulup[k.id]) return;
+    eloDurum.kulupler = [...eloDurum.kulupler.filter(x => x !== k.id), k.id].slice(-4);   // en fazla 4 kulüp (renk sırası)
+    $("#eloEkle").value = ""; grafik();
+  });
+}
+
+async function eloCiz(hedef, id) {
+  const kap = $("#elo", hedef);
+  if (!kap) return;
+  let E;
+  try { E = await al(`data/elo.json?s=${OZET.surum || ""}`); } catch { return; }
+  const l = E.kulup[id];
+  if (!l || l.length < 2 || !kap.isConnected) return;
+  kap.hidden = false;
+  const zirve = E.zirve.find(z => z[0] === id) || (() => { const m = l.reduce((a, b) => b[1] > a[1] ? b : a); return [id, m[1], null, m[0]]; })();
+  const g = E.guncel.find(r => r[0] === id);
+  kap.innerHTML = `<h3>Elo puanı</h3><p class="soluk aciklama">Sezon sonu Elo (Süper Lig ortalaması = 1500). ${g ? `Bugün <b>${g[1]}</b>, ` : ""}en yüksek ${zirve[1]} (${esc(zirve[3])}). <a class="bag" href="#/elo">Elo puan durumu →</a></p><div class="elo-g"></div>`;
+  const sezonlar = l.map(x => x[0]);
+  cizgiGrafik($(".elo-g", kap), { xler: sezonlar, seriler: [{ ad: "Elo", renk: "var(--vurgu)", d: l.map(x => x[1]) }], bicim: v => String(Math.round(v)), yukseklik: 200 });
+}
+
 yollar.splice(yollar.length - 1, 0, [/^#\/sayilar$/, sayilarSayfa]);
+yollar.splice(yollar.length - 1, 0, [/^#\/elo$/, eloSayfa]);
+window.eloCiz = eloCiz;
 window.yolculukCiz = yolculukCiz;
 })();

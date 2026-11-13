@@ -474,3 +474,10 @@ a.oyuncu-bag:hover { color: var(--vurgu); text-decoration: underline; text-under
 /* kırmızı kart grafikleri */
 .grafik-svg .ga-cizgi { stroke: var(--yazi2); stroke-width: 1.5; }
 .grafik-svg .model-nokta { fill: var(--yazi); }
+
+/* Elo */
+td.artı { color: var(--g); } td.eksi { color: var(--m); }
+.kaldir { border: 0; background: none; color: var(--soluk); cursor: pointer; font-size: 14px; padding: 0 2px; }
+.kaldir:hover { color: var(--yazi); }
+#elo { margin-top: 16px; }
+.elo-ad { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
