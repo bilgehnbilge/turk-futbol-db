@@ -933,7 +933,7 @@ async function oyuncuSayfa(no, tdNo) {
   })();
   icerik.innerHTML = `
   <div class="sayfa-bas"><div><h1>${esc(ad)}</h1>
-    <p class="soluk">${ulke ? `${ULKE[ulke] ? ULKE[ulke][1] + " " + ULKE[ulke][0] : ulke === "TUR" ? "🇹🇷 Türkiye" : esc(ulke)}` : ""}${yas ? ` · Doğum: ${yas}` : ""}</p></div></div>
+    <p class="soluk">${ulke ? (ULKE[ulke] ? ulkeHtml(ulke) : ulke === "TUR" ? `${bayrak("TUR")} Türkiye` : esc(ulke)) : ""}${yas ? ` · Doğum: ${yas}` : ""}</p></div></div>
   ${ks.length ? `<h2 class="bolum">Oyuncu olarak</h2>` : ""}
   ${ks.length ? `<div class="kart"><div class="ozet-sat">
     <div><b>${top.mac}</b><span>Avrupa maçı</span></div><div><b>${top.ilk}</b><span>İlk 11</span></div><div><b>${top.gol}</b><span>Gol</span></div>
@@ -962,7 +962,19 @@ const ULKE = {   // UEFA ülke kodu -> [Türkçe ad, bayrak]
   SMR: ["San Marino", "🇸🇲"], SRB: ["Sırbistan", "🇷🇸"], YUG: ["Yugoslavya", "🇷🇸"], SCG: ["Sırbistan-Karadağ", "🇷🇸"], SUI: ["İsviçre", "🇨🇭"],
   SVK: ["Slovakya", "🇸🇰"], SVN: ["Slovenya", "🇸🇮"], SWE: ["İsveç", "🇸🇪"], UKR: ["Ukrayna", "🇺🇦"], WAL: ["Galler", "🏴󠁧󠁢󠁷󠁬󠁳󠁿"],
 };
-const ulkeAd = u => u ? (ULKE[u] ? `${ULKE[u][1]} ${ULKE[u][0]}` : u) : "Bilinmiyor";
+const ulkeAd = u => u ? (ULKE[u] ? ULKE[u][0] : u) : "Bilinmiyor";
+// bayrak resmi (docs/bayrak/<iso>.svg; Windows bayrak emojisi göstermiyor). Tarihi ülkeler kendi bayraklarıyla.
+const ULKE_BAYRAK = { TCH: "cs", GDR: "dd", URS: "su", YUG: "yu" };
+function bayrakKod(u) {
+  if (ULKE_BAYRAK[u]) return ULKE_BAYRAK[u];
+  const e = ULKE[u]?.[1]; if (!e) return u === "TUR" ? "tr" : null;
+  const cp = [...e].map(c => c.codePointAt(0));
+  if (cp.length === 2 && cp.every(c => c >= 0x1F1E6 && c <= 0x1F1FF)) return cp.map(c => String.fromCharCode(c - 0x1F1E6 + 97)).join("");
+  const etiket = cp.filter(c => c >= 0xE0061 && c <= 0xE007A).map(c => String.fromCharCode(c - 0xE0000)).join("");
+  return { gbeng: "gb-eng", gbsct: "gb-sct", gbwls: "gb-wls", gbnir: "gb-nir" }[etiket] || null;
+}
+const bayrak = u => { const k = bayrakKod(u); return k ? `<img class="bayrak" src="bayrak/${k}.svg" alt="" loading="lazy">` : ""; };
+const ulkeHtml = u => `${bayrak(u)} ${esc(ulkeAd(u))}`;
 const avrupaDurum = { kulup: "", yar: "", sira: "O", ters: true, ulke: null };
 
 async function avrupaUlkeler() {
@@ -1012,9 +1024,9 @@ async function avrupaUlkeler() {
       <div class="tablo-kap"><table class="tablo"><thead><tr>
         ${[["ad", "Ülke"], ["O", "O"], ["G", "G"], ["B", "B"], ["M", "M"], ["AG", "AG"], ["YG", "YG"], ["Av", "Av"], ["Y", "G%"]].map(([k, a]) => `<th class="sirala ${k === "ad" ? "" : "s"}" data-k="${k}">${a}${D.sira === k ? (D.ters ? " ↓" : " ↑") : ""}</th>`).join("")}
         <th class="s gizle-mobil">Rakip</th></tr></thead>
-        <tbody>${l.map(x => `<tr class="${D.ulke === x.ulke ? "vurgu-sat" : ""}" data-u="${x.ulke}" style="cursor:pointer"><td class="ad">${esc(ulkeAd(x.ulke))}</td><td class="s">${x.O}</td><td class="s">${x.G}</td><td class="s">${x.B}</td><td class="s">${x.M}</td>
+        <tbody>${l.map(x => `<tr class="${D.ulke === x.ulke ? "vurgu-sat" : ""}" data-u="${x.ulke}" style="cursor:pointer"><td class="ad">${ulkeHtml(x.ulke)}</td><td class="s">${x.O}</td><td class="s">${x.G}</td><td class="s">${x.B}</td><td class="s">${x.M}</td>
           <td class="s">${x.AG}</td><td class="s">${x.YG}</td><td class="s">${x.AG - x.YG > 0 ? "+" : ""}${x.AG - x.YG}</td><td class="s">%${yuzde(x.G, x.O)}</td><td class="s gizle-mobil">${x.rakip.size}</td></tr>`).join("")}</tbody></table></div>
-      ${D.ulke !== null ? `<div class="kart bolum"><h3>${esc(ulkeAd(D.ulke))} — ${ayrinti.length} maç</h3><div class="tabelalar">${ayrinti.map(m => tabelaSatir({
+      ${D.ulke !== null ? `<div class="kart bolum"><h3>${ulkeHtml(D.ulke)} — ${ayrinti.length} maç</h3><div class="tabelalar">${ayrinti.map(m => tabelaSatir({
         id: m.id, tarih: m.tarih, lig: m.lig, tur: m.tur, saha: m.saha, kulup: m.biz, takim: kulupAd(m.biz), rakipId: m.rakip, rakip: m.rakip != null ? kulupAd(m.rakip) : m.rakipAd,
         a: m.a, y: m.y, pa: m.saha === "E" ? m.ep : m.dp, py: m.saha === "E" ? m.dp : m.ep, durum: m.durum, s: m.s }, true)).join("")}</div></div>` : ""}`;
     kap.querySelector("#avKulup").addEventListener("change", e => { D.kulup = e.target.value; D.ulke = null; ciz(); });
