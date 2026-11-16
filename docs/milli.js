@@ -36,18 +36,12 @@ async function milliSayfa(sekme = "ozet") {
     const liste = [...ms].reverse(), n = durum.tum ? liste.length : 40;
     const onyillar = [...new Set(tum.map(m => m.tarih.slice(0, 3) + "0"))].sort();
     const rk = durum.rakip ? tum.find(m => m.kod === durum.rakip) : null;
-    icerik.innerHTML = `
-    <div class="sayfa-bas"><div><h1>${bayrakImg("tr", "bayrak baslik")} A Milli Takım</h1>
-      <p class="soluk">${tarihYaz(tum[0].tarih)} – ${tarihYaz(tum.at(-1).tarih)} · ${tum.length} resmi ve özel maç</p></div></div>
-    <div class="filtre milli-filtre">
-      <select id="mKat"><option value="">Bütün maçlar</option><option value="resmi" ${durum.kat === "resmi" ? "selected" : ""}>Resmi maçlar (özel maçlar hariç)</option>
-        ${KAT_SIRA.map(k => `<option ${durum.kat === k ? "selected" : ""}>${k}</option>`).join("")}</select>
-      <select id="mOnyil"><option value="">Bütün yıllar</option>${onyillar.map(o => `<option value="${o}" ${durum.onyil === o ? "selected" : ""}>${o}'lar</option>`).join("")}</select>
-      ${rk ? `<span class="rozet">${rk.bayrak} ${esc(rk.rakip)} <a href="#" id="mRakipSil" title="Rakip filtresini kaldır">✕</a></span>` : ""}
-    </div>
-    <nav class="sekmeler bolum">${[["", "Özet ve maçlar"], ["/rekorlar", "Rekorlar ve seriler"]].map(([y, ad]) => `<a href="#/milli${y}" class="${(sekme === "rekorlar") === (y === "/rekorlar") ? "aktif" : ""}">${ad}</a>`).join("")}</nav>
-    ${sekme === "rekorlar" ? (ms.length ? rekorHtml(d, ms) : `<div class="bos">Bu filtreye uyan maç yok.</div>`) : `
-    ${!ms.length ? `<div class="bos">Bu filtreye uyan maç yok.</div>` : `
+    const SEKME = [["ozet", "", "Özet"], ["maclar", "/maclar", "Maçlar"], ["rakipler", "/rakipler", "Rakipler"], ["rekorlar", "/rekorlar", "Rekorlar ve seriler"]];
+    // rakipler sekmesi rakip filtresinden bağımsız (bütün rakipleri gösterir)
+    const msR = sekme === "rakipler" ? tum.filter(m => (!durum.kat || (durum.kat === "resmi" ? m.kat !== "Özel maç" : m.kat === durum.kat)) &&
+      (!durum.onyil || m.tarih.slice(0, 3) === durum.onyil.slice(0, 3))) : ms;
+    const rakipT = [...msR.reduce((a, m) => a.set(m.kod, [...(a.get(m.kod) || []), m]), new Map())].sort((x, y) => y[1].length - x[1].length || x[1][0].rakip.localeCompare(y[1][0].rakip, "tr"));
+    const ozetHtml = () => `
     <div class="kart bolum"><div class="ozet-sat">
       <div><b>${T.O}</b><span>Maç</span></div><div><b>${T.G}</b><span>Galibiyet</span></div><div><b>${T.B}</b><span>Beraberlik</span></div>
       <div><b>${T.M}</b><span>Mağlubiyet</span></div><div><b>${T.AG}</b><span>Attığı gol</span></div><div><b>${T.YG}</b><span>Yediği gol</span></div>
@@ -62,22 +56,38 @@ async function milliSayfa(sekme = "ozet") {
         .map(([ad, l]) => `<tr><td class="ad">${ad}</td>${hucre(say(l))}</tr>`).join("")}</tbody></table>
         <p class="soluk not">Ev sahibi, TFF listesinde ilk yazılan takım. Turnuva finallerindeki tarafsız saha maçları TFF'nin yazdığı sıraya göre ayrılıyor.</p></div>
     </div>
-    <h2 class="bolum">Rakiplere göre</h2>
-    <p class="soluk not">${rakip.length} farklı rakip. Satıra tıklayınca o ülkeyle oynanan maçlar listelenir.</p>
-    <div class="tablo-kap"><table class="tablo milli-rakip">${bas(["Rakip"])}<tbody>${rakip.map(([k, l]) => `<tr data-rakip="${esc(k)}" class="tiklanir">
-      <td class="ad">${l[0].bayrak} ${esc(l[0].rakip)}</td>${hucre(say(l))}</tr>`).join("")}</tbody></table></div>
-    <h2 class="bolum">Maçlar</h2>
-    <div class="tablo-kap"><table class="tablo"><thead><tr><th>Tarih</th><th class="ad">Rakip</th><th class="s">Saha</th><th class="s">Skor</th><th class="s"></th><th class="ad">Yarışma</th></tr></thead>
-      <tbody>${liste.slice(0, n).map(m => `<tr><td class="tarih">${tarihYaz(m.tarih)}</td><td class="ad">${m.bayrak} ${esc(m.rakip)}</td><td class="s soluk">${m.saha === "E" ? "İç" : "Dış"}</td>
-        <td class="s">${skorHtml(m)}</td><td class="s"><span class="son ${m.s}">${m.s}</span></td><td class="ad soluk">${esc(m.org)}</td></tr>`).join("")}</tbody></table></div>
+    <h2 class="bolum">Son maçlar</h2>
+    ${macListe(liste.slice(0, 10))}
+    <p class="soluk not"><a class="bag" href="#/milli/maclar">Bütün maçlar →</a></p>
+    <div id="milliOyuncular"></div>`;
+    const macListe = l => `<div class="tablo-kap"><table class="tablo"><thead><tr><th>Tarih</th><th class="ad">Rakip</th><th class="s">Saha</th><th class="s">Skor</th><th class="s"></th><th class="ad">Yarışma</th></tr></thead>
+      <tbody>${l.map(m => `<tr><td class="tarih">${tarihYaz(m.tarih)}</td><td class="ad">${m.bayrak} ${esc(m.rakip)}</td><td class="s soluk">${m.saha === "E" ? "İç" : "Dış"}</td>
+        <td class="s">${skorHtml(m)}</td><td class="s"><span class="son ${m.s}">${m.s}</span></td><td class="ad soluk">${esc(m.org)}</td></tr>`).join("")}</tbody></table></div>`;
+    const maclarHtml = () => `${rk ? `<h2 class="bolum">${rk.bayrak} ${esc(rk.rakip)} ile oynanan maçlar</h2>
+      <div class="kart bolum"><div class="ozet-sat"><div><b>${T.O}</b><span>Maç</span></div><div><b>${T.G}</b><span>Galibiyet</span></div><div><b>${T.B}</b><span>Beraberlik</span></div>
+        <div><b>${T.M}</b><span>Mağlubiyet</span></div><div><b>${T.AG}-${T.YG}</b><span>Gol</span></div></div></div>` : ""}
+    ${macListe(liste.slice(0, n))}
     ${liste.length > n ? `<button class="dugme daha" id="mTum">${liste.length} maçın hepsini göster</button>` : ""}
-    <p class="soluk not">Skor her zaman ev sahibi önce yazılır; "İç" Türkiye'nin ev sahibi olduğu maçlar.</p>`}
-    <div id="milliOyuncular"></div>`}`;
+    <p class="soluk not">Skor her zaman ev sahibi önce yazılır; "İç" Türkiye'nin ev sahibi olduğu maçlar. Skora tıklayınca maç sayfası açılır.</p>`;
+    const rakiplerHtml = () => `<p class="soluk not bolum">${rakipT.length} farklı rakip. Satıra tıklayınca o ülkeyle oynanan maçlar açılır.</p>
+    <div class="tablo-kap"><table class="tablo milli-rakip">${bas(["Rakip"])}<tbody>${rakipT.map(([k, l]) => `<tr data-rakip="${esc(k)}" class="tiklanir">
+      <td class="ad">${l[0].bayrak} ${esc(l[0].rakip)}</td>${hucre(say(l))}</tr>`).join("")}</tbody></table></div>`;
+    icerik.innerHTML = `
+    <div class="sayfa-bas"><div><h1>${bayrakImg("tr", "bayrak baslik")} A Milli Takım</h1>
+      <p class="soluk">${tarihYaz(tum[0].tarih)} – ${tarihYaz(tum.at(-1).tarih)} · ${tum.length} resmi ve özel maç</p></div></div>
+    <div class="kulup-sekme"><nav class="sekmeler">${SEKME.map(([k, y, ad]) => `<a href="#/milli${y}" class="${k === sekme ? "aktif" : ""}">${ad}</a>`).join("")}</nav></div>
+    <div class="filtre milli-filtre bolum">
+      <select id="mKat"><option value="">Bütün maçlar</option><option value="resmi" ${durum.kat === "resmi" ? "selected" : ""}>Resmi maçlar (özel maçlar hariç)</option>
+        ${KAT_SIRA.map(k => `<option ${durum.kat === k ? "selected" : ""}>${k}</option>`).join("")}</select>
+      <select id="mOnyil"><option value="">Bütün yıllar</option>${onyillar.map(o => `<option value="${o}" ${durum.onyil === o ? "selected" : ""}>${o}'lar</option>`).join("")}</select>
+      ${rk && sekme !== "rakipler" ? `<span class="rozet">${rk.bayrak} ${esc(rk.rakip)} <a href="#" id="mRakipSil" title="Rakip filtresini kaldır">✕</a></span>` : ""}
+    </div>
+    ${!msR.length ? `<div class="bos">Bu filtreye uyan maç yok.</div>` : { ozet: ozetHtml, maclar: maclarHtml, rakipler: rakiplerHtml, rekorlar: () => rekorHtml(d, ms) }[sekme]()}`;
     $("#mKat").onchange = e => { durum.kat = e.target.value; ciz(); };
     $("#mOnyil").onchange = e => { durum.onyil = e.target.value; ciz(); };
     $("#mRakipSil")?.addEventListener("click", e => { e.preventDefault(); durum.rakip = ""; ciz(); });
     $("#mTum")?.addEventListener("click", () => { durum.tum = true; const y = scrollY; ciz(); scrollTo(0, y); });
-    icerik.querySelectorAll("tr[data-rakip]").forEach(tr => tr.addEventListener("click", () => { durum.rakip = tr.dataset.rakip; durum.tum = true; ciz(); scrollTo(0, 0); }));
+    icerik.querySelectorAll("tr[data-rakip]").forEach(tr => tr.addEventListener("click", () => { durum.rakip = tr.dataset.rakip; durum.tum = true; location.hash = "#/milli/maclar"; }));
     if ($("#milliOyuncular")) oyuncular(d, $("#milliOyuncular"));
     icerik.querySelectorAll("details[data-seri]").forEach(x => x.addEventListener("toggle", () => x.open && (x.querySelector(".seri-liste").innerHTML ||= seriListe(JSON.parse(x.dataset.seri)))));
   };
@@ -190,5 +200,5 @@ window.milliOyuncu = async (kap, kisi, yalnizMilli) => {
   return true;
 };
 
-yollar.splice(yollar.length - 1, 0, [/^#\/milli$/, () => milliSayfa("ozet")], [/^#\/milli\/rekorlar$/, () => milliSayfa("rekorlar")], [/^#\/milli\/mac\/(\d+)$/, id => milliMacSayfa(+id)]);
+yollar.splice(yollar.length - 1, 0, [/^#\/milli$/, () => milliSayfa("ozet")], [/^#\/milli\/(maclar|rakipler|rekorlar)$/, s => milliSayfa(s)], [/^#\/milli\/mac\/(\d+)$/, id => milliMacSayfa(+id)]);
 })();
