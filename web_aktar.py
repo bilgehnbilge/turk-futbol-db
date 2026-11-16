@@ -16,6 +16,7 @@ import collections, datetime, json, os, shutil, sqlite3
 import rekor
 import sayilar
 import elo
+import tff_detay
 
 KOK = os.path.dirname(os.path.abspath(__file__))
 DB = os.path.join(KOK, "futbol.db")
@@ -76,6 +77,17 @@ def yaz(yol, veri):
     os.makedirs(os.path.dirname(yol), exist_ok=True)
     with open(yol, "w", encoding="utf-8") as f:
         json.dump(veri, f, ensure_ascii=False, separators=(",", ":"))
+
+
+def araliklar(l):
+    """[5, 6, 7, 10] -> [[5, 3], [10, 1]] (başlangıç, uzunluk)"""
+    out = []
+    for x in sorted(l):
+        if out and out[-1][0] + out[-1][1] == x:
+            out[-1][1] += 1
+        else:
+            out.append([x, 1])
+    return out
 
 
 def mac_detay(maclar, okunur):
@@ -224,8 +236,23 @@ def teknik_aktar(maclar, okunur):
 def main():
     c = sqlite3.connect(DB)
     c.row_factory = sqlite3.Row
+    # Ham kaynağı yerelde duran çıktılar (GitHub Actions'ta raw/ yok): kaynak yoksa eski dosyalar korunur
+    koru = [a for a, kaynak in (("mac", "uefa_detay.db"), ("oyuncu_uefa.json", "uefa_detay.db"), ("teknik.json", "oyuncu.db"), ("tff", "oyuncu.db"))
+            if not os.path.exists(os.path.join(KOK, "raw", kaynak)) and os.path.exists(os.path.join(CIKTI, a))]
+    gecici = CIKTI + ".korunan"
+    if os.path.isdir(gecici):
+        shutil.rmtree(gecici)
+    for a in koru:
+        os.makedirs(gecici, exist_ok=True)
+        shutil.move(os.path.join(CIKTI, a), os.path.join(gecici, a))
     if os.path.isdir(CIKTI):
         shutil.rmtree(CIKTI)
+    for a in koru:
+        os.makedirs(CIKTI, exist_ok=True)
+        shutil.move(os.path.join(gecici, a), os.path.join(CIKTI, a))
+    if os.path.isdir(gecici):
+        shutil.rmtree(gecici)
+    print("korunan (ham kaynağı yok):", koru or "-")
     maclar = [dict(r) for r in c.execute("SELECT * FROM mac ORDER BY tarih IS NULL, tarih, saat, id")]
     sozluk_kur([m["ev_adi"] for m in maclar] + [m["dep_adi"] for m in maclar])
 
@@ -331,10 +358,16 @@ def main():
                     m["ev_pen"], m["dep_pen"], m["durum"], okunur(m["ev_adi"]), okunur(m["dep_adi"])] for m in maclar if m["yarisma"] == "avrupa"]})
 
     # ---- maç ayrıntıları (şimdilik Avrupa: UEFA; uefa_detay.py) -> data/mac/<id>.json
-    detayli = mac_detay(maclar, okunur)
+    if os.path.exists(os.path.join(KOK, "raw", "uefa_detay.db")):
+        detayli = mac_detay(maclar, okunur)
+    else:   # GitHub Actions: UEFA ayrıntıları korunan dosyalardan (Avrupa maç numaraları sabit: 1-1506)
+        detayli = sorted(int(f[:-5]) for f in os.listdir(os.path.join(CIKTI, "mac"))) if os.path.isdir(os.path.join(CIKTI, "mac")) else []
+    # ---- TFF maç ayrıntıları, oyuncular (tff_detay.py; raw/oyuncu.db) -> data/tff/
+    tff_ayr = tff_detay.aktar(c, maclar, okunur, CIKTI)
 
     # ---- teknik direktörler: TFF maç sayfaları (lig, kupa) + UEFA (Avrupa) -> data/teknik.json
-    teknik_aktar(maclar, okunur)
+    if os.path.exists(os.path.join(KOK, "raw", "oyuncu.db")):
+        teknik_aktar(maclar, okunur)
 
     # ---- tüm zamanlar rekorları
     sezon_sira = {s: i for i, s in enumerate(sorted(sez, key=lambda s: (s[:4], s)))}
@@ -359,7 +392,7 @@ def main():
         "sezonlar": sorted(sez, key=lambda s: (s[:4], s)),
         "ilk_tarih": next((m["tarih"] for m in maclar if m["tarih"]), None),
         "son_tarih": max(m["tarih"] for m in maclar if m["tarih"] and m["ev_gol"] is not None),
-        "kapsam": kapsam, "detayli": detayli})
+        "kapsam": kapsam, "detayli": detayli, "detayli_aralik": araliklar(tff_ayr)})
     toplam = sum(os.path.getsize(os.path.join(d, f)) for d, _, fs in os.walk(CIKTI) for f in fs)
     print(f"{len(liste)} kulup, {len(sez)} sezon, {len(maclar)} mac -> {CIKTI} ({toplam / 1e6:.1f} MB)")
 

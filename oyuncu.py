@@ -2,6 +2,7 @@
 
   python3 oyuncu.py indir [--kademe 1] [--sezon 2015-2016] [--bekle 2]   # raw/tff_mac/<..>/<macId>.html.gz (kaldığı yerden)
   python3 oyuncu.py ayikla                                               # raw/oyuncu.db
+  python3 oyuncu.py uyum                                                 # mac_bilgi.gol_uyum: gol listesi skorla tutuyor mu
   python3 oyuncu.py durum                                                # kaç sayfa indi / kaldı
 
 Sayfa: https://www.tff.org/Default.aspx?pageID=29&macId=<macId>  (macId = tff.db'deki kaynak_id)
@@ -171,6 +172,48 @@ def ayikla():
     c.commit()
     say = {t: c.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0] for t in ("kadro", "gol", "kart", "degisiklik", "teknik", "hakem")}
     print(n, "mac sayfasi ->", OYUNCU_DB, say)
+    gol_uyum(c)
+
+
+def seri_mi(tip, dk, ek):
+    """Seri penaltı golü: S, ya da dakikasız / 90+30 ve sonrası P (TFF seri penaltıları bazen P diye yazıyor)."""
+    return tip == "S" or (tip == "P" and (dk is None or (dk == 90 and (ek or 0) >= 30)))
+
+
+def gol_uyum(c=None):
+    """mac_bilgi.gol_uyum: gol listesi skorla tutuyor mu?
+    tutuyor | 0-0 | yok (gol listesi yok) | hukmen (3-0 masa başı; sahadaki goller listede) | seri (skora seri penaltılar katılmış) | uyumsuz"""
+    c = c or sqlite3.connect(OYUNCU_DB)
+    if "gol_uyum" not in [r[1] for r in c.execute("PRAGMA table_info(mac_bilgi)")]:
+        c.execute("ALTER TABLE mac_bilgi ADD COLUMN gol_uyum TEXT")
+    gol, seri = collections.defaultdict(lambda: [0, 0]), collections.Counter()
+    for mac, taraf, tip, dk, ek in c.execute("SELECT mac, taraf, tip, dk, ek FROM gol"):
+        if seri_mi(tip, dk, ek):
+            seri[mac] += 1
+            continue
+        gol[mac][(2 - taraf) if tip == "K" else (taraf - 1)] += 1
+    say, guncel = collections.Counter(), []
+    for mac, eg, dg in c.execute("SELECT mac, ev_gol, dep_gol FROM mac_bilgi").fetchall():
+        g = gol.get(mac)
+        if eg is None:
+            d = None
+        elif eg + dg == 0 and not g:
+            d = "0-0"
+        elif not g:
+            d = "yok"
+        elif g == [eg, dg]:
+            d = "tutuyor"
+        elif (eg, dg) in ((3, 0), (0, 3)):
+            d = "hukmen"
+        elif seri[mac] or (eg > g[0] and dg > g[1] and eg + dg - sum(g) >= 5):
+            d = "seri"
+        else:
+            d = "uyumsuz"
+        say[d] += 1
+        guncel.append((d, mac))
+    c.executemany("UPDATE mac_bilgi SET gol_uyum=? WHERE mac=?", guncel)
+    c.commit()
+    print("gol listesi / skor:", dict(say))
 
 
 # TFF sezon sayfalarinda listelenmeyen maclar (1990-2007 numara boslugu): lig play-off/baraj ve ozel kupalar
@@ -264,9 +307,9 @@ def durum():
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("komut", choices=["indir", "ayikla", "durum", "ek"])
+    p.add_argument("komut", choices=["indir", "ayikla", "durum", "ek", "uyum"])
     p.add_argument("--kademe", type=int)
     p.add_argument("--sezon")
     p.add_argument("--bekle", type=float, default=2.0)
     a = p.parse_args()
-    {"indir": lambda: indir(a.kademe, a.sezon, a.bekle), "ayikla": ayikla, "durum": durum, "ek": ek_maclar}[a.komut]()
+    {"indir": lambda: indir(a.kademe, a.sezon, a.bekle), "ayikla": ayikla, "durum": durum, "ek": ek_maclar, "uyum": gol_uyum}[a.komut]()
