@@ -3,6 +3,7 @@
   python3 oyuncu.py indir [--kademe 1] [--sezon 2015-2016] [--bekle 2]   # raw/tff_mac/<..>/<macId>.html.gz (kaldığı yerden)
   python3 oyuncu.py ayikla                                               # raw/oyuncu.db
   python3 oyuncu.py uyum                                                 # mac_bilgi.gol_uyum: gol listesi skorla tutuyor mu
+  python3 oyuncu.py kisi [--bekle 2]                                     # raw/tff_kisi/<..>/<kisiId>.html.gz: oyuncu sayfaları
   python3 oyuncu.py durum                                                # kaç sayfa indi / kaldı
 
 Sayfa: https://www.tff.org/Default.aspx?pageID=29&macId=<macId>  (macId = tff.db'deki kaynak_id)
@@ -68,6 +69,53 @@ def indir(kademe, sezon, bekle):
                 f.write(f"{time.strftime('%F %T')} oyuncu {kod} {m}\n")
             if hata >= 10:
                 # internet ya da TFF kesintisi: durmak yerine 30 dk bekleyip yeniden dene (gözetimsiz çalışma); 12 saat sürerse dur
+                kesinti += 1
+                if kesinti > 24:
+                    sys.exit("12 saattir art arda hata: durdum (aynı komut kaldığı yerden devam eder).")
+                print(f"  art arda 10 hata (son kod {kod or 'bağlantı yok'}), 30 dk bekleniyor ({time.strftime('%H:%M')})", flush=True)
+                time.sleep(1800)
+                hata = 0
+            time.sleep(30 * hata)
+        if i % 200 == 0:
+            print(f"  {i}/{len(liste)} {time.strftime('%H:%M')}", flush=True)
+        time.sleep(bekle)
+    print("Bitti.", flush=True)
+
+
+KISI_HAM = os.path.join(KOK, "raw", "tff_kisi")
+KISI_URL = "https://www.tff.org/Default.aspx?pageId=30&kisiId={}"
+
+
+def kisi_yol(k):
+    return os.path.join(KISI_HAM, str(k)[-2:].zfill(2), f"{k}.html.gz")
+
+
+def kisi_indir(bekle):
+    """TFF oyuncu sayfaları (doğum tarihi/yeri, uyruk, lisans): kadrolarda geçen kişiler, en çok maça çıkandan başlayarak."""
+    c = sqlite3.connect(OYUNCU_DB)
+    hedef_l = [k for (k,) in c.execute("SELECT kisi FROM kadro WHERE kisi IS NOT NULL GROUP BY kisi ORDER BY COUNT(*) DESC")]
+    liste = [k for k in hedef_l if not os.path.exists(kisi_yol(k)) and not os.path.exists(kisi_yol(k) + ".yok")]
+    print(f"{len(liste)}/{len(hedef_l)} oyuncu sayfası indirilecek (~{len(liste) * (bekle + 0.8) / 3600:.1f} saat)", flush=True)
+    hata = kesinti = 0
+    for i, k in enumerate(liste, 1):
+        yol_ = kisi_yol(k)
+        os.makedirs(os.path.dirname(yol_), exist_ok=True)
+        r = subprocess.run(["curl", "-sL", "--compressed", "-m", "60", "-A", UA, "-w", "\n%{http_code}", KISI_URL.format(k)], capture_output=True)
+        govde, _, kod = r.stdout.rpartition(b"\n")
+        kod = kod.decode().strip()
+        if kod == "200" and b"oyuncuBilgileri_lblAdi" in govde:
+            with gzip.open(yol_ + ".tmp", "wb") as g:
+                g.write(govde)
+            os.replace(yol_ + ".tmp", yol_)
+            hata = 0
+        elif kod == "200" and len(govde) > 15000 and b"tff.org" in govde.lower():
+            open(yol_ + ".yok", "w").close()   # TFF sayfası var ama oyuncu bilgisi yok
+            hata = 0
+        else:
+            hata += 1
+            with open(os.path.join(KOK, "hatalar.log"), "a") as f:
+                f.write(f"{time.strftime('%F %T')} kisi {kod} {k}\n")
+            if hata >= 10:
                 kesinti += 1
                 if kesinti > 24:
                     sys.exit("12 saattir art arda hata: durdum (aynı komut kaldığı yerden devam eder).")
@@ -307,9 +355,9 @@ def durum():
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("komut", choices=["indir", "ayikla", "durum", "ek", "uyum"])
+    p.add_argument("komut", choices=["indir", "ayikla", "durum", "ek", "uyum", "kisi"])
     p.add_argument("--kademe", type=int)
     p.add_argument("--sezon")
     p.add_argument("--bekle", type=float, default=2.0)
     a = p.parse_args()
-    {"indir": lambda: indir(a.kademe, a.sezon, a.bekle), "ayikla": ayikla, "durum": durum, "ek": ek_maclar, "uyum": gol_uyum}[a.komut]()
+    {"indir": lambda: indir(a.kademe, a.sezon, a.bekle), "ayikla": ayikla, "durum": durum, "ek": ek_maclar, "uyum": gol_uyum, "kisi": lambda: kisi_indir(a.bekle)}[a.komut]()

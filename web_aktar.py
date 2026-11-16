@@ -220,6 +220,7 @@ def teknik_aktar(maclar, okunur):
             if m["kaynak"] == "tff" and m["kaynak_id"]:
                 tff[m["kaynak_id"]] = m
         o = sqlite3.connect(oy)
+        kisi_ad = tff_detay.kisi_okunur_kur(o, okunur)   # yabancı adlarda I = i
         for mac, taraf, ant, ad in o.execute("SELECT mac, taraf, kisi, ad FROM teknik"):
             m = tff.get(str(mac))
             if not m:
@@ -227,7 +228,7 @@ def teknik_aktar(maclar, okunur):
             anahtar = "t" + td_ad[sade(ad)] if sade(ad) in td_ad else "a" + str(ant)
             ant_[str(ant)] = anahtar
             if anahtar not in kisi:
-                kisi[anahtar] = [okunur(ad), None]
+                kisi[anahtar] = [kisi_ad(ad), None]
             ekle(anahtar, m["id"], m["ev_kulup"] if taraf == 1 else m["dep_kulup"])
     yaz(os.path.join(CIKTI, "teknik.json"), {"kisi": kisi, "tff": ant_, "alanlar": ["kisi", "mac", "kulup", "sezon", "yarisma", "attigi", "yedigi", "tarih"],
                                              "maclar": sorted(satir, key=lambda x: (x[0], x[7] or ""))})
