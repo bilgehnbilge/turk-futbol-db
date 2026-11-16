@@ -819,6 +819,13 @@ async function tffOyuncuRekorlari(kap, kid) {
     ${kart("Bir maçta en çok gol", "Lig ve kupa", d.mac_gol, x => x[2], mac)}
     ${kart("Ligde bir maçta en çok gol", "", d.mac_lig_gol, x => x[2], mac)}
   </div>
+  ${d.sari ? `<h2 class="bolum">Kartlar</h2>
+  <div class="izgara iki ust-hiza">
+    ${kart("En çok sarı kart görenler", "Kulüpteki bütün lig ve kupa maçları", d.sari, x => x[2], x => `${x[5].slice(0, 4)}–${x[6].slice(5)} · ${x[4]} maç`)}
+    ${kart("En çok kırmızı kart görenler", "İkinci sarıdan kırmızı dahil", d.kirmizi, x => x[3], x => `${x[5].slice(0, 4)}–${x[6].slice(5)} · ${x[4]} maç`)}
+    ${kart("Bir sezonda en çok sarı kart", "Lig ve kupa birlikte", d.sezon_sari, x => x[7], x => `${sz(x)} · ${x[6]} maç`)}
+    ${kart("Bir sezonda en çok kırmızı kart", "İkinci sarıdan kırmızı dahil", d.sezon_kirmizi, x => x[8], x => `${sz(x)} · ${x[6]} maç`)}
+  </div>` : ""}
   <p class="soluk not">Kaynak: TFF maç sayfaları — lig 1990-91'den (goller 1991-92'den), Türkiye Kupası 1990-2007. Daha eski dönem ve Avrupa maçları bu listelere henüz girmiyor; seyirci kaydı TFF sayfalarında yok. Yukarıdaki filtreler bu bölümü etkilemez.</p>`;
 }
 
@@ -1163,7 +1170,7 @@ const rekorDurum = { tablo: 20, acik: new Set() };
 async function rekorlarSayfa(kap) {
   document.title = "Tüm zamanlar rekorları · Türk Futbol Arşivi";
   icerik.innerHTML = `<div class="yukleniyor">Rekorlar yükleniyor…</div>`;
-  const R = await al(`data/rekorlar.json?s=${OZET.surum || ""}`);
+  const [R, TR] = await Promise.all([al(`data/rekorlar.json?s=${OZET.surum || ""}`), al(`data/tff/rekor.json?s=${OZET.surum || ""}`).catch(() => null)]);
   if (!R.veri[kap]) kap = R.kapsamlar[0][0];   // eski önbellekteki dosyada olmayan sekme
   const v = R.veri[kap];
   const kapAd = Object.fromEntries(R.kapsamlar)[kap];
@@ -1197,6 +1204,24 @@ async function rekorlarSayfa(kap) {
         <small class="soluk">${sayiYaz(x[2])} maçta · %${yuzde(x[1], x[2])}</small></span><b class="n">${sayiYaz(x[1])}</b></li>`).join("")}</ol>
       ${l.length > 10 ? `<button class="dugme daha" data-ac="${id}">${acik ? "Daha az" : `İlk ${l.length}`}</button>` : ""}</div>`;
   };
+  // bir maçta en çok gol atan futbolcular (TFF maç sayfaları, 1991-92'den)
+  const golKap = { tum: x => true, kupa: x => x[8] === "K", pro: x => x[8] === "L", 1: x => x[8] === "L" && x[9] === 1, 2: x => x[8] === "L" && x[9] === 2, 3: x => x[8] === "L" && x[9] === 3, 4: x => x[8] === "L" && x[9] === 4 };
+  const oyuncuGol = () => {
+    if (!TR) return "";
+    const l = TR.mac_gol.filter(golKap[kap] || (() => false));
+    if (!l.length) return "";
+    const r = sira(l, x => x[2]), acik = rekorDurum.acik.has("oygol");
+    let n = acik ? l.length : 10;
+    if (!acik) while (n < l.length && n < 25 && l[n][2] === l[n - 1][2] && r[n] === r[n - 1]) n++;   // 10. sıradaki eşitlikler
+    return `<h2 class="bolum">Bir maçta en çok gol atan futbolcular</h2>
+    <div class="tablo-kap rekor-tablo-kap"><table class="tablo rekor-tablo"><tbody>${l.slice(0, n).map((x, i) => `<tr>
+      <td class="s sira">${r[i]}</td><td class="tarih">${tarihYaz(x[4])}<br><a class="bag" href="#/sezon/${x[5]}">${esc(x[5])}</a></td>
+      <td class="ad"><a class="bag" href="#/oyuncu/k${x[0]}">${esc(x[1])}</a><br><small class="soluk">${kulupBag(x[6])}</small></td>
+      <td class="o"><b>${x[2]}</b> gol</td><td class="ad"><small class="soluk">Rakip</small> ${kulupBag(x[7])} <small>${skorBag(x[3], "· maç")}</small></td>
+      <td class="ek soluk" style="font-size:13px">${esc(x[8] === "L" ? KADEME_AD[x[9]] || "Lig" : YAR_AD[x[8]] || "")}${x[10] ? " · play-off" : ""}</td></tr>`).join("")}</tbody></table></div>
+    ${l.length > n ? `<button class="dugme daha" data-ac="oygol">${acik ? "Daha az göster" : `${sayiYaz(l.length)} maçın hepsini göster (3+ gol)`}</button>` : acik ? `<button class="dugme daha" data-ac="oygol">Daha az göster</button>` : ""}
+    <p class="soluk not">Kaynak: TFF maç sayfaları — lig 1991-92'den, Türkiye Kupası 1991-2007. Kendi kalesine goller hariç, penaltı golleri dahil. 1991 öncesi henüz yok.</p>`;
+  };
   const tablo = () => {
     const l = v.tablo, n = Math.min(rekorDurum.tablo, l.length);
     return `<div class="tablo-kap"><table class="tablo"><thead><tr><th class="s">#</th><th>Kulüp</th><th class="s" title="Sezon">Sz</th><th class="s">O</th><th class="s">G</th><th class="s">B</th><th class="s">M</th>
@@ -1224,6 +1249,7 @@ async function rekorlarSayfa(kap) {
       <div><h3>En gollü maçlar</h3>${macTablo(v.gollu, "gollu")}</div>
       <div><h3>Deplasmanda en farklı galibiyetler</h3>${macTablo(v.dep_fark, "dep_fark")}</div>
     </div>
+    ${oyuncuGol()}
 
     ${v.seriler ? `<h2 class="bolum">Seriler</h2>
     <div class="izgara k3">${["yenilmez", "ic_yenilmez", "dis_yenilmez", "galibiyetsiz", "galibiyet", "golyemeden", "golsuz"].map(seriKart).join("")}</div>

@@ -119,8 +119,11 @@ def kisi_okunur_kur(o, okunur):
             return a
         if TR_HARF & set(a):
             return okunur(a)
-        return " ".join(okunur(w) if w in tr else okunur(w.replace("I", "İ")) for w in a.split())
+        return " ".join(w.lower() if w in EDAT else okunur(w) if w in tr else okunur(w.replace("I", "İ")) for w in a.split())
     return f
+
+
+EDAT = {"DE", "DA", "DO", "DOS", "DAS", "DI", "DU", "DEL", "VAN", "VON", "DER", "DEN", "LA", "LE", "EL"}
 
 
 def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
@@ -200,8 +203,10 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
     O = collections.defaultdict(lambda: collections.defaultdict(lambda: [0] * 12))   # kisi -> anahtar -> [mac, ilk11, gol, pen, kk, sari, kirmizi, dakika, yedek, kaleci maç, gol yemeden, yenen gol]
     kul_oy = collections.defaultdict(lambda: collections.defaultdict(lambda: [0, 0, None, None]))   # kulüp -> kisi -> [mac, gol, ilk, son]
     kul_lig = collections.defaultdict(lambda: collections.defaultdict(lambda: [0, 0, None, None]))  # yalnız lig (play-off dahil)
-    kul_sezon = collections.defaultdict(lambda: collections.defaultdict(lambda: [0, 0, 0, 0]))   # kulüp -> (kisi, sezon) -> [gol, lig golü, gol yemeden (kaleci), maç]
+    kul_sezon = collections.defaultdict(lambda: collections.defaultdict(lambda: [0, 0, 0, 0, 0, 0]))   # kulüp -> (kisi, sezon) -> [gol, lig golü, gol yemeden (kaleci), maç, sarı, kırmızı]
+    kul_kart = collections.defaultdict(lambda: collections.defaultdict(lambda: [0, 0, 0, None, None]))   # kulüp -> kisi -> [sarı, kırmızı, maç, ilk, son]
     mac_gol = collections.defaultdict(list)   # kulüp -> [kisi, gol, futbol maç no, lig mi]
+    genel_gol = []
     kaleci = lambda k_: bas_say[k_] >= 3 and ilk_say[k_] / bas_say[k_] >= 0.6
     for t in mevcut:
         f, ters = tersi[t]
@@ -236,6 +241,9 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
                     r[8] += 1
                     continue
                 kul_sezon[kid][(kisi, m["sezon"])][3] += 1
+                kk_ = kul_kart[kid][kisi]
+                kk_[2] += 1
+                kk_[3] = min(kk_[3] or m["sezon"], m["sezon"]); kk_[4] = max(kk_[4] or m["sezon"], m["sezon"])
                 if lig:
                     kl = kul_lig[kid][kisi]
                     kl[0] += 1
@@ -266,11 +274,18 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
                     bu_mac[(kid, x[4])] += 1
             elif x[1] == "Y":
                 r[5] += 1
+                kul_sezon[kid][(x[4], m["sezon"])][4] += 1
+                kul_kart[kid][x[4]][0] += 1
             elif x[1] in ("R", "YR"):
                 r[6] += 1
+                kul_sezon[kid][(x[4], m["sezon"])][5] += 1
+                kul_kart[kid][x[4]][1] += 1
         for (kid, kisi), n in bu_mac.items():
             if n >= 2:
                 mac_gol[kid].append([kisi, n, f, 1 if lig else 0])
+                if n >= 3:   # genel rekorlar: bir maçta en çok gol (hat-trick ve üstü)
+                    rakip = m["dep_kulup"] if m["ev_kulup"] == kid else m["ev_kulup"]
+                    genel_gol.append([kisi, None, n, f, m["tarih"], m["sezon"], kid, rakip, YAR[m["yarisma"]], m["kademe"] or 0, m["asama"] == "play-off"])
     odir = os.path.join(tff, "o")
     if os.path.isdir(odir):
         shutil.rmtree(odir)
@@ -311,11 +326,20 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
             "alanlar": ["kisi", "ad", "mac", "gol", "ilk", "son"],
             "gol": sorted([x for x in l if x[3]], key=lambda x: (-x[3], x[2]))[:25], "mac": sorted(l, key=lambda x: (-x[2], -x[3]))[:25],
             "lig_gol": ilk_n([x for x in ll if x[3]], lambda x: (-x[3], x[2])), "lig_mac": ilk_n(ll, lambda x: (-x[2], -x[3])),
-            "sezon_alanlar": ["kisi", "ad", "sezon", "gol", "lig_gol", "gol_yemeden", "mac"],
+            "sezon_alanlar": ["kisi", "ad", "sezon", "gol", "lig_gol", "gol_yemeden", "mac", "sari", "kirmizi"],
+            "sezon_sari": ilk_n([x for x in ss if x[7]], lambda x: (-x[7], x[6], x[2])),
+            "sezon_kirmizi": ilk_n([x for x in ss if x[8]], lambda x: (-x[8], x[6], x[2])),
+            "kart_alanlar": ["kisi", "ad", "sari", "kirmizi", "mac", "ilk", "son"],
+            "sari": ilk_n([[k_, A(k_), *v] for k_, v in kul_kart[kid].items() if k_ and v[0]], lambda x: (-x[2], x[4])),
+            "kirmizi": ilk_n([[k_, A(k_), *v] for k_, v in kul_kart[kid].items() if k_ and v[1]], lambda x: (-x[3], x[4])),
             "sezon_gol": ilk_n([x for x in ss if x[3]], lambda x: (-x[3], x[2])),
             "sezon_lig_gol": ilk_n([x for x in ss if x[4]], lambda x: (-x[4], x[2])),
             "sezon_gy": ilk_n([x for x in ss if x[5]], lambda x: (-x[5], x[2])),
             "mac_gol_alanlar": ["kisi", "ad", "gol", "mac", "lig", "tarih", "rakip"],
             "mac_gol": ilk_n(mg, lambda x: (-x[2], x[5] or "")), "mac_lig_gol": ilk_n([x for x in mg if x[4]], lambda x: (-x[2], x[5] or ""))})
+    for x in genel_gol:
+        x[1] = okunur(ad.get(x[0], ""))
+    yaz(os.path.join(tff, "rekor.json"), {"mac_gol_alanlar": ["kisi", "ad", "gol", "mac", "tarih", "sezon", "kulup", "rakip", "yarisma", "kademe", "playoff"],
+                                          "mac_gol": sorted(genel_gol, key=lambda x: (-x[2], x[4] or ""))})
     print(f"TFF ayrıntı: {len(mevcut)} maç, {len(dizin)} oyuncu, {len(kul_oy)} kulüp")
     return mevcut
