@@ -6,7 +6,7 @@ let MILLI = null, MILLI_DETAY = null;
 const milliAl = async () => MILLI ||= await al(`data/milli.json?s=${OZET.surum || ""}`);
 const milliDetayAl = async () => MILLI_DETAY ||= await al(`data/milli_detay.json?s=${OZET.surum || ""}`);
 const durum = { kat: "", onyil: "", rakip: "", tum: false };
-// bayraklar docs/bayrak/<kod>.svg: flag-icons (MIT) ve tarihi ülkeler için Wikimedia Commons (Yugoslavya, SSCB, Çekoslovakya, Doğu Almanya)
+// bayraklar docs/bayrak/<kod>.svg: circle-flags (MIT); Doğu Almanya Wikimedia Commons'tan (CSS ile daireye kırpılıyor)
 const bayrakImg = (kod, sinif = "bayrak") => kod ? `<img class="${sinif}" src="bayrak/${kod}.svg" alt="" loading="lazy">` : "";
 const TR_BAYRAK = () => bayrakImg("tr");
 
