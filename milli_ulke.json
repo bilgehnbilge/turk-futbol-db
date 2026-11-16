@@ -1,26 +1,477 @@
 {
-"ABD": ["ABD", "🇺🇸"], "ALMANYA": ["Almanya", "🇩🇪"], "ANDORRA": ["Andorra", "🇦🇩"], "ANGOLA": ["Angola", "🇦🇴"],
-"ARNAVUTLUK": ["Arnavutluk", "🇦🇱"], "AVUSTRALYA": ["Avustralya", "🇦🇺"], "AVUSTURYA": ["Avusturya", "🇦🇹"], "AZERBAYCAN": ["Azerbaycan", "🇦🇿"],
-"BELARUS": ["Belarus", "🇧🇾"], "BELÇİKA": ["Belçika", "🇧🇪"], "BOSNA-HERSEK": ["Bosna-Hersek", "🇧🇦"], "BREZİLYA": ["Brezilya", "🇧🇷"],
-"BULGARİSTAN": ["Bulgaristan", "🇧🇬"], "CEBELİTARIK": ["Cebelitarık", "🇬🇮"], "CEZAYİR": ["Cezayir", "🇩🇿"], "DANİMARKA": ["Danimarka", "🇩🇰"],
-"DEMOKRATİK ALMANYA": ["Doğu Almanya", ""], "EKVADOR": ["Ekvador", "🇪🇨"], "ERMENİSTAN": ["Ermenistan", "🇦🇲"], "ESTONYA": ["Estonya", "🇪🇪"],
-"ETİOPYA": ["Etiyopya", "🇪🇹"], "FAROE ADALARI": ["Faroe Adaları", "🇫🇴"], "FRANSA": ["Fransa", "🇫🇷"], "FİLDİŞİ SAHİLİ": ["Fildişi Sahili", "🇨🇮"],
-"FİNLANDİYA": ["Finlandiya", "🇫🇮"], "GALLER": ["Galler", "🏴󠁧󠁢󠁷󠁬󠁳󠁿"], "GANA": ["Gana", "🇬🇭"], "GÜNEY AFRİKA": ["Güney Afrika", "🇿🇦"],
-"GÜNEY KORE": ["Güney Kore", "🇰🇷"], "GÜRCİSTAN": ["Gürcistan", "🇬🇪"], "GİNE": ["Gine", "🇬🇳"], "HIRVATİSTAN": ["Hırvatistan", "🇭🇷"],
-"HOLLANDA": ["Hollanda", "🇳🇱"], "HONDURAS": ["Honduras", "🇭🇳"], "IRAK": ["Irak", "🇮🇶"], "JAPONYA": ["Japonya", "🇯🇵"],
-"KAMERUN": ["Kamerun", "🇨🇲"], "KANADA": ["Kanada", "🇨🇦"], "KARADAĞ": ["Karadağ", "🇲🇪"], "KATAR": ["Katar", "🇶🇦"],
-"KAZAKİSTAN": ["Kazakistan", "🇰🇿"], "KOLOMBİYA": ["Kolombiya", "🇨🇴"], "KOSOVA": ["Kosova", "🇽🇰"], "KOSTARİKA": ["Kosta Rika", "🇨🇷"],
-"KUZEY MAKEDONYA": ["Kuzey Makedonya", "🇲🇰"], "KUZEY İRLANDA": ["Kuzey İrlanda", ""], "LETONYA": ["Letonya", "🇱🇻"], "LÜKSEMBURG": ["Lüksemburg", "🇱🇺"],
-"LİBYA": ["Libya", "🇱🇾"], "LİECHTENSTEİN": ["Lihtenştayn", "🇱🇮"], "LİTVANYA": ["Litvanya", "🇱🇹"], "MACARİSTAN": ["Macaristan", "🇭🇺"],
-"MALEZYA": ["Malezya", "🇲🇾"], "MALTA": ["Malta", "🇲🇹"], "MEKSİKA": ["Meksika", "🇲🇽"], "MISIR": ["Mısır", "🇪🇬"],
-"MOLDOVA": ["Moldova", "🇲🇩"], "NORVEÇ": ["Norveç", "🇳🇴"], "PAKİSTAN": ["Pakistan", "🇵🇰"], "PARAGUAY": ["Paraguay", "🇵🇾"],
-"POLONYA": ["Polonya", "🇵🇱"], "PORTEKİZ": ["Portekiz", "🇵🇹"], "ROMANYA": ["Romanya", "🇷🇴"], "RUSYA": ["Rusya", "🇷🇺"],
-"SAN MARİNO": ["San Marino", "🇸🇲"], "SENEGAL": ["Senegal", "🇸🇳"], "SIRBİSTAN": ["Sırbistan", "🇷🇸"], "SLOVAKYA": ["Slovakya", "🇸🇰"],
-"SLOVENYA": ["Slovenya", "🇸🇮"], "SOVYETLER BİRLİĞİ": ["Sovyetler Birliği", ""], "SURİYE": ["Suriye", "🇸🇾"], "SUUDİ ARABİSTAN": ["Suudi Arabistan", "🇸🇦"],
-"TUNUS": ["Tunus", "🇹🇳"], "UKRAYNA": ["Ukrayna", "🇺🇦"], "URUGUAY": ["Uruguay", "🇺🇾"], "VENEZUELA": ["Venezuela", "🇻🇪"],
-"YENİ ZELANDA": ["Yeni Zelanda", "🇳🇿"], "YUGOSLAVYA": ["Yugoslavya", ""], "YUNANİSTAN": ["Yunanistan", "🇬🇷"], "ÇEKOSLOVAKYA": ["Çekoslovakya", ""],
-"ÇEKYA": ["Çekya", "🇨🇿"], "ÇİN CUMHURİYETİ": ["Çin", "🇨🇳"], "ÖZBEKİSTAN": ["Özbekistan", "🇺🇿"], "İNGİLTERE": ["İngiltere", "🏴󠁧󠁢󠁥󠁮󠁧󠁿"],
-"İRAN": ["İran", "🇮🇷"], "İRLANDA CUMHURİYETİ": ["İrlanda", "🇮🇪"], "İSKOÇYA": ["İskoçya", "🏴󠁧󠁢󠁳󠁣󠁴󠁿"], "İSPANYA": ["İspanya", "🇪🇸"],
-"İSRAİL": ["İsrail", "🇮🇱"], "İSVEÇ": ["İsveç", "🇸🇪"], "İSVİÇRE": ["İsviçre", "🇨🇭"], "İTALYA": ["İtalya", "🇮🇹"],
-"İZLANDA": ["İzlanda", "🇮🇸"], "ŞİLİ": ["Şili", "🇨🇱"], "TÜRKİYE": ["Türkiye", "🇹🇷"]
+"ABD": [
+"ABD",
+"🇺🇸",
+"us"
+],
+"ALMANYA": [
+"Almanya",
+"🇩🇪",
+"de"
+],
+"ANDORRA": [
+"Andorra",
+"🇦🇩",
+"ad"
+],
+"ANGOLA": [
+"Angola",
+"🇦🇴",
+"ao"
+],
+"ARNAVUTLUK": [
+"Arnavutluk",
+"🇦🇱",
+"al"
+],
+"AVUSTRALYA": [
+"Avustralya",
+"🇦🇺",
+"au"
+],
+"AVUSTURYA": [
+"Avusturya",
+"🇦🇹",
+"at"
+],
+"AZERBAYCAN": [
+"Azerbaycan",
+"🇦🇿",
+"az"
+],
+"BELARUS": [
+"Belarus",
+"🇧🇾",
+"by"
+],
+"BELÇİKA": [
+"Belçika",
+"🇧🇪",
+"be"
+],
+"BOSNA-HERSEK": [
+"Bosna-Hersek",
+"🇧🇦",
+"ba"
+],
+"BREZİLYA": [
+"Brezilya",
+"🇧🇷",
+"br"
+],
+"BULGARİSTAN": [
+"Bulgaristan",
+"🇧🇬",
+"bg"
+],
+"CEBELİTARIK": [
+"Cebelitarık",
+"🇬🇮",
+"gi"
+],
+"CEZAYİR": [
+"Cezayir",
+"🇩🇿",
+"dz"
+],
+"DANİMARKA": [
+"Danimarka",
+"🇩🇰",
+"dk"
+],
+"DEMOKRATİK ALMANYA": [
+"Doğu Almanya",
+"",
+"dd"
+],
+"EKVADOR": [
+"Ekvador",
+"🇪🇨",
+"ec"
+],
+"ERMENİSTAN": [
+"Ermenistan",
+"🇦🇲",
+"am"
+],
+"ESTONYA": [
+"Estonya",
+"🇪🇪",
+"ee"
+],
+"ETİOPYA": [
+"Etiyopya",
+"🇪🇹",
+"et"
+],
+"FAROE ADALARI": [
+"Faroe Adaları",
+"🇫🇴",
+"fo"
+],
+"FRANSA": [
+"Fransa",
+"🇫🇷",
+"fr"
+],
+"FİLDİŞİ SAHİLİ": [
+"Fildişi Sahili",
+"🇨🇮",
+"ci"
+],
+"FİNLANDİYA": [
+"Finlandiya",
+"🇫🇮",
+"fi"
+],
+"GALLER": [
+"Galler",
+"🏴󠁧󠁢󠁷󠁬󠁳󠁿",
+"gb-wls"
+],
+"GANA": [
+"Gana",
+"🇬🇭",
+"gh"
+],
+"GÜNEY AFRİKA": [
+"Güney Afrika",
+"🇿🇦",
+"za"
+],
+"GÜNEY KORE": [
+"Güney Kore",
+"🇰🇷",
+"kr"
+],
+"GÜRCİSTAN": [
+"Gürcistan",
+"🇬🇪",
+"ge"
+],
+"GİNE": [
+"Gine",
+"🇬🇳",
+"gn"
+],
+"HIRVATİSTAN": [
+"Hırvatistan",
+"🇭🇷",
+"hr"
+],
+"HOLLANDA": [
+"Hollanda",
+"🇳🇱",
+"nl"
+],
+"HONDURAS": [
+"Honduras",
+"🇭🇳",
+"hn"
+],
+"IRAK": [
+"Irak",
+"🇮🇶",
+"iq"
+],
+"JAPONYA": [
+"Japonya",
+"🇯🇵",
+"jp"
+],
+"KAMERUN": [
+"Kamerun",
+"🇨🇲",
+"cm"
+],
+"KANADA": [
+"Kanada",
+"🇨🇦",
+"ca"
+],
+"KARADAĞ": [
+"Karadağ",
+"🇲🇪",
+"me"
+],
+"KATAR": [
+"Katar",
+"🇶🇦",
+"qa"
+],
+"KAZAKİSTAN": [
+"Kazakistan",
+"🇰🇿",
+"kz"
+],
+"KOLOMBİYA": [
+"Kolombiya",
+"🇨🇴",
+"co"
+],
+"KOSOVA": [
+"Kosova",
+"🇽🇰",
+"xk"
+],
+"KOSTARİKA": [
+"Kosta Rika",
+"🇨🇷",
+"cr"
+],
+"KUZEY MAKEDONYA": [
+"Kuzey Makedonya",
+"🇲🇰",
+"mk"
+],
+"KUZEY İRLANDA": [
+"Kuzey İrlanda",
+"",
+"gb-nir"
+],
+"LETONYA": [
+"Letonya",
+"🇱🇻",
+"lv"
+],
+"LÜKSEMBURG": [
+"Lüksemburg",
+"🇱🇺",
+"lu"
+],
+"LİBYA": [
+"Libya",
+"🇱🇾",
+"ly"
+],
+"LİECHTENSTEİN": [
+"Lihtenştayn",
+"🇱🇮",
+"li"
+],
+"LİTVANYA": [
+"Litvanya",
+"🇱🇹",
+"lt"
+],
+"MACARİSTAN": [
+"Macaristan",
+"🇭🇺",
+"hu"
+],
+"MALEZYA": [
+"Malezya",
+"🇲🇾",
+"my"
+],
+"MALTA": [
+"Malta",
+"🇲🇹",
+"mt"
+],
+"MEKSİKA": [
+"Meksika",
+"🇲🇽",
+"mx"
+],
+"MISIR": [
+"Mısır",
+"🇪🇬",
+"eg"
+],
+"MOLDOVA": [
+"Moldova",
+"🇲🇩",
+"md"
+],
+"NORVEÇ": [
+"Norveç",
+"🇳🇴",
+"no"
+],
+"PAKİSTAN": [
+"Pakistan",
+"🇵🇰",
+"pk"
+],
+"PARAGUAY": [
+"Paraguay",
+"🇵🇾",
+"py"
+],
+"POLONYA": [
+"Polonya",
+"🇵🇱",
+"pl"
+],
+"PORTEKİZ": [
+"Portekiz",
+"🇵🇹",
+"pt"
+],
+"ROMANYA": [
+"Romanya",
+"🇷🇴",
+"ro"
+],
+"RUSYA": [
+"Rusya",
+"🇷🇺",
+"ru"
+],
+"SAN MARİNO": [
+"San Marino",
+"🇸🇲",
+"sm"
+],
+"SENEGAL": [
+"Senegal",
+"🇸🇳",
+"sn"
+],
+"SIRBİSTAN": [
+"Sırbistan",
+"🇷🇸",
+"rs"
+],
+"SLOVAKYA": [
+"Slovakya",
+"🇸🇰",
+"sk"
+],
+"SLOVENYA": [
+"Slovenya",
+"🇸🇮",
+"si"
+],
+"SOVYETLER BİRLİĞİ": [
+"Sovyetler Birliği",
+"",
+"su"
+],
+"SURİYE": [
+"Suriye",
+"🇸🇾",
+"sy"
+],
+"SUUDİ ARABİSTAN": [
+"Suudi Arabistan",
+"🇸🇦",
+"sa"
+],
+"TUNUS": [
+"Tunus",
+"🇹🇳",
+"tn"
+],
+"UKRAYNA": [
+"Ukrayna",
+"🇺🇦",
+"ua"
+],
+"URUGUAY": [
+"Uruguay",
+"🇺🇾",
+"uy"
+],
+"VENEZUELA": [
+"Venezuela",
+"🇻🇪",
+"ve"
+],
+"YENİ ZELANDA": [
+"Yeni Zelanda",
+"🇳🇿",
+"nz"
+],
+"YUGOSLAVYA": [
+"Yugoslavya",
+"",
+"yu"
+],
+"YUNANİSTAN": [
+"Yunanistan",
+"🇬🇷",
+"gr"
+],
+"ÇEKOSLOVAKYA": [
+"Çekoslovakya",
+"",
+"cs"
+],
+"ÇEKYA": [
+"Çekya",
+"🇨🇿",
+"cz"
+],
+"ÇİN CUMHURİYETİ": [
+"Çin",
+"🇨🇳",
+"cn"
+],
+"ÖZBEKİSTAN": [
+"Özbekistan",
+"🇺🇿",
+"uz"
+],
+"İNGİLTERE": [
+"İngiltere",
+"🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+"gb-eng"
+],
+"İRAN": [
+"İran",
+"🇮🇷",
+"ir"
+],
+"İRLANDA CUMHURİYETİ": [
+"İrlanda",
+"🇮🇪",
+"ie"
+],
+"İSKOÇYA": [
+"İskoçya",
+"🏴󠁧󠁢󠁳󠁣󠁴󠁿",
+"gb-sct"
+],
+"İSPANYA": [
+"İspanya",
+"🇪🇸",
+"es"
+],
+"İSRAİL": [
+"İsrail",
+"🇮🇱",
+"il"
+],
+"İSVEÇ": [
+"İsveç",
+"🇸🇪",
+"se"
+],
+"İSVİÇRE": [
+"İsviçre",
+"🇨🇭",
+"ch"
+],
+"İTALYA": [
+"İtalya",
+"🇮🇹",
+"it"
+],
+"İZLANDA": [
+"İzlanda",
+"🇮🇸",
+"is"
+],
+"ŞİLİ": [
+"Şili",
+"🇨🇱",
+"cl"
+],
+"TÜRKİYE": [
+"Türkiye",
+"🇹🇷",
+"tr"
+]
 }

@@ -655,7 +655,7 @@ function macCiz(d) {
   const ad = ([kid, a]) => kid != null && KULUP.has(kid) ? `<a href="#/kulup/${kid}">${esc(a)}</a>` : esc(a);
   const buyuk = ([kid, a], i) => { const k = KULUP.get(kid), tema = takimTema(k);
     return `<a class="taraf ${i ? "sag" : ""}" ${kid != null ? `href="#/kulup/${kid}"` : ""} style="--tr:${tema ? tema["--tv-acik"] : "var(--yazi)"}">
-      <span class="buyuk-logo">${k?.logo ? `<img src="logo/${k.logo}.png" alt="">` : d.bayrak?.[i] ? `<span class="bayrak-buyuk">${d.bayrak[i]}</span>` : esc(a.slice(0, 2).toLocaleUpperCase("tr"))}</span><span class="ad">${esc(a)}</span></a>`; };
+      <span class="buyuk-logo">${k?.logo ? `<img src="logo/${k.logo}.png" alt="">` : d.bayrak?.[i] ? d.bayrak[i] : esc(a.slice(0, 2).toLocaleUpperCase("tr"))}</span><span class="ad">${esc(a)}</span></a>`; };
   const dakika = o => o[2] == null ? "" : `${o[2]}${o[3] ? "+" + o[3] : ""}'`;
   // oyuncuya göre olay simgeleri (kadroda göstermek için)
   const simge = new Map(), ekle = (no, s) => no && simge.set(no, (simge.get(no) || "") + s);

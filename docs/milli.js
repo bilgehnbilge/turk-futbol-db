@@ -6,10 +6,13 @@ let MILLI = null, MILLI_DETAY = null;
 const milliAl = async () => MILLI ||= await al(`data/milli.json?s=${OZET.surum || ""}`);
 const milliDetayAl = async () => MILLI_DETAY ||= await al(`data/milli_detay.json?s=${OZET.surum || ""}`);
 const durum = { kat: "", onyil: "", rakip: "", tum: false };
+// bayraklar docs/bayrak/<kod>.svg: flag-icons (MIT) ve tarihi ülkeler için Wikimedia Commons (Yugoslavya, SSCB, Çekoslovakya, Doğu Almanya)
+const bayrakImg = (kod, sinif = "bayrak") => kod ? `<img class="${sinif}" src="bayrak/${kod}.svg" alt="" loading="lazy">` : "";
+const TR_BAYRAK = () => bayrakImg("tr");
 
 function maclar(d) {
   return d.maclar.map(r => ({ tff: r[0], tarih: r[1], rakip: r[2], kod: r[3], saha: r[4], a: r[5], y: r[6], kat: r[7], org: r[8], ayr: r[9],
-    bayrak: (d.ulke[r[3]] || [])[1] || "", s: sonuc(r[5], r[6]) }));
+    bayrak: bayrakImg((d.ulke[r[3]] || [])[2]), bkod: (d.ulke[r[3]] || [])[2], s: sonuc(r[5], r[6]) }));
 }
 const KAT_SIRA = ["Dünya Kupası", "Dünya Kupası elemeleri", "Avrupa Şampiyonası", "Avrupa Şampiyonası elemeleri", "Uluslar Ligi", "Diğer turnuvalar", "Özel maç"];
 const say = l => l.reduce((t, m) => (t.O++, t[m.s]++, t.AG += m.a, t.YG += m.y, t), { O: 0, G: 0, B: 0, M: 0, AG: 0, YG: 0 });
@@ -34,7 +37,7 @@ async function milliSayfa(sekme = "ozet") {
     const onyillar = [...new Set(tum.map(m => m.tarih.slice(0, 3) + "0"))].sort();
     const rk = durum.rakip ? tum.find(m => m.kod === durum.rakip) : null;
     icerik.innerHTML = `
-    <div class="sayfa-bas"><div><h1>🇹🇷 A Milli Takım</h1>
+    <div class="sayfa-bas"><div><h1>${bayrakImg("tr", "bayrak baslik")} A Milli Takım</h1>
       <p class="soluk">${tarihYaz(tum[0].tarih)} – ${tarihYaz(tum.at(-1).tarih)} · ${tum.length} resmi ve özel maç</p></div></div>
     <div class="filtre milli-filtre">
       <select id="mKat"><option value="">Bütün maçlar</option><option value="resmi" ${durum.kat === "resmi" ? "selected" : ""}>Resmi maçlar (özel maçlar hariç)</option>
@@ -161,7 +164,7 @@ async function milliMacSayfa(tff) {
   const [d, D] = await Promise.all([milliAl(), milliDetayAl()]);
   const m = maclar(d).find(x => x.tff === tff), r = D[tff];
   if (!m || !r) { icerik.innerHTML = `<div class="bos">Bu maçın ayrıntısı yok.</div>`; return; }
-  const tr = ["Türkiye", "🇹🇷"], rk = [m.rakip, m.bayrak], ev = m.saha === "E";
+  const tr = ["Türkiye", bayrakImg("tr", "bayrak buyuk")], rk = [m.rakip, bayrakImg(m.bkod, "bayrak buyuk")], ev = m.saha === "E";
   const TUR = { Y: "YELLOW_CARD", R: "RED_CARD", YR: "YELLOW_CARD_SECOND", S: "SUBSTITUTION", G: "GOAL" };
   macCiz({
     tarih: m.tarih, ev: [null, (ev ? tr : rk)[0]], dep: [null, (ev ? rk : tr)[0]], bayrak: [(ev ? tr : rk)[1], (ev ? rk : tr)[1]],
@@ -179,7 +182,7 @@ window.milliOyuncu = async (kap, kisi, yalnizMilli) => {
   if (!v) return false;
   const [ad, mac, ilk, gol, pen, sari, kirmizi, bas, son, kulup] = v;
   if (yalnizMilli) document.title = `${ad} · Türk Futbol Arşivi`;
-  kap.innerHTML = `${yalnizMilli ? `<div class="sayfa-bas"><div><h1>${esc(ad)}</h1><p class="soluk">${esc(kulup.join(", "))}</p></div></div>` : `<h2 class="bolum">🇹🇷 A Milli Takım</h2>`}
+  kap.innerHTML = `${yalnizMilli ? `<div class="sayfa-bas"><div><h1>${esc(ad)}</h1><p class="soluk">${esc(kulup.join(", "))}</p></div></div>` : `<h2 class="bolum">${bayrakImg("tr")} A Milli Takım</h2>`}
     <div class="kart bolum"><div class="ozet-sat">
       <div><b>${mac}</b><span>Maç</span></div><div><b>${ilk}</b><span>İlk 11</span></div><div><b>${gol}</b><span>Gol</span></div>
       <div><b>${pen}</b><span>Penaltı golü</span></div><div><b>${sari}</b><span>Sarı kart</span></div><div><b>${kirmizi}</b><span>Kırmızı kart</span></div></div>
