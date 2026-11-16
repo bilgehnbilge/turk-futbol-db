@@ -487,3 +487,11 @@ td.artı { color: var(--g); } td.eksi { color: var(--m); }
 tr.toplam td { border-top: 1px solid var(--cizgi); }
 .oneri a.oyuncu-oneri { flex-direction: column; align-items: flex-start; gap: 2px; }
 .oneri a.oyuncu-oneri small { white-space: normal; }
+.bayrak-buyuk { font-size: 40px; line-height: 1; }
+/* milli takım */
+.milli-filtre { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.milli-filtre .rozet a { margin-left: 6px; color: var(--soluk); }
+tr.tiklanir { cursor: pointer; }
+tr.tiklanir:hover td { background: var(--yuzey2); }
+@media (max-width: 1100px) { .milli-iki { grid-template-columns: 1fr; } }
+.milli-iki .tablo td, .milli-iki .tablo th { padding-left: 6px; padding-right: 6px; }

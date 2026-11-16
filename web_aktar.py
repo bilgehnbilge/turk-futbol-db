@@ -366,6 +366,10 @@ def main():
     # ---- TFF maç ayrıntıları, oyuncular (tff_detay.py; raw/oyuncu.db) -> data/tff/
     tff_ayr = tff_detay.aktar(c, maclar, okunur, CIKTI)
 
+    # ---- A Milli Takım (milli.py; milli_maclar.json depoda) -> data/milli.json, data/milli_detay.json
+    import milli
+    milli.site(yaz, CIKTI)
+
     # ---- teknik direktörler: TFF maç sayfaları (lig, kupa) + UEFA (Avrupa) -> data/teknik.json
     if os.path.exists(os.path.join(KOK, "raw", "oyuncu.db")):
         teknik_aktar(maclar, okunur)
