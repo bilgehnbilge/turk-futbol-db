@@ -197,7 +197,7 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
         yaz(os.path.join(mdir, f"{b}.json"), {"ad": {k_: okunur(ad.get(k_, "")) for k_ in kisiler if k_}, "mac": d})
 
     # ---- oyuncu kariyerleri: sezon x kulüp x yarışma
-    O = collections.defaultdict(lambda: collections.defaultdict(lambda: [0] * 9))   # kisi -> anahtar -> [mac, ilk11, gol, pen, kk, sari, kirmizi, dakika, yedek]
+    O = collections.defaultdict(lambda: collections.defaultdict(lambda: [0] * 12))   # kisi -> anahtar -> [mac, ilk11, gol, pen, kk, sari, kirmizi, dakika, yedek, kaleci maç, gol yemeden, yenen gol]
     kul_oy = collections.defaultdict(lambda: collections.defaultdict(lambda: [0, 0, None, None]))   # kulüp -> kisi -> [mac, gol, ilk, son]
     kul_lig = collections.defaultdict(lambda: collections.defaultdict(lambda: [0, 0, None, None]))  # yalnız lig (play-off dahil)
     kul_sezon = collections.defaultdict(lambda: collections.defaultdict(lambda: [0, 0, 0, 0]))   # kulüp -> (kisi, sezon) -> [gol, lig golü, gol yemeden (kaleci), maç]
@@ -224,8 +224,11 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
             # gol yemeden: ilk 11'deki kaleci (ilk sıradaki, kaleci değilse kadrodaki kaleci), hükmen maçlar hariç
             ilk_ = ilk_sira.get((t, (2 - i) if ters else (i + 1)))
             gk = ilk_ if ilk_ and kaleci(ilk_) else next((p[1] for p in taraf if p[2] and kaleci(p[1])), None)
-            if gk and yedigi == 0 and not hukmen:
-                kul_sezon[kid][(gk, m["sezon"])][2] += 1
+            if gk and not hukmen and yedigi is not None:
+                if yedigi == 0:
+                    kul_sezon[kid][(gk, m["sezon"])][2] += 1
+                rg = O[gk][anahtar_]
+                rg[9] += 1; rg[10] += yedigi == 0; rg[11] += yedigi
             for forma, kisi, ilk11 in taraf:
                 oyn = ilk11 or kisi in giris
                 r = O[kisi][anahtar_]
@@ -286,7 +289,7 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
         dizin.append([kisi, okunur(ad.get(kisi, "")), mac, gol, min(s[0] for s in satir if s[4]), max(s[0] for s in satir if s[4]), son[1]])
     for b, d in okova.items():
         yaz(os.path.join(odir, f"{b}.json"), {"alanlar": ["sezon", "kulup", "yarisma", "kademe", "mac", "ilk11", "gol", "penalti", "kendi_kalesine",
-                                                         "sari", "kirmizi", "dakika", "yedek"], "oyuncu": d})
+                                                         "sari", "kirmizi", "dakika", "yedek", "kaleci_mac", "gol_yemeden", "yenen_gol"], "oyuncu": d})
     yaz(os.path.join(tff, "oyuncular.json"), {"alanlar": ["kisi", "ad", "mac", "gol", "ilk", "son", "son_kulup"],
                                               "oyuncu": sorted(dizin, key=lambda x: -x[2])})
     kdir = os.path.join(tff, "kulup")
