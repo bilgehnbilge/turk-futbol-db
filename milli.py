@@ -296,6 +296,7 @@ def site(yaz, cikti):
     satir, detay = [], {}
     oy = collections.defaultdict(lambda: {"ad": None, "mac": 0, "ilk": 0, "gol": 0, "pen": 0, "sari": 0, "kirmizi": 0, "bas": None, "son": None, "kulup": collections.Counter()})
     td = collections.defaultdict(lambda: {"ad": None, "maclar": []})
+    mac_gol, kal = [], collections.defaultdict(lambda: {"ad": None, "mac": 0, "gy": 0, "yenen": 0})
     for m in sorted(ms, key=lambda m: m["tarih"] or "9999"):
         if m["ev_gol"] is None or not m["tarih"]:
             continue
@@ -327,6 +328,15 @@ def site(yaz, cikti):
         for taraf, ant, ad in m["teknik"]:
             if taraf == trt:
                 td[ant]["ad"] = ad; td[ant]["maclar"].append(m["tff"])
+        # rekorlar: bir maçta 3+ gol; kaleci (TFF ilk 11'i kaleciyle başlatıyor) gol yemeden
+        bu = collections.Counter(x[1] for x in m["gol"] if x[0] == trt and x[1] and x[6] != "K" and not oyuncu.seri_mi(x[6], x[4], x[5]))
+        for kisi, n in bu.items():
+            if n >= 3:
+                mac_gol.append([kisi, oy[kisi]["ad"], n, m["tff"], m["tarih"], ulke.get(rakip, [rakip])[0], 1 if m["ev"] == TR else 0])
+        gk = next((k[1] for k in m["kadro"] if k[0] == trt and k[5] and k[1]), None)
+        if gk:
+            kal[gk]["mac"] += 1; kal[gk]["ad"] = oy[gk]["ad"]
+            kal[gk]["gy"] += y == 0; kal[gk]["yenen"] += y
         # maç ayrıntısı: taraf 1 = ev sahibi (sayfadaki gibi)
         olay = [[x[0], "G", x[4], x[5], x[2], None, x[6], x[1] or None, None] for x in m["gol"] if not oyuncu.seri_mi(x[6], x[4], x[5])]
         olay += [[x[0], {"Sarı Kart": "Y", "Kırmızı Kart": "R"}.get(x[3], "YR"), x[5], x[6], x[2], None, None, x[1] or None, None] for x in m["kart"]]
@@ -348,7 +358,10 @@ def site(yaz, cikti):
     yaz(os.path.join(cikti, "milli.json"), {
         "ulke": ulke, "mac_alanlar": ["tff", "tarih", "rakip", "rakip_kod", "saha", "attigi", "yedigi", "kategori", "organizasyon", "ayrinti"],
         "maclar": satir, "oyuncu_alanlar": ["ad", "mac", "ilk11", "gol", "penalti", "sari", "kirmizi", "ilk", "son", "kulupler"],
-        "oyuncu": oyuncular, "teknik": tek})
+        "oyuncu": oyuncular, "teknik": tek,
+        "mac_gol_alanlar": ["kisi", "ad", "gol", "tff", "tarih", "rakip", "ic_saha"], "mac_gol": sorted(mac_gol, key=lambda x: (-x[2], x[4])),
+        "kaleci_alanlar": ["kisi", "ad", "mac", "gol_yemeden", "yenen"],
+        "kaleci": sorted([[k, v["ad"], v["mac"], v["gy"], v["yenen"]] for k, v in kal.items() if v["mac"] >= 5], key=lambda x: (-x[3], x[2]))})
     yaz(os.path.join(cikti, "milli_detay.json"), detay)
     print(f"milli: {len(satir)} maç, {len(detay)} ayrıntılı, {len(oyuncular)} oyuncu")
 
