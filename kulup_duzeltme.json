@@ -105,7 +105,27 @@
 
   "mac_duzelt": [
     {"sezon": "2022-2023", "tarih": "2022-11-27", "ev": "tff:3688", "dep": "tff:3591", "durum": "Çifte H",
-     "not": "Maç oynanmadı; iki takım da 0-3 hükmen yenik sayıldı (resmi puan tablosu)"}
+     "not": "Maç oynanmadı; iki takım da 0-3 hükmen yenik sayıldı (resmi puan tablosu)"},
+    {"sezon": "1980-1981", "tarih": "1980-10-11", "ev": "tff:29", "dep": "tff:31", "ev_gol": 1, "dep_gol": 0, "durum": "MS",
+     "not": "Skor resmi puan tablosuna göre düzeltildi (Maçkolik 2-1 yazıyor; dogrula.py, 17.11.2026)"},
+    {"sezon": "1981-1982", "tarih": "1982-05-02", "ev": "tff:3599", "dep": "tff:117", "ev_gol": 3, "dep_gol": 0, "durum": "Hük.",
+     "not": "Skor resmi puan tablosuna göre düzeltildi (Maçkolik 2-0 yazıyor; dogrula.py, 17.11.2026)"},
+    {"sezon": "1981-1982", "tarih": "1981-09-20", "ev": "tff:16", "dep": "tff:3629", "ev_gol": 3, "dep_gol": 0, "durum": "Hük.",
+     "not": "Skor resmi puan tablosuna göre düzeltildi (Maçkolik 0-0 yazıyor; dogrula.py, 17.11.2026)"},
+    {"sezon": "1987-1988", "tarih": "1987-08-29", "ev": "tff:5", "dep": "tff:16", "ev_gol": 0, "dep_gol": 1, "durum": "MS",
+     "not": "Skor resmi puan tablosuna göre düzeltildi (Maçkolik 1-1 yazıyor; dogrula.py, 17.11.2026)"},
+    {"sezon": "1987-1988", "tarih": "1987-08-29", "ev": "tff:106", "dep": "tff:47", "ev_gol": 1, "dep_gol": 0, "durum": "MS",
+     "not": "Skor resmi puan tablosuna göre düzeltildi (Maçkolik 3-2 yazıyor; dogrula.py, 17.11.2026)"},
+    {"sezon": "1994-1995", "tarih": "1994-10-05", "ev": "tff:116", "dep": "tff:81", "ev_gol": 1, "dep_gol": 0, "durum": "MS",
+     "not": "Skor resmi puan tablosuna göre düzeltildi (TFF fikstürü 3-1 yazıyor; dogrula.py, 17.11.2026)"},
+    {"sezon": "2006-2007", "tarih": "2006-12-10", "ev": "tff:1211", "dep": "tff:37", "ev_gol": 2, "dep_gol": 0, "durum": "MS",
+     "not": "Skor resmi puan tablosuna göre düzeltildi (TFF fikstürü 2-1 yazıyor; dogrula.py, 17.11.2026)"},
+    {"sezon": "2011-2012", "tarih": "2012-03-11", "ev": "tff:1015", "dep": "tff:101", "ev_gol": 0, "dep_gol": 3, "durum": "Hük.",
+     "not": "Skor resmi puan tablosuna göre düzeltildi (TFF fikstürü 0-1 yazıyor; dogrula.py, 17.11.2026)"},
+    {"sezon": "2012-2013", "tarih": "2013-01-27", "ev": "tff:3678", "dep": "tff:3640", "ev_gol": 2, "dep_gol": 0, "durum": "MS",
+     "not": "Skor resmi puan tablosuna göre düzeltildi (TFF fikstürü 2-1 yazıyor; dogrula.py, 17.11.2026)"},
+    {"sezon": "2014-2015", "tarih": "2015-04-05", "ev": "tff:60", "dep": "tff:86", "ev_gol": 3, "dep_gol": 2, "durum": "MS",
+     "not": "Skor resmi puan tablosuna göre düzeltildi (TFF fikstürü 4-2 yazıyor; dogrula.py, 17.11.2026)"}
   ],
 
   "ardil": [
