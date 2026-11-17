@@ -115,6 +115,10 @@ def indir():
             else:
                 bos_say[k] = bos_say.get(k, 0) + 1
     liste = [x for x in h if x[0] not in var]
+    atla = sum(1 for x in liste if (x[1], x[2]) not in dolu and bos_say.get((x[1], x[2]), 0) >= BOS_ESIK)
+    if atla:
+        print(f"{atla} maç olaysız sezonlarda olduğu için atlanacak", flush=True)
+    liste = [x for x in liste if (x[1], x[2]) in dolu or bos_say.get((x[1], x[2]), 0) < BOS_ESIK]
     print(f"{len(liste)} maç sayfası indirilecek (~{len(liste) * (sum(BEKLE) / 2 + 1) / 3600:.0f} saat)", flush=True)
     engel = 0
     with open(CIKTI, "a", encoding="utf-8") as f:

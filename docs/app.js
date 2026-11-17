@@ -660,9 +660,27 @@ const OLAY = {
   GOAL: ["⚽", "Gol"], PENALTY: ["✖", "Kaçan penaltı"], YELLOW_CARD: ["🟨", "Sarı kart"], YELLOW_CARD_SECOND: ["🟨🟥", "İkinci sarı"],
   RED_YELLOW_CARD: ["🟨🟥", "İkinci sarıdan kırmızı"], RED_CARD: ["🟥", "Kırmızı kart"], SUBSTITUTION: ["⇄", "Oyuncu değişikliği"],
 };
+// Maçkolik maç olayları (Süper Lig 1959-1991, 1. Lig 1990-91): data/mk/dizin.json (futbol.db no -> Maçkolik no), data/mk/m/<no[:2]>.json
+let MK_DIZIN = null;
+async function mkMacAl(id) {
+  if (BOLUM !== "erkek") return null;
+  MK_DIZIN ||= await al(`data/mk/dizin.json?s=${OZET.surum || ""}`).catch(() => ({}));
+  const no = MK_DIZIN[id];
+  if (!no) return null;
+  const r = (await al(`data/mk/m/${no.slice(0, 2)}.json?s=${OZET.surum || ""}`).catch(() => ({})))[no];
+  if (!r) return null;
+  const [tarih, saat, sezon, lig, tur, ev, dep, skor] = r.m;
+  return { id, tarih, saat, sezon, lig, tur, ev, dep, skor, kaynak: "Maçkolik", kadro: [[], []], teknik: [[], []],
+    olay: r.o.map(([taraf, tur, dk, ek, a1, a2, ay]) => [taraf, tur, dk, ek, a1, a2, ay, null, null]) };
+}
 async function macSayfa(id) {
   icerik.innerHTML = `<div class="yukleniyor">Maç yükleniyor…</div>`;
-  const d = (DETAYLI ||= new Set(OZET.detayli || [])).has(id) ? await al(`data/mac/${id}.json?s=${OZET.surum || ""}`) : await tffMacAl(id);
+  let d = (DETAYLI ||= new Set(OZET.detayli || [])).has(id) ? await al(`${V}mac/${id}.json?s=${OZET.surum || ""}`) : await tffMacAl(id);
+  if (!d || (d.kaynak === "TFF" && !d.olay.some(o => o[1] === "GOAL") && (d.skor[0] || d.skor[1]))) {
+    const mk = await mkMacAl(id);   // 1990-91: TFF'nin kadrosu + Maçkolik'in golleri, kartları, değişiklikleri
+    if (mk && d) { d.olay = mk.olay; d.uyum = null; d.olayKaynak = "Maçkolik"; }
+    else if (mk) d = mk;
+  }
   if (!d) { icerik.innerHTML = `<div class="bos">Bu maçın ayrıntısı yok.</div>`; return; }
   macCiz(d);
 }
@@ -711,11 +729,13 @@ function macCiz(d) {
   ${d.uyum === "yok" ? `<p class="soluk not bolum">TFF bu maçın gollerini kaydetmemiş.</p>` : ""}
   ${istatHtml(d)}
   ${d.olay.length ? `<div class="kart bolum"><h3>Maçın akışı</h3><div class="akis">${akis}</div></div>` : ""}
-  <div class="izgara iki bolum ust-hiza">
+  ${d.kadro[0].length || d.kadro[1].length ? `<div class="izgara iki bolum ust-hiza">
     <div class="kart"><h3>${ad(d.ev)}</h3>${kadroHtml(d.kadro[0], d.teknik[0])}</div>
     <div class="kart"><h3>${ad(d.dep)}</h3>${kadroHtml(d.kadro[1], d.teknik[1])}</div>
-  </div>
-  <p class="soluk not bolum">Kadro ve olaylar: ${d.tff ? `<a class="bag" href="${d.kaynakUrl || `https://www.tff.org/Default.aspx?pageID=29&macId=${d.tff}`}" target="_blank" rel="noopener">TFF maç sayfası</a>` : esc(d.kaynak)}. Oyuncu adları kaynakta yazıldığı gibidir.</p>`;
+  </div>` : ""}
+  <p class="soluk not bolum">${d.olayKaynak ? `Kadro: <a class="bag" href="https://www.tff.org/Default.aspx?pageID=29&macId=${d.tff}" target="_blank" rel="noopener">TFF maç sayfası</a>; goller, kartlar ve değişiklikler: ${esc(d.olayKaynak)}`
+    : d.kaynak === "Maçkolik" ? "Goller, kartlar ve oyuncu değişiklikleri: Maçkolik. Bu dönemin kadroları henüz yok"
+    : `Kadro ve olaylar: ${d.tff ? `<a class="bag" href="${d.kaynakUrl || `https://www.tff.org/Default.aspx?pageID=29&macId=${d.tff}`}" target="_blank" rel="noopener">TFF maç sayfası</a>` : esc(d.kaynak)}`}. Oyuncu adları kaynakta yazıldığı gibidir.</p>`;
 }
 
 const ISTAT = [   // [anahtar, ad, yüzde mi]

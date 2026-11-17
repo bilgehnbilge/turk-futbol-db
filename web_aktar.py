@@ -238,7 +238,7 @@ def main():
     c = sqlite3.connect(DB)
     c.row_factory = sqlite3.Row
     # Ham kaynağı yerelde duran çıktılar (GitHub Actions'ta raw/ yok): kaynak yoksa eski dosyalar korunur
-    koru = [a for a, kaynak in (("mac", "uefa_detay.db"), ("oyuncu_uefa.json", "uefa_detay.db"), ("teknik.json", "oyuncu.db"), ("tff", "oyuncu.db"), ("kadin", "kadin.db"))
+    koru = [a for a, kaynak in (("mac", "uefa_detay.db"), ("oyuncu_uefa.json", "uefa_detay.db"), ("teknik.json", "oyuncu.db"), ("tff", "oyuncu.db"), ("kadin", "kadin.db"), ("mk", "mackolik_detay.jsonl"))
             if not os.path.exists(os.path.join(KOK, "raw", kaynak)) and os.path.exists(os.path.join(CIKTI, a))]
     gecici = CIKTI + ".korunan"
     if os.path.isdir(gecici):
@@ -365,6 +365,9 @@ def main():
         detayli = sorted(int(f[:-5]) for f in os.listdir(os.path.join(CIKTI, "mac"))) if os.path.isdir(os.path.join(CIKTI, "mac")) else []
     # ---- TFF maç ayrıntıları, oyuncular (tff_detay.py; raw/oyuncu.db) -> data/tff/
     tff_ayr = tff_detay.aktar(c, maclar, okunur, CIKTI)
+    # ---- Maçkolik maç olayları: Süper Lig 1959-1991, 1. Lig 1990-91 (mackolik_olay.py) -> data/mk/
+    import mackolik_olay
+    mk_ayr = mackolik_olay.aktar(maclar, CIKTI, yaz, okunur)
 
     # ---- A Milli Takım (milli.py; milli_maclar.json depoda) -> data/milli.json, data/milli_detay.json
     import milli
@@ -402,7 +405,7 @@ def main():
         "sezonlar": sorted(sez, key=lambda s: (s[:4], s)),
         "ilk_tarih": next((m["tarih"] for m in maclar if m["tarih"]), None),
         "son_tarih": max(m["tarih"] for m in maclar if m["tarih"] and m["ev_gol"] is not None),
-        "kapsam": kapsam, "detayli": detayli, "detayli_aralik": araliklar(tff_ayr)})
+        "kapsam": kapsam, "detayli": detayli, "detayli_aralik": araliklar(sorted(set(tff_ayr) | set(mk_ayr)))})
     toplam = sum(os.path.getsize(os.path.join(d, f)) for d, _, fs in os.walk(CIKTI) for f in fs)
     print(f"{len(liste)} kulup, {len(sez)} sezon, {len(maclar)} mac -> {CIKTI} ({toplam / 1e6:.1f} MB)")
 
