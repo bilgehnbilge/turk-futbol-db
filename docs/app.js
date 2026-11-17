@@ -956,8 +956,7 @@ async function oyuncuSayfa(no, tdNo) {
     const sezon = [...td.reduce((m, x) => { const k = `${x.sezon}|${x.kulup}`; return m.set(k, [...(m.get(k) || []), x]); }, new Map())]
       .sort((a, b) => b[0].localeCompare(a[0]));
     const kul = [...td.reduce((m, x) => m.set(x.kulup, [...(m.get(x.kulup) || []), x]), new Map())].sort((a, b) => b[1].length - a[1].length);
-    return `<h2 class="bolum">Teknik direktör olarak</h2>
-    <div class="kart"><div class="ozet-sat">
+    return `<div class="kart"><div class="ozet-sat">
       <div><b>${t.O}</b><span>Maç</span></div><div><b>${t.G}</b><span>Galibiyet</span></div><div><b>${t.B}</b><span>Beraberlik</span></div>
       <div><b>${t.M}</b><span>Mağlubiyet</span></div><div><b>%${yuzde(t.G, t.O)}</b><span>Kazanma</span></div><div><b>${pm(t)}</b><span>Maç başı puan</span></div></div>
       <div class="cubuk"><i class="g" style="width:${yuzde(t.G, t.O)}%"></i><i class="b" style="width:${yuzde(t.B, t.O)}%"></i><i class="m" style="width:${yuzde(t.M, t.O)}%"></i></div></div>
@@ -974,7 +973,11 @@ async function oyuncuSayfa(no, tdNo) {
   icerik.innerHTML = `
   <div class="sayfa-bas"><div><h1>${esc(ad)}</h1>
     <p class="soluk">${ulke ? (ULKE[ulke] ? ulkeHtml(ulke) : ulke === "TUR" ? `${bayrak("TUR")} Türkiye` : esc(ulke)) : ""}${yas ? ` · Doğum: ${yas}` : ""}</p></div></div>
-  ${ks.length ? `<h2 class="bolum">Oyuncu olarak</h2>` : ""}
+  ${ks.length && td.length ? `<nav class="sekmeler bolum">
+    <a href="#" data-k="oy" class="${ks.length >= td.length ? "aktif" : ""}">Oyuncu olarak <small class="soluk">${ks.length} maç</small></a>
+    <a href="#" data-k="td" class="${ks.length < td.length ? "aktif" : ""}">Teknik direktör olarak <small class="soluk">${td.length} maç</small></a></nav>`
+    : ks.length ? `<h2 class="bolum">Oyuncu olarak</h2>` : td.length ? `<h2 class="bolum">Teknik direktör olarak</h2>` : ""}
+  <div id="sk-oy" ${ks.length && td.length && ks.length < td.length ? "hidden" : ""}>
   ${ks.length ? `<div class="kart"><div class="ozet-sat">
     <div><b>${top.mac}</b><span>Avrupa maçı</span></div><div><b>${top.ilk}</b><span>İlk 11</span></div><div><b>${top.gol}</b><span>Gol</span></div>
     <div><b>${top.sari}</b><span>Sarı kart</span></div><div><b>${top.kirmizi}</b><span>Kırmızı kart</span></div>
@@ -983,8 +986,15 @@ async function oyuncuSayfa(no, tdNo) {
   <div class="izgara iki bolum ust-hiza">${kulupler.map(([kid, l]) => `<div class="kart"><h3>${kid != null && KULUP.has(kid) ? kulupBag(kid) : esc(kulupAd(kid))}</h3>
     <p class="soluk" style="margin:0 0 6px;font-size:13px">${l.length} maç · ${l.reduce((s, k) => s + k.gol, 0)} gol · ${l.at(-1).sezon} – ${l[0].sezon}</p>
     <div class="tabelalar">${l.map(m => `${tabelaSatir(m, true)}<div class="katki">${m.ilk11 ? "İlk 11" : `${m.giris}'de girdi`}${m.cikis != null ? ` · ${m.cikis}'de çıktı` : ""}${m.gol ? ` · ${"⚽".repeat(m.gol)}` : ""}${m.sari ? " · 🟨" : ""}${m.kirmizi ? " · 🟥" : ""}</div>`).join("")}</div></div>`).join("")}</div>
-  ${tdHtml}
+  </div>
+  <div id="sk-td" ${ks.length && td.length && ks.length >= td.length ? "hidden" : ""}>${tdHtml}</div>
   <p class="soluk not bolum">Kaynak: UEFA. Şimdilik yalnız Türk takımlarının Avrupa kupası maçları; lig maçları TFF verisi işlendikten sonra eklenecek.</p>`;
+
+  icerik.querySelectorAll(".sekmeler a[data-k]").forEach(a => a.addEventListener("click", e => {
+    e.preventDefault();
+    icerik.querySelectorAll(".sekmeler a[data-k]").forEach(x => x.classList.toggle("aktif", x === a));
+    $("#sk-oy").hidden = a.dataset.k !== "oy"; $("#sk-td").hidden = a.dataset.k !== "td";
+  }));
 }
 
 // ---------------------------------------------------------------- Avrupa: ülkelere göre
