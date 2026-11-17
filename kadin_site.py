@@ -99,7 +99,7 @@ def aktar():
         m_dict.append({"id": tff, "kaynak": "tff", "kaynak_id": str(tff), "yarisma": "lig", "lig": lig, "kademe": kademe, "sezon": sezon,
                        "grup": grup or None, "asama": "play-off" if asama else "lig", "tur": asama or None, "tarih": tarih, "saat": None,
                        "ev_kulup": ev, "dep_kulup": dep, "ev_adi": kulup[ev]["ad"], "dep_adi": kulup[dep]["ad"], "ev_gol": eg, "dep_gol": dg,
-                       "ev_pen": ep, "dep_pen": dp, "durum": None, "notlar": None})
+                       "ev_pen": ep, "dep_pen": dp, "durum": "MS" if eg is not None else None, "notlar": None})
     kulup_mac = collections.defaultdict(list)
     for m in m_dict:
         tur = m["grup"] if not m["tur"] else m["tur"]
@@ -107,7 +107,7 @@ def aktar():
         for s, r_ in (("ev", "dep"), ("dep", "ev")):
             kulup_mac[m[s + "_kulup"]].append([m["id"], m["tarih"], m["sezon"], "L", m["lig"], m["kademe"], tur, "p" if m["tur"] else "",
                                                "E" if s == "ev" else "D", m[s + "_adi"], m[r_ + "_kulup"], m[r_ + "_adi"],
-                                               m[s + "_gol"], m[r_ + "_gol"], m[s + "_pen"], m[r_ + "_pen"], None, None])
+                                               m[s + "_gol"], m[r_ + "_gol"], m[s + "_pen"], m[r_ + "_pen"], m["durum"], None])
     for kid, ms in kulup_mac.items():
         yaz(os.path.join(CIKTI, "kulup", f"{kid}.json"), {
             "alanlar": ["id", "tarih", "sezon", "yarisma", "lig", "kademe", "grup_tur", "playoff", "saha", "takim", "rakip_id",
@@ -128,6 +128,7 @@ def aktar():
             tff_detay.OYUNCU_DB, tff_detay.KUPA_ES = eski
         krallar = gol_krallari(o, tff_kulup)
         oyuncu = len(json.load(open(os.path.join(CIKTI, "tff", "oyuncular.json"), encoding="utf-8"))["oyuncu"])
+    rekor_sayilar(m_dict, sezonlar, kulup)
     for eski_ in ("m", "o", "k", "oyuncular.json"):   # 17.11 öncesi kadın bölümüne özel dosyalar
         y = os.path.join(CIKTI, eski_)
         if os.path.isdir(y):
@@ -143,6 +144,29 @@ def aktar():
         "sampiyonlar": sampiyonlar(kulup), "sampiyon_not": json.load(open(SAMPIYON, encoding="utf-8")).get("_notlar", {})})
     toplam = sum(os.path.getsize(os.path.join(d, f)) for d, _, fs in os.walk(CIKTI) for f in fs)
     print(f"kadın: {len(maclar)} maç ({len(tff_ayr)} ayrıntılı), {len(kulup)} kulüp, {oyuncu} oyuncu -> {CIKTI} ({toplam / 1e6:.1f} MB)")
+
+
+KADEME_AD = {1: "Kadın Süper Ligi", 2: "Kadınlar 1. Ligi", 3: "Kadınlar 2. Ligi", 4: "Kadınlar 3. Ligi"}   # bugünkü adlar, seviyeye göre
+
+
+def rekor_sayilar(maclar, sezonlar, kulup):
+    """Erkek bölümünün Rekorlar ve Sayılar sayfaları için aynı biçimde: rekorlar.json, sayilar.json, yolculuk.json."""
+    import rekor, sayilar
+    sezon_sira = {s: i for i, s in enumerate(sorted(sezonlar, key=lambda s: (s[:4], s)))}
+    eski_k, eski_d = rekor.KAPSAMLAR, sayilar.DERBI
+    rekor.KAPSAMLAR = [("pro", "Bütün ligler", lambda m: True)] + [
+        (str(k), ad, (lambda k_: lambda m: m["kademe"] == k_)(k)) for k, ad in KADEME_AD.items()]
+    tff_kid = {v["tff"][0]: k for k, v in kulup.items()}
+    sayilar.DERBI = {tff_kid[t]: ad for t, ad in (("3604", "Galatasaray (Kadın)"), ("3592", "Fenerbahçe (Kadın)"), ("3590", "Beşiktaş (Kadın)"), ("3596", "Trabzonspor (Kadın)")) if t in tff_kid}
+    try:
+        yaz(os.path.join(CIKTI, "rekorlar.json"), rekor.hesapla(maclar, sezon_sira, web_aktar.okunur))
+        bellek = sqlite3.connect(":memory:")
+        bellek.execute("CREATE TABLE puan_durumu(sezon, kademe, grup, sira, kulup, yarisma)")
+        sy, yol = sayilar.hesapla(maclar, bellek)
+        yaz(os.path.join(CIKTI, "sayilar.json"), sy)
+        yaz(os.path.join(CIKTI, "yolculuk.json"), yol)
+    finally:
+        rekor.KAPSAMLAR, sayilar.DERBI = eski_k, eski_d
 
 
 SAMPIYON = os.path.join(KOK, "kadin_sampiyon.json")

@@ -18,7 +18,7 @@ let KADEME_AD = { 1: "Süper Lig", 2: "1. Lig", 3: "TFF 2. Lig", 4: "TFF 3. Lig"
 // Bölüm: erkek (varsayılan) ya da kadın. Kulüp, maç ve oyuncu sayfaları iki bölümde aynı kodla çizilir; bölüm değişince
 // OZET/KULUP/KADEME_AD ve önbellekler o bölümünkiyle değişir, bağlantılar K ("" | "kadin/"), veri yolları V ön ekini alır.
 let K = "", V = "data/", BOLUM = "erkek";
-const BOLUMLER = {}, BOLUM_YUKLE = {};   // kadin.js BOLUM_YUKLE.kadin'i tanımlar: {OZET, KULUP, KADEME_AD}
+const BOLUMLER = {}, BOLUM_YUKLE = {}, BOLUM_UST = {};   // BOLUM_UST.kadin(sekme): bölüm sayfalarının başlığı ve sekmeleri   // kadin.js BOLUM_YUKLE.kadin'i tanımlar: {OZET, KULUP, KADEME_AD}
 async function bolumSec(ad) {
   if (ad === BOLUM) return;
   BOLUMLER[BOLUM] = { OZET, KULUP, KADEME_AD, DETAYLI, TFF_DIZIN };
@@ -180,9 +180,9 @@ async function yonlendir() {
   temaUygula(null);
   const bolum = h.startsWith("#/kadin") ? "kadin" : "erkek";
   try { await bolumSec(bolum); } catch (e) { icerik.innerHTML = `<div class="bos">Veri yüklenemedi (${esc(e.message)}).</div>`; return; }
-  const h0 = bolum === "erkek" ? h : h.replace(/^#\/kadin\/(?=(kulup|mac|oyuncu|h2h)\/)/, "#/");
+  const h0 = bolum === "erkek" ? h : h.replace(/^#\/kadin\/(?=(kulup|mac|oyuncu|h2h)\/|(rekorlar|sayilar)(\/|$))/, "#/");
   for (const [re, f] of yollar) {
-    const m = h.match(re) || (h0 !== h && /^\^#\\\/(kulup|mac|oyuncu|h2h)/.test(re.source) ? h0.match(re) : null);
+    const m = h.match(re) || (h0 !== h && /^\^#\\\/(kulup|mac|oyuncu|h2h|rekorlar|sayilar)/.test(re.source) ? h0.match(re) : null);
     if (m) {
       try { await f(...m.slice(1).map(x => x && decodeURIComponent(x))); }
       catch (e) { console.error(e); icerik.innerHTML = `<div class="bos">Bir hata oluştu: ${esc(e.message)}</div>`; }
@@ -1209,9 +1209,9 @@ const SERI_AD = {
 const rekorDurum = { tablo: 20, acik: new Set() };
 
 async function rekorlarSayfa(kap) {
-  document.title = "Tüm zamanlar rekorları · Türk Futbol Arşivi";
+  document.title = `${BOLUM === "kadin" ? "Kadın futbolu rekorları" : "Tüm zamanlar rekorları"} · Türk Futbol Arşivi`;
   icerik.innerHTML = `<div class="yukleniyor">Rekorlar yükleniyor…</div>`;
-  const [R, TR] = await Promise.all([al(`data/rekorlar.json?s=${OZET.surum || ""}`), al(`data/tff/rekor.json?s=${OZET.surum || ""}`).catch(() => null)]);
+  const [R, TR] = await Promise.all([al(`${V}rekorlar.json?s=${OZET.surum || ""}`), al(`${V}tff/rekor.json?s=${OZET.surum || ""}`).catch(() => null)]);
   if (!R.veri[kap]) kap = R.kapsamlar[0][0];   // eski önbellekteki dosyada olmayan sekme
   const v = R.veri[kap];
   const kapAd = Object.fromEntries(R.kapsamlar)[kap];
@@ -1261,7 +1261,7 @@ async function rekorlarSayfa(kap) {
       <td class="o"><b>${x[2]}</b> gol</td><td class="ad"><small class="soluk">Rakip</small> ${kulupBag(x[7])} <small>${skorBag(x[3], "· maç")}</small></td>
       <td class="ek soluk" style="font-size:13px">${esc(x[8] === "L" ? KADEME_AD[x[9]] || "Lig" : YAR_AD[x[8]] || "")}${x[10] ? " · play-off" : ""}</td></tr>`).join("")}</tbody></table></div>
     ${l.length > n ? `<button class="dugme daha" data-ac="oygol">${acik ? "Daha az göster" : `${sayiYaz(l.length)} maçın hepsini göster (3+ gol)`}</button>` : acik ? `<button class="dugme daha" data-ac="oygol">Daha az göster</button>` : ""}
-    <p class="soluk not">Kaynak: TFF maç sayfaları — lig 1991-92'den, Türkiye Kupası 1991-2007. Kendi kalesine goller hariç, penaltı golleri dahil. 1991 öncesi henüz yok.</p>`;
+    <p class="soluk not">Kaynak: ${BOLUM === "kadin" ? `${KADIN_KAYNAK}. Kendi kalesine goller hariç, penaltı golleri dahil.` : "TFF maç sayfaları — lig 1991-92'den, Türkiye Kupası 1991-2007. Kendi kalesine goller hariç, penaltı golleri dahil. 1991 öncesi henüz yok."}</p>`;
   };
   const tablo = () => {
     const l = v.tablo, n = Math.min(rekorDurum.tablo, l.length);
@@ -1275,10 +1275,10 @@ async function rekorlarSayfa(kap) {
 
   const ciz = () => {
     icerik.innerHTML = `
-    <h1>Tüm zamanlar rekorları</h1>
-    <nav class="sekmeler">${R.kapsamlar.map(([k, ad]) => `<a href="#/rekorlar/${k}" class="${k === kap ? "aktif" : ""}">${esc(ad)}</a>`).join("")}</nav>
+    ${BOLUM_UST[BOLUM] ? `${BOLUM_UST[BOLUM]("rekorlar")}<h2>Tüm zamanlar rekorları</h2>` : "<h1>Tüm zamanlar rekorları</h1>"}
+    <nav class="sekmeler">${R.kapsamlar.map(([k, ad]) => `<a href="#/${K}rekorlar/${k}" class="${k === kap ? "aktif" : ""}">${esc(ad)}</a>`).join("")}</nav>
     <p class="soluk">${esc(kapAd)} · ${esc(v.sezon[0])} – ${esc(v.sezon[1])} · ${sayiYaz(v.mac)} maç.
-      ${kap === "pro" ? "Bütün lig seviyeleri bir arada: bir kulübün Süper Lig'den alt lige geçişi seriyi bozmaz." : ""}</p>
+      ${kap === "pro" ? `Bütün lig seviyeleri bir arada: bir kulübün ${esc(KADEME_AD[1])}'nden alt lige geçişi seriyi bozmaz.` : ""}</p>
 
     ${v.tablo ? `<h2 class="bolum">Tüm zamanlar tablosu</h2>
     <p class="soluk not">Galibiyet bütün sezonlar için 3 puan sayıldı. ${lig ? "Play-off maçları ve puan silme cezaları dahil değil; hükmen sonuçlar dahil." : "Uzatmada biten maçlar skora göre, penaltıyla biten maçlar beraberlik sayıldı."}</p>

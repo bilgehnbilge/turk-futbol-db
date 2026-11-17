@@ -47,18 +47,24 @@ const sekmeler = (l, aktif) => `<nav class="sekmeler">${l.map(([k, h, a]) => `<a
 
 // ---------------------------------------------------------------- ana sayfa: sezonlar, kulüpler, oyuncular
 const anaDurum = { kulupAra: "", oyuncuAra: "" };
-async function kadinSayfa(sekme = "sezonlar") {
-  document.title = "Kadın Futbolu · Türk Futbol Arşivi";
-  icerik.innerHTML = `<div class="yukleniyor">Kadın ligleri yükleniyor…</div>`;
-  const z = await kOzet();
-  const SEK = [["sezonlar", "#/kadin", "Sezonlar"], ["krallar", "#/kadin/krallar", "Gol kralları"], ["kulupler", "#/kadin/kulupler", "Kulüpler"], ["oyuncular", "#/kadin/oyuncular", "Oyuncular"]];
-  const ust = `${basOn("Kadın Futbolu", `TFF kadın ligleri, ${z.sezonlar[0]}'den bugüne. Erkek liglerinden ayrı tutulur; erkek takımıyla aynı kulüp olanlar "(Kadın)" ekiyle yazılır.`)}
+// bölümün başlığı ve sekmeleri; Rekorlar ve Sayılar sekmeleri app.js / grafik.js'teki erkek sayfalarının kodunu kullanır (BOLUM_UST)
+function kadinUst(sekme) {
+  const z = KZ;
+  const SEK = [["sezonlar", "#/kadin", "Sezonlar"], ["krallar", "#/kadin/krallar", "Gol kralları"], ["kulupler", "#/kadin/kulupler", "Kulüpler"],
+    ["oyuncular", "#/kadin/oyuncular", "Oyuncular"], ["rekorlar", "#/kadin/rekorlar", "Rekorlar"], ["sayilar", "#/kadin/sayilar", "Sayılar"]];
+  return `${basOn("Kadın Futbolu", `TFF kadın ligleri, ${z.sezonlar[0]}'den bugüne. Erkek liglerinden ayrı tutulur; erkek takımıyla aynı kulüp olanlar "(Kadın)" ekiyle yazılır.`)}
     <div class="kart bolum"><div class="ozet-sat">
       <div><b>${sayiYaz(z.oynanan)}</b><span>Maç</span></div><div><b>${sayiYaz(z.kulupler.length)}</b><span>Kulüp</span></div>
       <div><b>${sayiYaz(z.oyuncu)}</b><span>Oyuncu</span></div><div><b>${z.sezonlar.length}</b><span>Sezon</span></div>
       <div><b>${sayiYaz(z.ayrintili)}</b><span>Kadrolu maç</span></div></div></div>
-    ${sekmeler(SEK, sekme)}<div id="kadinIc"></div><p class="soluk not bolum">${NOT}</p>`;
-  icerik.innerHTML = ust;
+    ${sekmeler(SEK, sekme)}`;
+}
+BOLUM_UST.kadin = kadinUst;
+async function kadinSayfa(sekme = "sezonlar") {
+  document.title = "Kadın Futbolu · Türk Futbol Arşivi";
+  icerik.innerHTML = `<div class="yukleniyor">Kadın ligleri yükleniyor…</div>`;
+  await kOzet();
+  icerik.innerHTML = `${kadinUst(sekme)}<div id="kadinIc"></div><p class="soluk not bolum">${NOT}</p>`;
   const ic = $("#kadinIc");
   if (sekme === "sezonlar") {
     // şampiyonlar: kadin_sampiyon.json (RSSSF / Vikipedi); play-off ve final turlarıyla belirlenen sezonlar tablodan çıkmaz

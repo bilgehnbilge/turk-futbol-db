@@ -123,7 +123,10 @@ const sayilarDurum = { skorLig: "1", skorDonem: "tum", skorTur: "oran" };
 async function sayilarSayfa() {
   document.title = "Sayılarla Türk futbolu · Türk Futbol Arşivi";
   icerik.innerHTML = `<div class="yukleniyor">Sayılar hazırlanıyor…</div>`;
-  const [S, Y] = await Promise.all([al(`data/sayilar.json?s=${OZET.surum || ""}`), al(`data/yolculuk.json?s=${OZET.surum || ""}`)]);
+  const [S, Y] = await Promise.all([al(`${V}sayilar.json?s=${OZET.surum || ""}`), al(`${V}yolculuk.json?s=${OZET.surum || ""}`)]);
+  DERBI_ID = Object.fromEntries(Object.entries(S.derbi_kulup).map(([id, ad]) => [ad, +id]));
+  const kadin = BOLUM === "kadin", ust = KADEME_AD[1];
+  if (kadin) document.title = "Sayılarla kadın futbolu · Türk Futbol Arşivi";
   const A = S.alanlar.reduce((o, a, i) => (o[a] = i, o), {});
   const kademeler = Object.keys(S.sezon).sort();
   const xler = [...new Set(kademeler.flatMap(k => S.sezon[k].map(r => r[0])))].sort((a, b) => sezonYil(a) - sezonYil(b) || a.localeCompare(b));
@@ -137,13 +140,13 @@ async function sayilarSayfa() {
   const toplamGol = kademeler.reduce((t, k) => t + S.sezon[k].reduce((u, r) => u + r[A.gol], 0), 0);
 
   icerik.innerHTML = `
-  <div class="sayfa-bas"><h1>Sayılarla Türk futbolu</h1></div>
-  <p class="soluk not">1959'dan bugüne profesyonel liglerin normal sezon maçlarından. Play-off, hükmen ve sayılmayan maçlar dahil değil; 20'den az maçı olan sezonlar çizilmedi.</p>
+  ${kadin ? `${BOLUM_UST.kadin("sayilar")}<h2>Sayılarla kadın futbolu</h2>` : `<div class="sayfa-bas"><h1>Sayılarla Türk futbolu</h1></div>`}
+  <p class="soluk not">${kadin ? `${esc(xler[0])}'den bugüne kadın liglerinin` : "1959'dan bugüne profesyonel liglerin"} normal sezon maçlarından. Play-off, hükmen ve sayılmayan maçlar dahil değil; 20'den az maçı olan sezonlar çizilmedi.</p>
   <div class="izgara k4 bolum-ust">
     <div class="kart stat"><span class="soluk">Lig maçı</span><b>${sayiYaz(toplamMac)}</b></div>
     <div class="kart stat"><span class="soluk">Gol</span><b>${sayiYaz(toplamGol)}</b></div>
-    <div class="kart stat"><span class="soluk">Süper Lig'in en az gollü sezonu</span><b>${esc(enAz[0])}</b><small class="soluk">maç başına ${ondalik(enAz[A.gol] / enAz[A.mac])} gol</small></div>
-    <div class="kart stat"><span class="soluk">Süper Lig'in en gollü sezonu</span><b>${esc(enCok[0])}</b><small class="soluk">maç başına ${ondalik(enCok[A.gol] / enCok[A.mac])} gol</small></div>
+    <div class="kart stat"><span class="soluk">${esc(ust)}'nin en az gollü sezonu</span><b>${esc(enAz[0])}</b><small class="soluk">maç başına ${ondalik(enAz[A.gol] / enAz[A.mac])} gol</small></div>
+    <div class="kart stat"><span class="soluk">${esc(ust)}'nin en gollü sezonu</span><b>${esc(enCok[0])}</b><small class="soluk">maç başına ${ondalik(enCok[A.gol] / enCok[A.mac])} gol</small></div>
   </div>
 
   <h2 class="bolum">Dönemler</h2>
@@ -163,11 +166,11 @@ async function sayilarSayfa() {
   <p class="soluk not">Lig, Türkiye Kupası ve Cumhurbaşkanlığı/Süper Kupa maçları. Çizgi, iki kulübün galibiyet farkının maç maç nasıl değiştiğini gösterir: çizgi yukarıdaysa soldaki kulüp, aşağıdaysa sağdaki kulüp önde. Penaltıyla biten maçlar beraberlik sayılır.</p>
   <div id="derbiler" class="izgara k2"></div>
 
-  <h2 class="bolum">Kırmızı kartın etkisi</h2>
-  <div id="kirmizi"><div class="yukleniyor">Hazırlanıyor…</div></div>
+  ${kadin ? "" : `<h2 class="bolum">Kırmızı kartın etkisi</h2>
+  <div id="kirmizi"><div class="yukleniyor">Hazırlanıyor…</div></div>`}
 
-  <h2 class="bolum">Süper Lig'de oynamış kulüpler</h2>
-  <p class="soluk not">Her satır bir kulüp, her kare bir sezon. Koyu kare Süper Lig, açıldıkça alt ligler; noktalı kare şampiyonluk. Süper Lig'de en çok sezon geçirenden en aza sıralı.</p>
+  <h2 class="bolum">${kadin ? "En üst ligde oynamış kulüpler" : "Süper Lig'de oynamış kulüpler"}</h2>
+  <p class="soluk not">Her satır bir kulüp, her kare bir sezon. Koyu kare ${kadin ? "en üst lig (2021-22'ye kadar Kadınlar 1. Ligi, sonra Kadın Süper Ligi)" : "Süper Lig"}, açıldıkça alt ligler; noktalı kare ${kadin ? "normal sezonu birinci bitirme (şampiyonluk play-off'la belirlenen sezonlarda farklı olabilir)" : "şampiyonluk"}. En üst ligde en çok sezon geçirenden en aza sıralı.</p>
   <div class="kart viz" id="matris"></div>`;
 
   cizgiGrafik($("#gGol"), { xler, seriler: golS, bicim: (v, eksen) => ondalik(v, eksen ? 1 : 2), yMin: 0 });
@@ -176,7 +179,7 @@ async function sayilarSayfa() {
   skorBolumu($("#skorBolum"), S, xler, A);
   derbiCiz($("#derbiler"), S);
   matrisCiz($("#matris"), Y, xler);
-  al(`data/kirmizi.json?s=${OZET.surum || ""}`).then(K => kirmiziBolumu($("#kirmizi"), K)).catch(() => { $("#kirmizi").innerHTML = `<p class="soluk">Kırmızı kart verisi yüklenemedi.</p>`; });
+  if (!kadin) al(`data/kirmizi.json?s=${OZET.surum || ""}`).then(K => kirmiziBolumu($("#kirmizi"), K)).catch(() => { $("#kirmizi").innerHTML = `<p class="soluk">Kırmızı kart verisi yüklenemedi.</p>`; });
 }
 
 // ---------------------------------------------------------------- kırmızı kart
@@ -327,7 +330,10 @@ function skorBolumu(kap, S, xler, A) {
 // ---------------------------------------------------------------- derbiler: galibiyet farkı (iki yönlü)
 function derbiCiz(kap, S) {
   const ad = id => S.derbi_kulup[id];
-  const ciftler = [[846, 463], [846, 95], [846, 115], [463, 95], [463, 115], [95, 115]];
+  const SIRA = ["Galatasaray", "Fenerbahçe", "Beşiktaş", "Trabzonspor"], sira = id => SIRA.findIndex(n => S.derbi_kulup[id].startsWith(n));
+  const idler = Object.keys(S.derbi_kulup).map(Number).sort((a, b) => sira(a) - sira(b));   // JSON sayısal anahtarları kendiliğinden sıralar
+  const ciftler = idler.flatMap((a, i) => idler.slice(i + 1).map(b => [a, b]))
+    .filter(([a, b]) => S.derbi.some(m => (m[3] === a && m[4] === b) || (m[3] === b && m[4] === a)));
   kap.innerHTML = ciftler.map((c, i) => `<div class="kart viz derbi"><h3>${esc(ad(c[0]))} – ${esc(ad(c[1]))}</h3><div class="derbi-ozet" id="dOz${i}"></div><div id="dG${i}"></div></div>`).join("");
   ciftler.forEach(([a, b], i) => {
     const ms = S.derbi.filter(m => (m[3] === a && m[4] === b) || (m[3] === b && m[4] === a)).sort((x, y) => x[0].localeCompare(y[0]));
@@ -401,7 +407,7 @@ function farkGrafik(kap, nok, adA, adB) {
     if (e.key === "ArrowLeft" || e.key === "ArrowRight") { secili = Math.max(0, Math.min(nok.length - 1, secili + (e.key === "ArrowLeft" ? -1 : 1))); goster(secili); e.preventDefault(); }
   });
 }
-const DERBI_ID = { "Galatasaray": 846, "Fenerbahçe": 463, "Beşiktaş": 95, "Trabzonspor": 115 };
+let DERBI_ID = { "Galatasaray": 846, "Fenerbahçe": 463, "Beşiktaş": 95, "Trabzonspor": 115 };   // sayilarSayfa bölümün sayilar.json'undan yeniler
 const KULUP_ID = ad => DERBI_ID[ad];
 const S_AD = (id, adA, adB) => id === KULUP_ID(adA) ? adA : adB;
 
@@ -418,7 +424,7 @@ function matrisCiz(kap, Y, xler) {
       ${satir.map(r => {
         const h = new Array(sutun.length).fill(null);
         for (const x of r.l) if (idx.has(x[A.sezon])) h[idx.get(x[A.sezon])] = x;
-        return `<a class="m-ad bag" href="#/kulup/${r.id}" title="${esc(kulupAd(r.id))}">${esc(kulupAd(r.id))}<small class="soluk">${r.sl}</small></a>` +
+        return `<a class="m-ad bag" href="#/${K}kulup/${r.id}" title="${esc(kulupAd(r.id))}">${esc(kulupAd(r.id))}<small class="soluk">${r.sl}</small></a>` +
           h.map((x, i) => x ? `<span class="m-h kd${x[A.kademe]}${x[A.kademe] === 1 && x[A.sira] === 1 ? " sampiyon" : ""}" data-k="${r.id}" data-s="${esc(sutun[i])}" data-kd="${x[A.kademe]}" data-r="${x[A.sira]}" data-n="${x[A.takim]}"></span>` : `<span class="m-h"></span>`).join("");
       }).join("")}
     </div></div>
