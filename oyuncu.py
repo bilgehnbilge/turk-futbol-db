@@ -1,6 +1,7 @@
 """TFF maç detay sayfalarından kadro, gol, kart, oyuncu değişikliği, teknik direktör ve hakem verisi.
 
   python3 oyuncu.py indir [--kademe 1] [--sezon 2015-2016] [--bekle 2]   # raw/tff_mac/<..>/<macId>.html.gz (kaldığı yerden)
+  python3 oyuncu.py kupa [--bekle 2]                                     # Türkiye Kupası maç sayfaları (TFF kupa arşivi, pageID=411)
   python3 oyuncu.py ayikla                                               # raw/oyuncu.db
   python3 oyuncu.py uyum                                                 # mac_bilgi.gol_uyum: gol listesi skorla tutuyor mu
   python3 oyuncu.py kisi [--bekle 2]                                     # raw/tff_kisi/<..>/<kisiId>.html.gz: oyuncu sayfaları
@@ -43,8 +44,19 @@ def hedefler(kademe=None, sezon=None):
     return [m for m, k in sirali if k == 1] + ek + [m for m, k in sirali if k != 1]
 
 
-def indir(kademe, sezon, bekle):
-    liste = [m for m in hedefler(kademe, sezon) if not os.path.exists(yol(m)) and not os.path.exists(yol(m) + ".yok")]
+def kupa_hedefleri():
+    """Türkiye Kupası maçları: TFF kupa arşivinin sezon sayfaları (raw/tff_kupa/kupa_<sezon>_<pageID>.html; arşiv pageID=411),
+    skoru olan maçlar, en yeni sezondan geriye."""
+    out, gor = [], set()
+    for f in sorted(glob.glob(os.path.join(KOK, "raw", "tff_kupa", "kupa_*.html")), reverse=True):
+        for m in topla.maclar(topla.oku(f)):
+            if m["mac"] and m["mac"] not in gor and re.fullmatch(r"\d+\s*-\s*\d+", m["skor"] or ""):
+                gor.add(m["mac"]); out.append(m["mac"])
+    return out
+
+
+def indir(kademe, sezon, bekle, kupa=False):
+    liste = [m for m in (kupa_hedefleri() if kupa else hedefler(kademe, sezon)) if not os.path.exists(yol(m)) and not os.path.exists(yol(m) + ".yok")]
     print(f"{len(liste)} sayfa indirilecek (~{len(liste) * (bekle + 0.6) / 3600:.1f} saat)", flush=True)
     hata = kesinti = 0
     for i, m in enumerate(liste, 1):
@@ -167,11 +179,16 @@ def sayfa_oku(t):
     for hid, metin in re.findall(r'lnkHakem" href="Default\.aspx\?pageId=72&(?:amp;)?hakemId=(\d+)"[^>]*>([^<]*)<', t):
         m = re.match(r"(.*?)\s*\((.*)\)\s*$", topla.temiz(metin))
         out["hakem"].append((int(hid), (m.group(1) if m else topla.temiz(metin)).strip(), m.group(2) if m else None))
-    # 1990'ların başı: yedekler ayrı listelenmemiş (hepsi "kadro"da); oyuna sonradan girenler ilk 11 değildir
+    # 1990'ların başı: yedekler ilk 11'le aynı listede (bazen yanında 254 numaralı tek bir yedek): bir takımda 11'den fazla
+    # ilk 11 oyuncusu varsa oyuna sonradan girenler, hâlâ fazlaysa 11'den büyük forma numaralılar yedektir
     for taraf in (1, 2):
-        if not any(k[0] == taraf and k[4] == 0 for k in out["kadro"]):
+        ilk = [k for k in out["kadro"] if k[0] == taraf and k[4]]
+        if len(ilk) > 11:
             girenler = {d[1] for d in out["degisiklik"] if d[0] == taraf and d[1]}
-            out["kadro"] = [(k[0], k[1], k[2], k[3], 0 if k[0] == taraf and k[1] in girenler else k[4]) for k in out["kadro"]]
+            yedek = {k[1] for k in ilk if k[1] in girenler}
+            if len(ilk) - len(yedek) > 11:
+                yedek |= {k[1] for k in ilk if k[1] not in yedek and (k[3] or "").isdigit() and int(k[3]) > 11}
+            out["kadro"] = [(k[0], k[1], k[2], k[3], 0 if k[0] == taraf and k[1] in yedek else k[4]) for k in out["kadro"]]
     stad = re.search(r'lnkStad"[^>]*>([^<]*)<', t)
     out["stad"] = topla.temiz(stad.group(1)) if stad else None
     # maç bilgisi (sezon sayfalarında listelenmeyen maçlar için: play-off, baraj, kupa, PAF...)
@@ -372,9 +389,9 @@ def durum():
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("komut", choices=["indir", "ayikla", "durum", "ek", "uyum", "kisi"])
+    p.add_argument("komut", choices=["indir", "kupa", "ayikla", "durum", "ek", "uyum", "kisi"])
     p.add_argument("--kademe", type=int)
     p.add_argument("--sezon")
     p.add_argument("--bekle", type=float, default=2.0)
     a = p.parse_args()
-    {"indir": lambda: indir(a.kademe, a.sezon, a.bekle), "ayikla": ayikla, "durum": durum, "ek": ek_maclar, "uyum": gol_uyum, "kisi": lambda: kisi_indir(a.bekle)}[a.komut]()
+    {"indir": lambda: indir(a.kademe, a.sezon, a.bekle), "kupa": lambda: indir(None, None, a.bekle, kupa=True), "ayikla": ayikla, "durum": durum, "ek": ek_maclar, "uyum": gol_uyum, "kisi": lambda: kisi_indir(a.bekle)}[a.komut]()
