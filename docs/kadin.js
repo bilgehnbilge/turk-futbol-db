@@ -63,7 +63,7 @@ BOLUM_UST.kadin = kadinUst;
 async function kadinSayfa(sekme = "sezonlar") {
   document.title = "Kadın Futbolu · Türk Futbol Arşivi";
   icerik.innerHTML = `<div class="yukleniyor">Kadın ligleri yükleniyor…</div>`;
-  await kOzet();
+  const z = await kOzet();
   icerik.innerHTML = `${kadinUst(sekme)}<div id="kadinIc"></div><p class="soluk not bolum">${NOT}</p>`;
   const ic = $("#kadinIc");
   if (sekme === "sezonlar") {
