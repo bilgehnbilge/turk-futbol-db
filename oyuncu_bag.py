@@ -71,6 +71,8 @@ def bagla(yaz=None):
     dog = {}
     if os.path.exists(KISI_DB):
         dog = {str(k): d for k, d in sqlite3.connect(KISI_DB).execute("SELECT kisi, dogum FROM kisi")}
+    import tff_detay
+    dog.update({str(k): d for k, d in tff_detay.DOGUM_DUZELT.items()})
     bag, say = {}, collections.Counter()
     for p, ks in uks.items():
         ad, udog = u["oyuncu"][p][0], u["oyuncu"][p][1]
@@ -94,9 +96,58 @@ def bagla(yaz=None):
             say["iki aday eşit"] += 1; continue
         bag[p] = int(puan[0][1])
         say["eşlendi (doğum da tuttu)" if puan[0][2] else "eşlendi (doğum bilinmiyor)"] += 1
-    (yaz or (lambda y, v: json.dump(v, open(y, "w", encoding="utf-8"))))(CIKTI, bag)
+    yaz = yaz or (lambda y, v: json.dump(v, open(y, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":")))
+    yaz(CIKTI, bag)
+    avrupa_yas(bag, yaz)
     print("UEFA-TFF oyuncu eşlemesi:", dict(say), "->", CIKTI)
     return bag
+
+
+def avrupa_yas(bag, yaz):
+    """Kulüplerin yaş rekorlarına (tff/kulup/<id>.json: genc, yasli, genc_gol, yasli_gol) Avrupa maçlarını kat: UEFA doğum
+    tarihleri; TFF oyuncusuyla eşlenen oyuncu TFF numarasıyla (aynı kişinin lig kaydıyla birleşir), eşlenmeyen 'u<UEFA no>'."""
+    import datetime
+    u = json.load(open(os.path.join(D, "oyuncu_uefa.json"), encoding="utf-8"))
+    av = {r[0]: r for r in json.load(open(os.path.join(D, "avrupa.json"), encoding="utf-8"))["maclar"]}
+    ek = collections.defaultdict(lambda: collections.defaultdict(lambda: [None, None, None, None]))   # kulüp -> kişi -> oyun [genç, yaşlı], gol [genç, yaşlı]
+    adlar = {}
+    for k in u["katilim"]:
+        p, mid, kid, gol = str(k[0]), k[1], k[2], k[4]
+        o, m = u["oyuncu"].get(p), av.get(mid)
+        if not o or not m or not o[1] or o[1][5:] in ("01-01", "07-01"):
+            continue
+        g = (datetime.date.fromisoformat(m[1]) - datetime.date.fromisoformat(o[1])).days
+        if g < 15 * 365 or g > 50 * 365:   # UEFA doğum tarihlerinde hata var (ör. 1985 Ömer Kılıç: 1971); TFF için alt sınır 12
+            continue
+        kisi = bag.get(p) or f"u{p}"
+        adlar[kisi] = o[0]
+        rakip = m[6] if m[5] == kid else m[5]
+        x = [g, m[1], mid, rakip]
+        r = ek[kid][kisi]
+        for i, ok in ((0, True), (2, bool(gol))):
+            if not ok:
+                continue
+            if r[i] is None or g < r[i][0]: r[i] = x
+            if r[i + 1] is None or g > r[i + 1][0]: r[i + 1] = x
+    n = 0
+    for kid, d in ek.items():
+        y = os.path.join(D, "tff", "kulup", f"{kid}.json")
+        if not os.path.exists(y):
+            continue
+        v = json.load(open(y, encoding="utf-8"))
+        for anahtar, i, ters in (("genc", 0, False), ("yasli", 1, True), ("genc_gol", 2, False), ("yasli_gol", 3, True)):
+            l = {x[0]: x for x in v.get(anahtar, [])}
+            for kisi, r in d.items():
+                x = r[i]
+                if x is None:
+                    continue
+                eski = l.get(kisi) or l.get(int(kisi) if str(kisi).isdigit() else kisi)
+                if not eski or (x[0] > eski[2] if ters else x[0] < eski[2]):
+                    ad = eski[1] if eski else adlar[kisi]
+                    l[kisi if not eski else eski[0]] = [kisi if not eski else eski[0], ad, x[0], x[1], x[2], x[3]]
+            v[anahtar] = sorted(l.values(), key=lambda x: -x[2] if ters else x[2])[:10]
+        yaz(y, v); n += 1
+    print(f"Avrupa yaş rekorları: {n} kulübe katıldı")
 
 
 if __name__ == "__main__":

@@ -11,9 +11,11 @@ değişse de dosyalar geçerli kalır:
 
 raw/oyuncu.db yoksa (GitHub Actions) yalnız dizin.json yeniden yazılır; diğer dosyalar olduğu gibi kalır.
 """
-import collections, json, os, shutil, sqlite3
+import collections, datetime, json, os, shutil, sqlite3
 
 KOK = os.path.dirname(os.path.abspath(__file__))
+# elle düzeltilen TFF doğum tarihleri (TFF kişi no -> tarih)
+DOGUM_DUZELT = {int(k): v[0] for k, v in json.load(open(os.path.join(KOK, "dogum_duzeltme.json"), encoding="utf-8")).items() if k[0] != "_"}
 OYUNCU_DB = os.path.join(KOK, "raw", "oyuncu.db")
 KUPA_ES = os.path.join(KOK, "tff_kupa_eslesme.json")   # Maçkolik kupa maçı -> TFF maç no (1990-2007 kupa sayfaları)
 YAR = {"lig": "L", "kupa": "K", "ozel_kupa": "O", "avrupa": "A", "terfi": "T"}
@@ -208,6 +210,31 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
     mac_gol = collections.defaultdict(list)   # kulüp -> [kisi, gol, futbol maç no, lig mi]
     genel_gol = []
     kaleci = lambda k_: bas_say[k_] >= 3 and ilk_say[k_] / bas_say[k_] >= 0.6
+    # yaş rekorları: yalnız tam doğum tarihi (1 Ocak / 1 Temmuz yalnız yıl bilindiğini gösterir; oyuncu.py kisi_ayikla)
+    kisi_db = os.path.join(KOK, "raw", "kisi.db")
+    dog = {}
+    if os.path.exists(kisi_db):
+        for k_, d_ in sqlite3.connect(kisi_db).execute("SELECT kisi, dogum FROM kisi WHERE dogum IS NOT NULL"):
+            d_ = DOGUM_DUZELT.get(k_, d_)
+            if d_[5:] not in ("01-01", "07-01"):
+                dog[k_] = datetime.date.fromisoformat(d_)
+    yas_oy = collections.defaultdict(dict)    # kulüp -> kisi -> [en genç: gün, maç] + [en yaşlı: gün, maç]
+    yas_gol = collections.defaultdict(dict)
+    ilk_tarih = {}   # kişi -> TFF'deki ilk maçı
+    def yas_ekle(tablo, kid, kisi, f_, tarih):
+        if kisi not in dog or not tarih:
+            return
+        if kisi not in ilk_tarih or tarih < ilk_tarih[kisi]:
+            ilk_tarih[kisi] = tarih
+        g = (datetime.date.fromisoformat(tarih) - dog[kisi]).days
+        if g < 12 * 365 or g > 50 * 365:   # doğum tarihi hatalı (12 yaşında ligde oynamış oyuncular var)
+            return
+        r_ = tablo[kid].get(kisi)
+        if not r_:
+            tablo[kid][kisi] = [g, f_, g, f_]
+        else:
+            if g < r_[0]: r_[0], r_[1] = g, f_
+            if g > r_[2]: r_[2], r_[3] = g, f_
     for t in mevcut:
         f, ters = tersi[t]
         m = m_[f]
@@ -241,6 +268,7 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
                     r[8] += 1
                     continue
                 kul_sezon[kid][(kisi, m["sezon"])][3] += 1
+                yas_ekle(yas_oy, kid, kisi, f, m["tarih"])
                 kk_ = kul_kart[kid][kisi]
                 kk_[2] += 1
                 kk_[3] = min(kk_[3] or m["sezon"], m["sezon"]); kk_[4] = max(kk_[4] or m["sezon"], m["sezon"])
@@ -272,6 +300,7 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
                         ks[1] += 1
                         kul_lig[kid][x[4]][1] += 1
                     bu_mac[(kid, x[4])] += 1
+                    yas_ekle(yas_gol, kid, x[4], f, m["tarih"])
             elif x[1] == "Y":
                 r[5] += 1
                 kul_sezon[kid][(x[4], m["sezon"])][4] += 1
@@ -292,7 +321,7 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
     okova = collections.defaultdict(dict)
     dizin = []
     kisi_db = os.path.join(KOK, "raw", "kisi.db")   # doğum tarihi/yeri, uyruk (oyuncu.py kisi_ayikla)
-    kb = {k: [d, y, u] for k, d, y, u in sqlite3.connect(kisi_db).execute("SELECT kisi, dogum, yer, uyruk FROM kisi")} if os.path.exists(kisi_db) else {}
+    kb = {k: [DOGUM_DUZELT.get(k, d), y, u] for k, d, y, u in sqlite3.connect(kisi_db).execute("SELECT kisi, dogum, yer, uyruk FROM kisi")} if os.path.exists(kisi_db) else {}
     for kisi, sat in O.items():
         if not kisi:
             continue
@@ -318,6 +347,28 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
             son = f(l[n - 1])[0]
             l = [x for i, x in enumerate(l) if i < n or f(x)[0] == son]
         return l
+    def supheli(k_):
+        """TFF bilinmeyen doğum tarihlerini ilk maçtan 12 yıl geriye yazmış görünüyor (Metin Ülgen: doğum 16.12.1978, ilk maç
+        16.12.1990). İlk maçı 12. doğum gününden önce ya da sonraki 10 gün içinde olanın doğum tarihine güvenilmez
+        (Erkan Aygün: doğum 27.01.1980 yazılı, ama 1991'de oynamış)."""
+        d_, t_ = dog.get(k_), ilk_tarih.get(k_)
+        if not d_ or not t_:
+            return False
+        try:
+            on_iki = d_.replace(year=d_.year + 12)
+        except ValueError:   # 29 Şubat
+            on_iki = d_.replace(year=d_.year + 12, day=28)
+        return (datetime.date.fromisoformat(t_) - on_iki).days <= 10
+    def yas_rekor(kid):
+        A = lambda k_: okunur(ad.get(k_, ""))
+        rakip = lambda f_: m_[f_]["dep_kulup"] if m_[f_]["ev_kulup"] == kid else m_[f_]["ev_kulup"]
+        sat = lambda k_, g, f_: [k_, A(k_), g, m_[f_]["tarih"], f_, rakip(f_)]
+        out = {"yas_alanlar": ["kisi", "ad", "gun", "tarih", "mac", "rakip"], "yas_kapsam": len(dog)}
+        for ad_, t_ in (("", yas_oy), ("_gol", yas_gol)):
+            v = {k_: r for k_, r in t_.get(kid, {}).items() if not supheli(k_)}
+            out["genc" + ad_] = sorted((sat(k_, r[0], r[1]) for k_, r in v.items()), key=lambda x: x[2])[:10]
+            out["yasli" + ad_] = sorted((sat(k_, r[2], r[3]) for k_, r in v.items()), key=lambda x: -x[2])[:10]
+        return out
     for kid, d in kul_oy.items():
         A = lambda k_: okunur(ad.get(k_, ""))
         l = [[k_, A(k_), *v] for k_, v in d.items() if k_]
@@ -338,7 +389,8 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
             "sezon_lig_gol": ilk_n([x for x in ss if x[4]], lambda x: (-x[4], x[2])),
             "sezon_gy": ilk_n([x for x in ss if x[5]], lambda x: (-x[5], x[2])),
             "mac_gol_alanlar": ["kisi", "ad", "gol", "mac", "lig", "tarih", "rakip"],
-            "mac_gol": ilk_n(mg, lambda x: (-x[2], x[5] or "")), "mac_lig_gol": ilk_n([x for x in mg if x[4]], lambda x: (-x[2], x[5] or ""))})
+            "mac_gol": ilk_n(mg, lambda x: (-x[2], x[5] or "")), "mac_lig_gol": ilk_n([x for x in mg if x[4]], lambda x: (-x[2], x[5] or "")),
+            **yas_rekor(kid)})
     for x in genel_gol:
         x[1] = okunur(ad.get(x[0], ""))
     yaz(os.path.join(tff, "rekor.json"), {"mac_gol_alanlar": ["kisi", "ad", "gol", "mac", "tarih", "sezon", "kulup", "rakip", "yarisma", "kademe", "playoff"],

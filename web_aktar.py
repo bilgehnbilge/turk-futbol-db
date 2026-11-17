@@ -101,6 +101,7 @@ def mac_detay(maclar, okunur):
     oyuncular = {}       # UEFA oyuncu no -> [ad, doğum, ülke]
     td_bilgi, td_mac = {}, []   # teknik direktör: UEFA kişi no -> ad; [kişi, maç, kulüp, diziliş]
     katilim = []         # [oyuncu, maç, kulüp, ilk11, gol, sarı, kırmızı, giriş dk, çıkış dk]
+    mac_tarih = {}       # UEFA maç no -> tarih
     for pid, ad, dogum, ulke in u.execute("SELECT oyuncu, ad, MAX(dogum), MAX(ulke) FROM kadro WHERE oyuncu IS NOT NULL GROUP BY oyuncu"):
         oyuncular[pid] = [ad, dogum, ulke]
     for uid, mid, stad, sehir, seyirci, hakem, hakem_ulke in u.execute(
@@ -176,7 +177,18 @@ def mac_detay(maclar, okunur):
             "kadro": [kadro[1], kadro[2]], "teknik": [teknik[1], teknik[2]], **({"istat": istat} if istat else {}),
             "olay_alanlar": ["taraf", "tur", "dk", "ek", "oyuncu", "oyuncu2", "ayrinti", "oyuncu_no", "oyuncu2_no"], "olay": olay})
         out.append(mid)
+        mac_tarih[mid] = m["tarih"]
     kullanilan = {k[0] for k in katilim}
+    # UEFA bazı oyunculara adaşının doğum tarihini yazmış (ör. 1976-85 Galatasaray'da oynayan Ömer Kılıç'a 1971 doğumlu
+    # Bursasporlu Ömer Kılıç'ınki): ilk Avrupa maçında 15 yaşından küçük görünen oyuncunun doğum tarihi gösterilmez
+    ilk_mac = {}
+    for k in katilim:
+        t_ = mac_tarih.get(k[1])
+        if t_ and (k[0] not in ilk_mac or t_ < ilk_mac[k[0]]):
+            ilk_mac[k[0]] = t_
+    for p_, v in oyuncular.items():
+        if v[1] and p_ in ilk_mac and int(ilk_mac[p_][:4]) - int(v[1][:4]) < 15:
+            oyuncular[p_] = [v[0], None, *v[2:]]
     # teknik direktörü oyuncu kaydına bağla: adı (büyük/küçük harf ve aksan farkı gözetmeden) tek bir oyuncuyla tutuyorsa
     import unicodedata
     sade = lambda s: "".join(c for c in unicodedata.normalize("NFKD", (s or "").replace("ı", "i").lower()) if not unicodedata.combining(c)).strip()

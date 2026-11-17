@@ -883,7 +883,7 @@ async function tffOyuncuRekorlari(kap, kid) {
   let d;
   try { d = await al(`${V}tff/kulup/${kid}.json?s=${OZET.surum || ""}`); } catch { return; }
   if (!d.lig_mac) return;
-  const oy = (k, a) => `<a class="bag" href="#/${K}oyuncu/k${k}">${esc(a)}</a>`;
+  const oy = (k, a) => `<a class="bag" href="#/${K}oyuncu/${String(k).startsWith("u") ? k : "k" + k}">${esc(a)}</a>`;   // u…: UEFA oyuncusu (TFF ile eşlenmemiş)
   const sira = (l, f) => { let r = 0, onc; return l.map((x, i) => { const v = f(x); if (v !== onc) { r = i + 1; onc = v; } return [r, x]; }); };
   const kart = (baslik, aciklama, l, deger, alt) => `<div class="kart rekor-kart"><h3>${baslik}</h3>${aciklama ? `<p class="soluk aciklama">${aciklama}</p>` : ""}
     ${l.length ? `<ol class="sirali">${sira(l, deger).slice(0, l.length > 12 ? 10 : 12).map(([r, x]) => `<li><span class="sira">${r}</span><span class="kim">${oy(x[0], x[1])}<small class="soluk">${alt(x)}</small></span><b class="n">${deger(x)}</b></li>`).join("")}</ol>
@@ -908,6 +908,30 @@ async function tffOyuncuRekorlari(kap, kid) {
     ${kart("Bir sezonda en çok sarı kart", BOLUM === "kadin" ? "" : "Lig ve kupa birlikte", d.sezon_sari, x => x[7], x => `${sz(x)} · ${x[6]} maç`)}
     ${kart("Bir sezonda en çok kırmızı kart", "İkinci sarıdan kırmızı dahil", d.sezon_kirmizi, x => x[8], x => `${sz(x)} · ${x[6]} maç`)}
   </div>` : ""}
+  ${d.genc?.length ? (() => {   // yaş rekorları: maç günündeki yaş (tam doğum tarihi bilinen oyuncular)
+    const yasYaz = x => {   // maç günü ve gün farkından doğum tarihi -> "15 yaş 3 ay 18 gün"
+      const m = new Date(x[3] + "T12:00:00Z"), d = new Date(m - x[2] * 864e5);
+      const ay = (dd, n) => { const s = Date.UTC(dd.getUTCFullYear(), dd.getUTCMonth() + n, 1);   // n ay sonrası (ay sonuna kırpılır)
+        const son = new Date(Date.UTC(dd.getUTCFullYear(), dd.getUTCMonth() + n + 1, 0)).getUTCDate();
+        return new Date(s + (Math.min(dd.getUTCDate(), son) - 1) * 864e5 + 432e5); };
+      let n = (m.getUTCFullYear() - d.getUTCFullYear()) * 12 + m.getUTCMonth() - d.getUTCMonth();
+      if (ay(d, n) > m) n--;
+      const y = Math.floor(n / 12), a = n % 12, g = Math.round((m - ay(d, n)) / 864e5);
+      return `${y} yaş${a ? ` ${a} ay` : ""}${g ? ` ${g} gün` : ""}`;
+    };
+    const yasMac = x => `${tarihYaz(x[3])} · ${x[5] != null ? kulupBag(x[5]) : ""} · ${skorBag(x[4], "maç")}`;
+    const yk = (baslik, aciklama, l) => `<div class="kart rekor-kart"><h3>${baslik}</h3><p class="soluk aciklama">${aciklama}</p>
+      ${l.length ? `<ol class="sirali">${l.map((x, i) => `<li><span class="sira">${i + 1}</span><span class="kim">${oy(x[0], x[1])}<small class="soluk">${yasMac(x)}</small></span><b class="n" style="font-size:13px;white-space:nowrap">${yasYaz(x)}</b></li>`).join("")}</ol>` : `<p class="soluk">—</p>`}</div>`;
+    return `<h2 class="bolum">Yaş rekorları</h2>
+  <div class="izgara iki ust-hiza">
+    ${yk("En genç oyuncular", "Kulüpte oynadığı en erken maçtaki yaşı", d.genc)}
+    ${yk("En yaşlı oyuncular", "Kulüpte oynadığı en geç maçtaki yaşı", d.yasli)}
+    ${yk("En genç golcüler", "Kulüp için ilk golündeki yaşı (kendi kalesine hariç)", d.genc_gol)}
+    ${yk("En yaşlı golcüler", "Kulüp için son golündeki yaşı", d.yasli_gol)}
+  </div>
+  <p class="soluk not">Yaş, maç günündeki yaştır; yalnız doğum tarihi tam bilinen oyuncular sayılır (TFF oyuncu sayfalarından, şimdilik ${sayiYaz(d.yas_kapsam || 0)} oyuncu).
+    Az maça çıkmış oyuncuların sayfaları henüz inmediği için özellikle en genç oyuncu listeleri eksik olabilir; indirme tamamlandıkça güncellenecek.</p>`;
+  })() : ""}
   <p class="soluk not">Kaynak: ${BOLUM === "kadin" ? `${KADIN_KAYNAK}.` : "TFF maç sayfaları — lig 1990-91'den (goller 1991-92'den), Türkiye Kupası 1990-2007. Daha eski dönem ve Avrupa maçları bu listelere henüz girmiyor; seyirci kaydı TFF sayfalarında yok."} Yukarıdaki filtreler bu bölümü etkilemez.</p>`;
 }
 
