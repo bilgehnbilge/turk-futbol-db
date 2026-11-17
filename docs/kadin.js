@@ -51,7 +51,7 @@ async function kadinSayfa(sekme = "sezonlar") {
   document.title = "Kadın Futbolu · Türk Futbol Arşivi";
   icerik.innerHTML = `<div class="yukleniyor">Kadın ligleri yükleniyor…</div>`;
   const z = await kOzet();
-  const SEK = [["sezonlar", "#/kadin", "Sezonlar"], ["kulupler", "#/kadin/kulupler", "Kulüpler"], ["oyuncular", "#/kadin/oyuncular", "Oyuncular"]];
+  const SEK = [["sezonlar", "#/kadin", "Sezonlar"], ["krallar", "#/kadin/krallar", "Gol kralları"], ["kulupler", "#/kadin/kulupler", "Kulüpler"], ["oyuncular", "#/kadin/oyuncular", "Oyuncular"]];
   const ust = `${basOn("Kadın Futbolu", `TFF kadın ligleri, ${z.sezonlar[0]}'den bugüne. Erkek liglerinden ayrı tutulur; erkek takımıyla aynı kulüp olanlar "(Kadın)" ekiyle yazılır.`)}
     <div class="kart bolum"><div class="ozet-sat">
       <div><b>${sayiYaz(z.oynanan)}</b><span>Maç</span></div><div><b>${sayiYaz(z.kulupler.length)}</b><span>Kulüp</span></div>
@@ -61,11 +61,26 @@ async function kadinSayfa(sekme = "sezonlar") {
   icerik.innerHTML = ust;
   const ic = $("#kadinIc");
   if (sekme === "sezonlar") {
+    // şampiyonlar: kadin_sampiyon.json (RSSSF / Vikipedi); play-off ve final turlarıyla belirlenen sezonlar tablodan çıkmaz
+    const sampiyonSay = new Map();
+    for (const s of z.sezonlar) { const k = z.sampiyonlar?.[s]; if (k != null) sampiyonSay.set(k, (sampiyonSay.get(k) || 0) + 1); }
     ic.innerHTML = `<div class="sezon-izgara">${[...z.sezonlar].reverse().map(s => `<a href="#/kadin/sezon/${s}">${s}</a>`).join("")}</div>
-      <h2 class="bolum">Gol kralları</h2>
-      <div class="tablo-kap"><table class="tablo"><thead><tr><th>Sezon</th><th class="ad">Lig</th><th class="ad">Oyuncu</th><th class="ad">Kulüp</th><th class="s">Gol</th></tr></thead><tbody>
-      ${[...z.sezonlar].reverse().map(s => { const k = z.krallar[s]?.[1]; return k ? `<tr><td><a class="bag" href="#/kadin/sezon/${s}">${s}</a></td><td class="ad soluk">${esc(kademeAd(s, 1))}</td>
-        <td class="ad">${k.map(x => oyBag(x[0], x[1])).join(", ")}</td><td class="ad">${k.map(x => kBag(x[3])).join(", ")}</td><td class="s"><b>${k[0][2]}</b></td></tr>` : ""; }).join("")}</tbody></table></div>`;
+      <h2 class="bolum">Şampiyonlar</h2>
+      <div class="tablo-kap"><table class="tablo"><thead><tr><th>Sezon</th><th class="ad">Lig</th><th class="ad">Şampiyon</th></tr></thead><tbody>
+      ${[...z.sezonlar].reverse().map(s => { const k = z.sampiyonlar?.[s], var_ = s in (z.sampiyonlar || {});
+        return `<tr><td><a class="bag" href="#/kadin/sezon/${s}">${s}</a></td><td class="ad soluk">${esc(kademeAd(s, 1))}</td>
+        <td class="ad">${k != null ? `<b>${kBag(k)}</b>` : var_ ? `<span class="soluk">${esc(z.sampiyon_not?.[s] || "Şampiyon ilan edilmedi")}</span>` : `<span class="soluk">Sezon sürüyor</span>`}</td></tr>`; }).join("")}</tbody></table></div>
+      <h2 class="bolum">En çok şampiyonluk</h2>
+      <div class="tablo-kap"><table class="tablo"><thead><tr><th class="ad">Kulüp</th><th class="s">Şampiyonluk</th><th class="ad">Sezonlar</th></tr></thead><tbody>
+      ${[...sampiyonSay].sort((a, b) => b[1] - a[1]).map(([k, n]) => `<tr><td class="ad">${kBag(k)}</td><td class="s"><b>${n}</b></td>
+        <td class="ad soluk">${z.sezonlar.filter(s => z.sampiyonlar[s] === k).join(", ")}</td></tr>`).join("")}</tbody></table></div>
+      <p class="soluk not">Şampiyonlar en üst ligin (2021-22'ye kadar Kadınlar 1. Ligi, sonra Kadın Futbol Süper Ligi) sezon sonu sonucudur;
+        play-off ve final turları dahil. Kaynak: RSSSF ve Vikipedi. 2006-07 (Gazi Üniversitesispor) ve öncesi sitede yok, TFF'de maç verisi bulunmuyor.</p>`;
+  } else if (sekme === "krallar") {
+    ic.innerHTML = `<div class="tablo-kap"><table class="tablo"><thead><tr><th>Sezon</th><th class="ad">Lig</th><th class="ad">Oyuncu</th><th class="ad">Kulüp</th><th class="s">Gol</th></tr></thead><tbody>
+      ${[...z.sezonlar].reverse().flatMap(s => Object.keys(z.krallar[s] || {}).sort().map(kd => { const k = z.krallar[s][kd]; return `<tr><td><a class="bag" href="#/kadin/sezon/${s}/${kd}">${s}</a></td><td class="ad soluk">${esc(kademeAd(s, +kd))}</td>
+        <td class="ad">${k.map(x => oyBag(x[0], x[1])).join(", ")}</td><td class="ad">${k.map(x => kBag(x[3])).join(", ")}</td><td class="s"><b>${k[0][2]}</b></td></tr>`; })).join("")}</tbody></table></div>
+      <p class="soluk not">Lig maçlarındaki goller (play-off ve final maçları hariç), TFF maç sayfalarından; kendi kalesine goller ve seri penaltılar sayılmaz. Gruplu liglerde bütün grupların en golcüsü. 2007-08 maç sayfalarında gol yok.</p>`;
   } else if (sekme === "kulupler") {
     const ciz = () => {
       const q = norm(anaDurum.kulupAra);
@@ -132,7 +147,7 @@ async function kadinSezon(sezon, kademeSec) {
 
 yollar.splice(yollar.length - 1, 0,
   [/^#\/kadin$/, () => kadinSayfa("sezonlar")],
-  [/^#\/kadin\/(kulupler|oyuncular)$/, s => kadinSayfa(s)],
+  [/^#\/kadin\/(krallar|kulupler|oyuncular)$/, s => kadinSayfa(s)],
   [/^#\/kadin\/sezon\/([\d-]+)(?:\/(\d))?$/, (s, k) => kadinSezon(s, k)],
   [/^#\/oyuncu\/w(\d+)$/, id => location.replace(`#/kadin/oyuncu/k${id}`)]);   // 17.11'deki ilk sürümün oyuncu bağlantıları
 })();

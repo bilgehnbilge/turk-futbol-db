@@ -139,9 +139,27 @@ def aktar():
         "surum": datetime.datetime.now().strftime("%Y%m%d%H%M"),
         "mac": len(maclar), "oynanan": sum(r[10] is not None for r in maclar), "ayrintili": len(detay),
         "sezonlar": sezonlar, "ligler": {s: sorted(l) for s, l in ligler.items()}, "detayli": [], "detayli_aralik": web_aktar.araliklar(tff_ayr),
-        "kulupler": sorted(kulup.values(), key=lambda k: -k["mac"]), "krallar": krallar, "oyuncu": oyuncu})
+        "kulupler": sorted(kulup.values(), key=lambda k: -k["mac"]), "krallar": krallar, "oyuncu": oyuncu,
+        "sampiyonlar": sampiyonlar(kulup), "sampiyon_not": json.load(open(SAMPIYON, encoding="utf-8")).get("_notlar", {})})
     toplam = sum(os.path.getsize(os.path.join(d, f)) for d, _, fs in os.walk(CIKTI) for f in fs)
     print(f"kadın: {len(maclar)} maç ({len(tff_ayr)} ayrıntılı), {len(kulup)} kulüp, {oyuncu} oyuncu -> {CIKTI} ({toplam / 1e6:.1f} MB)")
+
+
+SAMPIYON = os.path.join(KOK, "kadin_sampiyon.json")
+
+
+def sampiyonlar(kulup):
+    """kadin_sampiyon.json (sezon -> TFF kulüp no) -> sezon -> kulüp kimliği (null: şampiyon yok)."""
+    tff = {v["tff"][0]: k for k, v in kulup.items()}
+    d = json.load(open(SAMPIYON, encoding="utf-8"))
+    out = {}
+    for s, t in d.items():
+        if s.startswith("_"):
+            continue
+        if t is not None and t not in tff:
+            raise SystemExit(f"kadin_sampiyon.json: {s} şampiyonu (TFF {t}) kulüp listesinde yok")
+        out[s] = tff.get(t)
+    return out
 
 
 def gol_krallari(o, tff_kulup):

@@ -1,6 +1,7 @@
 """Kadın futbol ligleri (TFF arşivi pageID=848, 2006-07'den bugüne): sezon/hafta sayfaları ve maç sayfaları.
 
   python3 kadin.py liste     # sezon, grup ve hafta sayfaları -> raw/tff_kadin/<kaynak>_<sezon>_<pageID>/ (kaldığı yerden)
+  python3 kadin.py guncel    # süren sezonun lig sayfaları (GUNCEL; her seferinde baştan)
   python3 kadin.py kur       # raw/tff_kadin -> raw/kadin.db (topla.py'nin ayrıştırıcısıyla; erkek verisinden ayrı)
   python3 kadin.py mac       # maç sayfaları -> raw/tff_kadin_mac/<son iki hane>/<macId>.html.gz (kaldığı yerden)
   python3 kadin.py ayikla    # maç sayfaları -> raw/kadin_detay.db (kadro, gol, kart...)
@@ -38,6 +39,9 @@ SEZONLAR = [
     ("ks", "2024-2025", 1735), ("k1", "2024-2025", 1736), ("k2", "2024-2025", 1737), ("k3", "2024-2025", 1738),
     ("ks", "2025-2026", 1781), ("k1", "2025-2026", 1782), ("k2", "2025-2026", 1783), ("k3", "2025-2026", 1792),
 ]
+# Süren sezon: TFF'nin güncel lig sayfaları (arşive geçmemiş; her çalıştırmada baştan indirilir). 3. Lig yeni sezona
+# geçmediyse sayfası eski sezonu gösterir; o zaman atlanır.
+GUNCEL = [("ks", 1000), ("k1", 1602), ("k2", 1001), ("k3", 1298)]
 LIG_AD = {"ks": "Kadın Futbol Süper Ligi", "k1": "Kadınlar 1. Ligi", "k2": "Kadınlar 2. Ligi", "k3": "Kadınlar 3. Ligi", "kb": "Kadınlar Bölgesel Ligi"}
 
 
@@ -62,6 +66,32 @@ def liste():
     for kaynak, sezon, pid in SEZONLAR:
         topla.sezon_indir(d, kaynak, sezon, pid)
     print("Bitti, yeni indirilen sayfa:", d.indirilen)
+
+
+def simdiki_sezon():
+    import datetime
+    b = datetime.date.today()
+    y = b.year if b.month >= 7 else b.year - 1
+    return f"{y}-{y + 1}"
+
+
+def guncel():
+    """Süren sezonun lig sayfaları -> raw/tff_kadin/<kaynak>_<sezon>_<pageID>/ (her seferinde baştan)."""
+    import shutil
+    topla.HAM = HAM
+    d = topla.Indirici()
+    sezon = simdiki_sezon()
+    for kaynak, pid in GUNCEL:
+        klasor = os.path.join(HAM, f"{kaynak}_{sezon}_{pid}")
+        if os.path.isdir(klasor):
+            shutil.rmtree(klasor)
+        topla.sezon_indir(d, kaynak, sezon, pid)
+        giris = os.path.join(klasor, "giris.html")
+        t = open(giris, encoding="cp1254", errors="replace").read() if os.path.exists(giris) else ""
+        if not any((m["tarih"] or "") >= f"{sezon[:4]}-08-01" for m in topla.maclar(t) or []):
+            print(f"{kaynak} {sezon}: sayfa henüz yeni sezona geçmemiş, atlandı", flush=True)
+            shutil.rmtree(klasor, ignore_errors=True)
+    print("Bitti, indirilen sayfa:", d.indirilen)
 
 
 def kur():
@@ -127,4 +157,4 @@ def durum():
 
 
 if __name__ == "__main__":
-    {"liste": liste, "kur": kur, "mac": mac, "ayikla": ayikla, "site": lambda: __import__("kadin_site").aktar(), "durum": durum}[sys.argv[1]]()
+    {"liste": liste, "guncel": guncel, "kur": kur, "mac": mac, "ayikla": ayikla, "site": lambda: __import__("kadin_site").aktar(), "durum": durum}[sys.argv[1]]()
