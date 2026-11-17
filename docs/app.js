@@ -983,7 +983,26 @@ async function oyuncuSayfa(no, tdNo) {
     <div><b>${top.sari}</b><span>Sarı kart</span></div><div><b>${top.kirmizi}</b><span>Kırmızı kart</span></div>
     ${top.dk ? `<div><b>${sayiYaz(top.dk)}</b><span>Dakika*</span></div>` : ""}</div>
     ${top.dk ? `<p class="soluk not" style="margin:8px 0 0">* Dakika bilgisi UEFA'nın istatistik tuttuğu maçlardan.</p>` : ""}</div>` : ""}
-  <div class="izgara iki bolum ust-hiza">${kulupler.map(([kid, l]) => `<div class="kart"><h3>${kid != null && KULUP.has(kid) ? kulupBag(kid) : esc(kulupAd(kid))}</h3>
+  ${ks.length ? (() => {   // kulüp ve sezon tabloları: oyuncunun katkısı ve oynadığı maçlarda takımın sonuçları
+    const say = l => l.reduce((t, k) => (t.mac++, t.ilk += k.ilk11, t.gol += k.gol, t.sari += k.sari, t.kirmizi += k.kirmizi, t.dk += k.dakika || 0, t[k.s] = (t[k.s] || 0) + 1, t),
+      { mac: 0, ilk: 0, gol: 0, sari: 0, kirmizi: 0, dk: 0, G: 0, B: 0, M: 0 });
+    const hucre = t => `<td class="s"><b>${t.mac}</b></td><td class="s">${t.ilk}</td><td class="s"><b>${t.gol || ""}</b></td><td class="s">${t.sari || ""}</td><td class="s">${t.kirmizi || ""}</td>
+      <td class="s">${t.dk ? sayiYaz(t.dk) : ""}</td><td class="s">${t.G}</td><td class="s">${t.B}</td><td class="s">${t.M}</td><td class="s">%${yuzde(t.G, t.mac)}</td>`;
+    const bas_ = ek => `<thead><tr>${ek.map((x, i) => `<th${i ? ' class="ad"' : ""}>${x}</th>`).join("")}<th class="s">Maç</th><th class="s" title="İlk 11'de başladığı maç">İlk 11</th>
+      <th class="s">Gol</th><th class="s" title="Sarı kart">Sarı</th><th class="s" title="Kırmızı kart">Kırm.</th><th class="s" title="UEFA'nın istatistik tuttuğu maçlarda">Dakika</th>
+      <th class="s" title="Oynadığı maçlarda takımının galibiyeti">G</th><th class="s">B</th><th class="s">M</th><th class="s" title="Galibiyet yüzdesi">G%</th></tr></thead>`;
+    const sezonlar = [...ks.reduce((m, k) => { const x = `${k.sezon}|${k.kulup}`; return m.set(x, [...(m.get(x) || []), k]); }, new Map())];
+    return `<div class="tablo-kap bolum"><table class="tablo">${bas_(["Kulüp"])}<tbody>
+      ${kulupler.map(([kid, l]) => `<tr><td class="ad">${kid != null && KULUP.has(kid) ? kulupBag(kid) : esc(kulupAd(kid))}</td>${hucre(say(l))}</tr>`).join("")}
+      ${kulupler.length > 1 ? `<tr class="toplam"><td class="ad"><b>Toplam</b></td>${hucre(say(ks))}</tr>` : ""}</tbody></table></div>
+    <h3 class="bolum">Sezon sezon</h3>
+    <div class="tablo-kap"><table class="tablo">${bas_(["Sezon", "Kulüp", "Kupa"])}<tbody>${sezonlar.map(([x, l]) => {
+      const [sz, kid] = x.split("|");
+      return `<tr><td><a class="bag" href="#/${K}sezon/${sz}">${sz}</a></td><td class="ad">${kulupBag(+kid)}</td><td class="ad soluk">${[...new Set(l.map(m => m.lig))].map(esc).join(", ")}</td>${hucre(say(l))}</tr>`;
+    }).join("")}</tbody></table></div>
+    <h3 class="bolum">Maçlar</h3>`;
+  })() : ""}
+  <div class="izgara iki ust-hiza">${kulupler.map(([kid, l]) => `<div class="kart"><h3>${kid != null && KULUP.has(kid) ? kulupBag(kid) : esc(kulupAd(kid))}</h3>
     <p class="soluk" style="margin:0 0 6px;font-size:13px">${l.length} maç · ${l.reduce((s, k) => s + k.gol, 0)} gol · ${l.at(-1).sezon} – ${l[0].sezon}</p>
     <div class="tabelalar">${l.map(m => `${tabelaSatir(m, true)}<div class="katki">${m.ilk11 ? "İlk 11" : `${m.giris}'de girdi`}${m.cikis != null ? ` · ${m.cikis}'de çıktı` : ""}${m.gol ? ` · ${"⚽".repeat(m.gol)}` : ""}${m.sari ? " · 🟨" : ""}${m.kirmizi ? " · 🟥" : ""}</div>`).join("")}</div></div>`).join("")}</div>
   </div>
