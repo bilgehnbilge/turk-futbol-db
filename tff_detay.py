@@ -291,11 +291,13 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
         shutil.rmtree(odir)
     okova = collections.defaultdict(dict)
     dizin = []
+    kisi_db = os.path.join(KOK, "raw", "kisi.db")   # doğum tarihi/yeri, uyruk (oyuncu.py kisi_ayikla)
+    kb = {k: [d, y, u] for k, d, y, u in sqlite3.connect(kisi_db).execute("SELECT kisi, dogum, yer, uyruk FROM kisi")} if os.path.exists(kisi_db) else {}
     for kisi, sat in O.items():
         if not kisi:
             continue
         satir = sorted([[*a, *v] for a, v in sat.items() if v[0] or v[8]], key=lambda x: (x[0], x[2]))
-        okova[kisi % 500][kisi] = {"ad": okunur(ad.get(kisi, "")), "s": satir}
+        okova[kisi % 500][kisi] = {"ad": okunur(ad.get(kisi, "")), "s": satir, **({"d": kb[kisi]} if kisi in kb and any(kb[kisi]) else {})}
         if not any(s[4] for s in satir):
             continue   # hiç oynamamış (yalnız yedek kulübesi): sayfası var (maç kadrolarından bağlantı), arama dizininde yok
         mac = sum(s[4] for s in satir)

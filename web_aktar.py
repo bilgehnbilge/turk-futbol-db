@@ -238,7 +238,7 @@ def main():
     c = sqlite3.connect(DB)
     c.row_factory = sqlite3.Row
     # Ham kaynağı yerelde duran çıktılar (GitHub Actions'ta raw/ yok): kaynak yoksa eski dosyalar korunur
-    koru = [a for a, kaynak in (("mac", "uefa_detay.db"), ("oyuncu_uefa.json", "uefa_detay.db"), ("teknik.json", "oyuncu.db"), ("tff", "oyuncu.db"), ("kadin", "kadin.db"), ("mk", "mackolik_detay.jsonl"))
+    koru = [a for a, kaynak in (("mac", "uefa_detay.db"), ("oyuncu_uefa.json", "uefa_detay.db"), ("teknik.json", "oyuncu.db"), ("tff", "oyuncu.db"), ("kadin", "kadin.db"), ("mk", "mackolik_detay.jsonl"), ("oyuncu_bag.json", "oyuncu.db"))
             if not os.path.exists(os.path.join(KOK, "raw", kaynak)) and os.path.exists(os.path.join(CIKTI, a))]
     gecici = CIKTI + ".korunan"
     if os.path.isdir(gecici):
@@ -368,6 +368,11 @@ def main():
     # ---- Maçkolik maç olayları: Süper Lig 1959-1991, 1. Lig 1990-91 (mackolik_olay.py) -> data/mk/
     import mackolik_olay
     mk_ayr = mackolik_olay.aktar(maclar, CIKTI, yaz, okunur)
+
+    # ---- UEFA oyuncusu -> TFF oyuncusu (oyuncu_bag.py; ad + ortak sezon-kulüp + doğum yılı) -> data/oyuncu_bag.json
+    if os.path.exists(os.path.join(KOK, "raw", "oyuncu.db")):
+        import oyuncu_bag
+        oyuncu_bag.bagla(yaz)
 
     # ---- A Milli Takım (milli.py; milli_maclar.json depoda) -> data/milli.json, data/milli_detay.json
     import milli

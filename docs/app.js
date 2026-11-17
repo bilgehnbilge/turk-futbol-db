@@ -791,6 +791,7 @@ async function avrupaOyunculari(hedef, kid) {
 
 // ---------------------------------------------------------------- TFF oyuncu sayfası (lig ve kupa: TFF maç sayfalarından)
 const KADIN_KAYNAK = "TFF maç sayfaları (kadın ligleri; kadro ve goller 2008-09'dan bugüne)";
+const okunurYer = s => String(s || "").split(" ").map(w => w.length > 2 ? w[0] + w.slice(1).replace(/I/g, "ı").replace(/İ/g, "i").toLocaleLowerCase("tr") : w).join(" ");
 const tffYarAd = (yar, kademe) => yar === "L" ? (KADEME_AD[kademe] || "Lig") : YAR_AD[yar] || yar;
 async function tffOyuncuSayfa(kisi) {
   icerik.innerHTML = `<div class="yukleniyor">Yükleniyor…</div>`;
@@ -828,9 +829,17 @@ async function tffOyuncuSayfa(kisi) {
   const yarlar = grupla(S, r => r.yar === "L" ? "L" + r.kademe : r.yar).sort((a, b) => a[0].localeCompare(b[0]));
   const kulupler = grupla(S, r => r.kulup).sort((a, b) => topla(b[1]).mac - topla(a[1]).mac);
   const sezonlar = grupla(S, r => `${r.sezon}|${r.kulup}`).sort((a, b) => b[0].localeCompare(a[0]));
+  const B = BOLUM === "erkek" ? await oyuncuBagAl() : {};
+  const uNo = Object.keys(B).find(u => B[u] === kisi) || null;
+  const [dg, dyer, uyruk] = p.d || [];
+  const dogumYaz = dg ? (["01-01", "07-01"].includes(dg.slice(5)) ? dg.slice(0, 4) : tarihYaz(dg)) : null;
   icerik.innerHTML = `
   <div class="sayfa-bas"><div><h1>${esc(p.ad)}</h1>
-    <p class="soluk">${ilk.slice(0, 4)}–${son.slice(5) || son.slice(0, 4)} · ${kulupler.map(([k]) => kulupBag(k)).join(", ")}</p></div></div>
+    <p class="soluk">${ilk.slice(0, 4)}–${son.slice(5) || son.slice(0, 4)} · ${kulupler.map(([k]) => kulupBag(k)).join(", ")}</p>
+    ${dogumYaz || dyer || uyruk ? `<p class="soluk">${[dogumYaz ? `Doğum: ${dogumYaz}${dyer ? `, ${esc(okunurYer(dyer))}` : ""}` : dyer ? `Doğum yeri: ${esc(okunurYer(dyer))}` : "", uyruk && uyruk !== "TC" ? `Uyruk: ${esc(uyruk)}` : ""].filter(Boolean).join(" · ")}</p>` : ""}</div></div>
+  ${uNo ? `<nav class="sekmeler bolum" id="oySekme"><a href="#" data-k="lk" class="aktif">Lig ve kupa <small class="soluk">${sayiYaz(T.mac)} maç</small></a>
+    <a href="#" data-k="av">Avrupa <small class="soluk" id="avSay"></small></a><a href="#" data-k="td" hidden>Teknik direktör <small class="soluk" id="tdSay"></small></a></nav>` : ""}
+  <div id="sk-lk">
   <div class="kart bolum"><div class="ozet-sat">
     <div><b>${sayiYaz(T.mac)}</b><span>Maç</span></div><div><b>${sayiYaz(T.ilk)}</b><span>İlk 11</span></div><div><b>${T.gol}</b><span>Gol</span></div>
     <div><b>${T.pen}</b><span>Penaltı golü</span></div><div><b>${T.sari}</b><span>Sarı kart</span></div><div><b>${T.kirmizi}</b><span>Kırmızı kart</span></div>
@@ -848,8 +857,23 @@ async function tffOyuncuSayfa(kisi) {
   <p class="soluk not">Kaynak: <a class="bag" href="https://www.tff.org/Default.aspx?pageId=30&kisiId=${kisi}" target="_blank" rel="noopener">TFF</a> ${BOLUM === "kadin" ? "maç sayfaları (kadın ligleri, 2008-09'dan bugüne)." : "maç sayfaları (lig 1990-91'den, gol dakikaları 1991-92'den; Türkiye Kupası 1990-2007)."}
     Ligler bugünkü adlarıyla gösteriliyor (1. kademe: ${esc(KADEME_AD[1])}, 2. kademe: ${esc(KADEME_AD[2])}…). Dakika, oyuna giriş-çıkış ve kırmızı kart dakikalarından hesaplanan yaklaşık süredir; uzatmalar sayılmaz.
     ${kaleci ? "Kaleci istatistikleri ilk 11'de kaleci olarak başladığı maçlardan (TFF kadroyu kaleciyle başlatıyor); oyundan çıktığı maçlarda da bütün maçın skoru sayılır, hükmen maçlar hariç." : ""}
-    ${BOLUM === "erkek" ? "Avrupa maçları ve 1990 öncesi henüz bu sayfada yok." : ""}</p>
+    ${BOLUM === "erkek" ? `${uNo ? "Avrupa maçları UEFA'dan (Avrupa sekmesi)." : "Avrupa maçı kaydı bu oyuncuyla eşlenmedi."} 1990 öncesi maçlar henüz bu sayfada yok.` : ""}</p>
+  </div>
+  <div id="sk-av" hidden></div><div id="sk-td" hidden></div>
   <div id="milliOyuncu"></div>`;
+  if (uNo) {
+    const n = await oyuncuSayfa(uNo, null, { oy: $("#sk-av"), td: $("#sk-td") });
+    if (n) {
+      $("#avSay").textContent = `${n.oy} maç`;
+      if (n.td) { const a = $('#oySekme a[data-k="td"]'); a.hidden = false; $("#tdSay").textContent = `${n.td} maç`; }
+      if (!n.oy) $('#oySekme a[data-k="av"]').hidden = true;
+    }
+    icerik.querySelectorAll("#oySekme a").forEach(a => a.addEventListener("click", e => {
+      e.preventDefault();
+      icerik.querySelectorAll("#oySekme a").forEach(x => x.classList.toggle("aktif", x === a));
+      for (const k of ["lk", "av", "td"]) $("#sk-" + k).hidden = a.dataset.k !== k;
+    }));
+  }
   if (BOLUM === "erkek" && typeof milliOyuncu === "function") milliOyuncu($("#milliOyuncu"), kisi, false);
 }
 
@@ -924,8 +948,11 @@ function oyuncuAra(q, adet = 5) {
 }
 
 // ---------------------------------------------------------------- oyuncu sayfası (şimdilik UEFA: Avrupa maçları)
-async function oyuncuSayfa(no, tdNo) {
-  icerik.innerHTML = `<div class="yukleniyor">Yükleniyor…</div>`;
+// UEFA oyuncusu -> TFF oyuncusu (oyuncu_bag.py): eşlenen oyuncunun tek sayfası TFF sayfasıdır, Avrupa maçları orada sekmede
+let OYUNCU_BAG = null;
+const oyuncuBagAl = async () => OYUNCU_BAG ||= await al(`data/oyuncu_bag.json?s=${OZET.surum || ""}`).catch(() => ({}));
+async function oyuncuSayfa(no, tdNo, hedef) {
+  if (!hedef) icerik.innerHTML = `<div class="yukleniyor">Yükleniyor…</div>`;
   const [d, av] = await Promise.all([al(`data/oyuncu_uefa.json?s=${OZET.surum || ""}`), al(`data/avrupa.json?s=${OZET.surum || ""}`)]);
   // teknik direktör sayfası oyuncu kaydına bağlıysa oyuncu sayfasına yönlen; oyuncunun teknik direktörlük kaydını bul
   if (tdNo?.startsWith("a")) {   // TFF antrenör no: UEFA kaydıyla birleşmişse oraya git
@@ -933,12 +960,13 @@ async function oyuncuSayfa(no, tdNo) {
     if (k && k !== tdNo) { location.replace(`#/oyuncu/${k.startsWith("t") ? "t" + k.slice(1) : k}`); return; }
   }
   if (tdNo && d.td_oyuncu[tdNo]) { location.replace(`#/oyuncu/u${d.td_oyuncu[tdNo]}`); return; }
+  if (!hedef && no) { const B = await oyuncuBagAl(); if (B[no]) { location.replace(`#/oyuncu/k${B[no]}`); return; } }
   if (!tdNo) tdNo = Object.keys(d.td_oyuncu).find(k => d.td_oyuncu[k] === no) || null;
   const T0 = tdNo?.startsWith("a") ? await al(`data/teknik.json?s=${OZET.surum || ""}`) : null;
   const o = no ? d.oyuncu[no] : d.td[tdNo] ? [d.td[tdNo], null, null] : T0?.kisi[tdNo] ? [T0.kisi[tdNo][0], null, null] : null;
   if (!o) { icerik.innerHTML = `<div class="bos">Kişi bulunamadı.</div>`; return; }
   const [ad, dogum, ulke] = o;
-  document.title = `${ad} · Türk Futbol Arşivi`;
+  if (!hedef) document.title = `${ad} · Türk Futbol Arşivi`;
   const mac = new Map(av.maclar.map(r => [r[0], r]));
   const ks = d.katilim.filter(k => k[0] === no).map(k => {
     const r = mac.get(k[1]); const ev = r[5] === k[2];
@@ -979,7 +1007,7 @@ async function oyuncuSayfa(no, tdNo) {
     }).join("")}</tbody></table></div>
     <p class="soluk not">Lig ve kupa maçları TFF maç sayfalarından (dört profesyonel lig 1990-91'den, Türkiye Kupası 1990-2007 ve 2007 sonrası özel kupalar), Avrupa maçları UEFA'dan. Maç başı puan bütün sezonlarda galibiyet 3 puanla hesaplandı; hükmen maçlar dahil değil.</p>`;
   })();
-  icerik.innerHTML = `
+  const html = `
   <div class="sayfa-bas"><div><h1>${esc(ad)}</h1>
     <p class="soluk">${ulke ? (ULKE[ulke] ? ulkeHtml(ulke) : ulke === "TUR" ? `${bayrak("TUR")} Türkiye` : esc(ulke)) : ""}${yas ? ` · Doğum: ${yas}` : ""}</p></div></div>
   ${ks.length && td.length ? `<nav class="sekmeler bolum">
@@ -1016,7 +1044,14 @@ async function oyuncuSayfa(no, tdNo) {
     <div class="tabelalar">${l.map(m => `${tabelaSatir(m, true)}<div class="katki">${m.ilk11 ? "İlk 11" : `${m.giris}'de girdi`}${m.cikis != null ? ` · ${m.cikis}'de çıktı` : ""}${m.gol ? ` · ${"⚽".repeat(m.gol)}` : ""}${m.sari ? " · 🟨" : ""}${m.kirmizi ? " · 🟥" : ""}</div>`).join("")}</div></div>`).join("")}</div>
   </div>
   <div id="sk-td" ${ks.length && td.length && ks.length >= td.length ? "hidden" : ""}>${tdHtml}</div>
-  <p class="soluk not bolum">Kaynak: UEFA. Şimdilik yalnız Türk takımlarının Avrupa kupası maçları; lig maçları TFF verisi işlendikten sonra eklenecek.</p>`;
+  <p class="soluk not bolum">Kaynak: UEFA (Türk takımlarının Avrupa kupası maçları)${tdHtml ? "; teknik direktörlükte lig ve kupa maçları TFF maç sayfalarından" : ""}.</p>`;
+  if (hedef) {   // TFF oyuncu sayfasının Avrupa ve teknik direktör sekmeleri
+    const g = document.createElement("div"); g.innerHTML = html;
+    hedef.oy.replaceChildren(...g.querySelector("#sk-oy").childNodes);
+    hedef.td.replaceChildren(...g.querySelector("#sk-td").childNodes);
+    return { oy: ks.length, td: td.length };
+  }
+  icerik.innerHTML = html;
 
   icerik.querySelectorAll(".sekmeler a[data-k]").forEach(a => a.addEventListener("click", e => {
     e.preventDefault();

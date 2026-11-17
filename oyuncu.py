@@ -5,6 +5,7 @@
   python3 oyuncu.py ayikla                                               # raw/oyuncu.db
   python3 oyuncu.py uyum                                                 # mac_bilgi.gol_uyum: gol listesi skorla tutuyor mu
   python3 oyuncu.py kisi [--bekle 2]                                     # raw/tff_kisi/<..>/<kisiId>.html.gz: oyuncu sayfaları
+  python3 oyuncu.py kisi_ayikla                                          # raw/tff_kisi -> raw/kisi.db (doğum tarihi/yeri, uyruk)
   python3 oyuncu.py durum                                                # kaç sayfa indi / kaldı
 
 Sayfa: https://www.tff.org/Default.aspx?pageID=29&macId=<macId>  (macId = tff.db'deki kaynak_id)
@@ -42,6 +43,30 @@ def hedefler(kademe=None, sezon=None):
         return [m for m, _ in sirali]
     ek = open(yoklama).read().split()
     return [m for m, k in sirali if k == 1] + ek + [m for m, k in sirali if k != 1]
+
+
+AYLAR = {a: i for i, a in enumerate(["ocak", "şubat", "mart", "nisan", "mayıs", "haziran", "temmuz", "ağustos", "eylül", "ekim", "kasım", "aralık"], 1)}
+KISI_DB = os.path.join(KOK, "raw", "kisi.db")
+
+
+def kisi_ayikla():
+    """İnmiş TFF oyuncu sayfaları (raw/tff_kisi) -> raw/kisi.db: ad, doğum tarihi, doğum yeri, uyruk."""
+    import html as H
+    c = sqlite3.connect(KISI_DB)
+    c.execute("DROP TABLE IF EXISTS kisi")
+    c.execute("CREATE TABLE kisi(kisi INTEGER PRIMARY KEY, ad TEXT, dogum TEXT, yer TEXT, uyruk TEXT)")
+    al = lambda t, k: (lambda m: " ".join(H.unescape(re.sub(r"<[^>]+>", "", m.group(1))).split()) if m else "")(
+        re.search(r'oyuncuBilgileri_' + k + r'"[^>]*>(.*?)</', t, re.S))
+    satir = []
+    for f in glob.glob(os.path.join(KISI_HAM, "*", "*.html.gz")):
+        t = gzip.open(f).read().decode("cp1254", "replace")
+        g = re.match(r"(\d{1,2})\s+(\S+)\s+(\d{4})", al(t, "Label2"))
+        ay = AYLAR.get(g.group(2).replace("I", "ı").replace("İ", "i").lower()) if g else None
+        dogum = f"{g.group(3)}-{ay:02d}-{int(g.group(1)):02d}" if g and ay else None
+        satir.append((int(os.path.basename(f)[:-8]), topla.temiz(al(t, "lblAdi")), dogum, topla.temiz(al(t, "Label1")) or None, al(t, "Label3") or None))
+    c.executemany("INSERT INTO kisi VALUES(?,?,?,?,?)", satir)
+    c.commit()
+    print(f"{len(satir)} oyuncu sayfası -> {KISI_DB}; doğum tarihi olan: {sum(1 for r in satir if r[2])}")
 
 
 def kupa_hedefleri():
@@ -403,9 +428,9 @@ def durum():
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("komut", choices=["indir", "kupa", "ayikla", "durum", "ek", "uyum", "kisi"])
+    p.add_argument("komut", choices=["indir", "kupa", "kisi_ayikla", "ayikla", "durum", "ek", "uyum", "kisi"])
     p.add_argument("--kademe", type=int)
     p.add_argument("--sezon")
     p.add_argument("--bekle", type=float, default=2.0)
     a = p.parse_args()
-    {"indir": lambda: indir(a.kademe, a.sezon, a.bekle), "kupa": lambda: (kupa_gruplari(), indir(None, None, a.bekle, kupa=True)), "ayikla": ayikla, "durum": durum, "ek": ek_maclar, "uyum": gol_uyum, "kisi": lambda: kisi_indir(a.bekle)}[a.komut]()
+    {"indir": lambda: indir(a.kademe, a.sezon, a.bekle), "kupa": lambda: (kupa_gruplari(), indir(None, None, a.bekle, kupa=True)), "kisi_ayikla": kisi_ayikla, "ayikla": ayikla, "durum": durum, "ek": ek_maclar, "uyum": gol_uyum, "kisi": lambda: kisi_indir(a.bekle)}[a.komut]()
