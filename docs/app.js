@@ -652,9 +652,10 @@ function macCiz(d) {
   const onek = d.oyuncuOnek || "u";
   const [eg, dg, ep, dp, durum] = d.skor;
   document.title = `${d.ev[1]} ${eg}-${dg} ${d.dep[1]} · Türk Futbol Arşivi`;
-  const ad = ([kid, a]) => kid != null && KULUP.has(kid) ? `<a href="#/kulup/${kid}">${esc(a)}</a>` : esc(a);
-  const buyuk = ([kid, a], i) => { const k = KULUP.get(kid), tema = takimTema(k);
-    return `<a class="taraf ${i ? "sag" : ""}" ${kid != null ? `href="#/kulup/${kid}"` : ""} style="--tr:${tema ? tema["--tv-acik"] : "var(--yazi)"}">
+  const href = d.kulupHref || (kid => kid != null && KULUP.has(kid) ? `#/kulup/${kid}` : null);   // kadın bölümü kendi kulüp bağlantısını verir
+  const ad = ([kid, a]) => href(kid) ? `<a href="${href(kid)}">${esc(a)}</a>` : esc(a);
+  const buyuk = ([kid, a], i) => { const k = d.kulupBilgi ? d.kulupBilgi(kid) : KULUP.get(kid), tema = takimTema(k);
+    return `<a class="taraf ${i ? "sag" : ""}" ${href(kid) ? `href="${href(kid)}"` : ""} style="--tr:${tema ? tema["--tv-acik"] : "var(--yazi)"}">
       <span class="buyuk-logo">${k?.logo ? `<img src="logo/${k.logo}.png" alt="">` : d.bayrak?.[i] ? d.bayrak[i] : esc(a.slice(0, 2).toLocaleUpperCase("tr"))}</span><span class="ad">${esc(a)}</span></a>`; };
   const dakika = o => o[2] == null ? "" : `${o[2]}${o[3] ? "+" + o[3] : ""}'`;
   // oyuncuya göre olay simgeleri (kadroda göstermek için)

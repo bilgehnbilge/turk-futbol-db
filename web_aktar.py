@@ -238,7 +238,7 @@ def main():
     c = sqlite3.connect(DB)
     c.row_factory = sqlite3.Row
     # Ham kaynağı yerelde duran çıktılar (GitHub Actions'ta raw/ yok): kaynak yoksa eski dosyalar korunur
-    koru = [a for a, kaynak in (("mac", "uefa_detay.db"), ("oyuncu_uefa.json", "uefa_detay.db"), ("teknik.json", "oyuncu.db"), ("tff", "oyuncu.db"))
+    koru = [a for a, kaynak in (("mac", "uefa_detay.db"), ("oyuncu_uefa.json", "uefa_detay.db"), ("teknik.json", "oyuncu.db"), ("tff", "oyuncu.db"), ("kadin", "kadin.db"))
             if not os.path.exists(os.path.join(KOK, "raw", kaynak)) and os.path.exists(os.path.join(CIKTI, a))]
     gecici = CIKTI + ".korunan"
     if os.path.isdir(gecici):
@@ -388,6 +388,11 @@ def main():
     # kırmızı kart analizi: kirmizi.py yerelde (TFF maç sayfalarıyla) üretir; depodaki sonuç dosyası siteye kopyalanır
     if os.path.exists(os.path.join(KOK, "kirmizi_kart.json")):
         shutil.copy(os.path.join(KOK, "kirmizi_kart.json"), os.path.join(CIKTI, "kirmizi.json"))
+
+    # ---- kadın ligleri (kadin_site.py; raw/kadin.db) -> data/kadin/ (ayrı bölüm; kulupler.json'dan sonra: ortak kulüp adları)
+    if os.path.exists(os.path.join(KOK, "raw", "kadin.db")):
+        import kadin_site
+        kadin_site.aktar()
 
     say = {r[0]: r[1] for r in c.execute("SELECT yarisma, COUNT(*) FROM mac GROUP BY 1")}
     kapsam = [list(r) for r in c.execute("SELECT kademe, sezon, grup, takim, bulunan, beklenen FROM kapsam")]
