@@ -1308,7 +1308,7 @@ function hakkindaSayfa() {
     <li><b>TFF</b>: 1984-85'ten bugüne Süper Lig, 1990-91'den bugüne alt ligler ve 1994-95'ten sonraki kupa eşleşmeleri.</li>
     <li><b>Maçkolik</b> (yeni site ve arşiv): 1959-1990 arası ligler, Türkiye Kupası ve Avrupa kupaları.</li>
     <li><b>RSSSF ve Vikipedi</b>: 1995-2003 Intertoto maçları; kulüp ardıllıkları ve eski adlar; 1966'dan bugüne Cumhurbaşkanlığı (1981-82'de Devlet Başkanlığı) Kupası, TFF Süper Kupa ve Başbakanlık Kupası maçları (1991-2006 arası TFF maç sayfalarından).</li>
-    <li><b>Kulüp logoları</b>: Football Manager topluluk logo paketi (TCM), kulüplerin bugünkü logoları; FM kimlikleri Sortitoutsi'den eşlendi; pakette olmayan kulüplerde Türkçe Vikipedi'deki arma. Logolar kulüplerin tescilli markasıdır.</li>
+    <li><b>Kulüp logoları</b>: Football Manager topluluk logo paketi (TCM), kulüplerin bugünkü logoları; FM kimlikleri Sortitoutsi'den eşlendi; pakette olmayan kulüplerde Türkçe Vikipedi'deki arma. Kadın kulüplerinde erkek takımıyla aynı kulüpse onun logosu, değilse TFF maç sayfalarındaki kulüp logosu. Logolar kulüplerin tescilli markasıdır.</li>
   </ul>
   <h2 class="bolum">Kulüpler nasıl eşlendi</h2>
   <p>Her kulüp TFF kulüp numarasına göre tanımlanır. 1990 öncesi kayıtlar, puan tablosu imzası ve ad benzerliğiyle TFF numarasına bağlandı. Aynı adı taşıyan ama farklı olan kulüpler (ör. 1984 Muşspor ile 2015 Muşspor) ayrı tutulur; bir kulübün yerine kurulan ya da hakkını devralan kulüp "ardıl" olarak gösterilir. Maçlarda takımın o dönemki adı yazar.</p>

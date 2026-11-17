@@ -56,7 +56,9 @@ def aktar():
             gorunen = son + " (Kadın)"
         else:
             gorunen = son
-        kulup[kid] = {"id": kid, "ad": gorunen, "adlar": adlar, "tff": tff, **({"logo": e["logo"]} if e and e.get("logo") else {}),
+        # logo: erkek takımıyla aynı kulüpse onun logosu (FM paketi), yoksa TFF maç sayfasındaki logo (kadin_logo.py)
+        logo = e["logo"] if e and e.get("logo") else f"tk{tff}" if os.path.exists(os.path.join(KOK, "docs", "logo", f"tk{tff}.png")) else None
+        kulup[kid] = {"id": kid, "ad": gorunen, "adlar": adlar, "tff": tff, **({"logo": logo} if logo else {}),
                       **({"erkek": e["id"]} if e else {}), **({"renk": e["renk"]} if e and e.get("renk") else {})}
 
     # ---- maçlar
