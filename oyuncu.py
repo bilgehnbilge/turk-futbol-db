@@ -48,11 +48,25 @@ def kupa_hedefleri():
     """Türkiye Kupası maçları: TFF kupa arşivinin sezon sayfaları (raw/tff_kupa/kupa_<sezon>_<pageID>.html; arşiv pageID=411),
     skoru olan maçlar, en yeni sezondan geriye."""
     out, gor = [], set()
-    for f in sorted(glob.glob(os.path.join(KOK, "raw", "tff_kupa", "kupa_*.html")), reverse=True):
+    # grup aşamaları ayrı grup/hafta sayfalarında (kupa_gruplari): raw/tff_kupa_grup/kupa_<sezon>_<pageID>/
+    dosyalar = sorted(glob.glob(os.path.join(KOK, "raw", "tff_kupa", "kupa_*.html")) +
+                      glob.glob(os.path.join(KOK, "raw", "tff_kupa_grup", "kupa_*", "*.html")), reverse=True)
+    for f in dosyalar:
         for m in topla.maclar(topla.oku(f)):
             if m["mac"] and m["mac"] not in gor and re.fullmatch(r"\d+\s*-\s*\d+", m["skor"] or ""):
                 gor.add(m["mac"]); out.append(m["mac"])
     return out
+
+
+def kupa_gruplari():
+    """Kupa sezonlarının grup aşaması: sezon sayfasındaki grupların grup ve hafta sayfaları -> raw/tff_kupa_grup/ (kaldığı yerden)."""
+    topla.HAM = os.path.join(KOK, "raw", "tff_kupa_grup")
+    d = topla.Indirici()
+    for f in sorted(glob.glob(os.path.join(KOK, "raw", "tff_kupa", "kupa_*.html"))):
+        m = re.search(r"kupa_(\d{4}-\d{4})_(\d+)\.html", f)
+        if topla.gruplar(topla.oku(f)):
+            topla.sezon_indir(d, "kupa", m.group(1), int(m.group(2)))
+    print("Bitti, yeni indirilen sayfa:", d.indirilen, flush=True)
 
 
 def indir(kademe, sezon, bekle, kupa=False):
@@ -394,4 +408,4 @@ if __name__ == "__main__":
     p.add_argument("--sezon")
     p.add_argument("--bekle", type=float, default=2.0)
     a = p.parse_args()
-    {"indir": lambda: indir(a.kademe, a.sezon, a.bekle), "kupa": lambda: indir(None, None, a.bekle, kupa=True), "ayikla": ayikla, "durum": durum, "ek": ek_maclar, "uyum": gol_uyum, "kisi": lambda: kisi_indir(a.bekle)}[a.komut]()
+    {"indir": lambda: indir(a.kademe, a.sezon, a.bekle), "kupa": lambda: (kupa_gruplari(), indir(None, None, a.bekle, kupa=True)), "ayikla": ayikla, "durum": durum, "ek": ek_maclar, "uyum": gol_uyum, "kisi": lambda: kisi_indir(a.bekle)}[a.komut]()
