@@ -55,7 +55,8 @@ def aktar():
         else:
             gorunen = son
         # logo: erkek takımıyla aynı kulüpse onun logosu (FM paketi), yoksa TFF maç sayfasındaki logo (kadin_logo.py)
-        logo = e["logo"] if e and e.get("logo") else f"tk{tff}" if os.path.exists(os.path.join(KOK, "docs", "logo", f"tk{tff}.png")) else None
+        # sonra Vikipedi'deki kulüp sayfasının logosu (kadin_logo.py wiki_bul / wiki_indir)
+        logo = e["logo"] if e and e.get("logo") else next((f"{o}{tff}" for o in ("tk", "wk") if os.path.exists(os.path.join(KOK, "docs", "logo", f"{o}{tff}.png"))), None)
         kulup[kid] = {"id": kid, "ad": gorunen, "adlar": adlar, "tff": tff, **({"logo": logo} if logo else {}),
                       **({"erkek": e["id"]} if e else {}), **({"renk": e["renk"]} if e and e.get("renk") else {})}
 
