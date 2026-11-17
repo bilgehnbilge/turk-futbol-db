@@ -180,9 +180,9 @@ async function yonlendir() {
   temaUygula(null);
   const bolum = h.startsWith("#/kadin") ? "kadin" : "erkek";
   try { await bolumSec(bolum); } catch (e) { icerik.innerHTML = `<div class="bos">Veri yüklenemedi (${esc(e.message)}).</div>`; return; }
-  const h0 = bolum === "erkek" ? h : h.replace(/^#\/kadin\/(?=(kulup|mac|oyuncu|h2h)\/|(rekorlar|sayilar)(\/|$))/, "#/");
+  const h0 = bolum === "erkek" ? h : h.replace(/^#\/kadin\/(?=(kulup|mac|oyuncu|h2h)\/|(rekorlar|sayilar|milli)(\/|$))/, "#/");
   for (const [re, f] of yollar) {
-    const m = h.match(re) || (h0 !== h && /^\^#\\\/(kulup|mac|oyuncu|h2h|rekorlar|sayilar)/.test(re.source) ? h0.match(re) : null);
+    const m = h.match(re) || (h0 !== h && /^\^#\\\/(kulup|mac|oyuncu|h2h|rekorlar|sayilar|milli)/.test(re.source) ? h0.match(re) : null);
     if (m) {
       try { await f(...m.slice(1).map(x => x && decodeURIComponent(x))); }
       catch (e) { console.error(e); icerik.innerHTML = `<div class="bos">Bir hata oluştu: ${esc(e.message)}</div>`; }
@@ -798,7 +798,7 @@ async function tffOyuncuSayfa(kisi) {
   const d = await al(`${V}tff/o/${kisi % 500}.json?s=${OZET.surum || ""}`), p = d.oyuncu[kisi];
   if (!p) {   // kulüp kaydı yok (ör. yalnız yurt dışında oynamış milli futbolcu): yalnız milli takım bölümü
     icerik.innerHTML = `<div id="milliOyuncu"></div>`;
-    if (BOLUM === "erkek" && typeof milliOyuncu === "function" && await milliOyuncu($("#milliOyuncu"), kisi, true)) return;
+    if (typeof milliOyuncu === "function" && await milliOyuncu($("#milliOyuncu"), kisi, true)) return;
     icerik.innerHTML = `<div class="bos">Oyuncu bulunamadı.</div>`; return;
   }
   document.title = `${p.ad} · Türk Futbol Arşivi`;
@@ -874,7 +874,7 @@ async function tffOyuncuSayfa(kisi) {
       for (const k of ["lk", "av", "td"]) $("#sk-" + k).hidden = a.dataset.k !== k;
     }));
   }
-  if (BOLUM === "erkek" && typeof milliOyuncu === "function") milliOyuncu($("#milliOyuncu"), kisi, false);
+  if (typeof milliOyuncu === "function") milliOyuncu($("#milliOyuncu"), kisi, false);
 }
 
 // kulüp rekorları sekmesi: oyuncu rekorları (TFF maç sayfaları; filtreden bağımsız)

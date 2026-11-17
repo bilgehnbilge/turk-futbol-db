@@ -51,10 +51,10 @@ const anaDurum = { kulupAra: "", oyuncuAra: "" };
 function kadinUst(sekme) {
   const z = KZ;
   const SEK = [["sezonlar", "#/kadin", "Sezonlar"], ["krallar", "#/kadin/krallar", "Gol kralları"], ["kulupler", "#/kadin/kulupler", "Kulüpler"],
-    ["oyuncular", "#/kadin/oyuncular", "Oyuncular"], ["rekorlar", "#/kadin/rekorlar", "Rekorlar"], ["sayilar", "#/kadin/sayilar", "Sayılar"]];
+    ["oyuncular", "#/kadin/oyuncular", "Oyuncular"], ["milli", "#/kadin/milli", "Milli Takım"], ["rekorlar", "#/kadin/rekorlar", "Rekorlar"], ["sayilar", "#/kadin/sayilar", "Sayılar"]];
   return `${basOn("Kadın Futbolu", `TFF kadın ligleri, ${z.sezonlar[0]}'den bugüne. Erkek liglerinden ayrı tutulur; erkek takımıyla aynı kulüp olanlar "(Kadın)" ekiyle yazılır.`)}
     <div class="kart bolum"><div class="ozet-sat">
-      <div><b>${sayiYaz(z.oynanan)}</b><span>Maç</span></div><div><b>${sayiYaz(z.kulupler.length)}</b><span>Kulüp</span></div>
+      <div><b>${sayiYaz(z.oynanan)}</b><span>Maç</span></div><div><b>${sayiYaz(z.kulupler.filter(k => k.yerli !== false).length)}</b><span>Kulüp</span></div>
       <div><b>${sayiYaz(z.oyuncu)}</b><span>Oyuncu</span></div><div><b>${z.sezonlar.length}</b><span>Sezon</span></div>
       <div><b>${sayiYaz(z.ayrintili)}</b><span>Kadrolu maç</span></div></div></div>
     ${sekmeler(SEK, sekme)}`;
@@ -90,7 +90,7 @@ async function kadinSayfa(sekme = "sezonlar") {
   } else if (sekme === "kulupler") {
     const ciz = () => {
       const q = norm(anaDurum.kulupAra);
-      const l = z.kulupler.filter(k => !q || norm(k.ad).includes(q) || k.adlar.some(a => norm(a[0]).includes(q)));
+      const l = z.kulupler.filter(k => k.yerli !== false).filter(k => !q || norm(k.ad).includes(q) || k.adlar.some(a => norm(a[0]).includes(q)));
       $("#kKulupListe").innerHTML = `<div class="tablo-kap"><table class="tablo"><thead><tr><th class="ad">Kulüp</th><th>Sezonlar</th><th class="s">Maç</th></tr></thead><tbody>
         ${l.map(k => `<tr><td class="ad">${kBag(k.id)}</td><td class="soluk">${k.ilk?.slice(0, 4)}–${k.son?.slice(5)}</td><td class="s">${k.mac}</td></tr>`).join("")}</tbody></table></div>`;
     };

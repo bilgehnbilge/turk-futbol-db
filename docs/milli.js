@@ -2,9 +2,11 @@
    Veri: data/milli.json (milli.py; TFF maç listesi pageID=425 ve maç sayfaları pageID=440), data/milli_detay.json.
    app.js'ten sonra yüklenir; $, esc, al, OZET, tarihYaz, sayiYaz, yuzde, sonuc, macCiz, yollar app.js'ten gelir. */
 (() => {
-let MILLI = null, MILLI_DETAY = null;
-const milliAl = async () => MILLI ||= await al(`data/milli.json?s=${OZET.surum || ""}`);
-const milliDetayAl = async () => MILLI_DETAY ||= await al(`data/milli_detay.json?s=${OZET.surum || ""}`);
+// bölüme göre (erkek: data/, kadın: data/kadin/; kadin_milli.py) ayrı önbellek
+const MILLI = {}, MILLI_DETAY = {};
+const milliAl = async () => MILLI[BOLUM] ||= await al(`${V}milli.json?s=${OZET.surum || ""}`);
+const milliDetayAl = async () => MILLI_DETAY[BOLUM] ||= await al(`${V}milli_detay.json?s=${OZET.surum || ""}`);
+const milliAd = () => BOLUM === "kadin" ? "Kadın A Milli Takımı" : "A Milli Takım";
 const durum = { kat: "", onyil: "", rakip: "", tum: false };
 // bayraklar docs/bayrak/<kod>.svg: circle-flags (MIT); Doğu Almanya Wikimedia Commons'tan (CSS ile daireye kırpılıyor)
 const bayrakImg = (kod, sinif = "bayrak") => kod ? `<img class="${sinif}" src="bayrak/${kod}.svg" alt="" loading="lazy">` : "";
@@ -20,10 +22,10 @@ const hucre = t => `<td class="s">${t.O}</td><td class="s">${t.G}</td><td class=
   <td class="s">${t.AG - t.YG > 0 ? "+" : ""}${t.AG - t.YG}</td><td class="s"><b>%${yuzde(t.G, t.O)}</b></td>`;
 const bas = ilk => `<thead><tr>${ilk.map((x, i) => `<th${i ? "" : ' class="ad"'}>${x}</th>`).join("")}<th class="s">O</th><th class="s">G</th><th class="s">B</th><th class="s">M</th>
   <th class="s" title="Attığı gol">AG</th><th class="s" title="Yediği gol">YG</th><th class="s">Av</th><th class="s" title="Galibiyet yüzdesi">G%</th></tr></thead>`;
-const skorHtml = m => { const s = `${m.saha === "E" ? `${m.a}-${m.y}` : `${m.y}-${m.a}`}`; return m.ayr ? `<a class="skor bagli" href="#/milli/mac/${m.tff}">${s}</a>` : `<b class="skor">${s}</b>`; };
+const skorHtml = m => { const s = `${m.saha === "E" ? `${m.a}-${m.y}` : `${m.y}-${m.a}`}`; return m.ayr ? `<a class="skor bagli" href="#/${K}milli/mac/${m.tff}">${s}</a>` : `<b class="skor">${s}</b>`; };
 
 async function milliSayfa(sekme = "ozet") {
-  document.title = "A Milli Takım · Türk Futbol Arşivi";
+  document.title = `${milliAd()} · Türk Futbol Arşivi`;
   icerik.innerHTML = `<div class="yukleniyor">Milli takım yükleniyor…</div>`;
   const d = await milliAl(), tum = maclar(d);
   const ciz = () => {
@@ -58,7 +60,7 @@ async function milliSayfa(sekme = "ozet") {
     </div>
     <h2 class="bolum">Son maçlar</h2>
     ${macListe(liste.slice(0, 10))}
-    <p class="soluk not"><a class="bag" href="#/milli/maclar">Bütün maçlar →</a></p>
+    <p class="soluk not"><a class="bag" href="#/${K}milli/maclar">Bütün maçlar →</a></p>
     <div id="milliOyuncular"></div>`;
     const macListe = l => `<div class="tablo-kap"><table class="tablo"><thead><tr><th>Tarih</th><th class="ad">Rakip</th><th class="s">Saha</th><th class="s">Skor</th><th class="s"></th><th class="ad">Yarışma</th></tr></thead>
       <tbody>${l.map(m => `<tr><td class="tarih">${tarihYaz(m.tarih)}</td><td class="ad">${m.bayrak} ${esc(m.rakip)}</td><td class="s soluk">${m.saha === "E" ? "İç" : "Dış"}</td>
@@ -73,9 +75,10 @@ async function milliSayfa(sekme = "ozet") {
     <div class="tablo-kap"><table class="tablo milli-rakip">${bas(["Rakip"])}<tbody>${rakipT.map(([k, l]) => `<tr data-rakip="${esc(k)}" class="tiklanir">
       <td class="ad">${l[0].bayrak} ${esc(l[0].rakip)}</td>${hucre(say(l))}</tr>`).join("")}</tbody></table></div>`;
     icerik.innerHTML = `
-    <div class="sayfa-bas"><div><h1>${bayrakImg("tr", "bayrak baslik")} A Milli Takım</h1>
+    ${BOLUM === "kadin" && BOLUM_UST.kadin ? BOLUM_UST.kadin("milli") : ""}
+    <div class="sayfa-bas"><div><h1>${bayrakImg("tr", "bayrak baslik")} ${milliAd()}</h1>
       <p class="soluk">${tarihYaz(tum[0].tarih)} – ${tarihYaz(tum.at(-1).tarih)} · ${tum.length} resmi ve özel maç</p></div></div>
-    <div class="kulup-sekme"><nav class="sekmeler">${SEKME.map(([k, y, ad]) => `<a href="#/milli${y}" class="${k === sekme ? "aktif" : ""}">${ad}</a>`).join("")}</nav></div>
+    <div class="kulup-sekme"><nav class="sekmeler">${SEKME.map(([k, y, ad]) => `<a href="#/${K}milli${y}" class="${k === sekme ? "aktif" : ""}">${ad}</a>`).join("")}</nav></div>
     <div class="filtre milli-filtre bolum">
       <select id="mKat"><option value="">Bütün maçlar</option><option value="resmi" ${durum.kat === "resmi" ? "selected" : ""}>Resmi maçlar (özel maçlar hariç)</option>
         ${KAT_SIRA.map(k => `<option ${durum.kat === k ? "selected" : ""}>${k}</option>`).join("")}</select>
@@ -87,7 +90,7 @@ async function milliSayfa(sekme = "ozet") {
     $("#mOnyil").onchange = e => { durum.onyil = e.target.value; ciz(); };
     $("#mRakipSil")?.addEventListener("click", e => { e.preventDefault(); durum.rakip = ""; ciz(); });
     $("#mTum")?.addEventListener("click", () => { durum.tum = true; const y = scrollY; ciz(); scrollTo(0, y); });
-    icerik.querySelectorAll("tr[data-rakip]").forEach(tr => tr.addEventListener("click", () => { durum.rakip = tr.dataset.rakip; durum.tum = true; location.hash = "#/milli/maclar"; }));
+    icerik.querySelectorAll("tr[data-rakip]").forEach(tr => tr.addEventListener("click", () => { durum.rakip = tr.dataset.rakip; durum.tum = true; location.hash = `#/${K}milli/maclar`; }));
     if ($("#milliOyuncular")) oyuncular(d, $("#milliOyuncular"));
     icerik.querySelectorAll("details[data-seri]").forEach(x => x.addEventListener("toggle", () => x.open && (x.querySelector(".seri-liste").innerHTML ||= seriListe(JSON.parse(x.dataset.seri)))));
   };
@@ -135,11 +138,11 @@ function rekorHtml(d, ms) {
   <h2 class="bolum">Oyuncu rekorları</h2>
   <div class="izgara iki ust-hiza">
     <div class="kart rekor-kart"><h3>Bir maçta en çok gol</h3><p class="soluk aciklama">Hat-trick ve üstü${filtreli ? ", seçili maçlarda" : ""}</p>
-      ${mgN.length ? `<ol class="sirali">${sira(mgN, x => x[2]).map(([r, x]) => `<li><span class="sira">${r}</span><span class="kim"><a class="bag" href="#/oyuncu/k${x[0]}">${esc(x[1])}</a>
-        <small class="soluk">${tarihYaz(x[4])} · ${esc(x[5])} · <a class="bag" href="#/milli/mac/${x[3]}">maç</a></small></span><b class="n">${x[2]}</b></li>`).join("")}</ol>
+      ${mgN.length ? `<ol class="sirali">${sira(mgN, x => x[2]).map(([r, x]) => `<li><span class="sira">${r}</span><span class="kim"><a class="bag" href="#/${K}oyuncu/k${x[0]}">${esc(x[1])}</a>
+        <small class="soluk">${tarihYaz(x[4])} · ${esc(x[5])} · <a class="bag" href="#/${K}milli/mac/${x[3]}">maç</a></small></span><b class="n">${x[2]}</b></li>`).join("")}</ol>
         ${mg.length > mgN.length ? `<p class="soluk aciklama">ve ${mg.length - mgN.length} hat-trick daha</p>` : ""}` : `<p class="soluk">—</p>`}</div>
     <div class="kart rekor-kart"><h3>Kalesini en çok gole kapatan kaleciler</h3><p class="soluk aciklama">İlk 11'de başladığı maçlar (bütün maçlar)</p>
-      <ol class="sirali">${sira(gk, x => x[3]).map(([r, x]) => `<li><span class="sira">${r}</span><span class="kim"><a class="bag" href="#/oyuncu/k${x[0]}">${esc(x[1])}</a>
+      <ol class="sirali">${sira(gk, x => x[3]).map(([r, x]) => `<li><span class="sira">${r}</span><span class="kim"><a class="bag" href="#/${K}oyuncu/k${x[0]}">${esc(x[1])}</a>
         <small class="soluk">${x[2]} maç · %${yuzde(x[3], x[2])} · maç başı ${(x[4] / x[2]).toFixed(2)} gol</small></span><b class="n">${x[3]}</b></li>`).join("")}</ol></div>
   </div>
   <p class="soluk not">Seriler ve maç rekorları yukarıdaki filtreye göre hesaplanır (ör. yalnız resmi maçlar). Kaleci, TFF'nin ilk 11'i kaleciyle başlatmasından bulunuyor.</p>`;
@@ -149,7 +152,7 @@ function oyuncular(d, kap) {
   const O = Object.entries(d.oyuncu).map(([k, v]) => ({ kisi: k, ad: v[0], mac: v[1], ilk: v[2], gol: v[3], pen: v[4], sari: v[5], kirmizi: v[6], bas: v[7], son: v[8], kulup: v[9] }));
   const sira = (l, f) => { let r = 0, onc; return l.map((x, i) => { const v = f(x); if (v !== onc) { r = i + 1; onc = v; } return [r, x]; }); };
   const kart = (baslik, aciklama, l, f, alt) => `<div class="kart rekor-kart"><h3>${baslik}</h3><p class="soluk aciklama">${aciklama}</p>
-    <ol class="sirali">${sira(l.slice(0, 15), f).map(([r, x]) => `<li><span class="sira">${r}</span><span class="kim"><a class="bag" href="#/oyuncu/k${x.kisi}">${esc(x.ad)}</a>
+    <ol class="sirali">${sira(l.slice(0, 15), f).map(([r, x]) => `<li><span class="sira">${r}</span><span class="kim"><a class="bag" href="#/${K}oyuncu/k${x.kisi}">${esc(x.ad)}</a>
       <small class="soluk">${x.bas.slice(0, 4)}–${x.son.slice(0, 4)} · ${alt(x)}</small></span><b class="n">${f(x)}</b></li>`).join("")}</ol></div>`;
   const by = f => O.filter(x => f(x)).sort((a, b) => f(b) - f(a) || b.mac - a.mac);
   // teknik direktörler
@@ -178,12 +181,12 @@ async function milliMacSayfa(tff) {
   const TUR = { Y: "YELLOW_CARD", R: "RED_CARD", YR: "YELLOW_CARD_SECOND", S: "SUBSTITUTION", G: "GOAL" };
   macCiz({
     tarih: m.tarih, ev: [null, (ev ? tr : rk)[0]], dep: [null, (ev ? rk : tr)[0]], bayrak: [(ev ? tr : rk)[1], (ev ? rk : tr)[1]],
-    skor: [ev ? m.a : m.y, ev ? m.y : m.a, null, null, null], ustHtml: `<a class="bag" href="#/milli">A Milli Takım</a> · ${esc(m.org)}`,
+    skor: [ev ? m.a : m.y, ev ? m.y : m.a, null, null, null], ustHtml: `<a class="bag" href="#/${K}milli">${milliAd()}</a> · ${esc(m.org)}`,
     stad: r.s, seyirci: r.sy, hakem: r.hk, kaynak: "TFF", tff, kaynakUrl: `https://www.tff.org/Default.aspx?pageID=440&macID=${tff}`, oyuncuOnek: "k",
-    kadro: r.k.map(l => l.map(([forma, ad, ilk11, kisi]) => [forma, ad, ilk11, 0, kisi])), teknik: r.t.map(l => l.map(([ad, k]) => [ad, "a" + k])),
+    kadro: r.k.map(l => l.map(([forma, ad, ilk11, kisi]) => [forma, ad, ilk11, 0, kisi])), teknik: r.t.map(l => l.map(([ad, k]) => BOLUM === "erkek" ? [ad, "a" + k] : ad)),
     olay: r.o.map(([taraf, tur, dk, ek, a1, a2, tip, k1, k2]) => [taraf, TUR[tur], dk, ek || null, a1, a2, tip === "P" ? "PENALTY" : tip === "K" ? "OWN" : tip === "H" ? "HEADER" : null, k1, k2]),
   });
-  document.title = `${(ev ? tr : rk)[0]} - ${(ev ? rk : tr)[0]} · A Milli Takım`;
+  document.title = `${(ev ? tr : rk)[0]} - ${(ev ? rk : tr)[0]} · ${milliAd()}`;
 }
 
 // oyuncu sayfasında milli takım bölümü; yalnizMilli: kulüp kaydı olmayan oyuncu (sayfanın tamamı)
@@ -192,11 +195,11 @@ window.milliOyuncu = async (kap, kisi, yalnizMilli) => {
   if (!v) return false;
   const [ad, mac, ilk, gol, pen, sari, kirmizi, bas, son, kulup] = v;
   if (yalnizMilli) document.title = `${ad} · Türk Futbol Arşivi`;
-  kap.innerHTML = `${yalnizMilli ? `<div class="sayfa-bas"><div><h1>${esc(ad)}</h1><p class="soluk">${esc(kulup.join(", "))}</p></div></div>` : `<h2 class="bolum">${bayrakImg("tr")} A Milli Takım</h2>`}
+  kap.innerHTML = `${yalnizMilli ? `<div class="sayfa-bas"><div><h1>${esc(ad)}</h1><p class="soluk">${esc(kulup.join(", "))}</p></div></div>` : `<h2 class="bolum">${bayrakImg("tr")} ${milliAd()}</h2>`}
     <div class="kart bolum"><div class="ozet-sat">
       <div><b>${mac}</b><span>Maç</span></div><div><b>${ilk}</b><span>İlk 11</span></div><div><b>${gol}</b><span>Gol</span></div>
       <div><b>${pen}</b><span>Penaltı golü</span></div><div><b>${sari}</b><span>Sarı kart</span></div><div><b>${kirmizi}</b><span>Kırmızı kart</span></div></div>
-      <p class="soluk not">İlk maçı ${tarihYaz(bas)}, son maçı ${tarihYaz(son)}. Milli takıma çağrıldığı kulüpler: ${esc(kulup.join(", ") || "—")}. <a class="bag" href="#/milli">Milli takım sayfası →</a></p></div>`;
+      <p class="soluk not">İlk maçı ${tarihYaz(bas)}, son maçı ${tarihYaz(son)}. Milli takıma çağrıldığı kulüpler: ${esc(kulup.join(", ") || "—")}. <a class="bag" href="#/${K}milli">Milli takım sayfası →</a></p></div>`;
   return true;
 };
 

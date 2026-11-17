@@ -103,12 +103,14 @@ def aktar():
                        "ev_kulup": ev, "dep_kulup": dep, "ev_adi": kulup[ev]["ad"], "dep_adi": kulup[dep]["ad"], "ev_gol": eg, "dep_gol": dg,
                        "ev_pen": ep, "dep_pen": dp, "durum": ("Hük." if durum == "Hük." else "MS") if eg is not None else None,
                        "notlar": "TFF puan tablosundan (fikstürde yok)" if tff < 0 else None})
+    detayli = avrupa(m_dict, kulup)   # Türk kadın kulüplerinin UEFA maçları (kadin_avrupa.py)
     kulup_mac = collections.defaultdict(list)
     for m in m_dict:
         tur = m["grup"] if not m["tur"] else m["tur"]
         tur = f"{int(tur)}. grup" if tur and tur.isdigit() else tur or ""
         for s, r_ in (("ev", "dep"), ("dep", "ev")):
-            kulup_mac[m[s + "_kulup"]].append([m["id"], m["tarih"], m["sezon"], "L", m["lig"], m["kademe"], tur, "p" if m["tur"] else "",
+            kulup_mac[m[s + "_kulup"]].append([m["id"], m["tarih"], m["sezon"], "A" if m["yarisma"] == "avrupa" else "L", m["lig"], m["kademe"], tur,
+                                               "p" if m["tur"] and m["yarisma"] != "avrupa" else "",
                                                "E" if s == "ev" else "D", m[s + "_adi"], m[r_ + "_kulup"], m[r_ + "_adi"],
                                                m[s + "_gol"], m[r_ + "_gol"], m[s + "_pen"], m[r_ + "_pen"], m["durum"], m["notlar"]])
     for kid, ms in kulup_mac.items():
@@ -116,13 +118,16 @@ def aktar():
             "alanlar": ["id", "tarih", "sezon", "yarisma", "lig", "kademe", "grup_tur", "playoff", "saha", "takim", "rakip_id",
                         "rakip", "attigi", "yedigi", "pen_a", "pen_y", "durum", "not"], "maclar": ms})
     for k, v in kulup.items():
-        v.update(tff=[v["tff"]], ardil=[], yerli=True, enust=min((m[5] for m in kulup_mac[k] if not m[7]), default=None))
+        if v.get("yerli") is False:   # Avrupa rakibi (UEFA)
+            v.update(enust=None)
+            continue
+        v.update(tff=[v["tff"]], ardil=[], yerli=True, enust=min((m[5] for m in kulup_mac[k] if not m[7] and m[3] == "L"), default=None))
     tff_ayr, krallar, oyuncu = [], {}, 0
     if o:
         bellek = sqlite3.connect(":memory:")
         bellek.executescript("CREATE TABLE kulup_kimlik(kulup_id, kaynak, kaynak_id, ilk_sezon, son_sezon);"
                              "CREATE TABLE mac(kaynak, kaynak_id, tarih, ev_kulup, dep_kulup, yarisma);")
-        bellek.executemany("INSERT INTO kulup_kimlik VALUES(?, 'tff', ?, NULL, NULL)", [(k, v["tff"][0]) for k, v in kulup.items()])
+        bellek.executemany("INSERT INTO kulup_kimlik VALUES(?, 'tff', ?, NULL, NULL)", [(k, v["tff"][0]) for k, v in kulup.items() if v["tff"]])
         eski = tff_detay.OYUNCU_DB, tff_detay.KUPA_ES
         tff_detay.OYUNCU_DB, tff_detay.KUPA_ES = DETAY_DB, os.path.join(KOK, "raw", "kadin_kupa_eslesme.json")
         try:
@@ -132,6 +137,9 @@ def aktar():
         krallar = gol_krallari(o, tff_kulup)
         oyuncu = len(json.load(open(os.path.join(CIKTI, "tff", "oyuncular.json"), encoding="utf-8"))["oyuncu"])
     rekor_sayilar(m_dict, sezonlar, kulup)
+    import kadin_milli   # Kadın A Milli Takımı -> kadin/milli.json, milli_detay.json
+    if os.path.exists(kadin_milli.CIKTI):
+        kadin_milli.site(yaz, CIKTI)
     # kırmızı kart analizi: kirmizi.py kadin yerelde üretir (depodaki kirmizi_kadin.json siteye kopyalanır)
     if os.path.exists(os.path.join(KOK, "kirmizi_kadin.json")):
         shutil.copy(os.path.join(KOK, "kirmizi_kadin.json"), os.path.join(CIKTI, "kirmizi.json"))
@@ -145,7 +153,7 @@ def aktar():
     yaz(os.path.join(CIKTI, "ozet.json"), {
         "surum": datetime.datetime.now().strftime("%Y%m%d%H%M"),
         "mac": len(maclar), "oynanan": sum(r[10] is not None for r in maclar), "ayrintili": len(detay),
-        "sezonlar": sezonlar, "ligler": {s: sorted(l) for s, l in ligler.items()}, "detayli": [], "detayli_aralik": web_aktar.araliklar(tff_ayr),
+        "sezonlar": sezonlar, "ligler": {s: sorted(l) for s, l in ligler.items()}, "detayli": detayli, "detayli_aralik": web_aktar.araliklar(tff_ayr),
         "kulupler": sorted(kulup.values(), key=lambda k: -k["mac"]), "krallar": krallar, "oyuncu": oyuncu,
         "sampiyonlar": sampiyonlar(kulup), "sampiyon_not": json.load(open(SAMPIYON, encoding="utf-8")).get("_notlar", {})})
     toplam = sum(os.path.getsize(os.path.join(d, f)) for d, _, fs in os.walk(CIKTI) for f in fs)
@@ -160,9 +168,9 @@ def rekor_sayilar(maclar, sezonlar, kulup):
     import rekor, sayilar
     sezon_sira = {s: i for i, s in enumerate(sorted(sezonlar, key=lambda s: (s[:4], s)))}
     eski_k, eski_d = rekor.KAPSAMLAR, sayilar.DERBI
-    rekor.KAPSAMLAR = [("pro", "Bütün ligler", lambda m: True)] + [
-        (str(k), ad, (lambda k_: lambda m: m["kademe"] == k_)(k)) for k, ad in KADEME_AD.items()]
-    tff_kid = {v["tff"][0]: k for k, v in kulup.items()}
+    rekor.KAPSAMLAR = [("pro", "Bütün ligler", lambda m: m["yarisma"] == "lig")] + [
+        (str(k), ad, (lambda k_: lambda m: m["yarisma"] == "lig" and m["kademe"] == k_)(k)) for k, ad in KADEME_AD.items()]
+    tff_kid = {v["tff"][0]: k for k, v in kulup.items() if v["tff"]}
     sayilar.DERBI = {tff_kid[t]: ad for t, ad in (("3604", "Galatasaray (Kadın)"), ("3592", "Fenerbahçe (Kadın)"), ("3590", "Beşiktaş (Kadın)"), ("3596", "Trabzonspor (Kadın)")) if t in tff_kid}
     try:
         yaz(os.path.join(CIKTI, "rekorlar.json"), rekor.hesapla(maclar, sezon_sira, web_aktar.okunur))
@@ -180,7 +188,7 @@ SAMPIYON = os.path.join(KOK, "kadin_sampiyon.json")
 
 def sampiyonlar(kulup):
     """kadin_sampiyon.json (sezon -> TFF kulüp no) -> sezon -> kulüp kimliği (null: şampiyon yok)."""
-    tff = {v["tff"][0]: k for k, v in kulup.items()}
+    tff = {v["tff"][0]: k for k, v in kulup.items() if v["tff"]}
     d = json.load(open(SAMPIYON, encoding="utf-8"))
     out = {}
     for s, t in d.items():
@@ -190,6 +198,92 @@ def sampiyonlar(kulup):
             raise SystemExit(f"kadin_sampiyon.json: {s} şampiyonu (TFF {t}) kulüp listesinde yok")
         out[s] = tff.get(t)
     return out
+
+
+UEFA_HAM = os.path.join(KOK, "raw", "uefa_kadin")
+UEFA_TFF = {"ALG Spor": "8472", "Ataşehir": "3580", "Beşiktaş": "3590", "Fenerbahçe": "3592", "Fomget SK": "6834",
+            "Galatasaray": "3604", "Gazi": "2895", "Konak": "4270", "Trabzonspor": "3596"}   # UEFA adı -> TFF kulüp no
+UEFA_YAR = {"UEFA Women's Champions League": "Kadınlar Şampiyonlar Ligi", "UEFA Women's Cup": "UEFA Kadınlar Kupası",
+            "UEFA Women's Europa Cup": "Kadınlar Avrupa Kupası"}
+
+
+def avrupa(m_dict, kulup):
+    """raw/uefa_kadin -> m_dict'e Avrupa maçları (yarisma 'avrupa', maç no = UEFA maç no) ve kadin/mac/<no>.json ayrıntıları;
+    rakip kulüpler kulup'a (no 900000 + UEFA takım no, yerli değil). Ayrıntılı maç numaralarını döner."""
+    import glob, gzip
+    from avrupa import UEFA_TUR
+    yol = os.path.join(UEFA_HAM, "maclar.json")
+    if not os.path.exists(yol):
+        return []
+    tff_kid = {v["tff"]: k for k, v in kulup.items() if isinstance(v.get("tff"), str)}
+    out = []
+    for dosya in sorted(glob.glob(os.path.join(UEFA_HAM, "mac", "*.json.gz"))):
+        d = json.load(gzip.open(dosya, "rt", encoding="utf-8"))
+        m = d["mac"]
+        kid = {}
+        for s_ in ("homeTeam", "awayTeam"):
+            t = m[s_]
+            tff = UEFA_TFF.get(t.get("internationalName")) if t.get("countryCode") == "TUR" else None
+            if tff and tff in tff_kid:
+                kid[s_] = tff_kid[tff]
+            else:
+                k = 900000 + int(t["id"])
+                kulup.setdefault(k, {"id": k, "ad": t.get("internationalName"), "adlar": [], "tff": [], "ardil": [], "yerli": False,
+                                     "ulke": t.get("countryCode"), "mac": 0})
+                kid[s_] = k
+        yil = int(m.get("seasonYear") or m["kickOffTime"]["date"][:4])
+        sezon = f"{yil - 1}-{yil}"
+        sk = (m.get("score") or {})
+        top, pen = sk.get("total") or {}, sk.get("penalty") or {}
+        yar = m.get("competition", {}).get("metaData", {}).get("name")
+        lig = UEFA_YAR.get(yar, yar)
+        tur_ = (m.get("round") or {}).get("metaData", {}).get("name") or ""
+        tur = UEFA_TUR.get(tur_.lower(), tur_)
+        ev, dep = kid["homeTeam"], kid["awayTeam"]
+        mid = int(m["id"])
+        m_dict.append({"id": mid, "kaynak": "uefa", "kaynak_id": str(mid), "yarisma": "avrupa", "lig": lig, "kademe": None, "sezon": sezon,
+                       "grup": None, "asama": "avrupa", "tur": tur, "tarih": m["kickOffTime"]["date"], "saat": None,
+                       "ev_kulup": ev, "dep_kulup": dep, "ev_adi": kulup[ev]["ad"], "dep_adi": kulup[dep]["ad"],
+                       "ev_gol": top.get("home"), "dep_gol": top.get("away"), "ev_pen": pen.get("home"), "dep_pen": pen.get("away"),
+                       "durum": "MS", "notlar": None})
+        for k in (ev, dep):
+            if kulup[k].get("yerli") is False:
+                kulup[k]["mac"] += 1
+                kulup[k]["ilk"] = min(kulup[k].get("ilk") or sezon, sezon); kulup[k]["son"] = max(kulup[k].get("son") or sezon, sezon)
+        # ayrıntı: erkek Avrupa maç dosyalarıyla aynı biçim (oyuncu numarası yok: kadın UEFA oyuncu sayfası henüz yok)
+        kadro, teknik = [[], []], [[], []]
+        k_ = d.get("kadro") or {}
+        for i, s_ in enumerate(("homeTeam", "awayTeam")):
+            x = k_.get(s_) or {}
+            for ilk11, bolum in ((1, "field"), (0, "bench")):
+                for p in x.get(bolum) or []:
+                    pl = p.get("player") or {}
+                    kadro[i].append([str(p.get("jerseyNumber") or ""), pl.get("internationalName"), ilk11, 1 if p.get("isCaptain") else 0, None])
+            for co in x.get("coaches") or []:
+                if co.get("role", "COACH") == "COACH":
+                    teknik[i].append((co.get("person") or {}).get("internationalName"))
+        olay = []
+        for e in d.get("olay") or []:
+            pa, sa = e.get("primaryActor") or {}, e.get("secondaryActor") or {}
+            taraf = 1 if (pa.get("team") or {}).get("id") == m["homeTeam"]["id"] else 2
+            tm = e.get("time") or {}
+            olay.append([taraf, e.get("type"), tm.get("minute"), tm.get("injuryMinute"), (pa.get("person") or {}).get("internationalName"),
+                         (sa.get("person") or {}).get("internationalName"), e.get("subType") or e.get("goalType"), None, None])
+        olay.sort(key=lambda o: (o[2] is None, o[2] or 0, o[3] or 0))
+        hakem = next((r for r in m.get("referees") or [] if r.get("role") == "REFEREE"), None)
+        st = m.get("stadium") or {}
+        yaz(os.path.join(CIKTI, "mac", f"{mid}.json"), {
+            "id": mid, "tarih": m["kickOffTime"]["date"], "saat": None, "sezon": sezon, "lig": lig, "tur": tur,
+            "ev": [ev, kulup[ev]["ad"]], "dep": [dep, kulup[dep]["ad"]], "skor": [top.get("home"), top.get("away"), pen.get("home"), pen.get("away"), "MS"],
+            "stad": ((st.get("translations") or {}).get("officialName") or {}).get("EN"),
+            "sehir": (((st.get("city") or {}).get("translations") or {}).get("name") or {}).get("EN"),
+            "seyirci": m.get("matchAttendance"), "hakem": (((hakem or {}).get("person") or {}).get("translations") or {}).get("name", {}).get("EN")
+            or ((hakem or {}).get("person") or {}).get("internationalName"), "hakem_ulke": ((hakem or {}).get("person") or {}).get("countryCode"),
+            "kaynak": "UEFA", "kadro": kadro, "teknik": teknik,
+            "olay_alanlar": ["taraf", "tur", "dk", "ek", "oyuncu", "oyuncu2", "ayrinti", "oyuncu_no", "oyuncu2_no"], "olay": olay})
+        out.append(mid)
+    print(f"kadın Avrupa maçları: {len(out)}")
+    return sorted(out)
 
 
 def gol_krallari(o, tff_kulup):
