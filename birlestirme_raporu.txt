@@ -4,6 +4,7 @@ Kaynaklar: Mackolik 51875 mac, Avrupa 1506, TFF 99353
 2) Arsiv<->Mackolik: puan tablosundaki 2907 takim satirinin 2803'i imzayla eslendi, 274 arsiv kimligi
    Mackolik'ten TFF'de de bulunan lig sezonlari cikarildi: 884 mac
 3) Sinir (arsiv<->TFF): 298 aday, 247 eslesme (tam ad disindakiler raporda: 18), 0 supheli
+   Avrupa maç numaraları: 1506 maç, 0 yeni numara (avrupa_no.json)
    TFF grup sayfalarindaki tekil dis takim maclari play-off sayildi: 17
    Vikipedi'den ozel kupa maci: 68
    Cift kayit silindi: 9

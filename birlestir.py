@@ -30,6 +30,7 @@ KOK = os.path.dirname(os.path.abspath(__file__))
 DB = os.path.join(KOK, "futbol.db")
 RAPOR = os.path.join(KOK, "birlestirme_raporu.txt")
 DUZELTME = os.path.join(KOK, "kulup_duzeltme.json")
+AVRUPA_NO = os.path.join(KOK, "avrupa_no.json")   # Avrupa maçlarının sabit numaraları
 TFF_DB = os.path.join(KOK, "raw", "tff.db")
 ARSIV = os.path.join(KOK, "raw", "mackolik_arsiv")
 TRM = str.maketrans("İIıŞşĞğÜüÖöÇçÂâÎî", "iiissgguuooccaaii")
@@ -596,7 +597,21 @@ def main():
                       kes_adi(m["ev_tff"], m["ev_adi"]), kes_adi(m["dep_tff"], m["dep_adi"]), m["ev_adi"], m["dep_adi"],
                       m["ev_gol"], m["dep_gol"], None, None, m["ev_pen"], m["dep_pen"],
                       m.get("durum") or ("MS" if m["ev_gol"] is not None else None), None, m["ham_skor"] if m["ev_gol"] is None and m["ham_skor"] else None))
-    c.executemany(f"INSERT INTO mac VALUES(NULL,{','.join('?' * 26)})", satir)
+    # Avrupa maçları sabit numarayla (avrupa_no.json: kaynak:kaynak_id -> numara). Liste yeniden sıralansa ya da araya
+    # eski bir maç eklense de numaralar (#/mac/<no>, docs/data/mac/<no>.json) değişmez; yeni maç en büyük numaradan sonra.
+    av_no = json.load(open(AVRUPA_NO, encoding="utf-8")) if os.path.exists(AVRUPA_NO) else {}
+    sonraki = max((v for k, v in av_no.items() if not k.startswith("_")), default=0) + 1
+    av_id, kullanilan, yeni = [], set(), 0
+    for x in av:
+        k = f"{x['kaynak']}:{x['kaynak_id']}"
+        if k not in av_no or av_no[k] in kullanilan:
+            av_no[k] = sonraki; sonraki += 1; yeni += 1
+        kullanilan.add(av_no[k]); av_id.append(av_no[k])
+    if yeni:
+        json.dump(av_no, open(AVRUPA_NO, "w", encoding="utf-8"), ensure_ascii=False, indent=0)
+    yaz(f"   Avrupa maç numaraları: {len(av_id)} maç, {yeni} yeni numara (avrupa_no.json)")
+    c.executemany(f"INSERT INTO mac VALUES({','.join('?' * 27)})", [(i, *r) for i, r in zip(av_id, satir[:len(av)])])
+    c.executemany(f"INSERT INTO mac VALUES(NULL,{','.join('?' * 26)})", satir[len(av):])
     # TFF grup sayfalarinda tek tuk gorunen dis takim maclari (gruplar arasi final/baraj): grupta en fazla 2 maci olan
     # takimin maclari, grubun geri kalani tam bir lig ise (>=6 takim, takim basina >=10 mac) play-off sayilir.
     once_deg = c.total_changes

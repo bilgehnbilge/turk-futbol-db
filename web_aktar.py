@@ -361,7 +361,7 @@ def main():
     # ---- maç ayrıntıları (şimdilik Avrupa: UEFA; uefa_detay.py) -> data/mac/<id>.json
     if os.path.exists(os.path.join(KOK, "raw", "uefa_detay.db")):
         detayli = mac_detay(maclar, okunur)
-    else:   # GitHub Actions: UEFA ayrıntıları korunan dosyalardan (Avrupa maç numaraları sabit: 1-1506)
+    else:   # GitHub Actions: UEFA ayrıntıları korunan dosyalardan (Avrupa maç numaraları sabit: avrupa_no.json)
         detayli = sorted(int(f[:-5]) for f in os.listdir(os.path.join(CIKTI, "mac"))) if os.path.isdir(os.path.join(CIKTI, "mac")) else []
     # ---- TFF maç ayrıntıları, oyuncular (tff_detay.py; raw/oyuncu.db) -> data/tff/
     tff_ayr = tff_detay.aktar(c, maclar, okunur, CIKTI)
