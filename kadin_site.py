@@ -66,13 +66,14 @@ def aktar():
         detay = {int(m) for (m,) in o.execute("SELECT mac FROM mac_bilgi")}
     maclar, kul_mac = [], collections.Counter()
     sezon_kul = collections.defaultdict(set)
-    for (mid, tff, sezon, kademe, lig, grup, asama, hafta, tarih, saat, ev, dep, eg, dg, ep, dp, ham) in c.execute(
-            "SELECT id, kaynak_id, sezon, kademe, lig, grup, asama, hafta, tarih, saat, ev_id, dep_id, ev_gol, dep_gol, ev_pen, dep_pen, ham_skor "
+    for (mid, tff, sezon, kademe, lig, grup, asama, hafta, tarih, saat, ev, dep, eg, dg, ep, dp, ham, durum) in c.execute(
+            "SELECT id, kaynak_id, sezon, kademe, lig, grup, asama, hafta, tarih, saat, ev_id, dep_id, ev_gol, dep_gol, ev_pen, dep_pen, ham_skor, durum "
             "FROM mac ORDER BY tarih IS NULL, tarih, saat, id"):
-        tff = int(tff)
+        # TFF maç no; fikstürde olmayıp puan tablosundan eklenen maçlar (kadin.py duzelt) eksi numara alır
+        tff = int(tff) if tff.isdigit() else -mid
         asama = "" if asama == "lig" else ASAMA.get(asama, asama)
         maclar.append([tff, tarih, sezon, kademe, lig, grup or "", asama, hafta, ev, dep, eg, dg, ep, dp,
-                       1 if tff in detay else 0, ham if eg is None and ham not in (None, "", "-") else None])
+                       1 if tff in detay else 0, durum or (ham if eg is None and ham not in (None, "", "-") else None)])
         for k in (ev, dep):
             kul_mac[k] += 1
             sezon_kul[k].add(sezon)
@@ -97,10 +98,11 @@ def aktar():
     m_dict = []
     for r in maclar:
         tff, tarih, sezon, kademe, lig, grup, asama, hafta, ev, dep, eg, dg, ep, dp, ayr, durum = r
-        m_dict.append({"id": tff, "kaynak": "tff", "kaynak_id": str(tff), "yarisma": "lig", "lig": lig, "kademe": kademe, "sezon": sezon,
+        m_dict.append({"id": tff, "kaynak": "tff" if tff > 0 else "puan", "kaynak_id": str(tff), "yarisma": "lig", "lig": lig, "kademe": kademe, "sezon": sezon,
                        "grup": grup or None, "asama": "play-off" if asama else "lig", "tur": asama or None, "tarih": tarih, "saat": None,
                        "ev_kulup": ev, "dep_kulup": dep, "ev_adi": kulup[ev]["ad"], "dep_adi": kulup[dep]["ad"], "ev_gol": eg, "dep_gol": dg,
-                       "ev_pen": ep, "dep_pen": dp, "durum": "MS" if eg is not None else None, "notlar": None})
+                       "ev_pen": ep, "dep_pen": dp, "durum": ("Hük." if durum == "Hük." else "MS") if eg is not None else None,
+                       "notlar": "TFF puan tablosundan (fikstürde yok)" if tff < 0 else None})
     kulup_mac = collections.defaultdict(list)
     for m in m_dict:
         tur = m["grup"] if not m["tur"] else m["tur"]
@@ -108,7 +110,7 @@ def aktar():
         for s, r_ in (("ev", "dep"), ("dep", "ev")):
             kulup_mac[m[s + "_kulup"]].append([m["id"], m["tarih"], m["sezon"], "L", m["lig"], m["kademe"], tur, "p" if m["tur"] else "",
                                                "E" if s == "ev" else "D", m[s + "_adi"], m[r_ + "_kulup"], m[r_ + "_adi"],
-                                               m[s + "_gol"], m[r_ + "_gol"], m[s + "_pen"], m[r_ + "_pen"], m["durum"], None])
+                                               m[s + "_gol"], m[r_ + "_gol"], m[s + "_pen"], m[r_ + "_pen"], m["durum"], m["notlar"]])
     for kid, ms in kulup_mac.items():
         yaz(os.path.join(CIKTI, "kulup", f"{kid}.json"), {
             "alanlar": ["id", "tarih", "sezon", "yarisma", "lig", "kademe", "grup_tur", "playoff", "saha", "takim", "rakip_id",

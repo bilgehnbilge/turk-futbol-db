@@ -20,7 +20,7 @@ const kOyuncular = async () => KOY ||= (await al(`data/kadin/tff/oyuncular.json?
 const kAd = id => KK.get(id)?.ad ?? "?";
 const kLogo = (id, cls = "logo-k") => { const l = KK.get(id)?.logo; return l ? `<img class="${cls}" src="logo/${l}.png" alt="" loading="lazy" onerror="this.remove()">` : ""; };
 const kBag = (id, ayni) => id == null ? "?" : id === ayni ? `<span>${kLogo(id)}${esc(kAd(id))}</span>` : `<a class="bag" href="#/kadin/kulup/${id}">${kLogo(id)}${esc(kAd(id))}</a>`;
-const kSkor = m => { const h = m.eg == null ? `<span class="soluk">${m.durum === "H" ? "hükmen" : "oynanmadı"}</span>` : skorYaz(m.eg, m.dg, m.ep, m.dp);
+const kSkor = m => { const h = m.eg == null ? `<span class="soluk">${m.durum === "H" ? "hükmen" : "oynanmadı"}</span>` : skorYaz(m.eg, m.dg, m.ep, m.dp, m.durum);
   return detayVar(m.tff) ? `<a class="skor bagli" href="#/kadin/mac/${m.tff}" title="Maç ayrıntısı">${h}</a>` : h; };
 const oyBag = (kisi, ad) => `<a class="oyuncu-bag" href="#/kadin/oyuncu/k${kisi}">${esc(ad)}</a>`;
 const PUAN = 3;   // 2007-08'den beri bütün kadın liglerinde galibiyet 3 puan
