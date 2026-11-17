@@ -165,8 +165,8 @@ const yollar = [
   [/^#\/sezonlar$/, sezonlarSayfa],
   [/^#\/sezon\/([\d-]+)$/, s => sezonSayfa(s)],
   [/^#\/rekorlar(?:\/(\w+))?$/, k => rekorlarSayfa(k || "tum")],
-  // 13.11.2026 öncesi Avrupa maç numaraları 150215-151720 arasındaydı; eski bağlantılar yeni numaraya yönlenir
-  [/^#\/mac\/(\d+)$/, id => +id >= 150215 && +id <= 151720 ? (location.replace(`#/mac/${+id - 150214}`), null) : macSayfa(+id)],
+  // (13.11.2026'daki eski Avrupa numaralarına yönlendirme 17.11'de kaldırıldı: lig maçlarının numaraları o aralığa ulaştı)
+  [/^#\/mac\/(\d+)$/, id => macSayfa(+id)],
   [/^#\/oyuncu\/u(\d+)$/, id => oyuncuSayfa(id)],
   [/^#\/oyuncu\/k(\d+)$/, id => tffOyuncuSayfa(+id)],
   [/^#\/oyuncu\/t(\d+)$/, id => oyuncuSayfa(null, id)],
@@ -803,6 +803,15 @@ async function tffOyuncuSayfa(kisi) {
   document.title = `${p.ad} · Türk Futbol Arşivi`;
   const S = p.s.map(r => ({ sezon: r[0], kulup: r[1], yar: r[2], kademe: r[3], mac: r[4], ilk: r[5], gol: r[6], pen: r[7], kk: r[8], sari: r[9], kirmizi: r[10], dk: r[11], kmac: r[13] || 0, gy: r[14] || 0, yenen: r[15] || 0 }))
     .filter(r => r.mac);
+  if (!S.length) {   // hiç oyuna girmemiş: yalnız yedek kulübesinde oturduğu maçlar
+    const Y = [...p.s.reduce((m, r) => { const k = `${r[0]}|${r[1]}`; return m.set(k, (m.get(k) || 0) + (r[12] || 0)); }, new Map())].filter(x => x[1]).sort((a, b) => b[0].localeCompare(a[0]));
+    icerik.innerHTML = `<div class="sayfa-bas"><div><h1>${esc(p.ad)}</h1></div></div>
+      <p class="bolum">Kayıtlı maçlarda hiç oyuna girmedi; ${sayiYaz(Y.reduce((t, x) => t + x[1], 0))} maçta yedek kulübesindeydi.</p>
+      <div class="tablo-kap bolum"><table class="tablo"><thead><tr><th>Sezon</th><th class="ad">Kulüp</th><th class="s">Yedek kulübesi</th></tr></thead><tbody>
+      ${Y.map(([k, n]) => { const [sz, kid] = k.split("|"); return `<tr><td><a class="bag" href="#/${K}sezon/${sz}">${sz}</a></td><td class="ad">${kulupBag(+kid)}</td><td class="s">${n}</td></tr>`; }).join("")}</tbody></table></div>
+      <p class="soluk not">Kaynak: <a class="bag" href="https://www.tff.org/Default.aspx?pageId=30&kisiId=${kisi}" target="_blank" rel="noopener">TFF</a> maç sayfaları.</p>`;
+    return;
+  }
   const topla = l => l.reduce((t, r) => { for (const k of ["mac", "ilk", "gol", "pen", "kk", "sari", "kirmizi", "dk", "kmac", "gy", "yenen"]) t[k] += r[k]; return t; },
     { mac: 0, ilk: 0, gol: 0, pen: 0, kk: 0, sari: 0, kirmizi: 0, dk: 0, kmac: 0, gy: 0, yenen: 0 });
   const T = topla(S);
