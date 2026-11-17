@@ -3,18 +3,16 @@
   python3 kadin.py site      (ya da: python3 kadin_site.py)
 
 Girdi: raw/kadin.db (kadin.py kur: maçlar, skorlar) ve raw/kadin_detay.db (kadin.py ayikla: kadro, gol, kart...).
-Çıktı:
-  kadin/ozet.json        sezonlar, ligler, kulüpler, sezon gol kralları
-  kadin/maclar.json      bütün maçlar (puan tabloları, kulüp sayfaları tarayıcıda hesaplanır)
-  kadin/oyuncular.json   oyuncu dizini (arama, tüm zamanlar listeleri)
-  kadin/m/<TFF maç no % 250>.json   maç ayrıntısı (kadro, olaylar, hakemler)
-  kadin/o/<kişi no % 250>.json      oyuncu kariyeri (sezon x kulüp)
-  kadin/k/<kulüp>.json              kulübün oyuncuları
+Çıktı (kulüp, maç ve oyuncu dosyaları erkek bölümüyle aynı biçimde; app.js aynı sayfaları kadın verisiyle çizer):
+  kadin/ozet.json        sezonlar, ligler, kulüpler, sezon gol kralları, ayrıntılı maç aralıkları
+  kadin/maclar.json      bütün maçlar (bölümün sezon sayfaları için)
+  kadin/kulup/<id>.json  kulübün maçları (web_aktar'ın kulup/<id>.json biçimi; maç no = TFF maç no)
+  kadin/tff/...          maç ayrıntıları, oyuncu kariyerleri, kulüp oyuncu listeleri (tff_detay.aktar)
 
 Kulüp adları: erkek takımıyla aynı TFF kulübü olanlar (Galatasaray, Fenerbahçe, Beşiktaş...) erkek bölümündeki adıyla
 ve "(Kadın)" ekiyle yazılır; adında zaten Kadın/Bayan geçmeyen ve bir erkek kulübüyle aynı adı taşıyanlar da "(Kadın)" alır.
 """
-import collections, datetime, json, os, sqlite3
+import collections, datetime, json, os, shutil, sqlite3
 
 import web_aktar
 import tff_detay
@@ -94,116 +92,75 @@ def aktar():
         "alanlar": ["tff", "tarih", "sezon", "kademe", "lig", "grup", "asama", "hafta", "ev", "dep", "ev_gol", "dep_gol", "ev_pen", "dep_pen", "ayrinti", "durum"],
         "maclar": maclar})
 
-    krallar, oyuncular = {}, []
+    # ---- erkek bölümüyle aynı biçimde: kulüp maç dosyaları ve TFF ayrıntıları (kulüp, maç, oyuncu sayfaları app.js'in kodunu kullanır)
+    m_dict = []
+    for r in maclar:
+        tff, tarih, sezon, kademe, lig, grup, asama, hafta, ev, dep, eg, dg, ep, dp, ayr, durum = r
+        m_dict.append({"id": tff, "kaynak": "tff", "kaynak_id": str(tff), "yarisma": "lig", "lig": lig, "kademe": kademe, "sezon": sezon,
+                       "grup": grup or None, "asama": "play-off" if asama else "lig", "tur": asama or None, "tarih": tarih, "saat": None,
+                       "ev_kulup": ev, "dep_kulup": dep, "ev_adi": kulup[ev]["ad"], "dep_adi": kulup[dep]["ad"], "ev_gol": eg, "dep_gol": dg,
+                       "ev_pen": ep, "dep_pen": dp, "durum": None, "notlar": None})
+    kulup_mac = collections.defaultdict(list)
+    for m in m_dict:
+        tur = m["grup"] if not m["tur"] else m["tur"]
+        tur = f"{int(tur)}. grup" if tur and tur.isdigit() else tur or ""
+        for s, r_ in (("ev", "dep"), ("dep", "ev")):
+            kulup_mac[m[s + "_kulup"]].append([m["id"], m["tarih"], m["sezon"], "L", m["lig"], m["kademe"], tur, "p" if m["tur"] else "",
+                                               "E" if s == "ev" else "D", m[s + "_adi"], m[r_ + "_kulup"], m[r_ + "_adi"],
+                                               m[s + "_gol"], m[r_ + "_gol"], m[s + "_pen"], m[r_ + "_pen"], None, None])
+    for kid, ms in kulup_mac.items():
+        yaz(os.path.join(CIKTI, "kulup", f"{kid}.json"), {
+            "alanlar": ["id", "tarih", "sezon", "yarisma", "lig", "kademe", "grup_tur", "playoff", "saha", "takim", "rakip_id",
+                        "rakip", "attigi", "yedigi", "pen_a", "pen_y", "durum", "not"], "maclar": ms})
+    for k, v in kulup.items():
+        v.update(tff=[v["tff"]], ardil=[], yerli=True, enust=min((m[5] for m in kulup_mac[k] if not m[7]), default=None))
+    tff_ayr, krallar, oyuncu = [], {}, 0
     if o:
-        krallar, oyuncular = detay_aktar(o, c, tff_kulup, kulup)
+        bellek = sqlite3.connect(":memory:")
+        bellek.executescript("CREATE TABLE kulup_kimlik(kulup_id, kaynak, kaynak_id, ilk_sezon, son_sezon);"
+                             "CREATE TABLE mac(kaynak, kaynak_id, tarih, ev_kulup, dep_kulup, yarisma);")
+        bellek.executemany("INSERT INTO kulup_kimlik VALUES(?, 'tff', ?, NULL, NULL)", [(k, v["tff"][0]) for k, v in kulup.items()])
+        eski = tff_detay.OYUNCU_DB, tff_detay.KUPA_ES
+        tff_detay.OYUNCU_DB, tff_detay.KUPA_ES = DETAY_DB, os.path.join(KOK, "raw", "kadin_kupa_eslesme.json")
+        try:
+            tff_ayr = tff_detay.aktar(bellek, m_dict, web_aktar.okunur, CIKTI)
+        finally:
+            tff_detay.OYUNCU_DB, tff_detay.KUPA_ES = eski
+        krallar = gol_krallari(o, tff_kulup)
+        oyuncu = len(json.load(open(os.path.join(CIKTI, "tff", "oyuncular.json"), encoding="utf-8"))["oyuncu"])
+    for eski_ in ("m", "o", "k", "oyuncular.json"):   # 17.11 öncesi kadın bölümüne özel dosyalar
+        y = os.path.join(CIKTI, eski_)
+        if os.path.isdir(y):
+            shutil.rmtree(y)
+        elif os.path.exists(y):
+            os.remove(y)
 
     yaz(os.path.join(CIKTI, "ozet.json"), {
         "surum": datetime.datetime.now().strftime("%Y%m%d%H%M"),
         "mac": len(maclar), "oynanan": sum(r[10] is not None for r in maclar), "ayrintili": len(detay),
-        "sezonlar": sezonlar, "ligler": {s: sorted(l) for s, l in ligler.items()},
-        "kulupler": sorted(kulup.values(), key=lambda k: -k["mac"]), "krallar": krallar, "oyuncu": len(oyuncular)})
+        "sezonlar": sezonlar, "ligler": {s: sorted(l) for s, l in ligler.items()}, "detayli": [], "detayli_aralik": web_aktar.araliklar(tff_ayr),
+        "kulupler": sorted(kulup.values(), key=lambda k: -k["mac"]), "krallar": krallar, "oyuncu": oyuncu})
     toplam = sum(os.path.getsize(os.path.join(d, f)) for d, _, fs in os.walk(CIKTI) for f in fs)
-    print(f"kadın: {len(maclar)} maç ({len(detay)} ayrıntılı), {len(kulup)} kulüp, {len(oyuncular)} oyuncu -> {CIKTI} ({toplam / 1e6:.1f} MB)")
+    print(f"kadın: {len(maclar)} maç ({len(tff_ayr)} ayrıntılı), {len(kulup)} kulüp, {oyuncu} oyuncu -> {CIKTI} ({toplam / 1e6:.1f} MB)")
 
 
-def detay_aktar(o, c, tff_kulup, kulup):
+def gol_krallari(o, tff_kulup):
+    """(sezon, kademe) -> en çok lig golü atan(lar): [[kişi, ad, gol, kulüp], ...]"""
     okunur = tff_detay.kisi_okunur_kur(o, web_aktar.okunur)
-    ad = {}
-    kadro = collections.defaultdict(lambda: [[], []])
-    for mac, taraf, kisi, a, forma, ilk11 in o.execute("SELECT mac, taraf, kisi, ad, forma, ilk11 FROM kadro ORDER BY rowid"):
-        kadro[int(mac)][taraf - 1].append([forma, kisi, ilk11])
-        ad.setdefault(kisi, a)
-    olay = collections.defaultdict(list)
-    for mac, taraf, kisi, a, dk, d1, d2, tip in o.execute("SELECT mac, taraf, kisi, ad, dakika, dk, ek, tip FROM gol"):
-        olay[int(mac)].append([taraf, "G", d1, d2 or 0, kisi, None, tip])
-        ad.setdefault(kisi, a)
-    for mac, taraf, kisi, a, renk, dk, d1, d2 in o.execute("SELECT mac, taraf, kisi, ad, renk, dakika, dk, ek FROM kart"):
-        olay[int(mac)].append([taraf, KART.get(renk, "Y"), d1, d2 or 0, kisi, None, None])
-        ad.setdefault(kisi, a)
-    giris, cikis = collections.defaultdict(dict), collections.defaultdict(dict)
-    for mac, taraf, gir, gad, cik, cad, dk, d1, d2 in o.execute("SELECT * FROM degisiklik"):
-        if gir or cik:
-            olay[int(mac)].append([taraf, "S", d1, d2 or 0, cik, gir, None])
-            if gir:
-                giris[int(mac)][gir] = d1
-                ad.setdefault(gir, gad)
-            if cik:
-                cikis[int(mac)][cik] = d1
-                ad.setdefault(cik, cad)
-    teknik = collections.defaultdict(lambda: [[], []])
-    for mac, taraf, kisi, a in o.execute("SELECT mac, taraf, kisi, ad FROM teknik"):
-        teknik[int(mac)][taraf - 1].append(okunur(a))
-    hakem = collections.defaultdict(list)
-    for mac, kisi, a, gorev in o.execute("SELECT mac, kisi, ad, gorev FROM hakem"):
-        hakem[int(mac)].append([okunur(a), gorev or "Hakem"])
-    bilgi = {int(m): (s, u) for m, s, u in o.execute("SELECT mac, stad, gol_uyum FROM mac_bilgi")}
-
-    # maç dosyaları
-    kova = collections.defaultdict(dict)
-    for m, (stad, uyum) in bilgi.items():
-        kova[m % KOVA][m] = {"s": stad, "u": uyum, "k": kadro[m], "o": sorted(olay[m], key=lambda x: (x[2] is None, x[2] or 0, x[3])),
-                             "t": teknik[m], "h": hakem[m]}
-    for b, d in kova.items():
-        kisiler = {p[1] for r in d.values() for t in r["k"] for p in t} | {x[4] for r in d.values() for x in r["o"]} | \
-                  {x[5] for r in d.values() for x in r["o"]}
-        yaz(os.path.join(CIKTI, "m", f"{b}.json"), {"ad": {k: okunur(ad.get(k, "")) for k in kisiler if k}, "mac": d})
-
-    # oyuncu istatistikleri: (kisi, sezon, kulüp, kademe) -> [maç, ilk11, gol, pen, sarı, kırmızı]
-    O = collections.defaultdict(lambda: collections.defaultdict(lambda: [0] * 6))
-    kul_oy = collections.defaultdict(lambda: collections.defaultdict(lambda: [0, 0, None, None]))
-    kral = collections.defaultdict(collections.Counter)   # (sezon, kademe) -> kisi -> lig golü
-    kral_kul = {}
-    for m in bilgi:
-        if m not in tff_kulup:
+    kral, kul, ad = collections.defaultdict(collections.Counter), {}, {}
+    for mac, taraf, kisi, a, dk, ek, tip in o.execute("SELECT mac, taraf, kisi, ad, dk, ek, tip FROM gol"):
+        t = tff_kulup.get(int(mac))
+        if not t or not t[4] or not kisi or tip == "K" or tff_detay.seri_mi(tip, dk, ek):
             continue
-        ev, dep, sezon, kademe, lig = tff_kulup[m]
-        for taraf, kid in ((1, ev), (2, dep)):
-            for forma, kisi, ilk11 in kadro[m][taraf - 1]:
-                if not kisi or not (ilk11 or kisi in giris[m]):
-                    continue
-                r = O[kisi][(sezon, kid, kademe if lig else 0)]
-                r[0] += 1
-                r[1] += ilk11
-                k = kul_oy[kid][kisi]
-                k[0] += 1
-                k[2] = min(k[2] or sezon, sezon)
-                k[3] = max(k[3] or sezon, sezon)
-        for taraf, tur, d1, d2, k1, k2, tip in olay[m]:
-            kid = ev if taraf == 1 else dep
-            if tur == "G" and k1 and tip != "K" and not tff_detay.seri_mi(tip, d1, d2):
-                r = O[k1][(sezon, kid, kademe if lig else 0)]
-                r[2] += 1
-                r[3] += tip == "P"
-                kul_oy[kid][k1][1] += 1
-                if lig:
-                    kral[(sezon, kademe)][k1] += 1
-                    kral_kul[(sezon, kademe, k1)] = kid
-            elif tur in ("Y", "R", "YR") and k1:
-                r = O[k1][(sezon, kid, kademe if lig else 0)]
-                if tur == "Y":
-                    r[4] += 1
-                else:
-                    r[5] += 1
-    okova = collections.defaultdict(dict)
-    dizin = []
-    for kisi, sat in O.items():
-        satir = [[s, kid, kad, *v] for (s, kid, kad), v in sorted(sat.items())]
-        okova[kisi % KOVA][kisi] = {"ad": okunur(ad.get(kisi, "")), "s": satir}
-        mac, gol = sum(x[3] for x in satir), sum(x[5] for x in satir)
-        son = max(satir, key=lambda x: x[0])
-        dizin.append([kisi, okunur(ad.get(kisi, "")), mac, gol, min(x[0] for x in satir), son[0], son[1]])
-    for b, d in okova.items():
-        yaz(os.path.join(CIKTI, "o", f"{b}.json"), {"oyuncu": d})
-    yaz(os.path.join(CIKTI, "oyuncular.json"), {"alanlar": ["kisi", "ad", "mac", "gol", "ilk", "son", "son_kulup"], "oyuncular": dizin})
-    for kid, d in kul_oy.items():
-        yaz(os.path.join(CIKTI, "k", f"{kid}.json"), {"alanlar": ["kisi", "ad", "mac", "gol", "ilk", "son"],
-            "oyuncular": sorted(([k, okunur(ad.get(k, "")), *v] for k, v in d.items()), key=lambda x: -x[2])})
-    krallar = {}
+        ev, dep, sezon, kademe, _ = t
+        kral[(sezon, kademe)][kisi] += 1
+        kul[(sezon, kademe, kisi)] = ev if taraf == 1 else dep
+        ad[kisi] = a
+    out = {}
     for (sezon, kademe), cnt in kral.items():
         en = cnt.most_common(1)[0][1]
-        krallar.setdefault(sezon, {})[kademe] = [[k, okunur(ad.get(k, "")), n, kral_kul[(sezon, kademe, k)]] for k, n in cnt.most_common() if n >= en][:5]
-    return krallar, dizin
+        out.setdefault(sezon, {})[kademe] = [[k, okunur(ad[k]), n, kul[(sezon, kademe, k)]] for k, n in cnt.most_common() if n >= en][:5]
+    return out
 
 
 if __name__ == "__main__":
