@@ -234,6 +234,23 @@ def gol_uyum(c=None):
     c = c or sqlite3.connect(OYUNCU_DB)
     if "gol_uyum" not in [r[1] for r in c.execute("PRAGMA table_info(mac_bilgi)")]:
         c.execute("ALTER TABLE mac_bilgi ADD COLUMN gol_uyum TEXT")
+    # TFF bazen normal golü "K" (kendi kalesine) diye işaretliyor: atan oyuncu golün listelendiği takımın kadrosunda ve
+    # skor ancak gol o takıma sayılınca tutuyor (ör. kadın 2021-22 Mengü 0-45 Esentepe). Böyle maçlarda K işareti F yapılır.
+    K = collections.defaultdict(list)
+    for mac, taraf, tip, dk, ek in c.execute("SELECT mac, taraf, tip, dk, ek FROM gol"):
+        if not seri_mi(tip, dk, ek):
+            K[mac].append((taraf, tip))
+    duz = []
+    for mac, eg, dg in c.execute("SELECT mac, ev_gol, dep_gol FROM mac_bilgi WHERE ev_gol IS NOT NULL").fetchall():
+        l = K.get(mac, [])
+        if any(t == "K" for _, t in l):
+            liste = [sum(1 for x, _ in l if x == s_) for s_ in (1, 2)]
+            normal = [sum(1 for x, t in l if (2 - x if t == "K" else x - 1) == s_) for s_ in (0, 1)]
+            if liste == [eg, dg] and normal != [eg, dg]:
+                duz.append(mac)
+    c.executemany("UPDATE gol SET tip='F' WHERE mac=? AND tip='K'", [(m,) for m in duz])
+    if duz:
+        print(f"kendi kalesine işareti hatalı (skorla tutmuyor, normal gol yapıldı): {len(duz)} maç")
     gol, seri = collections.defaultdict(lambda: [0, 0]), collections.Counter()
     for mac, taraf, tip, dk, ek in c.execute("SELECT mac, taraf, tip, dk, ek FROM gol"):
         if seri_mi(tip, dk, ek):
