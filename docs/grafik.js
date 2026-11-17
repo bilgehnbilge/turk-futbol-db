@@ -166,8 +166,8 @@ async function sayilarSayfa() {
   <p class="soluk not">Lig, Türkiye Kupası ve Cumhurbaşkanlığı/Süper Kupa maçları. Çizgi, iki kulübün galibiyet farkının maç maç nasıl değiştiğini gösterir: çizgi yukarıdaysa soldaki kulüp, aşağıdaysa sağdaki kulüp önde. Penaltıyla biten maçlar beraberlik sayılır.</p>
   <div id="derbiler" class="izgara k2"></div>
 
-  ${kadin ? "" : `<h2 class="bolum">Kırmızı kartın etkisi</h2>
-  <div id="kirmizi"><div class="yukleniyor">Hazırlanıyor…</div></div>`}
+  <h2 class="bolum">Kırmızı kartın etkisi</h2>
+  <div id="kirmizi"><div class="yukleniyor">Hazırlanıyor…</div></div>
 
   <h2 class="bolum">${kadin ? "En üst ligde oynamış kulüpler" : "Süper Lig'de oynamış kulüpler"}</h2>
   <p class="soluk not">Her satır bir kulüp, her kare bir sezon. Koyu kare ${kadin ? "en üst lig (2021-22'ye kadar Kadınlar 1. Ligi, sonra Kadın Süper Ligi)" : "Süper Lig"}, açıldıkça alt ligler; noktalı kare ${kadin ? "normal sezonu birinci bitirme (şampiyonluk play-off'la belirlenen sezonlarda farklı olabilir)" : "şampiyonluk"}. En üst ligde en çok sezon geçirenden en aza sıralı.</p>
@@ -179,7 +179,7 @@ async function sayilarSayfa() {
   skorBolumu($("#skorBolum"), S, xler, A);
   derbiCiz($("#derbiler"), S);
   matrisCiz($("#matris"), Y, xler);
-  if (!kadin) al(`data/kirmizi.json?s=${OZET.surum || ""}`).then(K => kirmiziBolumu($("#kirmizi"), K)).catch(() => { $("#kirmizi").innerHTML = `<p class="soluk">Kırmızı kart verisi yüklenemedi.</p>`; });
+  al(`${V}kirmizi.json?s=${OZET.surum || ""}`).then(K => kirmiziBolumu($("#kirmizi"), K)).catch(() => { $("#kirmizi").innerHTML = `<p class="soluk">Kırmızı kart verisi yüklenemedi.</p>`; });
 }
 
 // ---------------------------------------------------------------- kırmızı kart
@@ -192,7 +192,7 @@ function kirmiziBolumu(kap, K) {
   const P = K.puan_alanlar.reduce((o, a, i) => (o[a] = i, o), {});
   const ber15 = K.puan.find(r => r[P.gecis] === 0 && r[P.dakika] === 15 && !r[P.uzatma] && r[P.saha] === 0 && r[P.fark] === 0);
   kap.innerHTML = `
-    <p class="soluk not">Süper Lig ${esc(kp.sezon_ilk)}–${esc(kp.sezon_son.slice(5))}, gol ve kart dakikaları TFF maç sayfalarından: ${sayiYaz(kp.mac)} maç, ${sayiYaz(kp.kirmizili)} maçta ${sayiYaz(kp.kirmizi)} kırmızı kart (ikinci sarıdan olanlar dahil). Gol listesi skorla tutmayan ya da dakikası eksik ${sayiYaz(Object.values(kp.cikarilan).reduce((a, b) => a + b, 0))} maç çıkarıldı.</p>
+    <p class="soluk not">${esc(kp.ad || "Süper Lig")} ${esc(kp.sezon_ilk)}–${esc(kp.sezon_son.slice(5))}, gol ve kart dakikaları TFF maç sayfalarından: ${sayiYaz(kp.mac)} maç, ${sayiYaz(kp.kirmizili)} maçta ${sayiYaz(kp.kirmizi)} kırmızı kart (ikinci sarıdan olanlar dahil). Gol listesi skorla tutmayan ya da dakikası eksik ${sayiYaz(Object.values(kp.cikarilan).reduce((a, b) => a + b, 0))} maç çıkarıldı.</p>
     <div class="izgara k4 bolum-ic">
       <div class="kart stat"><span class="soluk">10 kişi kalan takımın attığı gol</span><b>×${c(md.kendi[0].carpan)}</b><small class="soluk">11'e 11'e göre (%95 aralık ${c(md.kendi[0].alt)}–${c(md.kendi[0].ust)})</small></div>
       <div class="kart stat"><span class="soluk">10 kişi kalan takımın yediği gol</span><b>×${c(md.rakip[0].carpan)}</b><small class="soluk">rakibin attığı gol (${c(md.rakip[0].alt)}–${c(md.rakip[0].ust)})</small></div>
@@ -201,7 +201,7 @@ function kirmiziBolumu(kap, K) {
     </div>
     <div class="izgara k2 bolum-ic">
       <div class="kart viz"><h3>Kırmızının dakikasına göre maç sonu gol farkına etkisi</h3>
-        <p class="soluk aciklama">Yalnız bir kırmızı kartın çıktığı ${sayiYaz(kp.tek)} maç. Kırmızı gören takımın kart sonrası gol farkı, aynı dakikada aynı skor durumunda (önde/berabere/geride) ve aynı sahadaki 11'e 11 maçlarla karşılaştırıldı. Çubuk: gözlenen ortalama, çizgi: %95 güven aralığı, nokta: model. 1-15 diliminde maç az, aralık geniş; 90+ diliminde model etkiyi gözlenenden küçük buluyor (uzatmalardaki kartlı maçlar daha uzun sürüyor olabilir).</p>
+        <p class="soluk aciklama">Yalnız bir kırmızı kartın çıktığı ${sayiYaz(kp.tek)} maç. Kırmızı gören takımın kart sonrası gol farkı, aynı dakikada aynı skor durumunda (önde/berabere/geride) ve aynı sahadaki 11'e 11 maçlarla karşılaştırıldı. Çubuk: gözlenen ortalama, çizgi: %95 güven aralığı, nokta: model. ${kp.ad && kp.ad !== "Süper Lig" ? "Maç sayısı erkek Süper Lig'inden az olduğu için aralıklar geniş; ilk 30 dakikadaki kartlarda gözlenen değerler dalgalı." : "1-15 diliminde maç az, aralık geniş; 90+ diliminde model etkiyi gözlenenden küçük buluyor (uzatmalardaki kartlı maçlar daha uzun sürüyor olabilir)."}</p>
         ${lejant([{ ad: "Gözlenen", renk: "var(--s2)" }], false)}<div id="kSutun"></div>
         ${tabloGorunum("Tablo olarak göster", ["Kart dakikası", "Maç", "Gol farkına etki", "%95 aralık", "Kart sonrası attığı (beklenen)", "Yediği (beklenen)", "Model"],
           K.gozlenen.map(g => [g.kova, g.n, (g.etki > 0 ? "+" : "") + c(g.etki), `±${c(g.ga)}`, `${c(g.atilan)} (${c(g.atilan_bek)})`, `${c(g.yenen)} (${c(g.yenen_bek)})`, c(g.model)]))}</div>
@@ -218,7 +218,7 @@ function kirmiziBolumu(kap, K) {
         <td>${esc(d.durum)}${d.dakika < 1000 ? " <small>(az veri)</small>" : ""}</td><td class="s">${sayiYaz(d.dakika)}</td><td class="s">${c(d.atilan90)}</td><td class="s">${c(d.yenen90)}</td><td class="s">${d.kendi === d.rakip ? `${sayiYaz(d.atilan * 2)} toplam` : `${d.atilan}–${d.yenen}`}</td></tr>`).join("")}
       </tbody></table></div>
       <p class="soluk aciklama" style="margin-top:10px">Örnek okuma: "10'a 11" satırı, 10 kişi kalan takımın bakışıyla. 11'e 11'de takım başına 90 dakikada ${c(K.durumlar.find(d => d.kendi === 11 && d.rakip === 11).atilan90)} gol atılırken, 10 kişi kalan takım ${c(ilk.atilan90)} atıp ${c(ilk.yenen90)} yiyor. İki takımın da 10 kişi kaldığı maçlar daha açık geçiyor.</p>
-      <p class="soluk aciklama">Puan maliyeti tablosunun tamamı (bütün dakikalar, skor farkları ve geçişler) <a class="bag" href="https://github.com/bilgehnbilge/turk-futbol-db/blob/main/kirmizi_kart_puan.csv">kirmizi_kart_puan.csv</a> dosyasında.</p>
+      <p class="soluk aciklama">Puan maliyeti tablosunun tamamı (bütün dakikalar, skor farkları ve geçişler) <a class="bag" href="https://github.com/bilgehnbilge/turk-futbol-db/blob/main/${esc(kp.csv || "kirmizi_kart_puan.csv")}">${esc(kp.csv || "kirmizi_kart_puan.csv")}</a> dosyasında.</p>
     </div>`;
   sutunGrafik($("#kSutun", kap), K.gozlenen);
   const ciz = () => {

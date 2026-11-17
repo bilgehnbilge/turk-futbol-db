@@ -129,6 +129,9 @@ def aktar():
         krallar = gol_krallari(o, tff_kulup)
         oyuncu = len(json.load(open(os.path.join(CIKTI, "tff", "oyuncular.json"), encoding="utf-8"))["oyuncu"])
     rekor_sayilar(m_dict, sezonlar, kulup)
+    # kırmızı kart analizi: kirmizi.py kadin yerelde üretir (depodaki kirmizi_kadin.json siteye kopyalanır)
+    if os.path.exists(os.path.join(KOK, "kirmizi_kadin.json")):
+        shutil.copy(os.path.join(KOK, "kirmizi_kadin.json"), os.path.join(CIKTI, "kirmizi.json"))
     for eski_ in ("m", "o", "k", "oyuncular.json"):   # 17.11 öncesi kadın bölümüne özel dosyalar
         y = os.path.join(CIKTI, eski_)
         if os.path.isdir(y):

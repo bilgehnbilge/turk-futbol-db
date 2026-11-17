@@ -2,6 +2,7 @@
 """Kırmızı kartın skora etkisi: Süper Lig 1991-92'den bugüne, TFF maç sayfalarındaki gol ve kart dakikalarından.
 
   python3 kirmizi.py          # kirmizi_kart.json (site: Sayılar sayfası) + kirmizi_kart_puan.csv (hakem hatası değerlendirmesi)
+  python3 kirmizi.py kadin    # aynı analiz kadın ligleriyle (bütün kademeler, normal sezon): kirmizi_kadin.json + kirmizi_kadin_puan.csv
 
 Yöntem
   1. Her maç, kırmızı kartlarla değişen oyuncu sayısı dönemlerine bölünür (11'e 11, 10'a 11, 9'a 11, 10'a 10 ...).
@@ -54,14 +55,27 @@ def kova(dk, ek):
     return 6
 
 
-def maclar():
+KAPSAM_AD = {"erkek": "Süper Lig", "kadin": "Kadın ligleri (bütün kademeler)"}
+
+
+def mac_listesi(bolum):
+    """[(TFF maç no, sezon, ev golü, dep golü, aşama, sayfa yolu)]"""
+    if bolum == "kadin":
+        import kadin
+        t = sqlite3.connect(kadin.DB)
+        return [(m, s, e, d, a, kadin.mac_yol(m)) for m, s, e, d, a in t.execute(
+            "SELECT kaynak_id, sezon, ev_gol, dep_gol, asama FROM mac WHERE ev_gol IS NOT NULL AND kaynak_id<>''")]
     t = sqlite3.connect(O.TFF_DB)
+    return [(m, s, e, d, a, O.yol(m)) for m, s, e, d, a in t.execute("""SELECT kaynak_id, sezon, ev_gol, dep_gol, asama FROM mac WHERE kaynak='tff'
+                                                  AND kademe=1 AND ev_gol IS NOT NULL AND kaynak_id<>'' AND sezon>='1991-1992'""")]
+
+
+def maclar(bolum="erkek"):
     out, sorun = [], collections.Counter()
-    for mid, sezon, eg, dg, asama in t.execute("""SELECT kaynak_id, sezon, ev_gol, dep_gol, asama FROM mac WHERE kaynak='tff'
-                                                  AND kademe=1 AND ev_gol IS NOT NULL AND kaynak_id<>'' AND sezon>='1991-1992'"""):
-        if asama != "lig" or not os.path.exists(O.yol(mid)):
+    for mid, sezon, eg, dg, asama, yol in mac_listesi(bolum):
+        if asama != "lig" or not os.path.exists(yol):
             continue
-        with gzip.open(O.yol(mid), "rb") as f:
+        with gzip.open(yol, "rb") as f:
             o = O.sayfa_oku(f.read().decode("cp1254", "replace"))
         goller = [(2 - g[0] if g[6] == "K" else g[0] - 1, g[4], g[5]) for g in o["gol"] if g[6] != "S"]
         say = [sum(1 for g in goller if g[0] == s) for s in (0, 1)]
@@ -252,8 +266,11 @@ def durum_tablosu(ms):
     return t
 
 
-def main():
-    ms, sorun = maclar()
+def main(bolum="erkek"):
+    global CIKTI_JSON, CIKTI_CSV
+    if bolum == "kadin":
+        CIKTI_JSON, CIKTI_CSV = os.path.join(KOK, "kirmizi_kadin.json"), os.path.join(KOK, "kirmizi_kadin_puan.csv")
+    ms, sorun = maclar(bolum)
     b, se, hucre = model_kur(ms)
     bd, sed, _ = model_kur(ms, dogrusal=True)
     M = Model(b)
@@ -303,7 +320,7 @@ def main():
         g["model"] = round(sum(M.kalan_beklenen(t, s, 10, 11) - M.kalan_beklenen(t, 1 - s, 11, 10)
                                - (M.kalan_beklenen(t, s, 11, 11) - M.kalan_beklenen(t, 1 - s, 11, 11)) for s in (0, 1)) / 2, 3)
     kart_say = collections.Counter((sum(1 for k in m["kart"] if k[1] == 0), sum(1 for k in m["kart"] if k[1] == 1)) for m in ms)
-    sonuc = dict(kapsam=dict(mac=len(ms), sezon_ilk=min(m["sezon"] for m in ms), sezon_son=max(m["sezon"] for m in ms),
+    sonuc = dict(kapsam=dict(ad=KAPSAM_AD[bolum], csv=os.path.basename(CIKTI_CSV), mac=len(ms), sezon_ilk=min(m["sezon"] for m in ms), sezon_son=max(m["sezon"] for m in ms),
                              kirmizili=sum(1 for m in ms if m["kart"]), kirmizi=sum(len(m["kart"]) for m in ms),
                              tek=sum(1 for m in ms if len(m["kart"]) == 1), cikarilan=dict(sorun),
                              kart_dagilimi=[[a, b_, n] for (a, b_), n in sorted(kart_say.items())]),
@@ -316,4 +333,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1] if len(sys.argv) > 1 else "erkek")
