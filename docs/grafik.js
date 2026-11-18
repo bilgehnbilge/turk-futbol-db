@@ -98,19 +98,54 @@ function cizgiGrafik(kap, { xler, seriler, bicim, yMin = null, yMax = null, yuks
     ip.goster(X(i) * olcek, Math.min(...seriler.map(s => s.d[i] ?? hi).map(Y)) * olcek, ipucuBas(xler[i]), sat.length ? sat : [{ deger: "—" }]);
   };
   let secili = xler.length - 1;
+  // ortak imleç: bir grafikte bir yıl seçilince sayfadaki öbür çizgi grafikler de o yılı gösterir (ipucusuz),
+  // her grafik o yılın değerlerini alttaki yıl şeridine yazar
+  const baslik = () => kap.closest(".kart, .viz")?.querySelector("h3")?.textContent.trim() || seriler.map(s => s.ad).join(", ");
+  const yay = i => document.dispatchEvent(new CustomEvent("grafikYil", { detail: { y: sezonYil(xler[i]), kaynak: kap } }));
+  const golge = i => {   // ipucusuz imleç (başka grafikten gelen yıl)
+    imlec.setAttribute("x1", X(i)); imlec.setAttribute("x2", X(i)); imlec.setAttribute("visibility", "visible");
+    seriler.forEach((s, j) => { const v = s.d[i]; noktalar[j].setAttribute("visibility", v == null ? "hidden" : "visible"); if (v != null) { noktalar[j].setAttribute("cx", X(i)); noktalar[j].setAttribute("cy", Y(v)); } });
+  };
+  const dinle = e => {
+    if (!kap.isConnected) { document.removeEventListener("grafikYil", dinle); document.removeEventListener("grafikYilBitti", bitti); return; }
+    const i = xler.findIndex(s => sezonYil(s) === e.detail.y);
+    if (e.detail.kaynak !== kap) { if (i < 0) { imlec.setAttribute("visibility", "hidden"); noktalar.forEach(n => n.setAttribute("visibility", "hidden")); } else golge(i); }
+    if (i >= 0) yilSerit.koy(kap, baslik(), e.detail.y, seriler.filter(s => s.d[i] != null).slice(0, 4).map(s => ({ ad: s.ad, renk: s.renk, deger: bicim(s.d[i]) })));
+    else yilSerit.koy(kap, baslik(), e.detail.y, []);
+  };
+  const bitti = e => { if (!kap.isConnected) return; if (e.detail?.kaynak !== kap) { imlec.setAttribute("visibility", "hidden"); noktalar.forEach(n => n.setAttribute("visibility", "hidden")); } yilSerit.gizle(); };
+  document.addEventListener("grafikYil", dinle);
+  document.addEventListener("grafikYilBitti", bitti);
   kat.addEventListener("pointermove", e => {
     const [px] = yerel(svg, e), x = px / svg.getBoundingClientRect().width * W;
-    secili = Math.max(0, Math.min(xler.length - 1, Math.round((x - sol) / ((W - sol - sag) / Math.max(1, xler.length - 1)))));
-    goster(secili);
+    const yeni = Math.max(0, Math.min(xler.length - 1, Math.round((x - sol) / ((W - sol - sag) / Math.max(1, xler.length - 1)))));
+    const degisti = yeni !== secili || imlec.getAttribute("visibility") !== "visible"; secili = yeni;
+    goster(secili); if (degisti) yay(secili);
   });
-  const sakla = () => { ip.gizle(); imlec.setAttribute("visibility", "hidden"); noktalar.forEach(n => n.setAttribute("visibility", "hidden")); };
+  const sakla = () => { ip.gizle(); imlec.setAttribute("visibility", "hidden"); noktalar.forEach(n => n.setAttribute("visibility", "hidden")); document.dispatchEvent(new CustomEvent("grafikYilBitti", { detail: { kaynak: kap } })); };
   kat.addEventListener("pointerleave", sakla);
-  kat.addEventListener("focus", () => goster(secili));
+  kat.addEventListener("focus", () => { goster(secili); yay(secili); });
   kat.addEventListener("blur", sakla);
   kat.addEventListener("keydown", e => {
-    if (e.key === "ArrowLeft" || e.key === "ArrowRight") { secili = Math.max(0, Math.min(xler.length - 1, secili + (e.key === "ArrowLeft" ? -1 : 1))); goster(secili); e.preventDefault(); }
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") { secili = Math.max(0, Math.min(xler.length - 1, secili + (e.key === "ArrowLeft" ? -1 : 1))); goster(secili); yay(secili); e.preventDefault(); }
   });
 }
+// yıl şeridi: ortak imleçte seçili yılın bütün grafiklerdeki değerleri (ekranın altında; yalnız 3+ grafik varsa)
+const yilSerit = (() => {
+  let d = null, veri = new Map(), yil = null;
+  const ciz = () => {
+    const l = [...veri].filter(([k]) => k.isConnected);
+    if (l.length < 3) { if (d) d.hidden = true; return; }
+    if (!d) { d = document.createElement("div"); d.className = "yil-serit"; d.setAttribute("aria-hidden", "true"); document.body.appendChild(d); }
+    d.innerHTML = `<b class="ys-yil">${yil}</b>${l.map(([, v]) => `<span class="ys-g"><small>${esc(v.baslik)}</small>${v.sat.length ? v.sat.map(s => `<span><i class="anahtar" style="background:${s.renk}"></i><b>${esc(s.deger)}</b></span>`).join("") : `<span class="soluk">—</span>`}</span>`).join("")}`;
+    d.hidden = false;
+  };
+  return {
+    koy(kap, baslik, y, sat) { if (y !== yil) { yil = y; } veri.set(kap, { baslik, sat }); clearTimeout(this.z); this.z = setTimeout(ciz, 0); },
+    gizle() { clearTimeout(this.z); if (d) d.hidden = true; },
+  };
+})();
+addEventListener("hashchange", () => yilSerit.gizle());
 function lejant(seriler, cizgi = true) {
   return `<div class="lejant">${seriler.map(s => `<span><i class="${cizgi ? "anahtar" : "anahtar kare"}" style="background:${cizgi && s.renk === KESIK ? `repeating-linear-gradient(90deg, ${s.renk} 0 5px, transparent 5px 8px)` : s.renk}"></i>${esc(s.ad)}</span>`).join("")}</div>`;
 }
@@ -517,6 +552,7 @@ async function eloSayfa() {
   icerik.innerHTML = `
   <div class="sayfa-bas"><h1>Elo puan durumu</h1></div>
   <p class="soluk not">Elo, her maçtan sonra güncellenen bir güç puanı: beklenenden iyi sonuç alan kazanır, kötü sonuç alan kaybeder; güçlü rakibi yenmek, zayıfı yenmekten çok puan getirir. 1959'dan bugüne ${sayiYaz(E.mac)} lig, play-off, Türkiye Kupası ve Cumhurbaşkanlığı/Süper Kupa maçından hesaplandı. Süper Lig'in ortalaması her sezon 1500 kabul edilir, yani puanlar dönemler arasında karşılaştırılabilir. Avrupa maçları dahil değil.</p>
+  <div class="izgara k2 bolum-ust elo-ust"><div class="kart" id="eloYaris"></div><div class="kart" id="eloBeklenti"></div></div>
   <div class="izgara k2 bolum-ust">
     <div class="kart"><h3>Bugünkü sıralama</h3><p class="soluk aciklama">${tarihYaz(E.son_tarih)} itibarıyla, bu sezon ligde oynayan kulüpler. Son sütun: son 10 maçtaki değişim.</p>
       <div class="filtre"><div class="cipler">${[["", "Bütün ligler"], ...kademeler.map(k => [String(k), KADEME_AD[k]])].map(([v, a]) => `<button class="cip ${eloDurum.kademe === v ? "aktif" : ""}" data-ek="${v}">${esc(a)}</button>`).join("")}</div></div>
@@ -541,6 +577,7 @@ async function eloSayfa() {
       ${l.map((r, i) => `<tr><td class="s soluk">${i + 1}</td><td class="ad elo-ad">${kulupBag(r[G.kulup])}</td><td class="gizle-mobil soluk">${esc(KADEME_AD[r[G.kademe]])}</td><td class="s p">${r[G.elo]}</td>
         <td class="s ${r[G.son10] > 0 ? "artı" : r[G.son10] < 0 ? "eksi" : ""}">${r[G.son10] > 0 ? "+" : ""}${r[G.son10]}</td></tr>`).join("")}</tbody></table></div>`;
   };
+  EK.eloYarisi($("#eloYaris"), E, sezonlar); EK.beklenti($("#eloBeklenti"), E);
   tablo();
   icerik.querySelectorAll("[data-ek]").forEach(b => b.addEventListener("click", () => { eloDurum.kademe = b.dataset.ek; icerik.querySelectorAll("[data-ek]").forEach(x => x.classList.toggle("aktif", x === b)); tablo(); }));
   const grafik = () => {
@@ -666,6 +703,7 @@ window.avrupaCiz = avrupaCiz;
 
 yollar.splice(yollar.length - 1, 0, [/^#\/sayilar$/, sayilarSayfa]);
 yollar.splice(yollar.length - 1, 0, [/^#\/elo$/, eloSayfa]);
+window.cizgiGrafik = cizgiGrafik;   // ek.js (iki kulüp sayfasındaki Elo eğrisi) kullanır
 window.eloCiz = eloCiz;
 window.yolculukCiz = yolculukCiz;
 })();

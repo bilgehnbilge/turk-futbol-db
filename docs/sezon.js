@@ -173,6 +173,7 @@ function ligBolumu(kap, sezon, sirali, Z) {
 }
 
 // ---------------------------------------------------------------- sıralama yarışı (bump chart)
+const etiket = a => a.length > 17 ? a.slice(0, 16).trimEnd() + "…" : a;
 function yarisCiz(kap, L, secince, satirVurgu) {
   const R = L.sonHafta, n = L.takimlar.length;
   if (R < 2) { kap.innerHTML = `<p class="soluk">Grafik için en az iki hafta gerekli.</p>`; return { imlec() {}, vurgula() {} }; }
@@ -193,7 +194,7 @@ function yarisCiz(kap, L, secince, satirVurgu) {
     const y = L.yaris.get(id), d = y.map((s, i) => `${i ? "L" : "M"}${X(i + 1).toFixed(1)},${Y(s).toFixed(1)}`).join("");
     const son = y.at(-1);
     h += `<g class="seri" data-t="${esc(id)}" style="${renkStil(id)}"><path class="cizgi" d="${d}"/><path class="hit-yol" d="${d}"/>
-      <circle class="uc" r="3.5" cx="${X(R)}" cy="${Y(son)}"/><text class="seri-ad" x="${X(R) + 8}" y="${Y(son) + 4}">${esc(adKisa(L, id))}</text>
+      <circle class="uc" r="3.5" cx="${X(R)}" cy="${Y(son)}"/><text class="seri-ad" x="${X(R) + 8}" y="${Y(son) + 4}">${esc(etiket(adKisa(L, id)))}</text>
       <circle class="imlec-nokta" r="4" cx="${X(R)}" cy="${Y(son)}"/></g>`;
   }
   svg.innerHTML = h;

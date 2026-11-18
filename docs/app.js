@@ -823,7 +823,9 @@ async function ikiliSayfa(a, b) {
       <div><b>${t.B}</b><span>Berabere</span></div><div><b style="color:var(--m)">${t.M}</b><span>${esc(kb.ad)} kazandı</span></div>
       <div><b>${t.AG}–${t.YG}</b><span>Gol</span></div></div>
       <div class="cubuk"><i class="g" style="width:${yuzde(t.G, t.O)}%"></i><i class="b" style="width:${yuzde(t.B, t.O)}%"></i><i class="m" style="width:${yuzde(t.M, t.O)}%"></i></div></div>
-    <div class="bolum tablo-kap"><table class="tablo"><thead><tr><th class="o">S</th><th>Tarih</th><th>Sezon</th><th class="gizle-mobil">Yarışma</th><th>Ev sahibi</th><th class="s">Skor</th><th>Deplasman</th></tr></thead>
+    <div id="ikiliEk" class="bolum"></div>
+    <h2 class="bolum">Bütün maçlar</h2>
+    <div class="tablo-kap"><table class="tablo"><thead><tr><th class="o">S</th><th>Tarih</th><th>Sezon</th><th class="gizle-mobil">Yarışma</th><th>Ev sahibi</th><th class="s">Skor</th><th>Deplasman</th></tr></thead>
     <tbody>${[...f].reverse().map(m => {
       const ev = m.saha === "E" ? logoImg(m.kulup) + esc(m.takim) : logoImg(m.rakipId) + esc(m.rakip), dep = m.saha === "E" ? logoImg(m.rakipId) + esc(m.rakip) : logoImg(m.kulup) + esc(m.takim);
       const sk = m.saha === "E" ? skorYaz(m.a, m.y, m.pa, m.py, m.durum) : skorYaz(m.y, m.a, m.py, m.pa, m.durum);
@@ -832,6 +834,7 @@ async function ikiliSayfa(a, b) {
     }).join("")}</tbody></table></div>`;
     icerik.querySelectorAll("[data-y]").forEach(x => x.addEventListener("click", () => { d.yar = x.dataset.y; ciz(); }));
     icerik.querySelectorAll("[data-s]").forEach(x => x.addEventListener("click", () => { d.saha = x.dataset.s; ciz(); }));
+    EK.ikili($("#ikiliEk"), f, a, b);
   };
   ciz();
 }
@@ -843,10 +846,11 @@ function karsilastirSayfa() {
   <div class="izgara k2" style="max-width:820px">
     <div class="kart"><h2 class="h3"><label for="kA">1. kulüp</label></h2><div style="position:relative"><input id="kA" data-yalniz-kulup="1" type="search" placeholder="Kulüp ara…" autocomplete="off"><div id="oA" class="oneri" hidden></div></div><p id="sA" class="soluk"></p></div>
     <div class="kart"><h2 class="h3"><label for="kB">2. kulüp</label></h2><div style="position:relative"><input id="kB" data-yalniz-kulup="1" type="search" placeholder="Kulüp ara…" autocomplete="off"><div id="oB" class="oneri" hidden></div></div><p id="sB" class="soluk"></p></div>
-  </div>`;
+  </div><div id="derbiler"></div>`;
+  EK.derbiler($("#derbiler"));
   const yaz = () => {
-    $("#sA").innerHTML = karsilastirSecim.a ? `Seçildi: <b>${esc(kulupAd(karsilastirSecim.a))}</b>` : "";
-    $("#sB").innerHTML = karsilastirSecim.b ? `Seçildi: <b>${esc(kulupAd(karsilastirSecim.b))}</b>` : "";
+    $("#sA").innerHTML = karsilastirSecim.a ? `<span class="secili-kulup">${logoImg(karsilastirSecim.a)}<b>${esc(kulupAd(karsilastirSecim.a))}</b></span>` : "";
+    $("#sB").innerHTML = karsilastirSecim.b ? `<span class="secili-kulup">${logoImg(karsilastirSecim.b)}<b>${esc(kulupAd(karsilastirSecim.b))}</b></span>` : "";
     if (karsilastirSecim.a && karsilastirSecim.b) location.hash = `#/h2h/${karsilastirSecim.a}/${karsilastirSecim.b}`;
   };
   oneriKutusu($("#kA"), $("#oA"), k => { karsilastirSecim.a = k.id; $("#kA").value = k.ad; yaz(); if (!karsilastirSecim.b) $("#kB").focus(); });
@@ -1126,6 +1130,7 @@ async function tffOyuncuSayfa(kisi) {
     ${kaleci ? `<div><b>${T.gy}</b><span>Gol yemeden</span></div><div><b>%${yuzde(T.gy, T.kmac)}</b><span>Gol yemeden oranı</span></div>
       <div><b>${(T.yenen / T.kmac).toFixed(2)}</b><span>Maç başı yenen gol</span></div>`
       : `<div><b>${T.mac ? (T.gol / T.mac).toFixed(2) : "–"}</b><span>Maç başı gol</span></div>`}</div></div>
+  <div class="kart bolum kariyer-kart" id="kariyerKart"></div>
   ${kaleci ? `<div class="cipler gorunum bolum" role="group" aria-label="Tablolarda gösterilen istatistikler"><button type="button" class="cip aktif" data-g="k" aria-pressed="true">Kaleci istatistikleri</button><button type="button" class="cip" data-g="o" aria-pressed="false">Oyuncu istatistikleri</button></div>` : ""}
   <div class="tablo-kap${kaleci ? "" : " bolum"}"><table class="tablo">${bas(["Yarışma"])}<tbody>${yarlar.map(([k, l]) => `<tr><td class="ad">${esc(tffYarAd(l[0].yar, l[0].kademe))}</td>${hucre(topla(l))}</tr>`).join("")}
       ${yarlar.length > 1 ? `<tr class="toplam"><td class="ad"><b>Toplam</b></td>${hucre(T)}</tr>` : ""}</tbody></table></div>
@@ -1142,6 +1147,7 @@ async function tffOyuncuSayfa(kisi) {
   </div>
   <div id="sk-av" hidden></div><div id="sk-td" hidden></div>
   <div id="milliOyuncu"></div>`;
+  EK.kariyer($("#kariyerKart"), S, kaleci);
   icerik.querySelectorAll(".gorunum .cip").forEach(b => b.addEventListener("click", () => {
     icerik.querySelectorAll(".gorunum .cip").forEach(x => { x.classList.toggle("aktif", x === b); x.setAttribute("aria-pressed", x === b); });
     $("#sk-lk").className = b.dataset.g === "k" ? "kv-k" : "kv-o";
@@ -1260,8 +1266,9 @@ async function oyuncularSayfa(sekme, kapsam) {
   if (sekme === "gol" || sekme === "mac") {
     const l = d.liste[kapsam]?.[sekme] || [];
     govde = `<div class="cipler gorunum">${OY_KAPSAM.map(([k, ad]) => `<a class="cip ${k === kapsam ? "aktif" : ""}" href="#/oyuncular/${sekme}/${k}">${ad}</a>`).join("")}</div>
+    <div class="kart cy-kart" id="cyKart"></div>
     <div class="tablo-kap"><table class="tablo"><thead><tr><th class="s sira">#</th><th class="ad">Oyuncu</th><th class="ad">Son kulübü</th><th>Yıllar</th>
-      <th class="s">Maç</th><th class="s">Gol</th><th class="s" title="Maç başına gol">Gol/maç</th></tr></thead><tbody>
+      <th class="s" data-sira>Maç</th><th class="s" data-sira>Gol</th><th class="s" title="Maç başına gol" data-sira>Gol/maç</th></tr></thead><tbody>
       ${l.map((x, i) => `<tr><td class="s soluk sira">${i + 1}</td><td class="ad">${oyB(x[0], x[1])}</td><td class="ad">${kulupBag(x[6])}</td><td class="soluk">${yil(x[4], x[5])}</td>
         <td class="s">${sekme === "mac" ? `<b>${sayiYaz(x[2])}</b>` : sayiYaz(x[2])}</td><td class="s">${sekme === "gol" ? `<b>${x[3]}</b>` : x[3]}</td>
         <td class="s soluk">${x[2] ? (x[3] / x[2]).toFixed(2) : ""}</td></tr>`).join("")}</tbody></table></div>`;
@@ -1270,7 +1277,8 @@ async function oyuncularSayfa(sekme, kapsam) {
     const kademeler = [...new Set(Object.values(d.krallar).flatMap(v => Object.keys(v).map(Number)))].sort();
     const sezonlar = Object.keys(d.krallar).filter(s => d.krallar[s][kd]).sort().reverse();
     govde = `<div class="cipler gorunum">${kademeler.map(k => `<a class="cip ${k === kd ? "aktif" : ""}" href="#/oyuncular/krallar/${k}">${esc(KADEME_AD[k] || k + ". kademe")}</a>`).join("")}</div>
-    <div class="tablo-kap"><table class="tablo"><thead><tr><th>Sezon</th><th class="ad">Gol kralı</th><th class="ad">Kulübü</th><th class="s">Gol</th><th class="s">Maç</th>
+    <div class="kart kral-kart" id="kralKart"></div>
+    <div class="tablo-kap bolum"><table class="tablo"><thead><tr><th>Sezon</th><th class="ad">Gol kralı</th><th class="ad">Kulübü</th><th class="s">Gol</th><th class="s">Maç</th>
       <th class="ad">2.</th><th class="ad">3.</th></tr></thead><tbody>
       ${sezonlar.map(s => { const l = d.krallar[s][kd], esit = l.filter(x => x[2] === l[0][2]), sonra = l.filter(x => x[2] !== l[0][2]);
         return `<tr><td><a class="bag" href="#/sezon/${s}">${s}</a></td><td class="ad">${esit.map(x => oyB(x[0], x[1])).join(", ")}</td><td class="ad">${esit.map(x => kulupBag(x[4])).join(", ")}</td>
@@ -1287,6 +1295,8 @@ async function oyuncularSayfa(sekme, kapsam) {
     <div class="filtre bolum"><input id="oyAra" type="search" placeholder="Oyuncu ara (en az 3 harf)…" autocomplete="off"></div><div id="oyAraSonuc"></div>
     <nav class="sekmeler bolum">${SEK.map(([k, ad]) => `<a href="#/oyuncular/${k}${k === "gol" || k === "mac" ? "/" + (OY_KAPSAM.some(x => x[0] === kapsam) ? kapsam : "tum") : ""}" class="${k === sekme ? "aktif" : ""}">${ad}</a>`).join("")}</nav>
     ${govde}`;
+  if (sekme === "gol" || sekme === "mac") { EK.oyuncuListesi(icerik, sekme); EK.golcuYarisi($("#cyKart"), d.liste[kapsam]?.[sekme] || [], kapsam, sekme); }
+  if (sekme === "krallar") EK.kralCizelgesi($("#kralKart"), d.krallar, +kapsam || 1);
   const ara = $("#oyAra");
   ara.addEventListener("input", async () => {
     const q = ara.value; if (norm(q).length < 3) { $("#oyAraSonuc").innerHTML = ""; return; }
@@ -1814,6 +1824,14 @@ async function rekorlarSayfa(kap) {
     ${l.length > n ? `<button class="dugme daha" data-ac="oygol">${acik ? "Daha az göster" : `${sayiYaz(l.length)} maçın hepsini göster (3+ gol)`}</button>` : acik ? `<button class="dugme daha" data-ac="oygol">Daha az göster</button>` : ""}
     <p class="soluk not">Kaynak: ${BOLUM === "kadin" ? `${KADIN_KAYNAK}. Kendi kalesine goller hariç, penaltı golleri dahil.` : `TFF maç sayfaları — lig 1991-92'den, Türkiye Kupası 1991-2007${MK_NOT()}. Kendi kalesine goller hariç, penaltı golleri dahil.`}</p>`;
   };
+  // tabela kartları: kapsamın zirvesindeki rekorlar büyük skor tabelasında
+  const tabelaKart = (baslik, m) => !m ? "" : `<a class="tabela-kart" href="${detayVar(m[13]) ? `#/${K}mac/${m[13]}` : `#/${K}sezon/${m[1]}`}">
+    <span class="tk-bas">${baslik}</span>
+    <span class="tk-skor"><span class="tk-takim">${logoImg(m[4])}<span>${esc(kisaAd(m[4], m[5]))}</span></span><b>${m[8]}<i>:</i>${m[9]}</b><span class="tk-takim">${logoImg(m[6])}<span>${esc(kisaAd(m[6], m[7]))}</span></span></span>
+    <span class="tk-alt">${tarihYaz(m[0])} · ${esc(m[2] || "")}${m[3] ? ` · ${esc(m[3])}` : ""}</span></a>`;
+  const oyuncuTabela = () => { const x = TR?.mac_gol.filter(golKap[kap] || (() => false))[0]; return x ? `<a class="tabela-kart" href="#/${K}oyuncu/k${x[0]}">
+    <span class="tk-bas">Bir maçta en çok gol</span><span class="tk-skor tk-oyuncu"><b>${x[2]}</b><span class="tk-takim"><span><b class="tk-ad">${esc(x[1])}</b><small>${esc(KULUP.get(x[6])?.ad || "")} – ${esc(KULUP.get(x[7])?.ad || "")}</small></span></span></span>
+    <span class="tk-alt">${tarihYaz(x[4])} · ${esc(x[8] === "L" ? KADEME_AD[x[9]] || "Lig" : YAR_AD[x[8]] || "")}</span></a>` : ""; };
   const tablo = () => {
     const l = v.tablo, n = Math.min(rekorDurum.tablo, l.length);
     return `<div class="tablo-kap"><table class="tablo"><thead><tr><th class="s">#</th><th>Kulüp</th><th class="s" title="Sezon">Sz</th><th class="s">O</th><th class="s">G</th><th class="s">B</th><th class="s">M</th>
@@ -1830,12 +1848,14 @@ async function rekorlarSayfa(kap) {
     <nav class="sekmeler">${R.kapsamlar.map(([k, ad]) => `<a href="#/${K}rekorlar/${k}" class="${k === kap ? "aktif" : ""}">${esc(ad)}</a>`).join("")}</nav>
     <p class="soluk">${esc(kapAd)} · ${esc(v.sezon[0])} – ${esc(v.sezon[1])} · ${sayiYaz(v.mac)} maç.
       ${kap === "pro" ? `Bütün lig seviyeleri bir arada: bir kulübün ${esc(KADEME_AD[1])}'nden alt lige geçişi seriyi bozmaz.` : ""}</p>
+    <div class="tabela-kartlar bolum">${tabelaKart("En farklı galibiyet", v.fark[0])}${tabelaKart("En gollü maç", v.gollu[0])}${tabelaKart("Deplasmanda en farklı", v.dep_fark[0])}${oyuncuTabela()}</div>
 
     ${v.tablo ? `<h2 class="bolum">Tüm zamanlar tablosu</h2>
     <p class="soluk not">Galibiyet bütün sezonlar için 3 puan sayıldı. ${lig ? "Play-off maçları ve puan silme cezaları dahil değil; hükmen sonuçlar dahil." : "Uzatmada biten maçlar skora göre, penaltıyla biten maçlar beraberlik sayıldı."}</p>
     ${tablo()}` : `<p class="soluk not">Bütün lig seviyeleri ve Türkiye Kupası birlikte. Seriler ve tablolar her yarışma için ayrı sekmelerde.</p>`}
 
     <h2 class="bolum">Maç rekorları</h2>
+    <div class="kart bolum rekor-zaman" id="rekorZaman"></div>
     <div class="izgara genis">
       <div><h3>En farklı galibiyetler</h3>${macTablo(v.fark, "fark")}</div>
       <div><h3>En gollü maçlar</h3>${macTablo(v.gollu, "gollu")}</div>
@@ -1861,6 +1881,7 @@ async function rekorlarSayfa(kap) {
     const nav = icerik.querySelector(".sekmeler"), ak = nav.querySelector(".aktif");
     nav.scrollLeft = ak.offsetLeft - (nav.clientWidth - ak.offsetWidth) / 2;
     icerik.querySelector("[data-tablo]")?.addEventListener("click", () => { rekorDurum.tablo += 100; const y = scrollY; ciz(); scrollTo(0, y); });
+    EK.rekorZaman($("#rekorZaman"), v);
   };
   rekorDurum.tablo = 20;
   ciz();

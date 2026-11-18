@@ -67,21 +67,25 @@ async function kadinSayfa(sekme = "sezonlar") {
   icerik.innerHTML = `${kadinUst(sekme)}<div id="kadinIc"></div><p class="soluk not bolum">${NOT}</p>`;
   const ic = $("#kadinIc");
   if (sekme === "sezonlar") {
-    // şampiyonlar: kadin_sampiyon.json (RSSSF / Vikipedi); play-off ve final turlarıyla belirlenen sezonlar tablodan çıkmaz
+    // şampiyonlar: kadin_sampiyon.json (RSSSF / Vikipedi); sezon kartları (erkek Sezonlar sayfasıyla aynı görünüm)
     const sampiyonSay = new Map();
     for (const s of z.sezonlar) { const k = z.sampiyonlar?.[s]; if (k != null) sampiyonSay.set(k, (sampiyonSay.get(k) || 0) + 1); }
-    // sezon dizini şampiyonlar tablosunun kendisi (her satır sezona bağlanır; ayrı düğme ızgarası yok)
+    const ms = await kMaclar(), sz = new Map();
+    for (const m of ms) { const t = sz.get(m.sezon) || { mac: 0, gol: 0, oyn: 0, takim: new Set() }; t.mac++; if (m.kademe === 1 && !m.asama) { t.takim.add(m.ev); t.takim.add(m.dep); if (m.eg != null) { t.oyn++; t.gol += m.eg + m.dg; } } sz.set(m.sezon, t); }
+    const kart = s => { const k = z.sampiyonlar?.[s], var_ = s in (z.sampiyonlar || {}), t = sz.get(s) || { mac: 0, takim: new Set() };
+      return `<a class="sezon-kart${k != null ? " renkli" : ""}" href="#/kadin/sezon/${s}" style="${k != null ? formaSerit(k) : ""}">
+        <span class="sk-yil">${s.slice(0, 4)}<small>–${s.slice(7)}</small></span>
+        ${k != null ? `<span class="sk-sp">${kLogo(k)}<span><b>${esc(kAd(k))}</b><small>şampiyon</small></span></span>`
+          : `<span class="sk-sp bos"><small>${var_ ? esc(z.sampiyon_not?.[s] || "şampiyon ilan edilmedi") : "sezon sürüyor"}</small></span>`}
+        <span class="sk-alt"><span>${esc(kademeAd(s, 1))}</span><span>${t.takim.size} takım${t.oyn ? ` · ${(t.gol / t.oyn).toLocaleString("tr-TR", { maximumFractionDigits: 2, minimumFractionDigits: 2 })} gol/maç` : ""}</span></span></a>`; };
     ic.innerHTML = `<h2>Sezonlar ve şampiyonlar</h2>
-      <div class="tablo-kap"><table class="tablo"><thead><tr><th>Sezon</th><th class="ad">Lig</th><th class="ad">Şampiyon</th></tr></thead><tbody>
-      ${[...z.sezonlar].reverse().map(s => { const k = z.sampiyonlar?.[s], var_ = s in (z.sampiyonlar || {});
-        return `<tr><td><a class="bag" href="#/kadin/sezon/${s}">${s}</a></td><td class="ad soluk">${esc(kademeAd(s, 1))}</td>
-        <td class="ad">${k != null ? `<b>${kBag(k)}</b>` : var_ ? `<span class="soluk">${esc(z.sampiyon_not?.[s] || "Şampiyon ilan edilmedi")}</span>` : `<span class="soluk">Sezon sürüyor</span>`}</td></tr>`; }).join("")}</tbody></table></div>
+      <div class="sezon-kartlar kadin-kartlar">${[...z.sezonlar].reverse().map(kart).join("")}</div>
       <h2 class="bolum">En çok şampiyonluk</h2>
       <div class="tablo-kap"><table class="tablo"><thead><tr><th class="ad">Kulüp</th><th class="s">Şampiyonluk</th><th class="ad">Sezonlar</th></tr></thead><tbody>
       ${[...sampiyonSay].sort((a, b) => b[1] - a[1]).map(([k, n]) => `<tr><td class="ad">${kBag(k)}</td><td class="s"><b>${n}</b></td>
         <td class="ad soluk">${z.sezonlar.filter(s => z.sampiyonlar[s] === k).join(", ")}</td></tr>`).join("")}</tbody></table></div>
       <p class="soluk not">Şampiyonlar en üst ligin (2021-22'ye kadar Kadınlar 1. Ligi, sonra Kadın Futbol Süper Ligi) sezon sonu sonucudur;
-        play-off ve final turları dahil. Kaynak: RSSSF ve Vikipedi. 2006-07 (Gazi Üniversitesispor) ve öncesi sitede yok, TFF'de maç verisi bulunmuyor.</p>`;
+        play-off ve final turları dahil. Kaynak: RSSSF ve Vikipedi. 2006-07 (Gazi Üniversitesispor) ve öncesi sitede yok, TFF'de maç verisi bulunmuyor. Gol ortalaması en üst ligin normal sezon maçlarından.</p>`;
   } else if (sekme === "krallar") {
     ic.innerHTML = `<div class="tablo-kap"><table class="tablo"><thead><tr><th>Sezon</th><th class="ad">Lig</th><th class="ad">Oyuncu</th><th class="ad">Kulüp</th><th class="s">Gol</th></tr></thead><tbody>
       ${[...z.sezonlar].reverse().flatMap(s => Object.keys(z.krallar[s] || {}).sort().map(kd => { const k = z.krallar[s][kd]; return `<tr><td><a class="bag" href="#/kadin/sezon/${s}/${kd}">${s}</a></td><td class="ad soluk">${esc(kademeAd(s, +kd))}</td>
@@ -127,28 +131,34 @@ async function kadinSezon(sezon, kademeSec) {
   const kademeler = [...new Set(ms.map(m => m.kademe))].sort();
   const kad = +kademeSec || kademeler[0];
   const km = ms.filter(m => m.kademe === kad);
+  // lig bölümü sezon.js'teki ligBolumu ile (lig seçici, hafta kaydırıcı, sıralama yarışı, maçlar): kadın maçları o biçime çevrilir
+  const cevir = m => ({ id: m.tff, tarih: m.tarih, yar: "L", lig: kademeAd(sezon, m.kademe), kademe: m.kademe, tur: m.grup || "", ev: m.ev, evAd: kAd(m.ev), dep: m.dep, depAd: kAd(m.dep),
+    eg: m.eg, dg: m.dg, ep: m.ep, dp: m.dp, durum: m.durum === "H" ? "Hük." : m.durum });
   const gruplar = new Map();
-  for (const m of km.filter(m => !m.asama)) (gruplar.get(m.grup) || gruplar.set(m.grup, []).get(m.grup)).push(m);
-  const tabloHtml = ([grup, l]) => {
-    const t = puanTablosu(l), oyn = l.filter(m => m.eg == null).length;
-    return `<div class="kart puan-kart"><div class="bas"><h3>${esc(kademeAd(sezon, kad))}${grup ? ` · ${esc(/^\d+$/.test(grup) ? `${+grup}. grup` : grup)}` : ""}</h3>
-      <span>${l.length} maç${oyn ? `, ${oyn} oynanmadı` : ""}</span></div>
-      <table class="tablo"><thead><tr><th class="s">#</th><th>Takım</th><th class="s">O</th><th class="s ek2">G</th><th class="s ek2">B</th><th class="s ek2">M</th><th class="s ek">AG</th><th class="s ek">YG</th><th class="s">Av</th><th class="s">P</th></tr></thead>
-      <tbody>${t.map((x, i) => `<tr><td class="s soluk">${i + 1}</td><td class="takim" title="${esc(kAd(x.id))}">${kBag(x.id)}</td><td class="s">${x.O}</td><td class="s ek2">${x.G}</td><td class="s ek2">${x.B}</td><td class="s ek2">${x.M}</td><td class="s ek">${x.AG}</td><td class="s ek">${x.YG}</td><td class="s">${x.Av > 0 ? "+" : ""}${x.Av}</td><td class="s p">${x.P}</td></tr>`).join("")}</tbody></table>
-      <details><summary>Maçlar</summary>${macListe(l)}</details></div>`;
-  };
+  for (const m of ms.filter(m => !m.asama)) { const k = `${m.kademe}|${m.grup || ""}`; (gruplar.get(k) || gruplar.set(k, { yar: "L", kademe: m.kademe, lig: kademeAd(sezon, m.kademe), grup: m.grup ? (/^\d+$/.test(m.grup) ? `${+m.grup}. grup` : m.grup) : "", ms: [] }).get(k)).ms.push(cevir(m)); }
+  const sirali = [...gruplar.values()].sort((a, b) => a.kademe - b.kademe || String(a.grup).localeCompare(String(b.grup), "tr", { numeric: true }));
+  // çıkan / düşen: ertesi sezonun normal sezon maçlarından kademe karşılaştırması
+  const kdm = s => { const t = new Map(); for (const m of KM.filter(x => x.sezon === s && !x.asama)) for (const id of [m.ev, m.dep]) t.set(id, Math.min(t.get(id) || 9, m.kademe)); return t; };
+  const bu = kdm(sezon), ert = sonraki ? kdm(sonraki) : null, kk = {};
+  if (ert?.size) for (const [id, a] of bu) { const b2 = ert.get(id), yon = b2 == null ? "a" : b2 < a ? "c" : b2 > a ? "d" : null; if (yon) ((kk[a] ||= { c: [], d: [], a: [] })[yon]).push(id); }
+  const Zk = { [sezon]: { sampiyon: z.sampiyonlar?.[sezon] ?? null, k: kk } };
   const po = new Map();
-  for (const m of km.filter(m => m.asama)) { const k = m.asama === "play-off" ? "Play-off maçları" : m.asama; (po.get(k) || po.set(k, []).get(k)).push(m); }
+  for (const m of ms.filter(m => m.asama)) { const k = `${kademeAd(sezon, m.kademe)} · ${m.asama === "play-off" ? "play-off maçları" : m.asama}`; (po.get(k) || po.set(k, []).get(k)).push(m); }
   const kral = z.krallar[sezon]?.[kad];
   icerik.innerHTML = `
   <div class="sayfa-bas"><h1>Kadın ligleri ${esc(sezon)}</h1>
     <div class="yan-yana">${onceki ? `<a class="cip" href="#/kadin/sezon/${onceki}">← ${onceki}</a>` : ""}${sonraki ? `<a class="cip" href="#/kadin/sezon/${sonraki}">${sonraki} →</a>` : ""}</div></div>
   <p class="soluk"><a class="bag" href="#/kadin">Kadın Futbolu</a> · ${ms.length} maç · Puan tabloları sonuçlardan hesaplandı (galibiyet 3 puan; puan silme cezaları dahil değil).</p>
-  ${sekmeler(kademeler.map(k => [k, `#/kadin/sezon/${sezon}/${k}`, esc(kademeAd(sezon, k))]), kad)}
-  ${kral ? `<p class="bolum">⚽ Gol kralı: ${kral.map(x => `${oyBag(x[0], x[1])} <span class="soluk">(${kBag(x[3])})</span>`).join(", ")} · <b>${kral[0][2]} gol</b></p>` : ""}
-  <div class="izgara puan">${[...gruplar].sort((a, b) => a[0].localeCompare(b[0], "tr", { numeric: true })).map(tabloHtml).join("")}</div>
+  <section class="sezon-ozet" aria-label="Sezon özeti">
+    ${Zk[sezon].sampiyon != null ? `<a class="oz-kutu" href="#/kadin/kulup/${Zk[sezon].sampiyon}" style="${formaSerit(Zk[sezon].sampiyon)}">${kLogo(Zk[sezon].sampiyon)}<span><small>${esc(kademeAd(sezon, 1))} şampiyonu</small><b>${esc(kAd(Zk[sezon].sampiyon))}</b></span></a>` : ""}
+    ${kral ? `<div class="oz-kutu"><span><small>Gol kralı (${esc(kademeAd(sezon, kad))})</small><b>${kral.map(x => oyBag(x[0], x[1])).join(", ")}</b><small>${kral[0][2]} gol · ${kral.map(x => esc(kAd(x[3]))).join(", ")}</small></span></div>` : ""}
+    ${kk[2]?.c?.length ? `<div class="oz-liste cik"><small>${esc(kademeAd(sezon, 1))}'ne çıkanlar ↑</small><span>${kk[2].c.map(id => kBag(id)).join("")}</span></div>` : ""}
+    ${kk[1]?.d?.length ? `<div class="oz-liste dus"><small>${esc(kademeAd(sezon, 1))}'nden düşenler ↓</small><span>${kk[1].d.map(id => kBag(id)).join("")}</span></div>` : ""}
+  </section>
+  <div id="kLig"></div>
   ${po.size ? `<h2 class="bolum">Play-off ve final maçları</h2>${[...po].map(([k, l]) => `<div class="kart" style="margin-bottom:12px"><h3>${esc(k)}${l[0].grup ? ` · ${esc(l[0].grup)}` : ""}</h3>${macListe(l)}</div>`).join("")}` : ""}
   <p class="soluk not bolum">${NOT}</p>`;
+  if (sirali.length) ligBolumu($("#kLig"), sezon, sirali, Zk);
 }
 
 yollar.splice(yollar.length - 1, 0,

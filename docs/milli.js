@@ -18,7 +18,12 @@ const cinsKart = async () => {
   };
   return `<nav class="milli-cins bolum" aria-label="Erkek ve kadın milli takımı">${kart("Erkek A Milli Takımı", "#/milli", e, BOLUM === "erkek", "erkek")}${kart("Kadın A Milli Takımı", "#/kadin/milli", k, BOLUM === "kadin", "kadin")}</nav>`;
 };
-const durum = { kat: "", onyil: "", rakip: "", tum: false };
+const durum = { kat: "", onyil: "", rakip: "", tum: false, yil: "", konf: "" };
+// konfederasyon (rakipler mozaiğinin süzgeci): bayrak kodundan; listede olmayanlar UEFA (tarihî ülkeler dahil)
+const KONF = { AFC: "ae af au bh bd cn hk id in iq ir jo jp kg kp kr kw la lb mm mn mo my np om ph pk ps qa sa sg sy th tj tm tw uz vn ye",
+  CAF: "dz ao bj bw bf bi cm cv cf td km cg cd ci dj eg gq er et ga gm gh gn gw ke ls lr ly mg mw ml mr mu ma mz na ne ng rw st sn sc sl so za ss sd sz tz tg tn ug zm zw",
+  CONMEBOL: "ar bo br cl co ec py pe uy ve", CONCACAF: "us ca mx cr jm hn sv gt pa tt ht cu bz ni sr gy bb ag lc vc gd dm kn bs", OFC: "nz fj pg sb vu nc" };
+const konfBul = kod => Object.keys(KONF).find(k => KONF[k].split(" ").includes(kod)) || "UEFA";
 // bayraklar docs/bayrak/<kod>.svg: circle-flags (MIT); Doğu Almanya Wikimedia Commons'tan (CSS ile daireye kırpılıyor)
 const bayrakImg = (kod, sinif = "bayrak") => kod ? `<img class="${sinif}" src="bayrak/${kod}.svg" alt="" loading="lazy">` : "";
 const TR_BAYRAK = () => bayrakImg("tr");
@@ -41,7 +46,7 @@ async function milliSayfa(sekme = "ozet") {
   const [d, cins] = await Promise.all([milliAl(), cinsKart()]), tum = maclar(d);
   const ciz = () => {
     const ms = tum.filter(m => (!durum.kat || (durum.kat === "resmi" ? m.kat !== "Özel maç" : m.kat === durum.kat)) &&
-      (!durum.onyil || m.tarih.slice(0, 3) === durum.onyil.slice(0, 3)) && (!durum.rakip || m.kod === durum.rakip));
+      (!durum.onyil || m.tarih.slice(0, 3) === durum.onyil.slice(0, 3)) && (!durum.yil || m.tarih.startsWith(durum.yil)) && (!durum.rakip || m.kod === durum.rakip));
     const T = say(ms);
     const kat = KAT_SIRA.map(k => [k, ms.filter(m => m.kat === k)]).filter(x => x[1].length);
     const onyil = [...ms.reduce((a, m) => a.set(m.tarih.slice(0, 3) + "0", [...(a.get(m.tarih.slice(0, 3) + "0") || []), m]), new Map())].sort();
@@ -55,7 +60,8 @@ async function milliSayfa(sekme = "ozet") {
       (!durum.onyil || m.tarih.slice(0, 3) === durum.onyil.slice(0, 3))) : ms;
     const rakipT = [...msR.reduce((a, m) => a.set(m.kod, [...(a.get(m.kod) || []), m]), new Map())].sort((x, y) => y[1].length - x[1].length || x[1][0].rakip.localeCompare(y[1][0].rakip, "tr"));
     const ozetHtml = () => `
-    <div class="bolum">${anaOzet(T, durum.kat || durum.onyil || durum.rakip ? "Seçili maçlar" : "Bütün maçlar")}</div>
+    <div class="bolum">${anaOzet(T, durum.kat || durum.onyil || durum.rakip || durum.yil ? "Seçili maçlar" : "Bütün maçlar")}</div>
+    <div class="kart bolum milli-yil" id="milliYil"></div>
     <div class="izgara iki bolum ust-hiza milli-iki">
       <div class="tablo-kap"><table class="tablo">${bas(["Yarışma"])}<tbody>${kat.map(([k, l]) => `<tr><td class="ad">${esc(k)}</td>${hucre(say(l))}</tr>`).join("")}${kat.length > 1 ? `<tr class="toplam"><td class="ad">Toplam</td>${hucre(T)}</tr>` : ""}</tbody></table></div>
       <div class="tablo-kap"><table class="tablo">${bas(["Dönem"])}<tbody>${onyil.map(([k, l]) => `<tr><td class="ad">${k}'lar</td>${hucre(say(l))}</tr>`).join("")}</tbody></table></div>
@@ -78,7 +84,15 @@ async function milliSayfa(sekme = "ozet") {
     ${macListe(liste.slice(0, n))}
     ${liste.length > n ? `<button class="dugme daha" id="mTum">${liste.length} maçın hepsini göster</button>` : ""}
     <p class="soluk not">Skor her zaman ev sahibi önce yazılır; "İç" Türkiye'nin ev sahibi olduğu maçlar. Skora tıklayınca maç sayfası açılır.</p>`;
-    const rakiplerHtml = () => `<p class="soluk not bolum">${rakipT.length} farklı rakip. Satıra tıklayınca o ülkeyle oynanan maçlar açılır.</p>
+    const rakipK = rakipT.filter(([k, l]) => !durum.konf || konfBul(l[0].bkod) === durum.konf);
+    const konflar = [...new Set(rakipT.map(([k, l]) => konfBul(l[0].bkod)))].sort((a, b) => a === "UEFA" ? -1 : b === "UEFA" ? 1 : a.localeCompare(b));
+    const mozaik = () => `<div class="cipler konf-sec bolum" role="group" aria-label="Konfederasyon"><button class="cip ${!durum.konf ? "aktif" : ""}" data-konf="">Bütün rakipler</button>${konflar.map(k => `<button class="cip ${durum.konf === k ? "aktif" : ""}" data-konf="${k}">${k} <small>${rakipT.filter(([, l]) => konfBul(l[0].bkod) === k).length}</small></button>`).join("")}</div>
+      <div class="rakip-mozaik">${rakipK.map(([k, l]) => { const t = say(l), p = t.O ? (t.G + t.B / 2) / t.O : .5;
+        return `<a href="#" data-rakip="${esc(k)}" class="rm ${t.O >= 25 ? "b3" : t.O >= 10 ? "b2" : ""}" style="--p:${p.toFixed(3)}" title="${esc(l[0].rakip)}: ${t.O} maç, ${t.G} G, ${t.B} B, ${t.M} M, gol ${t.AG}-${t.YG}">
+          ${l[0].bayrak}<span class="rm-ad">${esc(l[0].rakip)}</span><span class="rm-say"><b>${t.G}-${t.B}-${t.M}</b> <small>${t.O} maç</small></span>
+          <span class="rm-cubuk"><i class="g" style="width:${yuzde(t.G, t.O)}%"></i><i class="b" style="width:${yuzde(t.B, t.O)}%"></i><i class="m" style="width:${yuzde(t.M, t.O)}%"></i></span></a>`; }).join("")}</div>
+      <p class="soluk not">Renk, rakibe karşı puan payı (galibiyet 1, beraberlik ½): yeşil Türkiye üstün, kırmızı rakip üstün. Büyük kartlar 10 ve 25 maçın üstü. Karta tıklayınca maçlar açılır.</p>`;
+    const rakiplerHtml = () => `${mozaik()}<h2 class="bolum">Tablo</h2><p class="soluk not">${rakipT.length} farklı rakip. Satıra tıklayınca o ülkeyle oynanan maçlar açılır.</p>
     <div class="tablo-kap"><table class="tablo milli-rakip">${bas(["Rakip"])}<tbody>${rakipT.map(([k, l]) => `<tr data-rakip="${esc(k)}" class="tiklanir">
       <td class="ad">${l[0].bayrak} ${esc(l[0].rakip)}</td>${hucre(say(l))}</tr>`).join("")}</tbody></table></div>`;
     icerik.innerHTML = `
@@ -91,17 +105,57 @@ async function milliSayfa(sekme = "ozet") {
         ${KAT_SIRA.map(k => `<option ${durum.kat === k ? "selected" : ""}>${k}</option>`).join("")}</select>
       <select id="mOnyil" aria-label="On yıl"><option value="">Bütün yıllar</option>${onyillar.map(o => `<option value="${o}" ${durum.onyil === o ? "selected" : ""}>${o}'lar</option>`).join("")}</select>
       ${rk && sekme !== "rakipler" ? `<span class="rozet">${rk.bayrak} ${esc(rk.rakip)} <a href="#" id="mRakipSil" title="Rakip filtresini kaldır">✕</a></span>` : ""}
+      ${durum.yil ? `<span class="rozet">${durum.yil} <a href="#" id="mYilSil" title="Yıl filtresini kaldır">✕</a></span>` : ""}
     </div>
     ${!msR.length ? `<div class="bos">Bu filtreye uyan maç yok.</div>` : { ozet: ozetHtml, maclar: maclarHtml, rakipler: rakiplerHtml, rekorlar: () => rekorHtml(d, ms) }[sekme]()}`;
     $("#mKat").onchange = e => { durum.kat = e.target.value; ciz(); };
     $("#mOnyil").onchange = e => { durum.onyil = e.target.value; ciz(); };
     $("#mRakipSil")?.addEventListener("click", e => { e.preventDefault(); durum.rakip = ""; ciz(); });
+    $("#mYilSil")?.addEventListener("click", e => { e.preventDefault(); durum.yil = ""; ciz(); });
+    if ($("#milliYil")) yilGrafik($("#milliYil"), ms, y => { durum.yil = y; durum.tum = true; location.hash = `#/${K}milli/maclar`; });
+    icerik.querySelectorAll(".rakip-mozaik [data-rakip]").forEach(a => a.addEventListener("click", e => { e.preventDefault(); durum.rakip = a.dataset.rakip; durum.tum = true; location.hash = `#/${K}milli/maclar`; }));
+    icerik.querySelector(".konf-sec")?.addEventListener("click", e => { const b = e.target.closest("[data-konf]"); if (b) { durum.konf = b.dataset.konf; ciz(); } });
     $("#mTum")?.addEventListener("click", () => { durum.tum = true; const y = scrollY; ciz(); scrollTo(0, y); });
     icerik.querySelectorAll("tr[data-rakip]").forEach(tr => tr.addEventListener("click", () => { durum.rakip = tr.dataset.rakip; durum.tum = true; location.hash = `#/${K}milli/maclar`; }));
     if ($("#milliOyuncular")) oyuncular(d, $("#milliOyuncular"));
     icerik.querySelectorAll("details[data-seri]").forEach(x => x.addEventListener("toggle", () => x.open && (x.querySelector(".seri-liste").innerHTML ||= seriListe(JSON.parse(x.dataset.seri)))));
   };
   ciz();
+}
+
+// ---- yıl yıl sonuçlar: yığılmış G/B/M çubukları; Dünya Kupası ve Avrupa Şampiyonası finallerinin yılları işaretli
+function yilGrafik(kap, ms, secince) {
+  if (!ms.length) { kap.remove(); return; }
+  const yillar = new Map();
+  for (const m of ms) { const y = m.tarih.slice(0, 4), t = yillar.get(y) || { G: 0, B: 0, M: 0, tur: new Set() }; t[m.s]++; if (m.kat === "Dünya Kupası" || m.kat === "Avrupa Şampiyonası") t.tur.add(m.kat === "Dünya Kupası" ? "DK" : "AŞ"); yillar.set(y, t); }
+  const a = +[...yillar.keys()].sort()[0], b = +[...yillar.keys()].sort().at(-1);
+  const Y = []; for (let y = a; y <= b; y++) Y.push(String(y));
+  const W = EK.genislik(kap), H = 210, sol = 28, sag = 8, ust = 22, alt = 22, bw = (W - sol - sag) / Y.length;
+  const enb = Math.max(...[...yillar.values()].map(t => t.G + t.B + t.M), 1), YY = v => ust + (1 - v / enb) * (H - ust - alt);
+  let h = "";
+  for (let v = 0; v <= enb; v += enb > 12 ? 5 : 2) h += `<line class="izgara-cizgi" x1="${sol}" x2="${W - sag}" y1="${YY(v)}" y2="${YY(v)}"/><text class="eksen-yazi" x="${sol - 6}" y="${YY(v) + 4}" text-anchor="end">${v}</text>`;
+  Y.forEach((y, i) => {
+    const x = sol + i * bw, t = yillar.get(y);
+    if (+y % (W < 600 ? 20 : 10) === 0) h += `<text class="eksen-yazi" x="${x + bw / 2}" y="${H - 6}" text-anchor="middle">${y}</text>`;
+    if (!t) return;
+    let alt0 = 0;
+    h += `<g class="yl" data-y="${y}">`;
+    for (const [k, c] of [["G", "var(--g)"], ["B", "var(--b)"], ["M", "var(--m)"]]) { if (!t[k]) continue; const y1 = YY(alt0 + t[k]), y0 = YY(alt0); h += `<rect x="${(x + bw * .1).toFixed(1)}" y="${y1.toFixed(1)}" width="${Math.max(1, bw * .8).toFixed(1)}" height="${Math.max(.5, y0 - y1 - .6).toFixed(1)}" style="fill:${c}"/>`; alt0 += t[k]; }
+    if (t.tur.size) h += `<text class="tur-isaret" x="${x + bw / 2}" y="${YY(alt0) - 5}" text-anchor="middle">${[...t.tur].join("·")}</text>`;
+    h += `<rect class="hit" x="${x}" y="0" width="${bw}" height="${H - alt}" fill="transparent"/></g>`;
+  });
+  kap.innerHTML = `<h3>Yıl yıl sonuçlar</h3><p class="aciklama soluk">Her çubuk bir yıl: yeşil galibiyet, sarı beraberlik, kırmızı mağlubiyet. DK: Dünya Kupası, AŞ: Avrupa Şampiyonası finalleri. Çubuğa tıklayınca o yılın maçları.</p>
+    <svg class="grafik-svg milli-yil-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Yıl yıl milli takım sonuçları">${h}</svg>`;
+  const svg = kap.querySelector("svg"), ip = EK.ipucu(kap);
+  svg.addEventListener("pointermove", e => {
+    const g = e.target.closest(".yl"); if (!g) { ip.gizle(); return; }
+    const t = yillar.get(g.dataset.y), l = ms.filter(m => m.tarih.startsWith(g.dataset.y));
+    svg.querySelectorAll(".yl.on").forEach(x => x.classList.remove("on")); g.classList.add("on");
+    ip.goster(e, `<div class="ipucu-bas">${g.dataset.y} · ${l.length} maç</div><div class="ipucu-satir"><b>${t.G}</b><span>G</span><b>${t.B}</b><span>B</span><b>${t.M}</b><span>M</span></div>
+      ${l.slice(0, 6).map(m => `<div class="ipucu-satir soluk"><span>${m.bayrak}</span><span>${esc(m.rakip)}</span><b>${m.saha === "E" ? `${m.a}-${m.y}` : `${m.y}-${m.a}`}</b></div>`).join("")}${l.length > 6 ? `<div class="soluk">…</div>` : ""}`);
+  });
+  svg.addEventListener("pointerleave", () => { ip.gizle(); svg.querySelectorAll(".yl.on").forEach(x => x.classList.remove("on")); });
+  svg.addEventListener("click", e => { const g = e.target.closest(".yl"); if (g) secince(g.dataset.y); });
 }
 
 // ---- rekorlar ve seriler (seçili filtredeki maçlar)
@@ -160,7 +214,11 @@ function oyuncular(d, kap) {
   const sira = (l, f) => { let r = 0, onc; return l.map((x, i) => { const v = f(x); if (v !== onc) { r = i + 1; onc = v; } return [r, x]; }); };
   const kart = (baslik, aciklama, l, f, alt) => `<div class="kart rekor-kart"><h3>${baslik}</h3><p class="soluk aciklama">${aciklama}</p>
     <ol class="sirali">${sira(l.slice(0, 15), f).map(([r, x]) => `<li><span class="sira">${r}</span><span class="kim"><a class="bag" href="#/${K}oyuncu/k${x.kisi}">${esc(x.ad)}</a>
-      <small class="soluk">${x.bas.slice(0, 4)}–${x.son.slice(0, 4)} · ${alt(x)}</small></span><b class="n">${f(x)}</b></li>`).join("")}</ol></div>`;
+      <small class="soluk">${x.bas.slice(0, 4)}–${x.son.slice(0, 4)} · ${alt(x)}</small>${donem(x)}</span><b class="n">${f(x)}</b></li>`).join("")}</ol>
+    <div class="donem-eksen" aria-hidden="true"><span>${ilkY}</span><span>${Math.round((ilkY + sonY) / 2)}</span><span>${sonY}</span></div></div>`;
+  // dönem çizgisi: oyuncunun ilk ve son milli maçı, takımın bütün tarihine göre
+  const ilkY = +d.maclar[0][1].slice(0, 4), sonY = +d.maclar.at(-1)[1].slice(0, 4), yer = t => ((+t.slice(0, 4) + (+t.slice(5, 7) - 1) / 12 - ilkY) / (sonY + 1 - ilkY) * 100).toFixed(2);
+  const donem = x => `<span class="donem-cizgi" title="${x.bas.slice(0, 4)}–${x.son.slice(0, 4)}"><i style="left:${yer(x.bas)}%;width:${Math.max(.8, yer(x.son) - yer(x.bas)).toFixed(2)}%"></i></span>`;
   const by = f => O.filter(x => f(x)).sort((a, b) => f(b) - f(a) || b.mac - a.mac);
   // teknik direktörler
   const ms = new Map(maclar(d).map(m => [m.tff, m]));
