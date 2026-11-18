@@ -499,3 +499,17 @@ tr.tiklanir:hover td { background: var(--yuzey2); }
 img.bayrak { width: 1.1em; height: 1.1em; object-fit: cover; vertical-align: -0.18em; border-radius: 50%; box-shadow: 0 0 0 1px var(--cizgi); }
 img.bayrak.baslik { width: .95em; height: .95em; vertical-align: -0.08em; }
 img.bayrak.buyuk { width: 56px; height: 56px; }
+
+/* Milli Takım: erkek / kadın seçimi (milli.js cinsKart) */
+.milli-cins { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px; }
+.milli-cins-kart { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 2px solid var(--cizgi); border-radius: 12px;
+  background: var(--yuzey); color: inherit; text-decoration: none; transition: border-color .15s, background .15s; }
+.milli-cins-kart:hover { border-color: color-mix(in srgb, var(--vurgu) 50%, var(--cizgi)); }
+.milli-cins-kart .bayrak { width: 34px; height: 34px; flex: none; }
+.milli-cins-kart .mc-ad { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.milli-cins-kart .mc-ad small { font-size: 11px; letter-spacing: .12em; font-weight: 700; color: var(--soluk); }
+.milli-cins-kart .mc-ad b { font-size: 16px; }
+.milli-cins-kart .mc-ad .soluk { font-size: 12.5px; }
+.milli-cins-kart.aktif { border-color: var(--vurgu); background: var(--vurgu-zemin); }
+.milli-cins-kart.aktif .mc-ad small { color: var(--vurgu); }
+@media (max-width: 560px) { .milli-cins { grid-template-columns: 1fr; } }

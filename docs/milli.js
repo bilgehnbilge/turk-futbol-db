@@ -6,7 +6,18 @@
 const MILLI = {}, MILLI_DETAY = {};
 const milliAl = async () => MILLI[BOLUM] ||= await al(`${V}milli.json?s=${OZET.surum || ""}`);
 const milliDetayAl = async () => MILLI_DETAY[BOLUM] ||= await al(`${V}milli_detay.json?s=${OZET.surum || ""}`);
-const milliAd = () => BOLUM === "kadin" ? "Kadın A Milli Takımı" : "A Milli Takım";
+const milliAd = () => BOLUM === "kadin" ? "Kadın A Milli Takımı" : "Erkek A Milli Takımı";
+// erkek / kadın seçimi: iki kart (bayrak, ad, dönem ve maç sayısı); öbür bölümün maç listesi küçük, bir kez yüklenir
+const cinsKart = async () => {
+  const [e, k] = await Promise.all([al("data/milli.json").catch(() => null), al("data/kadin/milli.json").catch(() => null)]);
+  const kart = (ad, href, d, aktif, cins) => {
+    const ms = d?.maclar || [];
+    return `<a class="milli-cins-kart ${cins} ${aktif ? "aktif" : ""}" href="${href}">${bayrakImg("tr", "bayrak")}
+      <span class="mc-ad"><small>${cins === "erkek" ? "ERKEK" : "KADIN"}</small><b>${ad}</b>
+      <span class="soluk">${ms.length ? `${ms[0][1].slice(0, 4)}–${ms.at(-1)[1].slice(0, 4)} · ${ms.length} maç` : ""}</span></span></a>`;
+  };
+  return `<nav class="milli-cins bolum">${kart("Erkek A Milli Takımı", "#/milli", e, BOLUM === "erkek", "erkek")}${kart("Kadın A Milli Takımı", "#/kadin/milli", k, BOLUM === "kadin", "kadin")}</nav>`;
+};
 const durum = { kat: "", onyil: "", rakip: "", tum: false };
 // bayraklar docs/bayrak/<kod>.svg: circle-flags (MIT); Doğu Almanya Wikimedia Commons'tan (CSS ile daireye kırpılıyor)
 const bayrakImg = (kod, sinif = "bayrak") => kod ? `<img class="${sinif}" src="bayrak/${kod}.svg" alt="" loading="lazy">` : "";
@@ -27,7 +38,7 @@ const skorHtml = m => { const s = `${m.saha === "E" ? `${m.a}-${m.y}` : `${m.y}-
 async function milliSayfa(sekme = "ozet") {
   document.title = `${milliAd()} · Türk Futbol Arşivi`;
   icerik.innerHTML = `<div class="yukleniyor">Milli takım yükleniyor…</div>`;
-  const d = await milliAl(), tum = maclar(d);
+  const [d, cins] = await Promise.all([milliAl(), cinsKart()]), tum = maclar(d);
   const ciz = () => {
     const ms = tum.filter(m => (!durum.kat || (durum.kat === "resmi" ? m.kat !== "Özel maç" : m.kat === durum.kat)) &&
       (!durum.onyil || m.tarih.slice(0, 3) === durum.onyil.slice(0, 3)) && (!durum.rakip || m.kod === durum.rakip));
@@ -75,7 +86,7 @@ async function milliSayfa(sekme = "ozet") {
     <div class="tablo-kap"><table class="tablo milli-rakip">${bas(["Rakip"])}<tbody>${rakipT.map(([k, l]) => `<tr data-rakip="${esc(k)}" class="tiklanir">
       <td class="ad">${l[0].bayrak} ${esc(l[0].rakip)}</td>${hucre(say(l))}</tr>`).join("")}</tbody></table></div>`;
     icerik.innerHTML = `
-    <nav class="sekmeler bolum milli-cins"><a href="#/milli" class="${BOLUM === "erkek" ? "aktif" : ""}">Erkek</a><a href="#/kadin/milli" class="${BOLUM === "kadin" ? "aktif" : ""}">Kadın</a></nav>
+    ${cins}
     <div class="sayfa-bas"><div><h1>${bayrakImg("tr", "bayrak baslik")} ${milliAd()}</h1>
       <p class="soluk">${tarihYaz(tum[0].tarih)} – ${tarihYaz(tum.at(-1).tarih)} · ${tum.length} resmi ve özel maç</p></div></div>
     <div class="kulup-sekme"><nav class="sekmeler">${SEKME.map(([k, y, ad]) => `<a href="#/${K}milli${y}" class="${k === sekme ? "aktif" : ""}">${ad}</a>`).join("")}</nav></div>

@@ -125,7 +125,27 @@
     {"sezon": "2012-2013", "tarih": "2013-01-27", "ev": "tff:3678", "dep": "tff:3640", "ev_gol": 2, "dep_gol": 0, "durum": "MS",
      "not": "Skor resmi puan tablosuna göre düzeltildi (TFF fikstürü 2-1 yazıyor; dogrula.py, 17.11.2026)"},
     {"sezon": "2014-2015", "tarih": "2015-04-05", "ev": "tff:60", "dep": "tff:86", "ev_gol": 3, "dep_gol": 2, "durum": "MS",
-     "not": "Skor resmi puan tablosuna göre düzeltildi (TFF fikstürü 4-2 yazıyor; dogrula.py, 17.11.2026)"}
+     "not": "Skor resmi puan tablosuna göre düzeltildi (TFF fikstürü 4-2 yazıyor; dogrula.py, 17.11.2026)"},
+    {"sezon": "2026-2027", "tarih": "2026-09-06", "ev": "tff:4879", "dep": "tff:165", "ev_gol": 0, "dep_gol": 3, "durum": "Hük.",
+     "not": "Yeni Malatyaspor sahaya çıkmadı; hükmen (TFF maç sayfasında stat, hakem ve kadro yok)"},
+    {"sezon": "2026-2027", "tarih": "2026-09-12", "ev": "tff:4499", "dep": "tff:4879", "ev_gol": 3, "dep_gol": 0, "durum": "Hük.",
+     "not": "Yeni Malatyaspor sahaya çıkmadı; hükmen (TFF maç sayfasında stat, hakem ve kadro yok)"},
+    {"sezon": "2026-2027", "tarih": "2026-09-20", "ev": "tff:4879", "dep": "tff:9399", "ev_gol": 0, "dep_gol": 3, "durum": "Hük.",
+     "not": "Yeni Malatyaspor sahaya çıkmadı; hükmen (TFF maç sayfasında stat, hakem ve kadro yok)"},
+    {"sezon": "2026-2027", "tarih": "2026-09-27", "ev": "tff:8742", "dep": "tff:4879", "ev_gol": 3, "dep_gol": 0, "durum": "Hük.",
+     "not": "Yeni Malatyaspor sahaya çıkmadı; hükmen (TFF maç sayfasında stat, hakem ve kadro yok)"},
+    {"sezon": "2026-2027", "tarih": "2026-10-03", "ev": "tff:4879", "dep": "tff:4517", "ev_gol": 0, "dep_gol": 3, "durum": "Hük.",
+     "not": "Yeni Malatyaspor sahaya çıkmadı; hükmen (TFF maç sayfasında stat, hakem ve kadro yok)"},
+    {"sezon": "2026-2027", "tarih": "2026-10-11", "ev": "tff:4844", "dep": "tff:4879", "ev_gol": 3, "dep_gol": 0, "durum": "Hük.",
+     "not": "Yeni Malatyaspor sahaya çıkmadı; hükmen (TFF maç sayfasında stat, hakem ve kadro yok)"},
+    {"sezon": "2026-2027", "tarih": "2026-10-17", "ev": "tff:4879", "dep": "tff:10337", "ev_gol": 0, "dep_gol": 3, "durum": "Hük.",
+     "not": "Yeni Malatyaspor sahaya çıkmadı; hükmen (TFF maç sayfasında stat, hakem ve kadro yok)"},
+    {"sezon": "2026-2027", "tarih": "2026-10-24", "ev": "tff:4398", "dep": "tff:4879", "ev_gol": 3, "dep_gol": 0, "durum": "Hük.",
+     "not": "Yeni Malatyaspor sahaya çıkmadı; hükmen (TFF maç sayfasında stat, hakem ve kadro yok)"},
+    {"sezon": "2026-2027", "tarih": "2026-11-01", "ev": "tff:4879", "dep": "tff:4228", "ev_gol": 0, "dep_gol": 3, "durum": "Hük.",
+     "not": "Yeni Malatyaspor sahaya çıkmadı; hükmen (TFF maç sayfasında stat, hakem ve kadro yok)"},
+    {"sezon": "2026-2027", "tarih": "2026-11-07", "ev": "tff:3196", "dep": "tff:4879", "ev_gol": 3, "dep_gol": 0, "durum": "Hük.",
+     "not": "Yeni Malatyaspor sahaya çıkmadı; hükmen (TFF maç sayfasında stat, hakem ve kadro yok)"}
   ],
 
   "ardil": [
