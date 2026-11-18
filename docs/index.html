@@ -9,16 +9,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=55">
+<link rel="stylesheet" href="style.css?v=57">
 </head>
 <body>
 <header class="ust">
   <a class="logo" href="#/"><span class="top"></span>Türk Futbol Arşivi</a>
+  <button id="menuDugme" class="menu-dugme" type="button" aria-expanded="false" aria-controls="ustMenu" aria-label="Menüyü aç"><span></span><span></span><span></span></button>
   <div class="ust-ara">
     <input id="ustAra" type="search" placeholder="Kulüp ya da oyuncu ara…" autocomplete="off" aria-label="Kulüp ya da oyuncu ara">
     <div id="ustOneri" class="oneri" hidden></div>
   </div>
-  <nav>
+  <nav id="ustMenu">
     <a href="#/sezonlar">Sezonlar</a>
     <a href="#/milli">Milli Takım</a>
     <a href="#/kadin">Kadın</a>
@@ -34,7 +35,7 @@
 <footer class="alt">
   Veri: TFF, Maçkolik, RSSSF, Vikipedi · Maçlar sonuçlardan derlenmiştir; puan silme ve hükmen kararlar kaynaklarda yazdığı gibidir.
 </footer>
-<script src="app.js?v=80"></script>
+<script src="app.js?v=81"></script>
 <script src="grafik.js?v=52"></script>
 <script src="milli.js?v=10"></script>
 <script src="kadin.js?v=8"></script>

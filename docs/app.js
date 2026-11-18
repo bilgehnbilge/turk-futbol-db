@@ -90,6 +90,18 @@ const sayiYaz = n => n.toLocaleString("tr-TR");
   });
 })();
 
+// ---------------------------------------------------------------- telefonda menü (≤720 px): düğme paneli açar/kapar
+(function menuKur() {
+  const ust = document.querySelector(".ust"), d = $("#menuDugme");
+  if (!ust || !d) return;
+  const ayarla = acik => { ust.classList.toggle("acik", acik); d.setAttribute("aria-expanded", acik); d.setAttribute("aria-label", acik ? "Menüyü kapat" : "Menüyü aç"); };
+  d.addEventListener("click", () => ayarla(!ust.classList.contains("acik")));
+  $("#ustMenu").addEventListener("click", e => { if (e.target.closest("a")) ayarla(false); });
+  window.addEventListener("hashchange", () => ayarla(false));
+  document.addEventListener("click", e => { if (!ust.contains(e.target)) ayarla(false); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && ust.classList.contains("acik")) { ayarla(false); d.focus(); } });
+})();
+
 // ---------------------------------------------------------------- kulüp arama
 function aramaIndeksi() {
   for (const k of KULUPLER) {

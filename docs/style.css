@@ -73,6 +73,28 @@ h3 { font-size: .98rem; font-weight: 650; }
 .ust nav a.aktif { color: var(--yazi); background: var(--yuzey3); }
 .tema { border: 1px solid var(--cizgi); background: var(--yuzey); color: var(--yazi); border-radius: 9px; width: 34px; height: 34px; cursor: pointer; font-size: 15px; margin-left: 6px; }
 .ust-ara { position: relative; flex: 1; max-width: 400px; }
+/* menü düğmesi yalnız dar ekranda (üç çizgi; açıkken çarpı) */
+.menu-dugme { display: none; flex-direction: column; justify-content: center; gap: 4px; width: 40px; height: 40px; padding: 0 10px;
+  border: 1px solid var(--cizgi); border-radius: 10px; background: var(--yuzey); cursor: pointer; }
+.menu-dugme span { display: block; height: 2px; border-radius: 2px; background: var(--yazi); transition: transform .2s, opacity .2s; }
+.ust.acik .menu-dugme span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.ust.acik .menu-dugme span:nth-child(2) { opacity: 0; }
+.ust.acik .menu-dugme span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+@media (prefers-reduced-motion: reduce) { .menu-dugme span { transition: none; } }
+/* dar ekranda (telefon ve tablet; masaüstü menüsü ~1100 px'e sığıyor) menü düğmesi ve açılır panel (app.js menuKur) */
+@media (max-width: 1100px) {
+  .ust { flex-wrap: wrap; gap: 8px 10px; }
+  .ust-ara { order: 3; max-width: none; flex-basis: 100%; }
+  .logo { flex: 1; }
+  .menu-dugme { display: inline-flex; }
+  .ust nav { display: none; order: 4; flex-basis: 100%; margin: 0; padding: 6px 0 4px; gap: 6px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); border-top: 1px solid var(--cizgi); }
+  .ust.acik nav { display: grid; }
+  .ust nav a { padding: 11px 12px; font-size: 15px; background: var(--yuzey2); border-radius: 10px; color: var(--yazi); }
+  .ust nav a.aktif { background: var(--vurgu-zemin); color: var(--vurgu); }
+  .ust nav .tema { grid-column: 1 / -1; width: 100%; height: 42px; margin: 0; font-size: 14px; }
+  .ust nav .tema::after { content: " Açık / koyu tema"; font-weight: 550; }
+}
 input[type=search], input[type=text], select {
   width: 100%; font: inherit; font-size: 14.5px; color: var(--yazi); background: var(--yuzey); border: 1px solid var(--cizgi);
   border-radius: 10px; padding: 8px 12px; outline: none; transition: border-color .15s, box-shadow .15s;
@@ -272,11 +294,7 @@ details.rekor[open] summary::after { content: "Gizle ▴"; }
 .logo-k { width: 18px; height: 18px; object-fit: contain; vertical-align: -4px; margin-right: 7px; }
 
 @media (max-width: 720px) {
-  .ust { flex-wrap: wrap; padding: 10px 16px; gap: 8px 10px; }
-  .ust-ara { order: 3; max-width: none; flex-basis: 100%; }
-  .logo { flex: 1; }
-  .ust nav { margin-left: 0; gap: 0; }
-  .ust nav a { padding: 6px 7px; font-size: 14px; }
+  .ust { padding: 10px 16px; }
   main { padding: 18px 16px 40px; }
   .kahraman { padding: 28px 0 12px; }
   .kulup-hero { padding: 20px 18px; border-radius: 16px; }
