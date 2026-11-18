@@ -422,7 +422,8 @@ def main():
         "sezonlar": sorted(sez, key=lambda s: (s[:4], s)),
         "ilk_tarih": next((m["tarih"] for m in maclar if m["tarih"]), None),
         "son_tarih": max(m["tarih"] for m in maclar if m["tarih"] and m["ev_gol"] is not None),
-        "kapsam": kapsam, "detayli": detayli, "detayli_aralik": araliklar(sorted(set(tff_ayr) | set(mk_ayr)))})
+        "kapsam": kapsam, "detayli": detayli, "detayli_aralik": araliklar(sorted(set(tff_ayr) | set(mk_ayr))),
+        "mk_kadro": tff_detay.MK_ILK})
     toplam = sum(os.path.getsize(os.path.join(d, f)) for d, _, fs in os.walk(CIKTI) for f in fs)
     print(f"{len(liste)} kulup, {len(sez)} sezon, {len(maclar)} mac -> {CIKTI} ({toplam / 1e6:.1f} MB)")
 

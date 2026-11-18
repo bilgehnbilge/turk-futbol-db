@@ -646,7 +646,7 @@ async function tffMacAl(id) {
   const [tarih, saat, sezon, lig, tur, ev, dep, skor] = r.m;
   const ilkGorev = r.h.find(h => h[1] === "Hakem");
   return {
-    id, tarih, saat, sezon, lig, tur, ev, dep, skor, stad: r.s, kaynak: "TFF", tff: t, uyum: r.u, oyuncuOnek: "k",
+    id, tarih, saat, sezon, lig, tur, ev, dep, skor, stad: r.s, kaynak: r.q || "TFF", olayKaynak: r.oq, tff: t, uyum: r.u, oyuncuOnek: "k",
     hakem: ilkGorev ? ilkGorev[0] : null, hakemler: r.h,
     kadro: r.k.map(l => l.map(([forma, k, ilk11]) => [forma, ad(k), ilk11, 0, k])),
     teknik: r.t.map(l => l.map(([k, a]) => BOLUM === "erkek" ? [a, "a" + k] : a)),   // kadın bölümünde teknik direktör sayfası yok
@@ -662,6 +662,8 @@ const OLAY = {
 };
 // Maçkolik maç olayları (Süper Lig 1959-1991, 1. Lig 1990-91): data/mk/dizin.json (futbol.db no -> Maçkolik no), data/mk/m/<no[:2]>.json
 let MK_DIZIN = null;
+// Maçkolik arşiv kadrolarıyla eklenen Süper Lig dönemi (ozet.json mk_kadro: en eski sezon)
+const MK_NOT = () => BOLUM === "erkek" && OZET?.mk_kadro ? `; Süper Lig ${OZET.mk_kadro.slice(0, 4)}-${OZET.mk_kadro.slice(7, 9)} ile 1989-90 arası Maçkolik arşivinin kadrolarından` : "";
 async function mkMacAl(id) {
   if (BOLUM !== "erkek") return null;
   MK_DIZIN ||= await al(`data/mk/dizin.json?s=${OZET.surum || ""}`).catch(() => ({}));
@@ -734,7 +736,7 @@ function macCiz(d) {
     <div class="kart"><h3>${ad(d.dep)}</h3>${kadroHtml(d.kadro[1], d.teknik[1])}</div>
   </div>` : ""}
   <p class="soluk not bolum">${d.olayKaynak ? `Kadro: <a class="bag" href="https://www.tff.org/Default.aspx?pageID=29&macId=${d.tff}" target="_blank" rel="noopener">TFF maç sayfası</a>; goller, kartlar ve değişiklikler: ${esc(d.olayKaynak)}`
-    : d.kaynak === "Maçkolik" ? "Goller, kartlar ve oyuncu değişiklikleri: Maçkolik. Bu dönemin kadroları henüz yok"
+    : d.kaynak === "Maçkolik" ? (d.kadro[0].length ? "Kadro, goller, kartlar ve oyuncu değişiklikleri: Maçkolik arşivi" : "Goller, kartlar ve oyuncu değişiklikleri: Maçkolik. Bu dönemin kadroları henüz yok")
     : `Kadro ve olaylar: ${d.tff ? `<a class="bag" href="${d.kaynakUrl || `https://www.tff.org/Default.aspx?pageID=29&macId=${d.tff}`}" target="_blank" rel="noopener">TFF maç sayfası</a>` : esc(d.kaynak)}`}. Oyuncu adları kaynakta yazıldığı gibidir.</p>`;
 }
 
@@ -854,10 +856,10 @@ async function tffOyuncuSayfa(kisi) {
     const [sz, kid] = k.split("|");
     return `<tr><td><a class="bag" href="#/${K}sezon/${sz}">${sz}</a></td><td class="ad">${kulupBag(+kid)}</td><td class="ad soluk">${[...new Set(l.map(r => tffYarAd(r.yar, r.kademe)))].join(", ")}</td>${hucre(topla(l))}</tr>`;
   }).join("")}</tbody></table></div>
-  <p class="soluk not">Kaynak: <a class="bag" href="https://www.tff.org/Default.aspx?pageId=30&kisiId=${kisi}" target="_blank" rel="noopener">TFF</a> ${BOLUM === "kadin" ? "maç sayfaları (kadın ligleri, 2008-09'dan bugüne)." : "maç sayfaları (lig 1990-91'den, gol dakikaları 1991-92'den; Türkiye Kupası 1990-2007)."}
+  <p class="soluk not">Kaynak: <a class="bag" href="https://www.tff.org/Default.aspx?pageId=30&kisiId=${kisi}" target="_blank" rel="noopener">TFF</a> ${BOLUM === "kadin" ? "maç sayfaları (kadın ligleri, 2008-09'dan bugüne)." : `maç sayfaları (lig 1990-91'den, gol dakikaları 1991-92'den; Türkiye Kupası 1990-2007)${MK_NOT()}.`}
     Ligler bugünkü adlarıyla gösteriliyor (1. kademe: ${esc(KADEME_AD[1])}, 2. kademe: ${esc(KADEME_AD[2])}…). Dakika, oyuna giriş-çıkış ve kırmızı kart dakikalarından hesaplanan yaklaşık süredir; uzatmalar sayılmaz.
     ${kaleci ? "Kaleci istatistikleri ilk 11'de kaleci olarak başladığı maçlardan (TFF kadroyu kaleciyle başlatıyor); oyundan çıktığı maçlarda da bütün maçın skoru sayılır, hükmen maçlar hariç." : ""}
-    ${BOLUM === "erkek" ? `${uNo ? "Avrupa maçları UEFA'dan (Avrupa sekmesi)." : "Avrupa maçı kaydı bu oyuncuyla eşlenmedi."} 1990 öncesi maçlar henüz bu sayfada yok.` : ""}</p>
+    ${BOLUM === "erkek" ? `${uNo ? "Avrupa maçları UEFA'dan (Avrupa sekmesi)." : "Avrupa maçı kaydı bu oyuncuyla eşlenmedi."} ${OZET?.mk_kadro ? `Süper Lig'de ${OZET.mk_kadro.slice(0, 4)} öncesi` : "1990 öncesi"} maçlar henüz bu sayfada yok.` : ""}</p>
   </div>
   <div id="sk-av" hidden></div><div id="sk-td" hidden></div>
   <div id="milliOyuncu"></div>`;
@@ -932,7 +934,7 @@ async function tffOyuncuRekorlari(kap, kid) {
   <p class="soluk not">Yaş, maç günündeki yaştır; yalnız doğum tarihi tam bilinen oyuncular sayılır (TFF oyuncu sayfalarından, şimdilik ${sayiYaz(d.yas_kapsam || 0)} oyuncu).
     Az maça çıkmış oyuncuların sayfaları henüz inmediği için özellikle en genç oyuncu listeleri eksik olabilir; indirme tamamlandıkça güncellenecek.</p>`;
   })() : ""}
-  <p class="soluk not">Kaynak: ${BOLUM === "kadin" ? `${KADIN_KAYNAK}.` : "TFF maç sayfaları — lig 1990-91'den (goller 1991-92'den), Türkiye Kupası 1990-2007. Daha eski dönem ve Avrupa maçları bu listelere henüz girmiyor; seyirci kaydı TFF sayfalarında yok."} Yukarıdaki filtreler bu bölümü etkilemez.</p>`;
+  <p class="soluk not">Kaynak: ${BOLUM === "kadin" ? `${KADIN_KAYNAK}.` : `TFF maç sayfaları — lig 1990-91'den (goller 1991-92'den), Türkiye Kupası 1990-2007${MK_NOT()}. Daha eski dönem ve Avrupa maçları bu listelere henüz girmiyor; seyirci kaydı TFF sayfalarında yok.`} Yukarıdaki filtreler bu bölümü etkilemez.</p>`;
 }
 
 // kulüp özeti: lig ve kupada en çok gol atan ve en çok maça çıkan oyuncular (TFF)
@@ -951,7 +953,7 @@ async function tffOyunculari(hedef, kid) {
       <div class="kart rekor-kart"><h3>En çok gol atanlar</h3><p class="soluk aciklama">Penaltı golleri dahil, kendi kalesine goller hariç</p>${d.gol.length ? liste(d.gol.slice(0, 15), x => x[3]) : `<p class="soluk">—</p>`}</div>
       <div class="kart rekor-kart"><h3>En çok maça çıkanlar</h3><p class="soluk aciklama">İlk 11 ya da oyuna sonradan girerek</p>${liste(d.mac.slice(0, 15), x => x[2])}</div>
     </div>
-    <p class="soluk not">Kaynak: ${BOLUM === "kadin" ? `${KADIN_KAYNAK}.` : "TFF maç sayfaları. Lig 1990-91'den, gol kayıtları 1991-92'den bugüne; Türkiye Kupası 1990-2007. Daha eski dönem henüz yok."}</p>`;
+    <p class="soluk not">Kaynak: ${BOLUM === "kadin" ? `${KADIN_KAYNAK}.` : `TFF maç sayfaları. Lig 1990-91'den, gol kayıtları 1991-92'den bugüne; Türkiye Kupası 1990-2007${MK_NOT()}. Daha eski dönem henüz yok.`}</p>`;
 }
 
 // oyuncu arama dizini (kulüp arama kutusunda: en az 3 harf yazılınca yüklenir)
@@ -1029,7 +1031,7 @@ async function oyuncuSayfa(no, tdNo, hedef) {
       const [sz, kid] = k.split("|");
       return satirT(`<a class="bag" href="#/${K}sezon/${sz}">${sz}</a>`, ozetle(l), `<td class="ad">${kulupBag(+kid)}</td><td class="soluk">${[...new Set(l.map(m => YAR_TD[m.yar]))].join(", ")}</td>`);
     }).join("")}</tbody></table></div>
-    <p class="soluk not">Lig ve kupa maçları TFF maç sayfalarından (dört profesyonel lig 1990-91'den, Türkiye Kupası 1990-2007 ve 2007 sonrası özel kupalar), Avrupa maçları UEFA'dan. Maç başı puan bütün sezonlarda galibiyet 3 puanla hesaplandı; hükmen maçlar dahil değil.</p>`;
+    <p class="soluk not">Lig ve kupa maçları TFF maç sayfalarından (dört profesyonel lig 1990-91'den, Türkiye Kupası 1990-2007 ve 2007 sonrası özel kupalar${MK_NOT()}), Avrupa maçları UEFA'dan. Maç başı puan bütün sezonlarda galibiyet 3 puanla hesaplandı; hükmen maçlar dahil değil.</p>`;
   })();
   const html = `
   <div class="sayfa-bas"><div><h1>${esc(ad)}</h1>
@@ -1378,7 +1380,7 @@ async function rekorlarSayfa(kap) {
       <td class="o"><b>${x[2]}</b> gol</td><td class="ad"><small class="soluk">Rakip</small> ${kulupBag(x[7])} <small>${skorBag(x[3], "· maç")}</small></td>
       <td class="ek soluk" style="font-size:13px">${esc(x[8] === "L" ? KADEME_AD[x[9]] || "Lig" : YAR_AD[x[8]] || "")}${x[10] ? " · play-off" : ""}</td></tr>`).join("")}</tbody></table></div>
     ${l.length > n ? `<button class="dugme daha" data-ac="oygol">${acik ? "Daha az göster" : `${sayiYaz(l.length)} maçın hepsini göster (3+ gol)`}</button>` : acik ? `<button class="dugme daha" data-ac="oygol">Daha az göster</button>` : ""}
-    <p class="soluk not">Kaynak: ${BOLUM === "kadin" ? `${KADIN_KAYNAK}. Kendi kalesine goller hariç, penaltı golleri dahil.` : "TFF maç sayfaları — lig 1991-92'den, Türkiye Kupası 1991-2007. Kendi kalesine goller hariç, penaltı golleri dahil. 1991 öncesi henüz yok."}</p>`;
+    <p class="soluk not">Kaynak: ${BOLUM === "kadin" ? `${KADIN_KAYNAK}. Kendi kalesine goller hariç, penaltı golleri dahil.` : `TFF maç sayfaları — lig 1991-92'den, Türkiye Kupası 1991-2007${MK_NOT()}. Kendi kalesine goller hariç, penaltı golleri dahil.`}</p>`;
   };
   const tablo = () => {
     const l = v.tablo, n = Math.min(rekorDurum.tablo, l.length);

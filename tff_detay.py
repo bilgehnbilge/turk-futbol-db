@@ -19,6 +19,7 @@ DOGUM_DUZELT = {int(k): v[0] for k, v in json.load(open(os.path.join(KOK, "dogum
 OYUNCU_DB = os.path.join(KOK, "raw", "oyuncu.db")
 KUPA_ES = os.path.join(KOK, "tff_kupa_eslesme.json")   # Maçkolik kupa maçı -> TFF maç no (1990-2007 kupa sayfaları)
 YAR = {"lig": "L", "kupa": "K", "ozel_kupa": "O", "avrupa": "A", "terfi": "T"}
+MK_ILK = None   # Maçkolik arşiv kadrolarının en eski sezonu (maclari_yaz doldurur; site notları için ozet.json'a)
 KART = {"Sarı Kart": "Y", "Kırmızı Kart": "R", "Çift Sarı Kart": "YR"}
 
 
@@ -160,6 +161,16 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
         if int(mac) in tersi:
             olay[int(mac)].append([taraf, "S", d1, d2 or 0, cikan, giren, None])
             ad.setdefault(giren, gad); ad.setdefault(cikan, cad)
+    # 1959-1991 Süper Lig: Maçkolik arşiv kadroları ve olayları (mackolik_oyuncu.py)
+    import mackolik_oyuncu as MO
+    erkek = os.path.basename(OYUNCU_DB) == "oyuncu.db"   # kadın verisi (kadin_site.py) aynı kodla geçer: arşiv yalnız erkek
+    ar, ar_say = MO.yukle(maclar, bag, c) if erkek else ({}, {})
+    mk_kadro, mk_olay = MO.kat(ar, MO.kisi_esle(ar, kadro, ad), kadro, olay, ad, ilk_sira, ilk_say, bas_say)
+    global MK_ILK
+    if erkek:
+        MK_ILK = min((m["sezon"] for m in maclar if m["id"] in bag and bag[m["id"]][0] in mk_kadro), default=None)
+    if erkek:
+        print(f"Maçkolik arşiv kadroları ({MK_ILK}'den): {dict(ar_say)}; kadro {len(mk_kadro)} maç, yalnız olay {len(mk_olay)} maç")
     teknik = collections.defaultdict(lambda: ([], []))
     for mac, taraf, kisi, a in o.execute("SELECT mac, taraf, kisi, ad FROM teknik"):
         if int(mac) in tersi:
@@ -189,8 +200,12 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
                  "k": [k[0], k[1]], "o": ol, "t": [tk[0], tk[1]], "h": hakem[t]}
         if stad:
             kayit["s"] = okunur_kulup(stad)
-        if uyum in ("uyumsuz", "yok"):
+        if uyum in ("uyumsuz", "yok") and t not in mk_olay and t not in mk_kadro:
             kayit["u"] = uyum
+        if t in mk_kadro:
+            kayit["q"] = "Maçkolik"
+        elif t in mk_olay:
+            kayit["oq"] = "Maçkolik"
         kova[t // 250][t] = kayit
         mevcut.append(t)
     mdir = os.path.join(tff, "m")
