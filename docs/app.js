@@ -3,6 +3,23 @@
 
 const $ = (s, k = document) => k.querySelector(s);
 const icerik = $("#icerik");
+// yana taşan tablolar klavyeyle kaydırılabilsin (WCAG 2.1.1): taşan .tablo-kap odak alır ve adlandırılır
+function kaydirmaIsaretle() {
+  const adlar = new Set([...icerik.querySelectorAll(".tablo-kap[data-kaydir]")].map(k => k.getAttribute("aria-label")));
+  for (const k of icerik.querySelectorAll(".tablo-kap")) {
+    const tasar = k.scrollWidth > k.clientWidth + 1;
+    if (tasar && !k.hasAttribute("tabindex")) {
+      const kok = `${k.querySelector("th")?.textContent.trim() || "Tablo"} tablosu, yana kaydırılabilir`;
+      let ad = kok; for (let i = 2; adlar.has(ad); i++) ad = `${kok} (${i})`;
+      adlar.add(ad); k.tabIndex = 0; k.setAttribute("role", "region"); k.setAttribute("aria-label", ad); k.dataset.kaydir = "1";
+    }
+    else if (!tasar && k.dataset.kaydir) { k.removeAttribute("tabindex"); k.removeAttribute("role"); k.removeAttribute("aria-label"); delete k.dataset.kaydir; }
+  }
+}
+let kaydirmaZaman;
+const kaydirmaPlanla = () => { clearTimeout(kaydirmaZaman); kaydirmaZaman = setTimeout(kaydirmaIsaretle, 150); };
+new MutationObserver(kaydirmaPlanla).observe(icerik, { childList: true, subtree: true });
+addEventListener("resize", kaydirmaPlanla);
 const onbellek = new Map();
 let KULUPLER = [], KULUP = new Map(), OZET = null;
 
@@ -482,20 +499,24 @@ function filtreBagla(d, yenidenYukle, ciz) {
   $("#fOncul")?.addEventListener("change", e => { d.oncul = e.target.checked; yenidenYukle(); });
 }
 
+// öne çıkan özet kartı (kulüp ve milli takım): t = { O, G, B, M, AG, YG, GY }
+function anaOzet(t, baslik) {
+  const say = (b, ad, ek = "") => `<div${ek}><b>${b}</b><span>${ad}</span></div>`;
+  return `<div class="kart ozet-ana"><h2>${baslik}</h2>
+    <div class="ana-sayilar">${say(sayiYaz(t.O), "Maç", ' class="ilk"')}${say(sayiYaz(t.G), "Galibiyet")}${say(sayiYaz(t.B), "Beraberlik")}${say(sayiYaz(t.M), "Mağlubiyet")}
+      ${say(sayiYaz(t.AG), "Attığı gol")}${say(sayiYaz(t.YG), "Yediği gol")}${say(sayiYaz(t.GY), "Gol yemediği maç")}</div>
+    <div class="cubuk" aria-hidden="true"><i class="g" style="width:${yuzde(t.G, t.O)}%"></i><i class="b" style="width:${yuzde(t.B, t.O)}%"></i><i class="m" style="width:${yuzde(t.M, t.O)}%"></i></div>
+    <p class="soluk ana-oran">Galibiyet oranı <b>%${yuzde(t.G, t.O)}</b> · Kalesini gole kapattığı maç <b>%${yuzde(t.GY, t.O)}</b> · Maç başı <b>${(t.AG / Math.max(t.O, 1)).toFixed(2)} – ${(t.YG / Math.max(t.O, 1)).toFixed(2)}</b> gol</p></div>`;
+}
 function ozetHtml(ms) {
   // bütün resmi maçlar öne çıkan kartta; yarışmalar (lig, kupalar…) altında tek tabloda, toplam satırı en altta
   const T = toplam(ms);
   const bolumler = [["L", "Lig"], ["K", "Türkiye Kupası"], ["A", "Avrupa kupaları"],
     ["O", "Diğer kupalar", "Cumhurbaşkanlığı, Başbakanlık, Atatürk Kupası, TFF Süper Kupa"], ["T", "Terfi maçları"]]
     .map(([y, ad, acik]) => { const alt = ms.filter(m => m.yar === y); return alt.length ? [ad, acik, toplam(alt)] : null; }).filter(Boolean);
-  const say = (b, ad, ek = "") => `<div${ek}><b>${b}</b><span>${ad}</span></div>`;
   const hucre = t => `<td class="s"><b>${sayiYaz(t.O)}</b></td><td class="s">${sayiYaz(t.G)}</td><td class="s">${sayiYaz(t.B)}</td><td class="s">${sayiYaz(t.M)}</td>
     <td class="s">${sayiYaz(t.AG)}</td><td class="s">${sayiYaz(t.YG)}</td><td class="s">${sayiYaz(t.GY)}</td><td class="s">${yuzde(t.G, t.O)}</td>`;
-  const kartlar = `<div class="kart ozet-ana"><h2>Bütün resmi maçlar</h2>
-    <div class="ana-sayilar">${say(sayiYaz(T.O), "Maç", ' class="ilk"')}${say(sayiYaz(T.G), "Galibiyet")}${say(sayiYaz(T.B), "Beraberlik")}${say(sayiYaz(T.M), "Mağlubiyet")}
-      ${say(sayiYaz(T.AG), "Attığı gol")}${say(sayiYaz(T.YG), "Yediği gol")}${say(sayiYaz(T.GY), "Gol yemediği maç")}</div>
-    <div class="cubuk" aria-hidden="true"><i class="g" style="width:${yuzde(T.G, T.O)}%"></i><i class="b" style="width:${yuzde(T.B, T.O)}%"></i><i class="m" style="width:${yuzde(T.M, T.O)}%"></i></div>
-    <p class="soluk ana-oran">Galibiyet oranı <b>%${yuzde(T.G, T.O)}</b> · Kalesini gole kapattığı maç <b>%${yuzde(T.GY, T.O)}</b> · Maç başı <b>${(T.AG / Math.max(T.O, 1)).toFixed(2)} – ${(T.YG / Math.max(T.O, 1)).toFixed(2)}</b> gol</p></div>
+  const kartlar = `${anaOzet(T, "Bütün resmi maçlar")}
   ${bolumler.length > 1 ? `<div class="tablo-kap bolum"><table class="tablo"><thead><tr><th>Yarışma</th><th class="s">Maç</th><th class="s" title="Galibiyet">G</th><th class="s" title="Beraberlik">B</th><th class="s" title="Mağlubiyet">M</th>
     <th class="s">Attığı</th><th class="s">Yediği</th><th class="s" title="Gol yemediği maç">Gol yemeden</th><th class="s" title="Maçların yüzde kaçını kazandı">Galibiyet (%)</th></tr></thead><tbody>
     ${bolumler.map(([ad, acik, t]) => `<tr><td${acik ? ` title="${acik}"` : ""}>${ad}${acik ? `<small class="soluk"> *</small>` : ""}</td>${hucre(t)}</tr>`).join("")}
@@ -828,7 +849,7 @@ function macCiz(d) {
     const [taraf, tur, , , a1, a2, ay, n1, n2] = o, [s, adi] = OLAY[tur] || ["•", tur];
     const metin = tur === "SUBSTITUTION" ? `<span class="gir">↑ ${oy(n2, a2)}</span> <span class="cik">↓ ${oy(n1, a1)}</span>`
       : `<b>${oy(n1, a1)}</b>${tur === "GOAL" && ay === "PENALTY" ? ` <small class="soluk">(penaltı)</small>` : ""}${tur === "GOAL" && ay === "HEADER" ? ` <small class="soluk">(kafa)</small>` : ""}${ay === "OWN" ? ` <small class="soluk">(kendi kalesine)</small>` : ""}${tur === "PENALTY" ? ` <small class="soluk">penaltı kaçırdı</small>` : ""}`;
-    return `<div class="akis-satir ${taraf === 1 ? "ev" : "dep"} ${tur === "GOAL" ? "gol" : ""}"><span class="akis-ic">${taraf === 1 ? `${metin} <span class="s" title="${adi}">${s}</span>` : `<span class="s" title="${adi}">${s}</span> ${metin}`}</span><span class="akis-dk">${dakika(o)}</span></div>`;
+    return `<div class="akis-satir ${taraf === 1 ? "ev" : "dep"} ${tur === "GOAL" ? "gol" : ""}${tur === "SUBSTITUTION" ? " degisiklik" : ""}"><span class="akis-ic">${taraf === 1 ? `${metin} <span class="s" title="${adi}">${s}</span>` : `<span class="s" title="${adi}">${s}</span> ${metin}`}</span><span class="akis-dk">${dakika(o)}</span></div>`;
   }).join("");
   icerik.innerHTML = `
   <div class="mac-bas">
@@ -836,17 +857,20 @@ function macCiz(d) {
     <div class="mac-ust soluk">${d.ustHtml || `<a class="bag" href="#/${K}sezon/${d.sezon}">${esc(d.sezon)}</a> · ${esc(d.lig)}${d.tur ? ` · ${esc(d.tur)}` : ""}`}</div>
     <div class="karsilasma mac">${buyuk(d.ev, 0)}<div class="mac-skor"><b>${eg ?? "–"} - ${dg ?? "–"}</b>${ep != null ? `<small>pen ${ep}-${dp}</small>` : durum === "UZ" ? `<small>uzatmada</small>` : ""}</div>${buyuk(d.dep, 1)}</div>
     <div class="mac-bilgi">
-      <span>📅 ${tarihYaz(d.tarih)}${d.saat ? ` · ${esc(d.saat)}` : ""}</span>
-      ${d.stad ? `<span>🏟 ${esc(d.stad)}${d.sehir ? `, ${esc(d.sehir)}` : ""}</span>` : ""}
-      ${d.seyirci ? `<span>👥 ${sayiYaz(d.seyirci)} seyirci</span>` : ""}
-      ${d.hakem ? `<span>🧑‍⚖️ ${esc(d.hakem)}${d.hakem_ulke && ULKE[d.hakem_ulke] ? ` <small class="soluk">(${ULKE[d.hakem_ulke][0]})</small>` : ""}</span>` : ""}
+      <span><i aria-hidden="true">📅</i>${tarihYaz(d.tarih)}${d.saat ? ` · ${esc(d.saat)}` : ""}</span>
+      ${d.stad ? `<span><i aria-hidden="true">🏟</i>${esc(d.stad)}${d.sehir ? `, ${esc(d.sehir)}` : ""}</span>` : ""}
+      ${d.seyirci ? `<span><i aria-hidden="true">👥</i>${sayiYaz(d.seyirci)} seyirci</span>` : ""}
+      ${d.hakem ? `<span><i aria-hidden="true">🧑‍⚖️</i>${esc(d.hakem)}${d.hakem_ulke && ULKE[d.hakem_ulke] ? ` <small class="soluk">(${ULKE[d.hakem_ulke][0]})</small>` : ""}</span>` : ""}
     </div>
     ${d.hakemler && d.hakemler.length > 1 ? `<div class="mac-hakemler soluk">${d.hakemler.filter(h => h[1] !== "Hakem").map(h => `${esc(h[1])}: ${esc(h[0])}`).join(" · ")}</div>` : ""}
   </div>
   ${d.uyum === "uyumsuz" ? `<p class="uyari bolum">TFF'nin bu maç için verdiği gol listesi skorla uyuşmuyor; kaynakta bir yazım hatası var. Goller TFF'de yazıldığı gibi gösteriliyor.</p>` : ""}
   ${d.uyum === "yok" ? `<p class="soluk not bolum">TFF bu maçın gollerini kaydetmemiş.</p>` : ""}
   ${istatHtml(d)}
-  ${d.olay.length ? `<div class="kart bolum"><h2 class="h3">Maçın akışı</h2><div class="akis">${akis}</div></div>` : ""}
+  ${d.olay.length ? (() => { const nD = d.olay.filter(o => o[1] === "SUBSTITUTION").length, nO = d.olay.length - nD;
+    return `<div class="kart bolum"><div class="akis-bas"><h2 class="h3">Maçın akışı</h2>
+      ${nD && nO ? `<div class="cipler gorunum" role="group" aria-label="Akışta gösterilenler"><button type="button" class="cip aktif" data-a="onemli" aria-pressed="true">Önemli anlar <small>${nO}</small></button><button type="button" class="cip" data-a="tum" aria-pressed="false">Bütün olaylar <small>${d.olay.length}</small></button></div>` : ""}</div>
+      <div class="akis${nD && nO ? " onemli" : ""}" id="akis">${akis}</div></div>`; })() : ""}
   ${d.kadro[0].length || d.kadro[1].length ? `<div class="izgara iki bolum ust-hiza">
     <div class="kart"><h2 class="h3">${ad(d.ev)}</h2>${kadroHtml(d.kadro[0], d.teknik[0])}</div>
     <div class="kart"><h2 class="h3">${ad(d.dep)}</h2>${kadroHtml(d.kadro[1], d.teknik[1])}</div>
@@ -854,6 +878,10 @@ function macCiz(d) {
   <p class="soluk not bolum">${d.olayKaynak ? `Kadro: <a class="bag" href="https://www.tff.org/Default.aspx?pageID=29&macId=${d.tff}" target="_blank" rel="noopener">TFF maç sayfası</a>; goller, kartlar ve değişiklikler: ${esc(d.olayKaynak)}`
     : d.kaynak === "Maçkolik" ? (d.kadro[0].length ? "Kadro, goller, kartlar ve oyuncu değişiklikleri: Maçkolik arşivi" : "Goller, kartlar ve oyuncu değişiklikleri: Maçkolik. Bu dönemin kadroları henüz yok")
     : `Kadro ve olaylar: ${d.tff ? `<a class="bag" href="${d.kaynakUrl || `https://www.tff.org/Default.aspx?pageID=29&macId=${d.tff}`}" target="_blank" rel="noopener">TFF maç sayfası</a>` : esc(d.kaynak)}`}. Oyuncu adları kaynakta yazıldığı gibidir.</p>`;
+  icerik.querySelectorAll(".akis-bas .cip").forEach(b => b.addEventListener("click", () => {
+    icerik.querySelectorAll(".akis-bas .cip").forEach(x => { x.classList.toggle("aktif", x === b); x.setAttribute("aria-pressed", x === b); });
+    $("#akis").classList.toggle("onemli", b.dataset.a === "onemli");
+  }));
 }
 
 const ISTAT = [   // [anahtar, ad, yüzde mi]

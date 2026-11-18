@@ -420,6 +420,14 @@ a.skor.bagli:hover { color: var(--vurgu); }
 .mac-skor small { color: var(--soluk); font-size: 13px; }
 .mac-bilgi { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; font-size: 14px; color: var(--yazi2); border-top: 1px solid var(--cizgi); padding-top: 14px; }
 .akis { display: flex; flex-direction: column; }
+.akis.onemli .degisiklik { display: none; }
+.akis.onemli .akis-satir:not(.degisiklik) { border-top: 0; }
+.akis.onemli .akis-satir:not(.degisiklik) ~ .akis-satir:not(.degisiklik) { border-top: 1px solid var(--cizgi); }
+.akis-bas { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-bottom: 10px; }
+.akis-bas h2 { margin: 0; }
+.akis-bas .gorunum { margin: 0; }
+.akis-bas .cip small { color: inherit; opacity: .7; font-variant-numeric: tabular-nums; margin-left: 2px; }
+.mac-bilgi i { font-style: normal; margin-right: 6px; }
 .akis-satir { display: grid; grid-template-columns: 1fr 52px 1fr; align-items: center; padding: 6px 0; border-top: 1px solid var(--cizgi); font-size: 14px; }
 .akis-satir:first-child { border-top: 0; }
 .akis-satir .akis-dk { grid-column: 2; grid-row: 1; text-align: center; font-weight: 700; color: var(--soluk); font-variant-numeric: tabular-nums; font-size: 13px; }
@@ -525,6 +533,7 @@ a.oyuncu-bag:hover { color: var(--vurgu); text-decoration: underline; text-under
 @supports (color: oklch(from red l c h)) {
   .hucre, .hucre.koyu { color: oklch(from color-mix(in oklab, var(--isi-uc) var(--t), var(--yuzey2)) clamp(0, (0.57 - l) * 1000, 1) 0 0); }
 }
+.tablo-kap[data-kaydir]:focus-visible { outline: 2px solid var(--vurgu); outline-offset: 2px; }
 .hucre:hover, .hucre:focus-visible { outline: 2px solid var(--yazi); outline-offset: -2px; }
 .isi-lejant { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 12px; margin-top: 10px; max-width: 460px; }
 .isi-lejant .olcek { display: inline-flex; align-items: center; gap: 6px; }

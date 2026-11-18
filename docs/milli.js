@@ -28,7 +28,7 @@ function maclar(d) {
     bayrak: bayrakImg((d.ulke[r[3]] || [])[2]), bkod: (d.ulke[r[3]] || [])[2], s: sonuc(r[5], r[6]) }));
 }
 const KAT_SIRA = ["Dünya Kupası", "Dünya Kupası elemeleri", "Avrupa Şampiyonası", "Avrupa Şampiyonası elemeleri", "Uluslar Ligi", "Diğer turnuvalar", "Özel maç"];
-const say = l => l.reduce((t, m) => (t.O++, t[m.s]++, t.AG += m.a, t.YG += m.y, t), { O: 0, G: 0, B: 0, M: 0, AG: 0, YG: 0 });
+const say = l => l.reduce((t, m) => (t.O++, t[m.s]++, t.AG += m.a, t.YG += m.y, t.GY += m.y === 0, t), { O: 0, G: 0, B: 0, M: 0, AG: 0, YG: 0, GY: 0 });
 const hucre = t => `<td class="s">${t.O}</td><td class="s">${t.G}</td><td class="s">${t.B}</td><td class="s">${t.M}</td><td class="s">${t.AG}</td><td class="s">${t.YG}</td>
   <td class="s">${t.AG - t.YG > 0 ? "+" : ""}${t.AG - t.YG}</td><td class="s"><b>%${yuzde(t.G, t.O)}</b></td>`;
 const bas = ilk => `<thead><tr>${ilk.map((x, i) => `<th${i ? "" : ' class="ad"'}>${x}</th>`).join("")}<th class="s">O</th><th class="s">G</th><th class="s">B</th><th class="s">M</th>
@@ -55,13 +55,9 @@ async function milliSayfa(sekme = "ozet") {
       (!durum.onyil || m.tarih.slice(0, 3) === durum.onyil.slice(0, 3))) : ms;
     const rakipT = [...msR.reduce((a, m) => a.set(m.kod, [...(a.get(m.kod) || []), m]), new Map())].sort((x, y) => y[1].length - x[1].length || x[1][0].rakip.localeCompare(y[1][0].rakip, "tr"));
     const ozetHtml = () => `
-    <div class="kart bolum"><div class="ozet-sat">
-      <div><b>${T.O}</b><span>Maç</span></div><div><b>${T.G}</b><span>Galibiyet</span></div><div><b>${T.B}</b><span>Beraberlik</span></div>
-      <div><b>${T.M}</b><span>Mağlubiyet</span></div><div><b>${T.AG}</b><span>Attığı gol</span></div><div><b>${T.YG}</b><span>Yediği gol</span></div>
-      <div><b>%${yuzde(T.G, T.O)}</b><span>Kazanma</span></div></div>
-      <div class="cubuk"><i class="g" style="width:${yuzde(T.G, T.O)}%"></i><i class="b" style="width:${yuzde(T.B, T.O)}%"></i><i class="m" style="width:${yuzde(T.M, T.O)}%"></i></div></div>
+    <div class="bolum">${anaOzet(T, durum.kat || durum.onyil || durum.rakip ? "Seçili maçlar" : "Bütün maçlar")}</div>
     <div class="izgara iki bolum ust-hiza milli-iki">
-      <div class="tablo-kap"><table class="tablo">${bas(["Yarışma"])}<tbody>${kat.map(([k, l]) => `<tr><td class="ad">${esc(k)}</td>${hucre(say(l))}</tr>`).join("")}</tbody></table></div>
+      <div class="tablo-kap"><table class="tablo">${bas(["Yarışma"])}<tbody>${kat.map(([k, l]) => `<tr><td class="ad">${esc(k)}</td>${hucre(say(l))}</tr>`).join("")}${kat.length > 1 ? `<tr class="toplam"><td class="ad">Toplam</td>${hucre(T)}</tr>` : ""}</tbody></table></div>
       <div class="tablo-kap"><table class="tablo">${bas(["Dönem"])}<tbody>${onyil.map(([k, l]) => `<tr><td class="ad">${k}'lar</td>${hucre(say(l))}</tr>`).join("")}</tbody></table></div>
     </div>
     <div class="bolum">

@@ -70,8 +70,8 @@ async function kadinSayfa(sekme = "sezonlar") {
     // şampiyonlar: kadin_sampiyon.json (RSSSF / Vikipedi); play-off ve final turlarıyla belirlenen sezonlar tablodan çıkmaz
     const sampiyonSay = new Map();
     for (const s of z.sezonlar) { const k = z.sampiyonlar?.[s]; if (k != null) sampiyonSay.set(k, (sampiyonSay.get(k) || 0) + 1); }
-    ic.innerHTML = `<div class="sezon-izgara">${[...z.sezonlar].reverse().map(s => `<a href="#/kadin/sezon/${s}">${s}</a>`).join("")}</div>
-      <h2 class="bolum">Şampiyonlar</h2>
+    // sezon dizini şampiyonlar tablosunun kendisi (her satır sezona bağlanır; ayrı düğme ızgarası yok)
+    ic.innerHTML = `<h2>Sezonlar ve şampiyonlar</h2>
       <div class="tablo-kap"><table class="tablo"><thead><tr><th>Sezon</th><th class="ad">Lig</th><th class="ad">Şampiyon</th></tr></thead><tbody>
       ${[...z.sezonlar].reverse().map(s => { const k = z.sampiyonlar?.[s], var_ = s in (z.sampiyonlar || {});
         return `<tr><td><a class="bag" href="#/kadin/sezon/${s}">${s}</a></td><td class="ad soluk">${esc(kademeAd(s, 1))}</td>
