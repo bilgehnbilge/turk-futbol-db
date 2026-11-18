@@ -118,6 +118,7 @@ def kisi_okunur_kur(o, okunur):
             (say_tr if TR_HARF & set(a) else say_ya).update(w for w in a.split() if "I" in w)
     tr = {w for w in say_tr if say_tr[w] >= say_ya[w]}
     def f(a):
+        a = on_temiz(a)
         if not a or any(ch.islower() for ch in a):
             return a
         if TR_HARF & set(a):
@@ -135,8 +136,34 @@ BAGLAC = {"DE", "DA", "DO", "DOS", "DAS", "DI", "DU", "DEL", "VAN", "VON", "DER"
 EDAT = {"DE", "DA", "DO", "DOS", "DAS", "DI", "DU", "DEL", "VAN", "VON", "DER", "DEN", "LA", "LE", "EL"}
 
 
+def on_temiz(a):
+    """TFF'nin ad yazımındaki bozukluklar: virgülle ayrılmış adlar ("RAYAN,NY,ALNA"), noktadan sonra boşluksuz kısaltmalar
+    ("M.ALİ"), büyük harfli adda tek tük küçük harf ("ARiF")."""
+    import re
+    if not a:
+        return a
+    a = re.sub(r"\s+", " ", re.sub(r"\.(?=[^\s.])", ". ", a.replace(",", " "))).strip()
+    harf = [ch for ch in a if ch.isalpha()]
+    kucuk = sum(ch.islower() for ch in harf)
+    if harf and 0 < kucuk <= len(harf) * 0.2:
+        a = a.replace("i", "İ").upper()
+    return a
+
+
+def yabanci_mi(a, tc_kelime):
+    """Kişi sayfası olmayan oyuncu: adının kelimelerinin çoğu Türk oyuncuların adlarında hiç geçmiyorsa ve Ğ/Ş yoksa yabancı."""
+    w = [x for x in on_temiz(a).upper().replace(".", " ").split() if len(x) > 1 and x not in BAGLAC]
+    if not w or any(set(x) & set("ĞŞ") for x in w):
+        return False
+    def tc(x):   # Türk adlarında geçen kelime ya da bileşik soyadı (KIRIK+KAYA)
+        x = x.replace("İ", "I")
+        return x in tc_kelime or any((x[i:] in tc_kelime and len(x) - i >= 4) or (x[:i] in tc_kelime and i >= 4) for i in range(2, len(x) - 1))
+    return sum(tc(x) for x in w) < len(w) / 2
+
+
 def yabanci_okunur(a, okunur):
     """Yabancı oyuncunun TFF'deki büyük harfli adı: Türkçe harfli (Ğ Ş Ö Ü) kelimeler Türkçe kuralla, gerisinde I = i."""
+    a = on_temiz(a)
     w = [okunur(x) if set(x) & set("ĞŞÖÜ") else okunur(x.replace("I", "İ")).replace("İ", "I") for x in a.split()]
     w = [x[0] + x[1:].replace("I", "ı").replace("İ", "i").lower() if len(x) > 1 and x.isupper() and x.isalpha() else x for x in w]
     return " ".join([w[0]] + [x.lower() if x.upper().replace("İ", "I") in BAGLAC else x for x in w[1:]]) if w else a
@@ -230,8 +257,9 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
     if os.path.basename(OYUNCU_DB) == "oyuncu.db":
         # yabancı oyuncuların TFF'deki büyük harfli adı: Türkçe kural yok (TFF "ROGERIO CONCEIÇAO" -> "Rogerıo" olmasın)
         kdb = os.path.join(KOK, "raw", "kisi.db")
-        yab = {k_ for k_, u_ in sqlite3.connect(kdb).execute("SELECT kisi, uyruk FROM kisi")
-               if u_ and u_ != "TC"} if os.path.exists(kdb) else set()
+        uy = dict(sqlite3.connect(kdb).execute("SELECT kisi, uyruk FROM kisi")) if os.path.exists(kdb) else {}
+        yab = {k_ for k_, u_ in uy.items() if u_ and u_ != "TC"}
+        # (yabanci_mi tahmini kullanılmıyor: kişi sayfası inince uyruk oradan gelir)
         for k_ in yab:
             if k_ in ad and ad[k_] and not any(ch.islower() for ch in ad[k_]):
                 ad[k_] = yabanci_okunur(ad[k_], okunur)
