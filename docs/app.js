@@ -267,6 +267,7 @@ function anaSayfa() {
       <div class="sayi"><b>${OZET.sezonlar.length}</b><span>sezon</span></div>
     </div>
   </section>
+  <section class="bolum bugun" id="bugun" aria-live="polite"></section>
   <section class="bolum izgara k3">
     <a class="kart" href="#/sezonlar"><h3>Sezonlar →</h3><p class="soluk">Her sezonun puan tabloları, kupa turları ve Avrupa maçları.</p></a>
     <a class="kart" href="#/elo"><h3>Elo puan durumu →</h3><p class="soluk">1959'dan bugüne bütün maçlardan hesaplanan güç puanı: bugünkü sıralama, tüm zamanların zirveleri ve en büyük sürprizler.</p></a>
@@ -276,6 +277,63 @@ function anaSayfa() {
     <a class="kart" href="#/hakkinda"><h3>Veri hakkında →</h3><p class="soluk">Kaynaklar, kapsam ve bilinen sınırlar.</p></a>
   </section>`;
   oneriKutusu($("#anaAra"), $("#anaOneri"), k => location.hash = `#/kulup/${k.id}`);
+  bugunTarihte($("#bugun")).catch(() => $("#bugun")?.remove());
+}
+
+// ana sayfa "Bugün tarihte": bu gün-ayda oynanmış dikkat çekici maçlar. Lig ve kupa: data/bugun.json (web_aktar.py,
+// gün başına seçilmiş derbi, final, farklı skor); Avrupa: avrupa.json; Milli Takım: milli.json. Sayfa çizildikten sonra yüklenir.
+const AY_AD = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+async function bugunTarihte(kap) {
+  if (!kap || BOLUM !== "erkek") return;
+  const s = `?s=${OZET.surum || ""}`;
+  const [bg, av, mi] = await Promise.all([al(`data/bugun.json${s}`).catch(() => null), al(`data/avrupa.json${s}`).catch(() => null), al(`data/milli.json${s}`).catch(() => null)]);
+  const bugun = new Date(), deneme = new URLSearchParams(location.search).get("gun");   // ?gun=AA-GG: başka günü denemek için
+  const gunAl = d => `${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const turk = id => KULUP.get(id)?.yerli;
+  const NEDEN = { final: ["Türkiye Kupası finali", 100], yari: ["Türkiye Kupası yarı finali", 45], derbi: ["Derbi", 60], fark: ["Farklı skor", 35], gol: ["Gol yağmuru", 30] };
+  const adaylar = gun => {
+    const l = [];
+    for (const r of bg?.gun?.[gun] || []) {
+      const [id, tarih, yar, kademe, tur, ev, dep, eg, dg, ep, dp, durum, neden] = r, [ad, p] = NEDEN[neden] || ["", 20];
+      l.push({ tur: "lig", tarih, p, etiket: neden === "derbi" ? `${yar === "K" ? "Türkiye Kupası" : esc(KADEME_AD[kademe] || "Lig")} derbisi` : yar === "L" ? `${esc(KADEME_AD[kademe] || "Lig")} · ${ad}` : ad,
+        mac: `${kulupBag(ev)} ${skorBag(id, `<b>${skorYaz(eg, dg, ep, dp, durum)}</b>`)} ${kulupBag(dep)}` });
+    }
+    for (const r of av?.maclar || []) {
+      if (r[1]?.slice(5, 10) !== gun || r[7] == null) continue;
+      const [id, tarih, sezon, lig, tr, ev, dep, eg, dg, ep, dp, durum, evAd, depAd] = r;
+      if (!!turk(ev) === !!turk(dep)) continue;
+      const tk = turk(ev) ? eg : dg, rk = turk(ev) ? dg : eg;
+      const p = /Final/i.test(tr) && !/(Yarı|Çeyrek|Son 16)/i.test(tr) ? 100 : /Yarı/i.test(tr) ? 60 : /Çeyrek/i.test(tr) ? 45 : 22 + (tk > rk ? 8 : 0) + Math.min(Math.abs(tk - rk), 4) * 2;
+      l.push({ tur: "avrupa", tarih, p, etiket: `Avrupa · ${esc(lig)}${tr ? ` · ${esc(tr)}` : ""}`, mac: `${kulupBag(ev, evAd)} ${skorBag(id, `<b>${skorYaz(eg, dg, ep, dp, durum)}</b>`)} ${kulupBag(dep, depAd)}` });
+    }
+    for (const r of mi?.maclar || []) {
+      if (r[1]?.slice(5, 10) !== gun || r[5] == null) continue;
+      const [tff, tarih, rakip, , saha, a, y, kat, org, ayr] = r;
+      const p = /^(Dünya Kupası|Avrupa Şampiyonası)$/.test(kat) ? 80 : /elemeleri|Uluslar/.test(kat) ? 40 : 18;
+      const sk = saha === "E" ? `${a}-${y}` : `${y}-${a}`, skH = ayr ? `<a class="skor bagli" href="#/milli/mac/${tff}"><b>${sk}</b></a>` : `<b>${sk}</b>`;
+      l.push({ tur: "milli", tarih, p: p + (a > y ? 8 : 0), etiket: `Milli Takım · ${esc(org || kat)}`,
+        mac: saha === "E" ? `<a class="bag" href="#/milli">Türkiye</a> ${skH} ${esc(rakip)}` : `${esc(rakip)} ${skH} <a class="bag" href="#/milli">Türkiye</a>` });
+    }
+    return l;
+  };
+  // bugün yoksa en yakın gün (±3)
+  let gun = deneme || gunAl(bugun), l = adaylar(gun), yakin = false;
+  for (let i = 1; !l.length && i <= 3; i++) for (const yon of [1, -1]) {
+    const d = new Date(2000, +gun.slice(0, 2) - 1, +gun.slice(3) + yon * i); const g = gunAl(d);
+    const x = adaylar(g); if (x.length) { gun = g; l = x; yakin = true; break; }
+  }
+  if (!l.length) { kap.remove(); return; }
+  // her türden en çok 3, toplam 8; önem sırasıyla seçilip yıla göre (yeniden eskiye) dizilir
+  l.sort((a, b) => b.p - a.p || b.tarih.localeCompare(a.tarih));
+  const say = {}, sec = [];
+  for (const x of l) { if ((say[x.tur] = (say[x.tur] || 0) + 1) > 3) continue; sec.push(x); if (sec.length >= 8) break; }
+  sec.sort((a, b) => b.tarih.localeCompare(a.tarih));
+  const yil = bugun.getFullYear(), gunAd = `${+gun.slice(3)} ${AY_AD[+gun.slice(0, 2) - 1]}`;
+  kap.innerHTML = `<div class="bugun-bas"><h2>Bugün tarihte <span class="soluk">· ${gunAd}</span></h2>
+    ${yakin ? `<p class="soluk">Bugün oynanmış kayıtlı maç yok; en yakın gün ${gunAd}.</p>` : ""}</div>
+    <ol class="bugun-liste">${sec.map(x => { const y = +x.tarih.slice(0, 4), fark = yil - y;
+      return `<li class="t-${x.tur}"><span class="yil">${y}</span><div class="bugun-mac"><span class="etiket">${x.etiket}</span>
+      <span class="maclar">${x.mac}</span></div><span class="once soluk">${fark > 0 ? `${fark} yıl önce` : "bu yıl"}</span></li>`; }).join("")}</ol>`;
 }
 
 // ---------------------------------------------------------------- kulüp verisi
