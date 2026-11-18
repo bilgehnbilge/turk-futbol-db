@@ -53,7 +53,7 @@ a { color: inherit; text-decoration: none; }
 a.bag { color: var(--vurgu); font-weight: 500; }
 a.bag:hover { text-decoration: underline; text-underline-offset: 3px; }
 h1, h2, h3 { line-height: 1.15; margin: 0 0 .5em; letter-spacing: -.02em; }
-h1 { font-size: clamp(1.75rem, 4vw, 2.6rem); font-weight: 800; }
+h1 { font-size: clamp(1.85rem, 4.4vw, 2.8rem); font-weight: 800; letter-spacing: -.035em; }
 h2 { font-size: 1.15rem; font-weight: 700; letter-spacing: -.01em; }
 h3, h2.h3 { font-size: .98rem; font-weight: 650; }
 .soluk { color: var(--soluk); }
@@ -191,7 +191,10 @@ details summary { cursor: pointer; font-weight: 600; min-height: 24px; padding-b
 @media (min-width: 561px) and (max-width: 940px) { .sayilar { grid-template-columns: repeat(3, 1fr); } }
 .sayi b { display: block; font-size: 1.45rem; font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
 .sayi span { color: var(--soluk); font-size: 13px; }
-a.kart { transition: border-color .15s, transform .15s, box-shadow .15s; }
+a.kart { position: relative; overflow: hidden; transition: border-color .2s, transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s; }
+a.kart::after { content: ""; position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: var(--vurgu); transform: scaleX(0); transform-origin: left; transition: transform .35s cubic-bezier(.22,1,.36,1); }
+a.kart:hover::after, a.kart:focus-visible::after { transform: scaleX(1); }
+@media (prefers-reduced-motion: reduce) { a.kart, a.kart::after { transition: none; } }
 a.kart:hover { border-color: color-mix(in srgb, var(--vurgu) 40%, var(--cizgi)); transform: translateY(-2px); box-shadow: var(--golge2); }
 a.kart h3 { margin-bottom: 6px; }
 a.kart p { margin: 0; font-size: 14px; }
@@ -210,7 +213,17 @@ a.kart p { margin: 0; font-size: 14px; }
 .hero-logo img { width: 64px; height: 64px; object-fit: contain; }
 .hero-logo.harf { font-weight: 800; font-size: 26px; color: var(--t1k); letter-spacing: -.03em; }
 .hero-metin { flex: 1; min-width: 220px; }
-.kulup-hero h1 { margin: 0 0 6px; color: #fff; }
+.kulup-hero h1 { margin: 0 0 6px; color: #fff; font-size: clamp(2rem, 5vw, 3.1rem); letter-spacing: -.04em; text-shadow: 0 2px 18px rgba(0,0,0,.18); }
+/* kulüp başlığı: üst köşeden yumuşak ışık ve ince doku (yalnız CSS), logo girişte hafifçe büyüyerek gelir */
+.kulup-hero::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(60% 90% at 12% 0%, rgba(255,255,255,.16), transparent 60%); }
+.kulup-hero::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .1; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+@keyframes logo-gir { from { opacity: 0; transform: scale(.85) rotate(-4deg); } to { opacity: 1; transform: none; } }
+@keyframes hero-gir { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.kulup-hero.ilk .hero-logo { animation: logo-gir .55s cubic-bezier(.22,1,.36,1) both; }
+.kulup-hero.ilk .hero-metin { animation: hero-gir .55s cubic-bezier(.22,1,.36,1) .08s both; }
+@media (prefers-reduced-motion: reduce) { .hero-logo, .hero-metin { animation: none; } }
 .hero-meta { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 14px; color: rgba(255,255,255,.85); }
 .hero-meta b { color: #fff; font-weight: 650; }
 .kulup-hero .adlar { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }

@@ -21,7 +21,7 @@ const kaydirmaPlanla = () => { clearTimeout(kaydirmaZaman); kaydirmaZaman = setT
 new MutationObserver(kaydirmaPlanla).observe(icerik, { childList: true, subtree: true });
 addEventListener("resize", kaydirmaPlanla);
 const onbellek = new Map();
-let KULUPLER = [], KULUP = new Map(), OZET = null;
+let KULUPLER = [], KULUP = new Map(), OZET = null, SON_HERO = null;
 
 // ---------------------------------------------------------------- yardımcılar
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -471,7 +471,7 @@ async function kulupSayfa(id, sekme) {
   temaUygula(k);
   const harf = k.ad.replace(/[^A-Za-zÇĞİÖŞÜçğıöşü0-9 ]/g, "").split(" ").filter(Boolean).slice(0, 2).map(w => w[0]).join("").toLocaleUpperCase("tr");
   icerik.innerHTML = `
-  <section class="kulup-hero">
+  <section class="kulup-hero${SON_HERO !== `${BOLUM}:${id}` ? " ilk" : ""}">
     ${k.logo ? `<img class="hero-filigran" src="logo/${k.logo}.png" alt="">` : ""}
     <div class="hero-ic">
       <div class="hero-logo ${k.logo ? "" : "harf"}">${k.logo ? `<img src="logo/${k.logo}.png" alt="">` : esc(harf)}</div>
@@ -493,6 +493,7 @@ async function kulupSayfa(id, sekme) {
   <div id="filtreAlan"></div>
   <div id="sekmeIcerik"></div>`;
   $("#karsBtn")?.addEventListener("click", () => { karsilastirSecim.a = id; });
+  SON_HERO = `${BOLUM}:${id}`;   // başlığın giriş hareketi yalnız kulübe ilk girişte (sekme değişiminde değil)
 
   const ciz = () => {
     $("#filtreAlan").innerHTML = filtreHtml(durum, tum, sekme, onculler);
