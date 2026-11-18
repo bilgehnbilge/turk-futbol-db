@@ -899,13 +899,15 @@ async function tffOyuncuSayfa(kisi) {
   const kaleci = T.kmac > 0 && T.kmac >= T.ilk / 2;   // ilk 11'de çoğunlukla kaleci olarak başlamış
   const grupla = (l, f) => [...l.reduce((m, r) => { const k = f(r); return m.set(k, [...(m.get(k) || []), r]); }, new Map())];
   const ilk = S.reduce((a, r) => a < r.sezon ? a : r.sezon, "9999"), son = S.reduce((a, r) => a > r.sezon ? a : r.sezon, "");
-  const hucre = t => `<td class="s">${t.mac}</td><td class="s">${t.ilk}</td><td class="s"><b>${t.gol || ""}</b></td><td class="s">${t.pen || ""}</td>
-    <td class="s">${t.sari || ""}</td><td class="s">${t.kirmizi || ""}</td><td class="s">${t.dk ? sayiYaz(t.dk) : ""}</td>
-    ${kaleci ? `<td class="s"><b>${t.gy || ""}</b></td><td class="s">${t.kmac ? `%${yuzde(t.gy, t.kmac)}` : ""}</td><td class="s">${t.kmac ? t.yenen : ""}</td><td class="s">${t.kmac ? (t.yenen / t.kmac).toFixed(2) : ""}</td>` : ""}`;
-  const bas = ek => `<thead><tr>${ek.map((x, i) => `<th${i ? ' class="ad"' : ""}>${x}</th>`).join("")}<th class="s">Maç</th><th class="s" title="İlk 11'de başladığı maç">İlk 11</th>
-    <th class="s">Gol</th><th class="s" title="Penaltıdan gol">Pen.</th><th class="s" title="Sarı kart">Sarı</th><th class="s" title="Kırmızı kart (ikinci sarıdan dahil)">Kırm.</th><th class="s" title="Yaklaşık oynanan dakika">Dakika</th>
-    ${kaleci ? `<th class="s" title="Kaleci olarak ilk 11'de başladığı ve takımının gol yemediği maçlar">Gol yemeden</th><th class="s" title="Kaleci olarak başladığı maçların yüzde kaçında gol yemedi">%</th>
-    <th class="s" title="Kaleci olarak başladığı maçlarda takımının yediği gol">Yenen gol</th><th class="s" title="Kaleci olarak başladığı maçlarda maç başına yenen gol">Maç başı</th>` : ""}</tr></thead>`;
+  // kaleci: oyuncu ve kaleci istatistikleri iki ayrı görünüm (aynı tablolarda; .oo yalnız oyuncu, .ko yalnız kaleci sütunu)
+  const oo = kaleci ? ' oo' : '', ko = ' ko';
+  const hucre = t => `<td class="s">${t.mac}</td><td class="s${oo}">${t.ilk}</td><td class="s${oo}"><b>${t.gol || ""}</b></td><td class="s${oo}">${t.pen || ""}</td>
+    <td class="s${oo}">${t.sari || ""}</td><td class="s${oo}">${t.kirmizi || ""}</td><td class="s${oo}">${t.dk ? sayiYaz(t.dk) : ""}</td>
+    ${kaleci ? `<td class="s${ko}">${t.kmac || ""}</td><td class="s${ko}"><b>${t.gy || ""}</b></td><td class="s${ko}">${t.kmac ? yuzde(t.gy, t.kmac) : ""}</td><td class="s${ko}">${t.kmac ? t.yenen : ""}</td><td class="s${ko}">${t.kmac ? (t.yenen / t.kmac).toFixed(2) : ""}</td>` : ""}`;
+  const bas = ek => `<thead><tr>${ek.map((x, i) => `<th${i ? ' class="ad"' : ""}>${x}</th>`).join("")}<th class="s">Maç</th><th class="s${oo}" title="İlk 11'de başladığı maç">İlk 11</th>
+    <th class="s${oo}">Gol</th><th class="s${oo}" title="Penaltıdan gol">Pen.</th><th class="s${oo}" title="Sarı kart">Sarı</th><th class="s${oo}" title="Kırmızı kart (ikinci sarıdan dahil)">Kırm.</th><th class="s${oo}" title="Yaklaşık oynanan dakika">Dakika</th>
+    ${kaleci ? `<th class="s${ko}" title="İlk 11'de kaleci olarak başladığı maç">Kalede</th><th class="s${ko}" title="Kaleci olarak ilk 11'de başladığı ve takımının gol yemediği maçlar">Gol yemeden</th><th class="s${ko}" title="Kalede başladığı maçların yüzde kaçında gol yemedi">Oran (%)</th>
+    <th class="s${ko}" title="Kalede başladığı maçlarda takımının yediği gol">Yenen gol</th><th class="s${ko}" title="Kalede başladığı maçlarda maç başına yenen gol">Maç başı</th>` : ""}</tr></thead>`;
   const yarlar = grupla(S, r => r.yar === "L" ? "L" + r.kademe : r.yar).sort((a, b) => a[0].localeCompare(b[0]));
   const kulupler = grupla(S, r => r.kulup).sort((a, b) => topla(b[1]).mac - topla(a[1]).mac);
   const sezonlar = grupla(S, r => `${r.sezon}|${r.kulup}`).sort((a, b) => b[0].localeCompare(a[0]));
@@ -926,14 +928,15 @@ async function tffOyuncuSayfa(kisi) {
     ${dogumYaz || dyer || uyruk ? `<p class="soluk">${[dogumYaz ? `Doğum: ${dogumYaz}${dyer ? `, ${esc(okunurYer(dyer, uyruk && uyruk !== "TC"))}` : ""}` : dyer ? `Doğum yeri: ${esc(okunurYer(dyer, uyruk && uyruk !== "TC"))}` : "", uyruk && uyruk !== "TC" ? `Uyruk: ${esc(uyruk)}` : ""].filter(Boolean).join(" · ")}</p>` : ""}</div></div>
   ${uNo || tdK || kAv ? `<nav class="sekmeler bolum" id="oySekme"><a href="#" data-k="lk" class="aktif">Lig ve kupa <small class="soluk">${sayiYaz(T.mac)} maç</small></a>
     <a href="#" data-k="av">Avrupa <small class="soluk" id="avSay"></small></a><a href="#" data-k="td" hidden>Teknik direktör <small class="soluk" id="tdSay"></small></a></nav>` : ""}
-  <div id="sk-lk">
+  <div id="sk-lk"${kaleci ? ' class="kv-k"' : ""}>
   <div class="kart bolum"><div class="ozet-sat">
     <div><b>${sayiYaz(T.mac)}</b><span>Maç</span></div><div><b>${sayiYaz(T.ilk)}</b><span>İlk 11</span></div><div><b>${T.gol}</b><span>Gol</span></div>
     <div><b>${T.pen}</b><span>Penaltı golü</span></div><div><b>${T.sari}</b><span>Sarı kart</span></div><div><b>${T.kirmizi}</b><span>Kırmızı kart</span></div>
     ${kaleci ? `<div><b>${T.gy}</b><span>Gol yemeden</span></div><div><b>%${yuzde(T.gy, T.kmac)}</b><span>Gol yemeden oranı</span></div>
       <div><b>${(T.yenen / T.kmac).toFixed(2)}</b><span>Maç başı yenen gol</span></div>`
       : `<div><b>${T.mac ? (T.gol / T.mac).toFixed(2) : "–"}</b><span>Maç başı gol</span></div>`}</div></div>
-  <div class="tablo-kap bolum"><table class="tablo">${bas(["Yarışma"])}<tbody>${yarlar.map(([k, l]) => `<tr><td class="ad">${esc(tffYarAd(l[0].yar, l[0].kademe))}</td>${hucre(topla(l))}</tr>`).join("")}
+  ${kaleci ? `<div class="cipler gorunum bolum" role="group" aria-label="Tablolarda gösterilen istatistikler"><button type="button" class="cip aktif" data-g="k" aria-pressed="true">Kaleci istatistikleri</button><button type="button" class="cip" data-g="o" aria-pressed="false">Oyuncu istatistikleri</button></div>` : ""}
+  <div class="tablo-kap${kaleci ? "" : " bolum"}"><table class="tablo">${bas(["Yarışma"])}<tbody>${yarlar.map(([k, l]) => `<tr><td class="ad">${esc(tffYarAd(l[0].yar, l[0].kademe))}</td>${hucre(topla(l))}</tr>`).join("")}
       ${yarlar.length > 1 ? `<tr class="toplam"><td class="ad"><b>Toplam</b></td>${hucre(T)}</tr>` : ""}</tbody></table></div>
   <div class="tablo-kap bolum"><table class="tablo">${bas(["Kulüp"])}<tbody>${kulupler.map(([k, l]) => `<tr><td class="ad">${kulupBag(k)}</td>${hucre(topla(l))}</tr>`).join("")}</tbody></table></div>
   <h2 class="bolum">Sezon sezon</h2>
@@ -948,6 +951,10 @@ async function tffOyuncuSayfa(kisi) {
   </div>
   <div id="sk-av" hidden></div><div id="sk-td" hidden></div>
   <div id="milliOyuncu"></div>`;
+  icerik.querySelectorAll(".gorunum .cip").forEach(b => b.addEventListener("click", () => {
+    icerik.querySelectorAll(".gorunum .cip").forEach(x => { x.classList.toggle("aktif", x === b); x.setAttribute("aria-pressed", x === b); });
+    $("#sk-lk").className = b.dataset.g === "k" ? "kv-k" : "kv-o";
+  }));
   if (kAv) {
     $("#sk-av").innerHTML = kadinAvrupaHtml(kAv, AV.mac);
     $("#avSay").textContent = `${kAv.length} maç`;

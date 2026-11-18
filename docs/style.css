@@ -137,6 +137,9 @@ h2.bolum, .bolum > h2 { margin-bottom: 14px; }
 .cip:hover { border-color: color-mix(in srgb, var(--vurgu) 50%, var(--cizgi)); color: var(--yazi); }
 .cip.aktif { background: var(--yazi); border-color: var(--yazi); color: var(--yuzey); }
 .tema-kulup .cip.aktif { background: var(--vurgu); border-color: var(--vurgu); color: #fff; }
+.gorunum { margin-bottom: 12px; }
+.gorunum + .tablo-kap { margin-top: 0; }
+.kv-k .oo, .kv-o .ko { display: none; }
 .rozet { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 999px; background: var(--yuzey2); color: var(--soluk); margin-right: 4px; vertical-align: 1px; }
 .rozet.vurgu { background: var(--vurgu-zemin); color: var(--vurgu); }
 .uyari { background: var(--b-zemin); color: var(--yazi); border-radius: var(--r2); padding: 10px 14px; font-size: 14px; margin: 10px 0; }
