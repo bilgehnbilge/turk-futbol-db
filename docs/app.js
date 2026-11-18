@@ -298,7 +298,7 @@ function anaSayfa() {
   bugunTarihte($("#bugun")).catch(() => $("#bugun")?.remove());
 }
 
-// ana sayfa "Bugün tarihte": bu gün-ayda oynanmış dikkat çekici maçlar. Lig ve kupa: data/bugun.json (web_aktar.py,
+// ana sayfa "Tarihte bugün": bu gün-ayda oynanmış dikkat çekici maçlar. Lig ve kupa: data/bugun.json (web_aktar.py,
 // gün başına seçilmiş derbi, final, farklı skor); Avrupa: avrupa.json; Milli Takım: milli.json. Sayfa çizildikten sonra yüklenir.
 const AY_AD = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
 async function bugunTarihte(kap) {
@@ -347,7 +347,7 @@ async function bugunTarihte(kap) {
   for (const x of l) { if ((say[x.tur] = (say[x.tur] || 0) + 1) > 3) continue; sec.push(x); if (sec.length >= 8) break; }
   sec.sort((a, b) => b.tarih.localeCompare(a.tarih));
   const yil = bugun.getFullYear(), gunAd = `${+gun.slice(3)} ${AY_AD[+gun.slice(0, 2) - 1]}`;
-  kap.innerHTML = `<div class="bugun-bas"><h2>Bugün tarihte <span class="soluk">· ${gunAd}</span></h2>
+  kap.innerHTML = `<div class="bugun-bas"><h2>Tarihte bugün <span class="soluk">· ${gunAd}</span></h2>
     ${yakin ? `<p class="soluk">Bugün oynanmış kayıtlı maç yok; en yakın gün ${gunAd}.</p>` : ""}</div>
     <ol class="bugun-liste">${sec.map(x => { const y = +x.tarih.slice(0, 4), fark = yil - y;
       return `<li class="t-${x.tur}"><span class="yil">${y}</span><div class="bugun-mac"><span class="etiket">${x.etiket}</span>
@@ -1095,7 +1095,7 @@ async function tffOyuncuRekorlari(kap, kid) {
     ${kart("Ligde en çok gol atanlar", "Kendi kalesine goller hariç", d.lig_gol, x => x[3], x => `${yil(x)} · ${x[2]} maç`)}
     ${kart("Bir sezonda en çok gol", BOLUM === "kadin" ? "Lig, play-off ve final maçları" : "Lig ve kupa birlikte (Avrupa hariç)", d.sezon_gol, x => x[3], x => `${sz(x)} · ${x[6]} maç`)}
     ${kart("Bir sezonda ligde en çok gol", "", d.sezon_lig_gol, x => x[4], x => `${sz(x)}`)}
-    ${kart("Bir sezonda en çok gol yemeden maç", `Kaleci: ilk 11'de başladığı ve takımının gol yemediği maçlar${BOLUM === "kadin" ? "" : ", lig ve kupa"}`, d.sezon_gy, x => x[5], x => `${sz(x)} · ${x[6]} maç`)}
+    ${kart("Bir sezonda kalesini en çok maçta gole kapatan kaleciler", `Kaleci: ilk 11'de başladığı ve takımının gol yemediği maçlar${BOLUM === "kadin" ? "" : ", lig ve kupa"}`, d.sezon_gy, x => x[5], x => `${sz(x)} · ${x[6]} maç`)}
     ${kart("Bir maçta en çok gol", BOLUM === "kadin" ? "Lig, play-off ve final maçları" : "Lig ve kupa", d.mac_gol, x => x[2], mac)}
     ${kart("Ligde bir maçta en çok gol", "", d.mac_lig_gol, x => x[2], mac)}
   </div>
