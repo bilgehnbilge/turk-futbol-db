@@ -293,7 +293,24 @@ async function yonlendir() {
   }
   icerik.innerHTML = `<div class="bos">Sayfa bulunamadı. <a class="bag" href="#/">Ana sayfa</a></div>`;
 }
-window.addEventListener("hashchange", () => { yonlendir(); window.scrollTo(0, 0); });
+// sayfa geçişi: tarayıcının görünüm geçişiyle (View Transitions; yoksa ya da hareket azaltmada doğrudan) — içerik kısa bir
+// solma ve kaymayla değişir, tıklanan kulüp logosu yeni sayfadaki büyük logoya kayar. Veri geç gelirse eski görüntü en çok
+// 350 ms bekletilir, sonra yeni sayfa (yükleniyor yazısıyla) gelir.
+function sayfaGecisi() {
+  const yap = () => { window.scrollTo(0, 0); return yonlendir(); };
+  if (!document.startViewTransition || matchMedia("(prefers-reduced-motion: reduce)").matches) { yap(); return; }
+  const g = document.startViewTransition(() => Promise.race([yap(), new Promise(r => setTimeout(r, 350))]));
+  g.ready.catch(() => {});   // sekme gizliyken geçiş atlanır; sayfa yine çizilir
+  g.finished.catch(() => {}).finally(() => document.querySelectorAll("[data-vt]").forEach(e => { e.style.viewTransitionName = ""; delete e.dataset.vt; }));
+}
+window.addEventListener("hashchange", sayfaGecisi);
+document.addEventListener("click", e => {   // kulüp bağlantısındaki logo yeni sayfadaki büyük logoya kaysın
+  const a = e.target.closest?.('a[href*="kulup/"]'), img = a?.querySelector("img.logo-k, .buyuk-logo img, .serit-yil img");
+  if (img && document.startViewTransition && !location.hash.startsWith(a.getAttribute("href"))) {
+    const h = document.querySelector(".hero-logo img"); if (h) { h.style.viewTransitionName = "none"; h.dataset.vt = ""; }   // aynı ad iki öğede olmasın
+    img.style.viewTransitionName = "kulup-logo"; img.dataset.vt = "";
+  }
+}, true);
 
 // ---------------------------------------------------------------- ana sayfa
 function anaSayfa() {
@@ -1561,12 +1578,42 @@ async function avrupaUlkeler() {
 }
 
 // ---------------------------------------------------------------- sezonlar
-function sezonlarSayfa() {
+// sezon özetleri (sezon_ozet.py üretir): şampiyon, kupa galibi, Süper Lig takım/maç/gol, çıkan ve düşenler
+const sezonOzetAl = () => al(`sezon_ozet.json?s=${OZET.surum || ""}`).then(d => d.sezon).catch(() => ({}));
+const golOrt = sl => sl && sl[1] ? (sl[2] / sl[1]).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : null;
+const formaSerit = id => { const r = KULUP.get(id)?.renk; return r?.length ? `--f1:${r[0]};--f2:${r[1] || r[0]}` : ""; };
+async function sezonlarSayfa() {
   document.title = "Sezonlar · Türk Futbol Arşivi";
+  const Z = await sezonOzetAl();
   const on = new Map();
   for (const s of [...OZET.sezonlar].reverse()) { const d = s.slice(0, 3) + "0"; (on.get(d) || on.set(d, []).get(d)).push(s); }
-  icerik.innerHTML = `<h1>Sezonlar</h1><p class="soluk">Puan tabloları maç sonuçlarından hesaplanır.</p>
-    ${[...on].map(([d, ss]) => `<div class="on-dekad">${d}'lar</div><div class="sezon-izgara">${ss.map(s => `<a href="#/${K}sezon/${s}">${s}</a>`).join("")}</div>`).join("")}`;
+  // süzgeç: en çok şampiyon olan dört kulüp + diğerleri
+  const say = new Map();
+  for (const o of Object.values(Z)) if (o.sampiyon != null) say.set(o.sampiyon, (say.get(o.sampiyon) || 0) + 1);
+  const buyuk = [...say].sort((a, b) => b[1] - a[1]).slice(0, 4).map(x => x[0]);
+  const kisa = id => KULUP.get(id)?.ad ?? "?";
+  const kart = s => {
+    const o = Z[s] || {}, sp = o.sampiyon ?? o.lider, surer = o.sampiyon == null && o.lider != null;
+    const k1 = o.k?.["1"], ort = golOrt(o.sl);
+    const grup = o.sampiyon == null ? "" : buyuk.includes(o.sampiyon) ? String(o.sampiyon) : "diger";
+    return `<a class="sezon-kart${sp != null ? " renkli" : ""}" href="#/${K}sezon/${s}" data-sp="${grup}" style="${sp != null ? formaSerit(sp) : ""}">
+      <span class="sk-yil">${s.length > 4 ? `${s.slice(0, 4)}<small>–${s.slice(7)}</small>` : s}</span>
+      ${sp != null ? `<span class="sk-sp">${logoImg(sp)}<span><b>${esc(kisa(sp))}</b><small>${surer ? "lider, sezon sürüyor" : "şampiyon"}</small></span></span>`
+        : `<span class="sk-sp bos"><small>${o.sl?.[0] ? "şampiyon belirsiz" : "Süper Lig yok"}</small></span>`}
+      <span class="sk-alt">${o.kupa != null ? `<span title="Türkiye Kupası galibi">Kupa: ${esc(kisa(o.kupa))}</span>` : ""}
+        ${o.sl?.[0] ? `<span>${o.sl[0]} takım${ort ? ` · ${ort} gol/maç` : ""}</span>` : `<span>${sayiYaz(o.mac || 0)} maç</span>`}
+        ${k1?.d?.length ? `<span class="sk-dus" title="Süper Lig'den düşenler: ${esc(k1.d.map(kisa).join(", "))}">↓ ${k1.d.length} düştü</span>` : ""}</span></a>`;
+  };
+  icerik.innerHTML = `<div class="sayfa-bas"><div><h1>Sezonlar</h1><p class="soluk">1959'dan bugüne her sezon: Süper Lig şampiyonu, kupa galibi ve ligin gol ortalaması. Puan tabloları maç sonuçlarından hesaplanır.</p></div></div>
+    <div class="cipler sezon-suz" role="group" aria-label="Şampiyona göre vurgula"><button class="cip aktif" data-k="">Tümü</button>${buyuk.map(id => `<button class="cip" data-k="${id}" style="${formaSerit(id)}">${logoImg(id)}${esc(kisa(id))} <b>${say.get(id)}</b></button>`).join("")}<button class="cip" data-k="diger">Diğer şampiyonlar <b>${[...say].filter(([id]) => !buyuk.includes(id)).reduce((t, x) => t + x[1], 0)}</b></button></div>
+    <div class="sezon-zaman">${[...on].map(([d, ss]) => `<section class="sz-on"><h2>${d}'lar</h2><div class="sezon-kartlar">${ss.map(kart).join("")}</div></section>`).join("")}</div>`;
+  const kap = icerik.querySelector(".sezon-zaman");
+  icerik.querySelector(".sezon-suz").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    icerik.querySelectorAll(".sezon-suz .cip").forEach(x => x.classList.toggle("aktif", x === b));
+    kap.classList.toggle("suzulu", !!b.dataset.k);
+    kap.querySelectorAll(".sezon-kart").forEach(k => k.classList.toggle("eslesir", !!b.dataset.k && k.dataset.sp === b.dataset.k));
+  });
 }
 async function sezonSayfa(sezon) {
   document.title = `${sezon} · Türk Futbol Arşivi`;
@@ -1582,40 +1629,40 @@ async function sezonSayfa(sezon) {
   }
   const sirali = [...gruplar.values()].sort((a, b) => (a.yar === "T") - (b.yar === "T") || (a.kademe ?? 9) - (b.kademe ?? 9) || a.lig.localeCompare(b.lig, "tr") || String(a.grup).localeCompare(String(b.grup), "tr", { numeric: true }));
   const p = puan(sezon);
-  const tabloHtml = g => {
-    const t = new Map();
-    const sat = (id, ad) => t.get(id) || t.set(id, { id, ad, O: 0, G: 0, B: 0, M: 0, AG: 0, YG: 0 }).get(id);
-    for (const m of g.ms) {
-      if (m.durum === "Çifte H") { for (const [id, ad] of [[m.ev ?? "a" + m.evAd, m.evAd], [m.dep ?? "a" + m.depAd, m.depAd]]) { const x = sat(id, ad); x.O++; x.M++; x.YG += 3; } continue; }
-      if (m.eg == null) continue;
-      const e = sat(m.ev ?? "a" + m.evAd, m.evAd), dd = sat(m.dep ?? "a" + m.depAd, m.depAd);
-      e.ad = m.evAd; dd.ad = m.depAd;
-      e.O++; dd.O++; e.AG += m.eg; e.YG += m.dg; dd.AG += m.dg; dd.YG += m.eg;
-      if (m.eg > m.dg) { e.G++; dd.M++; } else if (m.eg < m.dg) { dd.G++; e.M++; } else { e.B++; dd.B++; }
-    }
-    const l = [...t.values()].map(x => ({ ...x, P: x.G * p + x.B, Av: x.AG - x.YG })).sort((a, b) => b.P - a.P || b.Av - a.Av || b.AG - a.AG);
-    const oynanmamis = g.ms.filter(m => m.eg == null && m.durum !== "Çifte H").length;
-    return `<div class="kart puan-kart">
-      <div class="bas"><h3>${esc(g.lig)}${g.grup ? ` · ${esc(g.grup)}` : ""}</h3>
-      <span>${g.ms.length} maç${oynanmamis ? `, ${oynanmamis} oynanmadı` : ""}</span></div>
-      <table class="tablo"><thead><tr><th class="s">#</th><th>Takım</th><th class="s">O</th><th class="s ek2">G</th><th class="s ek2">B</th><th class="s ek2">M</th><th class="s ek">AG</th><th class="s ek">YG</th><th class="s">Av</th><th class="s">P</th></tr></thead>
-      <tbody>${l.map((x, i) => `<tr><td class="s soluk">${i + 1}</td><td class="takim" title="${esc(x.ad)}">${typeof x.id === "number" ? kulupBag(x.id, kisaAd(x.id, x.ad)) : esc(kisaAd(null, x.ad))}</td><td class="s">${x.O}</td><td class="s ek2">${x.G}</td><td class="s ek2">${x.B}</td><td class="s ek2">${x.M}</td><td class="s ek">${x.AG}</td><td class="s ek">${x.YG}</td><td class="s">${x.Av > 0 ? "+" : ""}${x.Av}</td><td class="s p">${x.P}</td></tr>`).join("")}</tbody></table>
-      <details><summary>Maçlar</summary>${macListesi(g.ms)}</details></div>`;
-  };
+  const Z = await sezonOzetAl();
   const kupa = ms.filter(m => m.yar === "K"), ozel = [...new Set(ms.filter(m => m.yar === "O").map(m => m.lig))].map((lig, i) => ({ k: "oz" + i, lig, ms: ms.filter(m => m.yar === "O" && m.lig === lig) })), avrupa = ms.filter(m => m.yar === "A"), po = ms.filter(m => (m.yar === "L" || m.yar === "T") && m.po);
   const turlara = l => { const t = new Map(); for (const m of l) (t.get(m.tur || m.lig) || t.set(m.tur || m.lig, []).get(m.tur || m.lig)).push(m); return [...t]; };
+  const o = Z[sezon] || {}, kul = id => KULUP.get(id)?.ad ?? "?";
+  const kutu = (baslik, id, ek = "") => id != null ? `<a class="oz-kutu" href="#/${K}kulup/${id}" style="${formaSerit(id)}">${logoImg(id)}<span><small>${baslik}</small><b>${esc(kul(id))}</b>${ek}</span></a>` : "";
+  const liste = (l, cls, baslik) => l?.length ? `<div class="oz-liste ${cls}"><small>${baslik}</small><span>${l.map(id => `<a href="#/${K}kulup/${id}">${logoImg(id)}${esc(kul(id))}</a>`).join("")}</span></div>` : "";
+  const ort = golOrt(o.sl);
   icerik.innerHTML = `
   <div class="sayfa-bas"><h1>${esc(sezon)} sezonu</h1>
     <div class="yan-yana">${onceki ? `<a class="cip" href="#/${K}sezon/${onceki}">← ${onceki}</a>` : ""}${sonraki ? `<a class="cip" href="#/${K}sezon/${sonraki}">${sonraki} →</a>` : ""}</div></div>
-  <p class="soluk">${ms.length} maç · Puan tabloları sonuçlardan hesaplandı (galibiyet ${p} puan; puan silme ve averaj kuralı farkları dahil değil).</p>
+  <section class="sezon-ozet" aria-label="Sezon özeti">
+    ${kutu(o.sampiyon != null ? "Süper Lig şampiyonu" : "Süper Lig lideri", o.sampiyon ?? o.lider, o.sampiyon == null && o.lider != null ? `<small>sezon sürüyor</small>` : "")}
+    ${kutu("Türkiye Kupası", o.kupa)}
+    <div class="oz-kutu kral" hidden></div>
+    ${o.sl?.[0] ? `<div class="oz-kutu sayi-k"><span><small>Süper Lig</small><b>${o.sl[0]} takım · ${sayiYaz(o.sl[1])} maç</b>${ort ? `<small>${ort} gol/maç</small>` : ""}</span></div>` : ""}
+    ${liste(o.k?.["2"]?.c, "cik", "Süper Lig'e çıkanlar ↑")}${liste(o.k?.["1"]?.d, "dus", "Süper Lig'den düşenler ↓")}
+  </section>
+  <p class="soluk not">${sayiYaz(ms.length)} maç · Puan tabloları sonuçlardan hesaplandı (galibiyet ${p} puan; puan silme ve averaj kuralı farkları dahil değil).</p>
   <nav class="sekmeler">${sirali.length ? `<a href="#lig" data-k="lig" class="aktif">Lig</a>` : ""}${po.length ? `<a href="#po" data-k="po">Play-off / baraj</a>` : ""}${kupa.length ? `<a href="#kupa" data-k="kupa">Türkiye Kupası</a>` : ""}${ozel.map(o => `<a href="#${o.k}" data-k="${o.k}">${esc(o.lig)}</a>`).join("")}${avrupa.length ? `<a href="#avrupa" data-k="avrupa">Avrupa</a>` : ""}</nav>
   <h2 class="gorunmez">Puan tabloları</h2>
-  <div id="sz-lig" class="izgara puan">${sirali.map(tabloHtml).join("") || ""}</div>
+  <div id="sz-lig"></div>
   <div id="sz-po" hidden><p class="soluk not">Normal sezondan sonra oynanan yükselme play-off'ları, düşme barajları ve gruplar arası final maçları. Puan tablolarına girmez. Turlar (yarı final, final...) TFF'nin yazdığı yerde ondan, yazmadığı yerde eşleşmelerden çıkarıldı.</p>
     ${playoffHtml(po, ms)}</div>
   <div id="sz-kupa" hidden>${turlara(kupa).map(([t, l]) => `<div class="kart" style="margin-bottom:12px"><h3>${esc(t)}</h3>${macListesi(l)}</div>`).join("")}</div>
   ${ozel.map(o => `<div id="sz-${o.k}" hidden>${macListesi(o.ms)}</div>`).join("")}
   <div id="sz-avrupa" hidden>${turlara(avrupa.map(m => ({ ...m, tur: `${m.lig}${m.tur ? " · " + m.tur : ""}` }))).map(([t, l]) => `<div class="kart" style="margin-bottom:12px"><h3>${esc(t)}</h3>${macListesi(l)}</div>`).join("")}</div>`;
+  if (sirali.length) ligBolumu($("#sz-lig"), sezon, sirali, Z);
+  // gol kralı (Süper Lig, TFF istatistikleri) arka planda
+  if (BOLUM === "erkek") al(`data/tff/istatistik.json?s=${OZET.surum || ""}`).then(d => {
+    const l = d.krallar?.[sezon]?.[1], k = icerik.querySelector(".sezon-ozet .kral"); if (!l?.length || !k) return;
+    const esit = l.filter(x => x[2] === l[0][2]);
+    k.innerHTML = `<span><small>Gol kralı</small><b>${esit.map(x => `<a class="oyuncu-bag" href="#/oyuncu/k${x[0]}">${esc(x[1])}</a>`).join(", ")}</b><small>${l[0][2]} gol · ${esit.map(x => esc(kul(x[4]))).join(", ")}</small></span>`;
+    k.hidden = false;
+  }).catch(() => {});
   const ilk = sirali.length ? "lig" : po.length ? "po" : kupa.length ? "kupa" : ozel.length ? ozel[0].k : "avrupa";
   const goster = k => { ["lig", "po", "kupa", ...ozel.map(o => o.k), "avrupa"].forEach(x => { const e = $("#sz-" + x); if (e) e.hidden = x !== k; }); icerik.querySelectorAll(".sekmeler a").forEach(a => a.classList.toggle("aktif", a.dataset.k === k)); };
   icerik.querySelectorAll(".sekmeler a").forEach(a => a.addEventListener("click", e => { e.preventDefault(); goster(a.dataset.k); }));
