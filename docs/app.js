@@ -833,13 +833,17 @@ async function tffOyuncuSayfa(kisi) {
   const sezonlar = grupla(S, r => `${r.sezon}|${r.kulup}`).sort((a, b) => b[0].localeCompare(a[0]));
   const B = BOLUM === "erkek" ? await oyuncuBagAl() : {};
   const uNo = Object.keys(B).find(u => B[u] === kisi) || null;
+  // aynı kişinin teknik direktörlük kaydı (teknik.json oyuncu: anahtar -> TFF oyuncu no)
+  const TJ = BOLUM === "erkek" ? await al(`data/teknik.json?s=${OZET.surum || ""}`).catch(() => ({})) : {};
+  const tdKs = Object.keys(TJ.oyuncu || {}).filter(k => TJ.oyuncu[k] === kisi), tdK = tdKs[0] || null;   // aynı kişinin birden çok kaydı olabilir (UEFA + TFF)
+  const tdArg = tdK ? (tdK.startsWith("a") ? tdK : tdK.slice(1)) : null;
   const [dg, dyer, uyruk] = p.d || [];
   const dogumYaz = dg ? (["01-01", "07-01"].includes(dg.slice(5)) ? dg.slice(0, 4) : tarihYaz(dg)) : null;
   icerik.innerHTML = `
   <div class="sayfa-bas"><div><h1>${esc(p.ad)}</h1>
     <p class="soluk">${ilk.slice(0, 4)}–${son.slice(5) || son.slice(0, 4)} · ${kulupler.map(([k]) => kulupBag(k)).join(", ")}</p>
     ${dogumYaz || dyer || uyruk ? `<p class="soluk">${[dogumYaz ? `Doğum: ${dogumYaz}${dyer ? `, ${esc(okunurYer(dyer))}` : ""}` : dyer ? `Doğum yeri: ${esc(okunurYer(dyer))}` : "", uyruk && uyruk !== "TC" ? `Uyruk: ${esc(uyruk)}` : ""].filter(Boolean).join(" · ")}</p>` : ""}</div></div>
-  ${uNo ? `<nav class="sekmeler bolum" id="oySekme"><a href="#" data-k="lk" class="aktif">Lig ve kupa <small class="soluk">${sayiYaz(T.mac)} maç</small></a>
+  ${uNo || tdK ? `<nav class="sekmeler bolum" id="oySekme"><a href="#" data-k="lk" class="aktif">Lig ve kupa <small class="soluk">${sayiYaz(T.mac)} maç</small></a>
     <a href="#" data-k="av">Avrupa <small class="soluk" id="avSay"></small></a><a href="#" data-k="td" hidden>Teknik direktör <small class="soluk" id="tdSay"></small></a></nav>` : ""}
   <div id="sk-lk">
   <div class="kart bolum"><div class="ozet-sat">
@@ -863,8 +867,8 @@ async function tffOyuncuSayfa(kisi) {
   </div>
   <div id="sk-av" hidden></div><div id="sk-td" hidden></div>
   <div id="milliOyuncu"></div>`;
-  if (uNo) {
-    const n = await oyuncuSayfa(uNo, null, { oy: $("#sk-av"), td: $("#sk-td") });
+  if (uNo || tdK) {
+    const n = await oyuncuSayfa(uNo, tdArg, { oy: $("#sk-av"), td: $("#sk-td"), tdK: tdKs });
     if (n) {
       $("#avSay").textContent = `${n.oy} maç`;
       if (n.td) { const a = $('#oySekme a[data-k="td"]'); a.hidden = false; $("#tdSay").textContent = `${n.td} maç`; }
@@ -981,11 +985,13 @@ async function oyuncuSayfa(no, tdNo, hedef) {
   if (!hedef) icerik.innerHTML = `<div class="yukleniyor">Yükleniyor…</div>`;
   const [d, av] = await Promise.all([al(`data/oyuncu_uefa.json?s=${OZET.surum || ""}`), al(`data/avrupa.json?s=${OZET.surum || ""}`)]);
   // teknik direktör sayfası oyuncu kaydına bağlıysa oyuncu sayfasına yönlen; oyuncunun teknik direktörlük kaydını bul
-  if (tdNo?.startsWith("a")) {   // TFF antrenör no: UEFA kaydıyla birleşmişse oraya git
-    const T1 = await al(`data/teknik.json?s=${OZET.surum || ""}`), k = T1.tff?.[tdNo.slice(1)];
+  if (tdNo && !hedef) {   // teknik direktör: TFF oyuncusuyla aynı kişiyse tek oyuncu sayfasına; TFF antrenör no UEFA kaydıyla birleşmişse oraya
+    const T1 = await al(`data/teknik.json?s=${OZET.surum || ""}`), anahtar = tdNo.startsWith("a") ? tdNo : "t" + tdNo;
+    const k = tdNo.startsWith("a") ? T1.tff?.[tdNo.slice(1)] : null, kk = k && k !== tdNo ? k : anahtar;
+    if (T1.oyuncu?.[kk]) { location.replace(`#/oyuncu/k${T1.oyuncu[kk]}`); return; }
     if (k && k !== tdNo) { location.replace(`#/oyuncu/${k.startsWith("t") ? "t" + k.slice(1) : k}`); return; }
   }
-  if (tdNo && d.td_oyuncu[tdNo]) { location.replace(`#/oyuncu/u${d.td_oyuncu[tdNo]}`); return; }
+  if (tdNo && !hedef && d.td_oyuncu[tdNo]) { location.replace(`#/oyuncu/u${d.td_oyuncu[tdNo]}`); return; }
   if (!hedef && no) { const B = await oyuncuBagAl(); if (B[no]) { location.replace(`#/oyuncu/k${B[no]}`); return; } }
   if (!tdNo) tdNo = Object.keys(d.td_oyuncu).find(k => d.td_oyuncu[k] === no) || null;
   const T0 = tdNo?.startsWith("a") ? await al(`data/teknik.json?s=${OZET.surum || ""}`) : null;
@@ -1006,7 +1012,8 @@ async function oyuncuSayfa(no, tdNo, hedef) {
   // teknik direktörlük (data/teknik.json: TFF lig/kupa + UEFA Avrupa)
   const T = await al(`data/teknik.json?s=${OZET.surum || ""}`);
   const tKey = tdNo ? (tdNo.startsWith("a") ? tdNo : "t" + tdNo) : null;
-  const td = tKey ? T.maclar.filter(x => x[0] === tKey).map(x => ({ id: x[1], kulup: x[2], sezon: x[3], yar: x[4], a: x[5], y: x[6], tarih: x[7], s: sonuc(x[5], x[6]) })) : [];
+  const tKeys = new Set(hedef?.tdK?.length ? hedef.tdK : tKey ? [tKey] : []);
+  const td = tKeys.size ? T.maclar.filter(x => tKeys.has(x[0])).map(x => ({ id: x[1], kulup: x[2], sezon: x[3], yar: x[4], a: x[5], y: x[6], tarih: x[7], s: sonuc(x[5], x[6]) })) : [];
   const ozetle = l => l.reduce((t, m) => (t.O++, t[m.s]++, t), { O: 0, G: 0, B: 0, M: 0 });
   const pm = t => t.O ? ((3 * t.G + t.B) / t.O).toFixed(2) : "–";
   const satirT = (bas, t, ek = "") => `<tr><td class="ad">${bas}</td>${ek}<td class="s">${t.O}</td><td class="s">${t.G}</td><td class="s">${t.B}</td><td class="s">${t.M}</td>

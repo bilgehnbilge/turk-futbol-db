@@ -247,7 +247,27 @@ def teknik_aktar(maclar, okunur):
             if anahtar not in kisi:
                 kisi[anahtar] = [kisi_ad(ad), None]
             ekle(anahtar, m["id"], m["ev_kulup"] if taraf == 1 else m["dep_kulup"])
-    yaz(os.path.join(CIKTI, "teknik.json"), {"kisi": kisi, "tff": ant_, "alanlar": ["kisi", "mac", "kulup", "sezon", "yarisma", "attigi", "yedigi", "tarih"],
+    # teknik direktör -> TFF oyuncusu (aynı kişi: tek oyuncu sayfası). UEFA teknik direktörü UEFA oyuncusuna bağlıysa onun TFF
+    # eşi; değilse ad: TFF oyuncuları arasında bu adda tek kişi olmalı ve oyunculuğu teknik direktörlüğünden önce başlamış olmalı
+    oy_ = {}
+    oyl = os.path.join(CIKTI, "tff", "oyuncular.json")
+    bag_ = json.load(open(os.path.join(CIKTI, "oyuncu_bag.json"), encoding="utf-8")) if os.path.exists(os.path.join(CIKTI, "oyuncu_bag.json")) else {}
+    if os.path.exists(oyl):
+        ad_oy = collections.defaultdict(list)
+        for r in json.load(open(oyl, encoding="utf-8"))["oyuncu"]:
+            ad_oy[sade(r[1])].append(r)
+        ilk_td = {}
+        for r in satir:
+            ilk_td[r[0]] = min(ilk_td.get(r[0], r[3]), r[3])
+        for k_, (a_, u_) in kisi.items():
+            if u_ and str(u_) in bag_:
+                oy_[k_] = bag_[str(u_)]
+                continue
+            l = ad_oy.get(sade(a_), [])
+            if len(l) == 1 and k_ in ilk_td and l[0][4] <= ilk_td[k_]:
+                oy_[k_] = l[0][0]
+    print(f"teknik direktör - oyuncu birleşmesi: {len(oy_)} kişi")
+    yaz(os.path.join(CIKTI, "teknik.json"), {"kisi": kisi, "tff": ant_, "oyuncu": oy_, "alanlar": ["kisi", "mac", "kulup", "sezon", "yarisma", "attigi", "yedigi", "tarih"],
                                              "maclar": sorted(satir, key=lambda x: (x[0], x[7] or ""))})
 
 
