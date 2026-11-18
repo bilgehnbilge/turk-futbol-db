@@ -135,6 +135,13 @@ BAGLAC = {"DE", "DA", "DO", "DOS", "DAS", "DI", "DU", "DEL", "VAN", "VON", "DER"
 EDAT = {"DE", "DA", "DO", "DOS", "DAS", "DI", "DU", "DEL", "VAN", "VON", "DER", "DEN", "LA", "LE", "EL"}
 
 
+def yabanci_okunur(a, okunur):
+    """Yabancı oyuncunun TFF'deki büyük harfli adı: Türkçe harfli (Ğ Ş Ö Ü) kelimeler Türkçe kuralla, gerisinde I = i."""
+    w = [okunur(x) if set(x) & set("ĞŞÖÜ") else okunur(x.replace("I", "İ")).replace("İ", "I") for x in a.split()]
+    w = [x[0] + x[1:].replace("I", "ı").replace("İ", "i").lower() if len(x) > 1 and x.isupper() and x.isalpha() else x for x in w]
+    return " ".join([w[0]] + [x.lower() if x.upper().replace("İ", "I") in BAGLAC else x for x in w[1:]]) if w else a
+
+
 BIRLES = {}   # ikinci TFF numarası -> asıl numara (maclari_yaz doldurur)
 
 
@@ -218,10 +225,22 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
             olay[int(mac)].append([taraf, "S", d1, d2 or 0, cikan, giren, None])
             ad.setdefault(giren, gad); ad.setdefault(cikan, cad)
     # bilinen adlar (Brezilyalı oyuncular, oyuncu_bag.py -> bilinen_ad.json): sitede bu ad, oyuncu sayfasında tam ad da
+    # ve yabancı oyuncular (Vikipedi/Wikidata, wikidata_ad.py -> bilinen_ad_wiki.json; öncelikli)
     tam_ad = {}
-    if os.path.basename(OYUNCU_DB) == "oyuncu.db" and os.path.exists(os.path.join(KOK, "bilinen_ad.json")):
-        for k_, a_ in json.load(open(os.path.join(KOK, "bilinen_ad.json"), encoding="utf-8")).items():
-            if int(k_) in ad:
+    if os.path.basename(OYUNCU_DB) == "oyuncu.db":
+        # yabancı oyuncuların TFF'deki büyük harfli adı: Türkçe kural yok (TFF "ROGERIO CONCEIÇAO" -> "Rogerıo" olmasın)
+        kdb = os.path.join(KOK, "raw", "kisi.db")
+        yab = {k_ for k_, u_ in sqlite3.connect(kdb).execute("SELECT kisi, uyruk FROM kisi")
+               if u_ and u_ != "TC"} if os.path.exists(kdb) else set()
+        for k_ in yab:
+            if k_ in ad and ad[k_] and not any(ch.islower() for ch in ad[k_]):
+                ad[k_] = yabanci_okunur(ad[k_], okunur)
+        bilinen = {}
+        for dosya in ("bilinen_ad.json", "bilinen_ad_wiki.json"):
+            if os.path.exists(os.path.join(KOK, dosya)):
+                bilinen.update(json.load(open(os.path.join(KOK, dosya), encoding="utf-8")))
+        for k_, a_ in bilinen.items():
+            if int(k_) in ad and ad[int(k_)]:
                 tam_ad[int(k_)] = okunur(ad[int(k_)])
                 ad[int(k_)] = a_
     # 1959-1991 Süper Lig: Maçkolik arşiv kadroları ve olayları (mackolik_oyuncu.py)
