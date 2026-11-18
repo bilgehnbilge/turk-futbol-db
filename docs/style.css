@@ -169,9 +169,19 @@ details summary { cursor: pointer; font-weight: 600; min-height: 24px; padding-b
 .kahraman { text-align: center; padding: 56px 0 28px; position: relative; isolation: isolate; }
 .kahraman::before {
   content: ""; position: absolute; inset: -28px 0 auto; height: 360px; z-index: -1; pointer-events: none;
-  background: radial-gradient(60% 70% at 50% 0%, color-mix(in srgb, #c8102e 12%, transparent), transparent 70%);
+  height: 520px;
+  background: radial-gradient(45% 55% at 30% 5%, color-mix(in srgb, #c8102e 16%, transparent), transparent 70%),
+              radial-gradient(40% 50% at 75% 10%, color-mix(in srgb, #e2a516 12%, transparent), transparent 70%),
+              radial-gradient(60% 60% at 50% 0%, color-mix(in srgb, #c8102e 6%, transparent), transparent 75%);
 }
-.kahraman h1 { font-size: clamp(2rem, 5.5vw, 3.4rem); letter-spacing: -.035em; margin-bottom: 14px; }
+.kahraman h1 { font-size: clamp(2.3rem, 7vw, 4.6rem); line-height: 1.02; letter-spacing: -.045em; margin-bottom: 18px; font-weight: 800; }
+.kahraman h1 em { font-style: normal; color: var(--vurgu); }
+.kahraman-ust { display: inline-block; margin-bottom: 18px; padding: 5px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 650; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--vurgu); background: var(--vurgu-zemin); border: 1px solid color-mix(in srgb, var(--vurgu) 25%, transparent); }
+/* ana sayfa zemini: kırmızı ve altın tonlu yumuşak ışık + çok ince doku (yalnız CSS) */
+.kahraman::after { content: ""; position: absolute; inset: -28px 0 auto; height: 520px; z-index: -1; pointer-events: none; opacity: .05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  -webkit-mask-image: radial-gradient(70% 80% at 50% 20%, #000, transparent 75%); mask-image: radial-gradient(70% 80% at 50% 20%, #000, transparent 75%); }
 .kahraman p { color: var(--soluk); max-width: 620px; margin: 0 auto 28px; font-size: 1.06rem; }
 .buyuk-ara { position: relative; max-width: 640px; margin: 0 auto; text-align: left; }
 .buyuk-ara input { font-size: 1.08rem; padding: 15px 20px; border-radius: 16px; background: var(--yuzey); box-shadow: var(--golge2); border-color: var(--cizgi); }
@@ -604,3 +614,47 @@ img.bayrak.buyuk { width: 56px; height: 56px; }
 .milli-cins-kart.aktif .mc-ad small { color: var(--vurgu); }
 .milli-cins-kart.aktif .mc-ad .soluk { color: var(--yazi2); }
 @media (max-width: 560px) { .milli-cins { grid-template-columns: 1fr; } }
+
+/* ---------------------------------------------------------------- ana sayfa: belirme, şampiyonlar şeridi, keşfet kapıları */
+.belir { opacity: 0; transform: translateY(14px); transition: opacity .6s cubic-bezier(.22,1,.36,1) var(--gecikme, 0ms), transform .6s cubic-bezier(.22,1,.36,1) var(--gecikme, 0ms); }
+.belir.gorundu { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .belir { opacity: 1; transform: none; transition: none; } }
+.serit-bas { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; margin-bottom: 12px; }
+.serit-bas h2 { margin: 0; }
+.serit-bas p { margin: 0; font-size: 13.5px; flex: 1; }
+.serit-dugme { display: flex; gap: 6px; }
+.serit-dugme button { width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--cizgi); background: var(--yuzey); color: var(--yazi); cursor: pointer; font-size: 15px; }
+.serit-dugme button:hover { border-color: var(--vurgu); color: var(--vurgu); }
+.serit { display: flex; gap: 6px; overflow-x: auto; scroll-snap-type: x proximity; padding: 6px 2px 14px; scrollbar-width: thin;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent); mask-image: linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent); }
+.serit:focus-visible { outline: 2px solid var(--vurgu); outline-offset: 2px; border-radius: 12px; }
+.serit-on { flex: none; align-self: stretch; display: flex; align-items: flex-end; padding: 0 4px 8px 10px; font-size: 11.5px; font-weight: 700; letter-spacing: .05em;
+  color: var(--soluk); border-left: 1px solid var(--cizgi); writing-mode: vertical-rl; transform: rotate(180deg); }
+.serit-yil { flex: none; scroll-snap-align: end; width: 62px; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 4px 8px;
+  border-radius: 12px; background: var(--yuzey); border: 1px solid var(--cizgi); box-shadow: inset 0 3px 0 var(--tr); color: var(--yazi);
+  transition: transform .2s cubic-bezier(.22,1,.36,1), border-color .2s, box-shadow .2s; }
+.serit-yil img, .serit-yil .harf { width: 32px; height: 32px; object-fit: contain; }
+.serit-yil .harf { display: grid; place-items: center; border-radius: 50%; background: var(--yuzey2); font-weight: 700; font-size: 12px; }
+.serit-yil b { font-size: 11.5px; font-weight: 650; font-variant-numeric: tabular-nums; color: var(--soluk); }
+.serit-yil:hover, .serit-yil:focus-visible { transform: translateY(-3px); border-color: var(--tr); }
+.serit-yil:hover b { color: var(--yazi); }
+.unvanlar { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.unvanlar .cip img, .unvanlar .cip .harf { width: 18px; height: 18px; object-fit: contain; }
+.unvanlar .cip b { color: var(--yazi); }
+.kapi-bas { margin-bottom: 12px; }
+.kapilar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+@media (max-width: 1000px) { .kapilar { grid-template-columns: repeat(2, 1fr); } }
+.kapi { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 18px 18px 20px; border-radius: var(--r); background: var(--yuzey);
+  border: 1px solid var(--cizgi); box-shadow: var(--golge); color: var(--yazi); overflow: hidden;
+  transition: transform .25s cubic-bezier(.22,1,.36,1), border-color .25s, box-shadow .25s, opacity .6s cubic-bezier(.22,1,.36,1) var(--gecikme, 0ms); }
+.kapi::after { content: ""; position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: var(--vurgu); transform: scaleX(0); transform-origin: left; transition: transform .35s cubic-bezier(.22,1,.36,1); }
+.kapi:hover, .kapi:focus-visible { transform: translateY(-3px); border-color: color-mix(in srgb, var(--vurgu) 40%, var(--cizgi)); box-shadow: var(--golge2); }
+.kapi:hover::after, .kapi:focus-visible::after { transform: scaleX(1); }
+.kapi h3 { margin: 0; font-size: 1.2rem; letter-spacing: -.02em; }
+.kapi p { margin: 0; color: var(--soluk); font-size: 14px; line-height: 1.45; }
+.kapi-ust { font-size: 11.5px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--vurgu); }
+.kapi-ok { position: absolute; top: 16px; right: 18px; color: var(--soluk); transition: transform .25s, color .25s; }
+.kapi:hover .kapi-ok { transform: translateX(3px); color: var(--vurgu); }
+.kapi.belir.gorundu:hover { transform: translateY(-3px); }
+@media (prefers-reduced-motion: reduce) { .kapi, .kapi::after, .serit-yil, .kapi-ok { transition: none; } }
+@media (max-width: 560px) { .serit-dugme { display: none; } .kapilar { grid-template-columns: 1fr 1fr; gap: 8px; } .kapi { padding: 14px 12px 16px; } .kapi p { font-size: 13px; } .kapi h3 { font-size: 1.05rem; } }

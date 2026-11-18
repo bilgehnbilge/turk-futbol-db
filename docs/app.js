@@ -270,32 +270,77 @@ function anaSayfa() {
   document.title = "Türk Futbol Arşivi";
   const y = OZET.yarisma;
   const ornek = ["Göztepe", "Sarıyer", "Kayserispor", "Zonguldakspor", "Bursaspor", "Pendikspor", "Altay", "Sivasspor"];
+  const ilkYil = 1959, sonYil = +(OZET.son_tarih || "").slice(0, 4) || new Date().getFullYear();
+  const sayi = (n, ad) => `<div class="sayi"><b data-say="${n}">${sayiYaz(n)}</b><span>${ad}</span></div>`;
+  const kapi = (href, baslik, metin, ek = "") => `<a class="kapi belir" href="${href}"><span class="kapi-ust">${ek}</span><h3>${baslik}</h3><p>${metin}</p><span class="kapi-ok" aria-hidden="true">→</span></a>`;
   icerik.innerHTML = `
   <section class="kahraman">
-    <h1>Türk futbolunun maç arşivi</h1>
-    <p>1959'dan bugüne profesyonel lig maçları, Türkiye Kupası ve Türk takımlarının Avrupa kupası maçları. Bir kulüp ara, rekorlarına, serilerine ve rakiplerine bak.</p>
+    <span class="kahraman-ust">${ilkYil} – ${sonYil} · ${OZET.sezonlar.length} sezon</span>
+    <h1>Türk futbolunun<br><em>maç arşivi</em></h1>
+    <p>Profesyonel ligler, Türkiye Kupası, Avrupa kupaları ve milli takım: ${sayiYaz(OZET.mac)} maç, kadrolar, goller ve oyuncular. Bir kulüp ya da oyuncu ara.</p>
     <div class="buyuk-ara"><input id="anaAra" type="search" placeholder="Kulüp ya da oyuncu adı yaz…" autocomplete="off" autofocus><div id="anaOneri" class="oneri" hidden></div></div>
     <div class="cipler" style="justify-content:center;margin-top:16px">${ornek.map(a => { const k = kulupAra(a, 1)[0]; return k ? `<a class="cip" href="#/${K}kulup/${k.id}">${esc(a)}</a>` : ""; }).join("")}</div>
-    <div class="sayilar">
-      <div class="sayi"><b>${sayiYaz(OZET.mac)}</b><span>maç</span></div>
-      <div class="sayi"><b>${sayiYaz(OZET.kulup)}</b><span>kulüp</span></div>
-      <div class="sayi"><b>${sayiYaz(y.lig || 0)}</b><span>lig maçı</span></div>
-      <div class="sayi"><b>${sayiYaz(y.kupa || 0)}</b><span>kupa maçı</span></div>
-      <div class="sayi"><b>${sayiYaz(y.avrupa || 0)}</b><span>Avrupa maçı</span></div>
-      <div class="sayi"><b>${OZET.sezonlar.length}</b><span>sezon</span></div>
-    </div>
+    <div class="sayilar">${sayi(OZET.mac, "maç")}${sayi(OZET.kulup, "kulüp")}${sayi(y.lig || 0, "lig maçı")}${sayi(y.kupa || 0, "kupa maçı")}${sayi(y.avrupa || 0, "Avrupa maçı")}${sayi(OZET.sezonlar.length, "sezon")}</div>
   </section>
-  <section class="bolum bugun" id="bugun" aria-live="polite"></section>
-  <section class="bolum izgara k3">
-    <a class="kart" href="#/sezonlar"><h3>Sezonlar →</h3><p class="soluk">Her sezonun puan tabloları, kupa turları ve Avrupa maçları.</p></a>
-    <a class="kart" href="#/elo"><h3>Elo puan durumu →</h3><p class="soluk">1959'dan bugüne bütün maçlardan hesaplanan güç puanı: bugünkü sıralama, tüm zamanların zirveleri ve en büyük sürprizler.</p></a>
-    <a class="kart" href="#/sayilar"><h3>Sayılarla Türk futbolu →</h3><p class="soluk">Dönemlere göre gol ortalaması, skorlar, derbiler ve Süper Lig'de oynamış bütün kulüpler.</p></a>
-    <a class="kart" href="#/rekorlar"><h3>Tüm zamanlar rekorları →</h3><p class="soluk">En farklı skorlar, en uzun seriler ve tüm zamanlar puan tabloları.</p></a>
-    <a class="kart" href="#/karsilastir"><h3>İki kulübü karşılaştır →</h3><p class="soluk">Aralarındaki bütün maçlar ve genel denge.</p></a>
-    <a class="kart" href="#/hakkinda"><h3>Veri hakkında →</h3><p class="soluk">Kaynaklar, kapsam ve bilinen sınırlar.</p></a>
+  <section class="bolum sampiyon-serit belir" id="sampiyonlar" hidden></section>
+  <section class="bolum bugun belir" id="bugun" aria-live="polite"></section>
+  <section class="bolum">
+    <h2 class="kapi-bas">Keşfet</h2>
+    <div class="kapilar">
+      ${kapi("#/sezonlar", "Sezonlar", "Her sezonun puan tabloları, play-off'lar, kupa turları ve Avrupa maçları.", "1959'dan bugüne")}
+      ${kapi("#/oyuncular", "Oyuncular", "Tüm zamanların golcüleri, en çok maça çıkanlar, sezon sezon gol kralları ve oyuncu karşılaştırma.", "Golcüler · krallar")}
+      ${kapi("#/milli", "Milli Takım", "Erkek ve kadın A milli takımlarının bütün maçları, rakipler ve oyuncular.", "1923'ten bugüne")}
+      ${kapi("#/kadin", "Kadın futbolu", "Kadın ligleri, kulüpler, oyuncular, gol kralları ve Avrupa maçları.", "2007'den bugüne")}
+      ${kapi("#/elo", "Elo puanı", "Bütün maçlardan hesaplanan güç sıralaması, tüm zamanların zirveleri ve sürprizler.", "Güç sıralaması")}
+      ${kapi("#/sayilar", "Sayılarla", "Dönemlere göre gol ortalaması, skorlar, derbiler ve kırmızı kartlar.", "İstatistik")}
+      ${kapi("#/rekorlar", "Rekorlar", "En farklı skorlar, en uzun seriler ve tüm zamanlar puan tabloları.", "Tüm zamanlar")}
+      ${kapi("#/karsilastir", "Karşılaştır", "İki kulübün aralarındaki bütün maçlar ve genel denge.", "Kulüp kulübe")}
+    </div>
+    <p class="soluk not" style="margin-top:14px"><a class="bag" href="#/hakkinda">Veri hakkında →</a> Kaynaklar, kapsam ve bilinen sınırlar.</p>
   </section>`;
   oneriKutusu($("#anaAra"), $("#anaOneri"), k => location.hash = `#/kulup/${k.id}`);
+  sampiyonSeridi($("#sampiyonlar")).catch(() => {});
   bugunTarihte($("#bugun")).catch(() => $("#bugun")?.remove());
+  sayilariSay(icerik);
+  belirKur(icerik);
+}
+// sayılar 0'dan değerine yükselir (bir kez; hareket azaltma tercihinde hemen son değer)
+function sayilariSay(kap) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  for (const b of kap.querySelectorAll("[data-say]")) {
+    const n = +b.dataset.say, t0 = performance.now(), sure = 900;
+    const adim = t => { const p = Math.min(1, (t - t0) / sure), e = 1 - (1 - p) ** 3; b.textContent = sayiYaz(Math.round(n * e)); if (p < 1 && b.isConnected) requestAnimationFrame(adim); };
+    requestAnimationFrame(adim);
+  }
+}
+// .belir: görünür olunca yumuşakça belirir (IntersectionObserver; hareket azaltmada hemen görünür)
+function belirKur(kap) {
+  const l = kap.querySelectorAll(".belir");
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) { l.forEach(e => e.classList.add("gorundu")); return; }
+  const io = new IntersectionObserver(es => es.forEach(x => { if (x.isIntersecting) { x.target.classList.add("gorundu"); io.unobserve(x.target); } }), { rootMargin: "0px 0px -8% 0px" });
+  l.forEach((e, i) => { e.style.setProperty("--gecikme", `${(i % 4) * 60}ms`); io.observe(e); });
+}
+// Süper Lig şampiyonları şeridi (docs/sampiyonlar.json; elle tutulur): yıl yıl logolar, en yenisi sağda; altında unvan sayıları
+async function sampiyonSeridi(kap) {
+  if (!kap || BOLUM !== "erkek") return;
+  const d = await al(`sampiyonlar.json?s=${OZET.surum || ""}`);
+  const l = Object.entries(d.sampiyon).sort();
+  if (!l.length || !kap.isConnected) return;
+  const say = new Map();
+  for (const [, k] of l) say.set(k, (say.get(k) || 0) + 1);
+  const kul = id => KULUP.get(id);
+  const logo = id => kul(id)?.logo ? `<img src="logo/${kul(id).logo}.png" alt="" loading="lazy">` : `<span class="harf">${esc((kul(id)?.ad || "?").slice(0, 2))}</span>`;
+  let onceki = "";
+  kap.hidden = false;
+  kap.innerHTML = `<div class="serit-bas"><h2>Şampiyonlar</h2><p class="soluk">Süper Lig, ${l[0][0].slice(0, 4)}'dan bugüne. Bir yıla tıkla, o sezona git.</p>
+      <div class="serit-dugme"><button type="button" data-y="-1" aria-label="Geriye kaydır">←</button><button type="button" data-y="1" aria-label="İleriye kaydır">→</button></div></div>
+    <div class="serit" tabindex="0" aria-label="Süper Lig şampiyonları, yıllara göre">${l.map(([s, k]) => {
+      const on = s.slice(0, 3) + "0", ayrac = on !== onceki ? `<span class="serit-on">${on}'lar</span>` : ""; onceki = on;
+      return `${ayrac}<a class="serit-yil" href="#/sezon/${s}" title="${s}: ${esc(kul(k)?.ad || "")}" style="--tr:${takimTema(kul(k))?.["--tv-acik"] || "var(--vurgu)"}">${logo(k)}<b>${s.length > 4 ? `${s.slice(2, 4)}/${s.slice(7)}` : s}</b></a>`; }).join("")}</div>
+    <div class="unvanlar">${[...say].sort((a, b) => b[1] - a[1]).map(([k, n]) => `<a class="cip" href="#/kulup/${k}">${logo(k)}${esc(kul(k)?.ad || "")} <b>${n}</b></a>`).join("")}</div>`;
+  const s = $(".serit", kap);
+  s.scrollLeft = s.scrollWidth;   // en yeni sezonlar görünür
+  kap.querySelectorAll(".serit-dugme button").forEach(b => b.addEventListener("click", () => s.scrollBy({ left: +b.dataset.y * s.clientWidth * 0.8, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })));
 }
 
 // ana sayfa "Tarihte bugün": bu gün-ayda oynanmış dikkat çekici maçlar. Lig ve kupa: data/bugun.json (web_aktar.py,
