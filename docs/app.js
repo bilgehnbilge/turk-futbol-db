@@ -442,7 +442,7 @@ async function kulupSayfa(id, sekme) {
   </section>
   ${ardilHtml}
   <div class="kulup-sekme"><nav class="sekmeler">
-    ${[["ozet", "Özet"], ["rekorlar", "Rekorlar ve seriler"], ["maclar", "Maçlar"], ["rakipler", "Rakipler"], ["sezonlar", "Sezon sezon"]]
+    ${[["ozet", "Özet"], ["rekorlar", "Rekorlar ve seriler"], ["oyuncular", "Oyuncu rekorları"], ["maclar", "Maçlar"], ["rakipler", "Rakipler"], ["sezonlar", "Sezon sezon"]]
       .map(([s, ad]) => `<a href="#/${K}kulup/${id}/${s}" class="${s === sekme ? "aktif" : ""}">${ad}</a>`).join("")}
   </nav></div>
   <div id="filtreAlan"></div>
@@ -457,9 +457,14 @@ async function kulupSayfa(id, sekme) {
     if (sekme === "ozet") {
       hedef.innerHTML = ozetHtml(tum, durum);
       if (BOLUM === "erkek") { if (typeof yolculukCiz === "function") yolculukCiz(hedef, id); if (typeof eloCiz === "function") eloCiz(hedef, id); if (typeof avrupaCiz === "function") avrupaCiz(hedef, tum); }
-      tffOyunculari(hedef, id); if (tum.some(m => m.yar === "A")) avrupaOyunculari(hedef, id);
     }
-    else if (sekme === "rekorlar") { hedef.innerHTML = rekorHtml(ms); tffOyuncuRekorlari($("#oyuncuRekor"), id); }
+    else if (sekme === "rekorlar") hedef.innerHTML = rekorHtml(ms);
+    else if (sekme === "oyuncular") {   // oyuncularla ilgili her şey: golcüler ve maç listeleri (lig, kupa, Avrupa), kart, maç ve yaş rekorları
+      hedef.innerHTML = "";
+      tffOyunculari(hedef, id); if (BOLUM === "erkek" && tum.some(m => m.yar === "A")) avrupaOyunculari(hedef, id);
+      const r = document.createElement("div"); r.id = "oyuncuRekor"; hedef.appendChild(r);
+      tffOyuncuRekorlari(r, id);
+    }
     else if (sekme === "maclar") macTablosu(hedef, ms, durum);
     else if (sekme === "rakipler") rakipTablosu(hedef, ms, id);
     else if (sekme === "sezonlar") hedef.innerHTML = sezonSezonHtml(tum);
@@ -473,6 +478,7 @@ function filtrele(ms, d, sekme) {
     && (sekme !== "maclar" || ((!d.sonuc || (d.sonuc === "GY" ? m.y === 0 && m.s !== "N" : m.s === d.sonuc)) && (!d.rakip || norm(m.rakip).includes(norm(d.rakip))))));
 }
 function filtreHtml(d, ms, sekme, onculler) {
+  if (sekme === "oyuncular") return "";   // oyuncu rekorları kulübün bütün maçlarından (filtre yok)
   if (sekme === "ozet" || sekme === "sezonlar") {
     return onculler.length ? `<div class="filtre"><label><input type="checkbox" id="fOncul" ${d.oncul ? "checked" : ""}> Öncül kulüplerin maçlarını da kat (${onculler.map(kulupAd).map(esc).join(", ")})</label></div>` : "";
   }
@@ -645,7 +651,7 @@ function rekorHtml(ms0) {
   <h2 class="bolum">Seriler <small class="soluk" style="font-weight:400;font-size:14px">— seçili maçlar art arda, sezonlar arası; ayrıntı için karta tıkla</small></h2>
   <div class="izgara iki ust-hiza">${sr.map(seriKart).join("")}</div>
   <p class="soluk" style="font-size:13px;margin-top:16px">Seriler seçili filtredeki maçların tarih sırasıyla hesaplanır; kulüp seçili yarışmada bir sezon ya da daha uzun süre yoksa seri kesilir. Penaltıyla biten kupa maçları beraberlik sayılır. Hükmen sonuçlar${hukmenSay ? ` (${hukmenSay} maç)` : ""} rekorlara, serilere ve gol sayımlarına girmez. "İç saha" seçilirse ev sahibi yenilmezlik serisi gibi kayıtlar çıkar.</p>
-  <div id="oyuncuRekor"></div>`;
+`;
 }
 
 function rakipTablosu(hedef, ms, id) {
@@ -1083,7 +1089,7 @@ async function tffOyuncuRekorlari(kap, kid) {
   const yil = x => `${x[4].slice(0, 4)}–${x[5].slice(5)}`;
   const sz = x => `<a class="bag" href="#/${K}sezon/${x[2]}">${x[2]}</a>`;
   const mac = x => `${tarihYaz(x[5])} · ${x[6] != null ? kulupBag(x[6]) : ""} · ${skorBag(x[3], "maç")}`;
-  kap.innerHTML = `<h2 class="bolum">Oyuncu rekorları</h2>
+  kap.innerHTML = `<h2 class="bolum">Maç ve sezon rekorları</h2>
   <div class="izgara iki ust-hiza">
     ${kart("Ligde en çok maça çıkanlar", "İlk 11 ya da oyuna sonradan girerek", d.lig_mac, x => x[2], x => `${yil(x)} · ${x[3]} gol`)}
     ${kart("Ligde en çok gol atanlar", "Kendi kalesine goller hariç", d.lig_gol, x => x[3], x => `${yil(x)} · ${x[2]} maç`)}
