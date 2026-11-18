@@ -329,6 +329,8 @@ def mac_yol(m):
 
 def mac():
     c = sqlite3.connect(DB)
+    import oyuncu   # son 30 günün kadrosuz sayfaları yeniden (TFF kadroları sonradan giriyor)
+    oyuncu.kadrosuz_yenile(c.execute("SELECT kaynak_id, tarih, durum FROM mac WHERE ev_gol IS NOT NULL AND kaynak='tff'"), mac_yol)
     hedef = [m for (m,) in c.execute("SELECT kaynak_id FROM mac WHERE ev_gol IS NOT NULL ORDER BY sezon DESC, kademe")]
     liste_ = [m for m in hedef if not os.path.exists(mac_yol(m)) and not os.path.exists(mac_yol(m) + ".yok")]
     print(f"{len(liste_)}/{len(hedef)} maç sayfası indirilecek", flush=True)

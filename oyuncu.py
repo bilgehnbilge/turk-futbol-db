@@ -94,7 +94,46 @@ def kupa_gruplari():
     print("Bitti, yeni indirilen sayfa:", d.indirilen, flush=True)
 
 
+YENILE = os.path.join(KOK, "raw", "kadrosuz_deneme.json")
+
+
+def kadrosuz_yenile(maclar, yol_, gun=30, en_cok=4):
+    """Maçtan hemen sonra indirilip kadrosu olmayan sayfalar (TFF kadroyu sonradan giriyor; kadroyu kulüpler giriyor):
+    son `gun` gün içinde oynanmış, hükmen olmayan maçların kadrosuz sayfası silinir ki indirici yeniden çeksin. Her maç en çok
+    `en_cok` kez denenir (raw/kadrosuz_deneme.json). maclar: [(TFF maç no, tarih, durum)]. Dönen: silinen sayfa sayısı."""
+    import datetime, json as J
+    deneme = J.load(open(YENILE)) if os.path.exists(YENILE) else {}
+    sinir = (datetime.date.today() - datetime.timedelta(days=gun)).isoformat()
+    n = 0
+    for m, tarih, durum in maclar:
+        if not tarih or tarih < sinir or (durum or "") in ("Hük.", "Çifte H") or deneme.get(str(m), 0) >= en_cok:
+            continue
+        y = yol_(m)
+        if os.path.exists(y + ".yok"):
+            kadrosuz = True
+        elif os.path.exists(y):
+            try:
+                kadrosuz = b"kisiId" not in gzip.open(y).read()
+            except OSError:
+                kadrosuz = True
+        else:
+            continue
+        if kadrosuz:
+            for f in (y, y + ".yok"):
+                if os.path.exists(f):
+                    os.remove(f)
+            deneme[str(m)] = deneme.get(str(m), 0) + 1
+            n += 1
+    J.dump(deneme, open(YENILE, "w"))
+    if n:
+        print(f"Kadrosuz {n} maç sayfası yeniden indirilecek (son {gun} gün)", flush=True)
+    return n
+
+
 def indir(kademe, sezon, bekle, kupa=False):
+    if not kupa:   # son 30 günün kadrosuz sayfaları yeniden
+        f = sqlite3.connect(os.path.join(KOK, "futbol.db"))
+        kadrosuz_yenile(f.execute("SELECT kaynak_id, tarih, durum FROM mac WHERE kaynak='tff' AND ev_gol IS NOT NULL"), yol)
     liste = [m for m in (kupa_hedefleri() if kupa else hedefler(kademe, sezon)) if not os.path.exists(yol(m)) and not os.path.exists(yol(m) + ".yok")]
     print(f"{len(liste)} sayfa indirilecek (~{len(liste) * (bekle + 0.6) / 3600:.1f} saat)", flush=True)
     hata = kesinti = 0
