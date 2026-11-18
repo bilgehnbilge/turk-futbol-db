@@ -456,7 +456,7 @@ async function kulupSayfa(id, sekme) {
     const hedef = $("#sekmeIcerik");
     if (sekme === "ozet") {
       hedef.innerHTML = ozetHtml(tum, durum);
-      if (BOLUM === "erkek") { if (typeof yolculukCiz === "function") yolculukCiz(hedef, id); if (typeof eloCiz === "function") eloCiz(hedef, id); }
+      if (BOLUM === "erkek") { if (typeof yolculukCiz === "function") yolculukCiz(hedef, id); if (typeof eloCiz === "function") eloCiz(hedef, id); if (typeof avrupaCiz === "function") avrupaCiz(hedef, tum); }
       tffOyunculari(hedef, id); if (tum.some(m => m.yar === "A")) avrupaOyunculari(hedef, id);
     }
     else if (sekme === "rekorlar") { hedef.innerHTML = rekorHtml(ms); tffOyuncuRekorlari($("#oyuncuRekor"), id); }
@@ -538,6 +538,7 @@ function ozetHtml(ms) {
   return `${kartlar}
   <div class="kart viz" id="yolculuk" hidden></div>
   <div class="kart viz" id="elo" hidden></div>
+  <div class="kart viz" id="avrupaG" hidden></div>
   <div class="bolum izgara k2">
     <div class="kart"><h3>Liglerde geçirdiği sezonlar</h3>
       ${Object.keys(ligBas).sort().map(ligSatiri).join("") || `<p class="soluk">Lig maçı yok.</p>`}

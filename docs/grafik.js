@@ -576,6 +576,94 @@ async function eloCiz(hedef, id) {
   cizgiGrafik($(".elo-g", kap), { xler: sezonlar, seriler: [{ ad: "Elo", renk: "var(--vurgu)", d: l.map(x => x[1]) }], bicim: v => String(Math.round(v)), yukseklik: 200 });
 }
 
+// ---------------------------------------------------------------- kulüp sayfası: Avrupa'da sezon sezon (yurt içi Elo'dan ayrı)
+// Tur sırası: en ileri tur; final kazanıldıysa şampiyon
+function avrupaTurSira(t) {
+  t = String(t || "").toLocaleLowerCase("tr");
+  if (/yar[ıi] ?final/.test(t)) return [6, "Yarı final"];
+  if (/çeyrek/.test(t)) return [5, "Çeyrek final"];
+  if (/^final|\bfinal$/.test(t) && !/\d/.test(t)) return [7, "Final"];
+  if (/son 16|16'?l[ıi] final/.test(t)) return [4, "Son 16"];
+  if (/son 32|32'?l[ıi] final|grup|lig aşaması|play/.test(t)) return [3, /grup/.test(t) ? "Grup aşaması" : /lig aşaması/.test(t) ? "Lig aşaması" : /32/.test(t) ? "Son 32" : "Play-off"];
+  const n = t.match(/(\d)\.?\s*(tur|eleme)/);
+  return n ? [Math.min(2.9, 1 + +n[1] * 0.3), `${n[1]}. ${n[2] === "eleme" ? "eleme turu" : "tur"}`] : [1, t ? t[0].toLocaleUpperCase("tr") + t.slice(1) : "—"];
+}
+function avrupaCiz(hedef, tum) {
+  const kap = $("#avrupaG", hedef);
+  const A = tum.filter(m => m.yar === "A" && !m.iptal && m.a != null);
+  if (!kap || A.length < 2) return;
+  kap.hidden = false;
+  const sz = new Map();
+  for (const m of A) {
+    const x = sz.get(m.sezon) || { G: 0, B: 0, M: 0, AG: 0, YG: 0, kupa: new Set(), en: [0, ""], enKupa: "", sampiyon: false };
+    x[m.s === "G" ? "G" : m.s === "M" ? "M" : "B"]++; x.AG += m.a; x.YG += m.y; x.kupa.add(m.lig);
+    const r = avrupaTurSira(m.tur);
+    if (r[0] > x.en[0]) { x.en = r; x.enKupa = m.lig; }
+    sz.set(m.sezon, x);
+  }
+  // final: son finalin sonucu (iki ayaklı finallerde toplam; penaltı dahil)
+  for (const [s, x] of sz) {
+    const f = A.filter(m => m.sezon === s && m.lig === x.enKupa && avrupaTurSira(m.tur)[0] === 7);
+    if (f.length) { const a = f.reduce((t, m) => t + m.a, 0), y = f.reduce((t, m) => t + m.y, 0), pa = f.at(-1).pa, py = f.at(-1).py;
+      x.sampiyon = a > y || (a === y && pa != null && pa > py); }
+  }
+  const yillar = [...sz.keys()].sort();
+  const ilk = sezonYil(yillar[0]), son = sezonYil(yillar.at(-1));
+  const xler = Array.from({ length: son - ilk + 1 }, (_, i) => `${ilk + i}-${ilk + i + 1}`);
+  const en = [...sz].sort((a, b) => (b[1].sampiyon - a[1].sampiyon) || (b[1].en[0] - a[1].en[0]) || a[0].localeCompare(b[0]))[0];
+  const T = [...sz.values()].reduce((t, x) => (t.G += x.G, t.B += x.B, t.M += x.M, t), { G: 0, B: 0, M: 0 });
+  const enYaz = ([s, x]) => `${x.enKupa} ${x.sampiyon ? "şampiyonu" : x.en[1].toLocaleLowerCase("tr")} (${s})`;
+  kap.innerHTML = `<h3>Avrupa'da sezon sezon</h3><p class="soluk aciklama">${sz.size} sezon, ${A.length} maç: ${T.G} galibiyet, ${T.B} beraberlik, ${T.M} mağlubiyet. En iyi derece: <b>${esc(enYaz(en))}</b>.
+    Çubuklar sezonda oynanan maçlar; renkler sonuç. Yurt içi Elo'ya katılmaz.</p>${lejant([{ ad: "Galibiyet", renk: "var(--g)" }, { ad: "Beraberlik", renk: "var(--b)" }, { ad: "Mağlubiyet", renk: "var(--m)" }], false)}<div class="av-g"></div>
+    ${tabloGorunum("Tablo olarak göster", ["Sezon", "Kupa", "En ileri tur", "G", "B", "M", "Gol"], [...sz].map(([s, x]) => [s, [...x.kupa].join(" / "), x.sampiyon ? "Şampiyon" : x.en[1], x.G, x.B, x.M, `${x.AG}-${x.YG}`]))}`;
+  const g = $(".av-g", kap); g.classList.add("grafik");
+  const W = genislik(g), H = 180, sol = 30, sag = 10, ust = 16, alt = 24;
+  const enCok = Math.max(...[...sz.values()].map(x => x.G + x.B + x.M));
+  const adim = guzelAdim(enCok, 3), hi = Math.ceil(enCok / adim) * adim;
+  const bw = (W - sol - sag) / xler.length, X = i => sol + i * bw, Y = v => ust + (hi - v) / hi * (H - ust - alt);
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, class: "grafik-svg", role: "img", "aria-label": "Avrupa kupalarında sezon sezon galibiyet, beraberlik ve mağlubiyet sayıları" });
+  for (let v = 0; v <= hi; v += adim) {
+    el("line", { x1: sol, x2: W - sag, y1: Y(v), y2: Y(v), class: v === 0 ? "eksen" : "izgara-cizgi" }, svg);
+    el("text", { x: sol - 6, y: Y(v) + 4, class: "eksen-yazi", "text-anchor": "end" }, svg).textContent = v;
+  }
+  const adimYil = W < 520 ? 20 : 10;
+  xler.forEach((s, i) => { const y = sezonYil(s); if (y % adimYil === 0) el("text", { x: X(i) + bw / 2, y: H - 6, class: "eksen-yazi", "text-anchor": "middle" }, svg).textContent = y; });
+  const gen = Math.max(2, Math.min(18, bw - 2));
+  xler.forEach((s, i) => {
+    const x = sz.get(s); if (!x) return;
+    let taban = 0;
+    for (const [k, renk] of [["G", "var(--g)"], ["B", "var(--b)"], ["M", "var(--m)"]]) {
+      if (!x[k]) continue;
+      const y1 = Y(taban + x[k]), y0 = Y(taban);
+      el("rect", { x: X(i) + (bw - gen) / 2, y: y1 + 1, width: gen, height: Math.max(1, y0 - y1 - 2), rx: Math.min(3, gen / 3), style: `fill:${renk}` }, svg);
+      taban += x[k];
+    }
+    if (x.sampiyon || x.en[0] >= 6) el("text", { x: X(i) + bw / 2, y: Y(taban) - 4, class: "eksen-yazi", "text-anchor": "middle" }, svg).textContent = x.sampiyon ? "★" : x.en[0] === 7 ? "F" : "YF";
+  });
+  const kat = el("rect", { x: sol, y: 0, width: W - sol - sag, height: H, fill: "transparent", tabindex: 0, class: "hit" }, svg);
+  g.appendChild(svg);
+  const ip = ipucuKur(g);
+  const dolu = xler.map((s, i) => sz.has(s) ? i : -1).filter(i => i >= 0);
+  let secili = dolu.at(-1);
+  const goster = i => {
+    const s = xler[i], x = sz.get(s), r = svg.getBoundingClientRect(), o = r.width / W;
+    if (!x) { ip.goster((X(i) + bw / 2) * o, Y(0) * o, s, [{ deger: "Avrupa'da yok" }]); return; }
+    ip.goster((X(i) + bw / 2) * o, Y(x.G + x.B + x.M) * o, `${s} · ${[...x.kupa].join(" / ")}`, [
+      { deger: x.sampiyon ? "Şampiyon" : x.en[1], ad: `en ileri tur (${x.enKupa})` }, { deger: x.G, ad: "galibiyet", renk: "var(--g)", kare: true },
+      { deger: x.B, ad: "beraberlik", renk: "var(--b)", kare: true }, { deger: x.M, ad: "mağlubiyet", renk: "var(--m)", kare: true }, { deger: `${x.AG}-${x.YG}`, ad: "gol" }]);
+  };
+  kat.addEventListener("pointermove", e => { const [px] = yerel(svg, e); secili = Math.max(0, Math.min(xler.length - 1, Math.floor((px / svg.getBoundingClientRect().width * W - sol) / bw))); goster(secili); });
+  kat.addEventListener("pointerleave", () => ip.gizle());
+  kat.addEventListener("focus", () => goster(secili));
+  kat.addEventListener("blur", () => ip.gizle());
+  kat.addEventListener("keydown", e => {
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    const j = dolu.indexOf(secili) + (e.key === "ArrowLeft" ? -1 : 1);
+    if (j >= 0 && j < dolu.length) { secili = dolu[j]; goster(secili); } e.preventDefault();
+  });
+}
+window.avrupaCiz = avrupaCiz;
+
 yollar.splice(yollar.length - 1, 0, [/^#\/sayilar$/, sayilarSayfa]);
 yollar.splice(yollar.length - 1, 0, [/^#\/elo$/, eloSayfa]);
 window.eloCiz = eloCiz;
