@@ -671,3 +671,48 @@ img.bayrak.buyuk { width: 56px; height: 56px; }
 .kapi.belir.gorundu:hover { transform: translateY(-3px); }
 @media (prefers-reduced-motion: reduce) { .kapi, .kapi::after, .serit-yil, .kapi-ok { transition: none; } }
 @media (max-width: 560px) { .serit-dugme { display: none; } .kapilar { grid-template-columns: 1fr 1fr; gap: 8px; } .kapi { padding: 14px 12px 16px; } .kapi p { font-size: 13px; } .kapi h3 { font-size: 1.05rem; } }
+
+/* ---------------------------------------------------------------- forma ve renk
+   Kulübün iki rengi (logodan, takimTema / formaRenkleri) forma çizgisi olarak işlenir: kulüp başlığında şeritler,
+   kulüp sayfasında kart kuşağı, tablo satırlarında iki renkli işaret, maç/karşılaştırma başlığında iki kulübün bandı,
+   ana sayfada şampiyonların renk barkodu. Hepsi süs: bilgi her zaman yazıyla da var. */
+.kulup-hero { background: var(--t1k); }
+.kulup-hero::before {
+  background: repeating-linear-gradient(90deg, var(--t1k) 0 44px, var(--t2) 44px 88px);
+  -webkit-mask-image: linear-gradient(90deg, transparent 46%, #000 72%); mask-image: linear-gradient(90deg, transparent 46%, #000 72%);
+}
+.kulup-hero::after { opacity: .14; }
+.hero-filigran { display: none; }
+.kulup-hero h1 { text-shadow: 0 2px 16px rgba(0, 0, 0, .3); }
+.kulup-hero .dugme { background: rgba(0, 0, 0, .38); border-color: rgba(255, 255, 255, .45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.kulup-hero .dugme:hover { background: rgba(0, 0, 0, .55); }
+@media (max-width: 720px) { .kulup-hero::before { -webkit-mask-image: linear-gradient(180deg, transparent 30%, #000 100%); mask-image: linear-gradient(180deg, transparent 30%, #000 100%); opacity: .55; } }
+/* kulüp sayfasında kartların ve tabloların üstünde kulüp rengi kuşak */
+.tema-kulup .kart, .tema-kulup .tablo-kap { border-top: 4px solid var(--vurgu); }
+.tema-kulup .tablo th { background: color-mix(in srgb, var(--vurgu) 9%, var(--yuzey)); }
+.tema-kulup .tablo-kap .tablo thead tr > :first-child, .tema-kulup .tablo-kap .tablo thead tr > :first-child:is(.o, .sira) + * { background: color-mix(in srgb, var(--vurgu) 9%, var(--yuzey)); }
+/* tablo satırında forma işareti: ilk hücrenin solunda iki renk */
+.tablo tr.renkli > td:first-child { box-shadow: inset 4px 0 0 var(--f1), inset 7px 0 0 var(--f2); padding-left: 14px; }
+@media (max-width: 720px) {
+  .tablo-kap .tablo tr.renkli > td:first-child:not(.o, .sira) { box-shadow: inset 4px 0 0 var(--f1), inset 7px 0 0 var(--f2), 1px 0 0 var(--cizgi); }
+  .tablo-kap .tablo tr.renkli > td:first-child:is(.o, .sira) { padding-left: 9px; padding-right: 2px; }
+}
+/* maç ve karşılaştırma başlığı: üstte ev sahibi | konuk forma bandı, iki yanda renk ışığı */
+.mac-bas.renk-bant { position: relative; overflow: hidden; padding-top: 26px;
+  background:
+    linear-gradient(90deg, var(--e1) 0 25%, var(--e2) 25% 50%, var(--d2) 50% 75%, var(--d1) 75%) top / 100% 8px no-repeat,
+    radial-gradient(45% 120% at 0% 45%, color-mix(in srgb, var(--e1) 14%, transparent), transparent 70%),
+    radial-gradient(45% 120% at 100% 45%, color-mix(in srgb, var(--d1) 14%, transparent), transparent 70%),
+    var(--yuzey); }
+.karsilasma.renk-bant:not(.mac) { padding-bottom: 18px;
+  background: linear-gradient(90deg, var(--e1) 0 25%, var(--e2) 25% 50%, var(--d2) 50% 75%, var(--d1) 75%) bottom / 100% 6px no-repeat; }
+/* ana sayfa: Süper Lig şampiyonlarının renk barkodu (her çizgi bir sezon, soldan sağa 1959'dan bugüne) */
+.sampiyon-barkod { display: flex; height: 12px; max-width: 760px; margin: 0 auto 28px; border-radius: 3px; overflow: hidden; }
+.sampiyon-barkod i { flex: 1; }
+.kahraman::before { opacity: .6; }
+.serit-yil { box-shadow: inset 0 5px 0 var(--tr); }
+/* dar ad sütununda logo adın üstüne düşmesin: logo solda sabit, ad yanında kırılır */
+.tablo td.ad a.bag:has(> .logo-k) { display: inline-flex; align-items: center; }
+.tablo td.ad a.bag > .logo-k { flex: none; }
+@media (max-width: 720px) { .tablo tr.renkli > td:first-child { padding-left: 12px; } }
+@media (max-width: 720px) { .kulup-hero::before { -webkit-mask-image: linear-gradient(180deg, transparent 45%, #000 100%); mask-image: linear-gradient(180deg, transparent 45%, #000 100%); } }

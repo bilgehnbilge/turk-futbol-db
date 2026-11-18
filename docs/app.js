@@ -19,6 +19,36 @@ function kaydirmaIsaretle() {
 let kaydirmaZaman;
 const kaydirmaPlanla = () => { clearTimeout(kaydirmaZaman); kaydirmaZaman = setTimeout(kaydirmaIsaretle, 150); };
 new MutationObserver(kaydirmaPlanla).observe(icerik, { childList: true, subtree: true });
+// forma renkleri: kulübün logodan gelen iki rengi (web_aktar: renk) çizildikten sonra işlenir — tek kulüplü tablo satırlarına
+// iki renkli forma işareti, maç ve karşılaştırma başlığına iki kulübün renk bandı, ana sayfada şampiyonların renk barkodu
+function formaRenkleri() {
+  const renk = id => { const k = KULUP.get(+id); if (!k?.renk?.length) return null; const [a, b] = k.renk; return [a, b || a]; };
+  const kulupNo = a => (a?.getAttribute("href") || "").match(/kulup\/(\d+)/)?.[1];
+  for (const tr of icerik.querySelectorAll(".tablo tbody tr:not([data-forma])")) {
+    tr.dataset.forma = "";
+    const ab = tr.querySelectorAll('a[href*="kulup/"]');
+    if (ab.length !== 1) continue;   // maç satırlarında iki kulüp var: işaret yanıltır
+    const r = renk(kulupNo(ab[0])); if (!r) continue;
+    tr.classList.add("renkli"); tr.style.setProperty("--f1", r[0]); tr.style.setProperty("--f2", r[1]);
+  }
+  for (const kar of icerik.querySelectorAll(".karsilasma:not([data-forma])")) {
+    kar.dataset.forma = "";
+    const t = [...kar.querySelectorAll(".taraf")].map(x => renk(kulupNo(x)) || ["#9aa1ab", "#c5cad2"]);
+    if (t.length !== 2) continue;
+    const kap = kar.closest(".mac-bas") || kar;
+    [["--e1", t[0][0]], ["--e2", t[0][1]], ["--d1", t[1][0]], ["--d2", t[1][1]]].forEach(([k, v]) => kap.style.setProperty(k, v));
+    kap.classList.add("renk-bant");
+  }
+  const kah = icerik.querySelector(".kahraman:not([data-forma])"), yil = icerik.querySelectorAll(".serit-yil");
+  if (kah && yil.length) {
+    kah.dataset.forma = "";
+    const s = document.createElement("div"); s.className = "sampiyon-barkod"; s.setAttribute("aria-hidden", "true");
+    s.innerHTML = [...yil].map(y => `<i style="background:${y.style.getPropertyValue("--tr")}"></i>`).join("");
+    kah.prepend(s);
+  }
+}
+let formaZaman = 0;
+new MutationObserver(() => { if (!formaZaman) formaZaman = requestAnimationFrame(() => { formaZaman = 0; formaRenkleri(); }); }).observe(icerik, { childList: true, subtree: true });
 addEventListener("resize", kaydirmaPlanla);
 const onbellek = new Map();
 let KULUPLER = [], KULUP = new Map(), OZET = null, SON_HERO = null;
