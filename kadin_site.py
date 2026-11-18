@@ -137,6 +137,7 @@ def aktar():
         krallar = gol_krallari(o, tff_kulup)
         oyuncu = len(json.load(open(os.path.join(CIKTI, "tff", "oyuncular.json"), encoding="utf-8"))["oyuncu"])
     rekor_sayilar(m_dict, sezonlar, kulup)
+    avrupa_oyuncu(kulup)   # Avrupa maçlarındaki oyuncular -> TFF kadın oyuncu sayfaları
     import kadin_milli   # Kadın A Milli Takımı -> kadin/milli.json, milli_detay.json
     if os.path.exists(kadin_milli.CIKTI):
         kadin_milli.site(yaz, CIKTI)
@@ -284,6 +285,104 @@ def avrupa(m_dict, kulup):
         out.append(mid)
     print(f"kadın Avrupa maçları: {len(out)}")
     return sorted(out)
+
+
+def avrupa_oyuncu(kulup):
+    """Türk kadın kulüplerinin UEFA maçlarında oynayanları TFF kadın oyuncularıyla eşler (oyuncu_bag.py'nin kuralları: aynı
+    kulüpte o sezon ya da bir önceki sezon oynamış olmak, ad benzerliği, doğum tarihi tutması) -> kadin/avrupa_oyuncu.json;
+    maç dosyalarındaki kadrolara oyuncu sayfası bağlantısı (kadin/mac/<no>.json, oyuncuOnek "k")."""
+    import glob, gzip
+    from oyuncu_bag import ad_puani, dogum_tutar
+    tff_kid = {(v["tff"] if isinstance(v["tff"], str) else v["tff"][0]): k for k, v in kulup.items() if v.get("tff")}
+    # TFF kadın oyuncuları: (sezon, kulüp) -> kişiler; ad, doğum
+    tks, tad, tdog = collections.defaultdict(set), {}, {}
+    for f in glob.glob(os.path.join(CIKTI, "tff", "o", "*.json")):
+        for k, v in json.load(open(f, encoding="utf-8"))["oyuncu"].items():
+            if "s" not in v:
+                continue
+            tad[k], tdog[k] = v["ad"], (v.get("d") or [None])[0]
+            for r in v["s"]:
+                if r[4]:
+                    tks[(r[0], r[1])].add(k)
+    katilim, oyuncu, maclar = collections.defaultdict(list), {}, {}
+    dosyalar = sorted(glob.glob(os.path.join(UEFA_HAM, "mac", "*.json.gz")))
+    for dosya in dosyalar:
+        d = json.load(gzip.open(dosya, "rt", encoding="utf-8"))
+        m = d["mac"]
+        mid = int(m["id"])
+        yil = int(m.get("seasonYear") or m["kickOffTime"]["date"][:4])
+        sezon = f"{yil - 1}-{yil}"
+        ol = d.get("olay") or []
+        for i, s_ in enumerate(("homeTeam", "awayTeam")):
+            t_ = m[s_]
+            tff = UEFA_TFF.get(t_.get("internationalName")) if t_.get("countryCode") == "TUR" else None
+            kid = tff_kid.get(tff)
+            if kid is None:
+                continue
+            x = (d.get("kadro") or {}).get(s_) or {}
+            for ilk11, bolum in ((1, "field"), (0, "bench")):
+                for p in x.get(bolum) or []:
+                    pl = p.get("player") or {}
+                    pid = pl.get("id")
+                    if not pid:
+                        continue
+                    kim = lambda e, r: ((e.get(r) or {}).get("person") or {}).get("id")
+                    giris = next(((e.get("time") or {}).get("minute") for e in ol if e.get("type") == "SUBSTITUTION" and kim(e, "secondaryActor") == pid), None)
+                    cikis = next(((e.get("time") or {}).get("minute") for e in ol if e.get("type") == "SUBSTITUTION" and kim(e, "primaryActor") == pid), None)
+                    if not ilk11 and giris is None:
+                        continue
+                    gol = sum(e.get("type") == "GOAL" and kim(e, "primaryActor") == pid and (e.get("goalType") or e.get("subType")) != "OWN" for e in ol)
+                    sari = sum(e.get("type") == "YELLOW_CARD" and kim(e, "primaryActor") == pid for e in ol)
+                    kirm = sum(e.get("type") in ("RED_CARD", "RED_YELLOW_CARD", "YELLOW_CARD_SECOND") and kim(e, "primaryActor") == pid for e in ol)
+                    oyuncu[pid] = (pl.get("internationalName"), pl.get("birthDate"))
+                    katilim[pid].append([mid, kid, ilk11, gol, sari, kirm, giris, cikis, sezon])
+    # eşleme
+    bag = {}
+    for pid, l in katilim.items():
+        ad, dg = oyuncu[pid]
+        aday = collections.Counter()
+        for r in l:
+            y = int(r[8][:4])
+            for s in (r[8], f"{y - 1}-{y}"):
+                for k in tks.get((s, r[1]), ()):
+                    aday[k] += 1
+        puan = []
+        for k, ortak in aday.items():
+            a, dt = ad_puani(ad, tad[k]), dogum_tutar(dg, tdog.get(k))
+            if a >= 0.5 and dt is not False:
+                puan.append((a + 0.3 * (dt is True) + 0.05 * min(ortak, 4), k))
+        puan.sort(reverse=True)
+        if puan and (len(puan) == 1 or puan[0][0] - puan[1][0] >= 0.05):
+            bag[pid] = puan[0][1]
+    # maç dosyalarına bağlantı ve oyuncu katılımları
+    out = collections.defaultdict(list)
+    for pid, l in katilim.items():
+        if pid in bag:
+            out[bag[pid]] += [r[:8] for r in l]
+    for y in glob.glob(os.path.join(CIKTI, "mac", "*.json")):
+        v = json.load(open(y, encoding="utf-8"))
+        ad_kisi = {}
+        dz = os.path.join(UEFA_HAM, "mac", f"{v['id']}.json.gz")
+        if os.path.exists(dz):
+            dd = json.load(gzip.open(dz, "rt", encoding="utf-8"))
+            for s_ in ("homeTeam", "awayTeam"):
+                for b_ in ("field", "bench"):
+                    for p in ((dd.get("kadro") or {}).get(s_) or {}).get(b_) or []:
+                        pl = p.get("player") or {}
+                        if pl.get("id") in bag:
+                            ad_kisi[pl.get("internationalName")] = int(bag[pl["id"]])
+        for taraf in v["kadro"]:
+            for p in taraf:
+                p[4] = ad_kisi.get(p[1], p[4])
+        v["oyuncuOnek"] = "k"
+        for o in v["olay"]:
+            o[7], o[8] = ad_kisi.get(o[4]), ad_kisi.get(o[5])
+        maclar[v["id"]] = [v["tarih"], v["sezon"], v["lig"], v["tur"], v["ev"][0], v["dep"][0], v["ev"][1], v["dep"][1], v["skor"][0], v["skor"][1]]
+        yaz(y, v)
+    yaz(os.path.join(CIKTI, "avrupa_oyuncu.json"), {
+        "alanlar": ["mac", "kulup", "ilk11", "gol", "sari", "kirmizi", "giris", "cikis"], "oyuncu": out,
+        "mac_alanlar": ["tarih", "sezon", "lig", "tur", "ev", "dep", "ev_ad", "dep_ad", "ev_gol", "dep_gol"], "mac": maclar})
+    print(f"kadın Avrupa oyuncuları: {len(katilim)} oyuncu, {len(bag)} TFF oyuncusuyla eşlendi")
 
 
 def gol_krallari(o, tff_kulup):

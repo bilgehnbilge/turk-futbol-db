@@ -118,6 +118,20 @@ function kulupAra(q, adet = 12) {
   }
   return sonuc.sort((a, b) => b[0] - a[0]).slice(0, adet).map(x => x[1]);
 }
+// kadın kulüpleri de aramada (ana sayfa arama kutusu): data/kadin/ozet.json'daki yerli kulüpler, gerektiğinde bir kez yüklenir
+let KADIN_ARA = null;
+async function kadinAraAl() {
+  if (KADIN_ARA) return KADIN_ARA;
+  const z = await al("data/kadin/ozet.json", { cache: "no-cache" }).catch(() => ({ kulupler: [] }));
+  KADIN_ARA = z.kulupler.filter(k => k.yerli !== false);
+  for (const k of KADIN_ARA) k._n = [...new Set([k.ad, ...k.adlar.map(a => a[0])])].map(norm);
+  return KADIN_ARA;
+}
+function kadinKulupAra(q, adet = 4) {
+  const n = norm(q); if (!n || !KADIN_ARA) return [];
+  return KADIN_ARA.map(k => [Math.max(...k._n.map(a => a === n ? 100 : a.startsWith(n) ? 80 : (" " + a).includes(" " + n) ? 60 : a.includes(n) ? 40 : 0)), k])
+    .filter(x => x[0]).sort((a, b) => b[0] - a[0] || b[1].mac - a[1].mac).slice(0, adet).map(x => x[1]);
+}
 function kulupAltYazi(k) {
   const yil = `${k.ilk.slice(0, 4)}–${k.son.slice(0, 4)}`;
   if (!k.yerli) return `Avrupa rakibi · ${k.mac} maç`;
@@ -129,14 +143,18 @@ function oneriKutusu(input, kutu, secince) {
   const ciz = () => {
     liste = kulupAra(input.value, 10);
     const oy = oyuncuVar ? oyuncuAra(input.value) : [];
-    if (!liste.length && !oy.length) { kutu.hidden = true; return; }
+    const kd = oyuncuVar && BOLUM === "erkek" ? kadinKulupAra(input.value) : [];
+    if (!liste.length && !oy.length && !kd.length) { kutu.hidden = true; return; }
     kutu.innerHTML = liste.map((k, i) => `<a href="#/${K}kulup/${k.id}" data-i="${i}" class="${i === secili ? "sec" : ""}">
       <span>${logoImg(k.id)}${esc(k.ad)}${eskiAdIpucu(k, input.value)}</span><small>${esc(kulupAltYazi(k))}</small></a>`).join("") +
       (oy.length ? `<div class="oneri-baslik">Oyuncular</div>` + oy.map(o => `<a href="#/${K}oyuncu/k${o.kisi}" class="oyuncu-oneri">
-        <span>${esc(o.ad)}</span><small>${o.ilk.slice(0, 4)}–${o.son.slice(5)} · ${o.mac} maç${o.gol ? ` · ${o.gol} gol` : ""}${KULUP.get(o.kulup) ? ` · ${esc(KULUP.get(o.kulup).ad)}` : ""}</small></a>`).join("") : "");
+        <span>${esc(o.ad)}</span><small>${o.ilk.slice(0, 4)}–${o.son.slice(5)} · ${o.mac} maç${o.gol ? ` · ${o.gol} gol` : ""}${KULUP.get(o.kulup) ? ` · ${esc(KULUP.get(o.kulup).ad)}` : ""}</small></a>`).join("") : "") +
+      (kd.length ? `<div class="oneri-baslik">Kadın takımları</div>` + kd.map(k => `<a href="#/kadin/kulup/${k.id}">
+        <span>${k.logo ? `<img class="logo-k" src="logo/${k.logo}.png" alt="" loading="lazy" onerror="this.remove()">` : ""}${esc(k.ad)}</span><small>${k.ilk.slice(0, 4)}–${k.son.slice(0, 4)} · ${sayiYaz(k.mac)} maç${k.enust === 1 ? " · Kadın Süper Ligi" : ""}</small></a>`).join("") : "");
     kutu.hidden = false;
   };
-  input.addEventListener("input", () => { secili = -1; if (oyuncuVar && norm(input.value).length >= 3 && !OYUNCULAR) oyuncuDiziniAl().then(ciz); ciz(); });
+  input.addEventListener("input", () => { secili = -1; if (oyuncuVar && norm(input.value).length >= 3 && !OYUNCULAR) oyuncuDiziniAl().then(ciz);
+    if (oyuncuVar && BOLUM === "erkek" && !KADIN_ARA) kadinAraAl().then(ciz); ciz(); });
   input.addEventListener("focus", () => input.value && ciz());
   input.addEventListener("keydown", e => {
     if (kutu.hidden) return;
@@ -176,7 +194,8 @@ const yollar = [
 ];
 async function yonlendir() {
   const h = location.hash || "#/";
-  document.querySelectorAll(".ust nav a").forEach(a => a.classList.toggle("aktif", h.startsWith(a.getAttribute("href"))));
+  const hn = h.startsWith("#/kadin/milli") ? "#/milli" : h;   // kadın milli takımı Milli Takım bölümünde (erkek / kadın sekmesi)
+  document.querySelectorAll(".ust nav a").forEach(a => a.classList.toggle("aktif", hn.startsWith(a.getAttribute("href"))));
   temaUygula(null);
   const bolum = h.startsWith("#/kadin") ? "kadin" : "erkek";
   try { await bolumSec(bolum); } catch (e) { icerik.innerHTML = `<div class="bos">Veri yüklenemedi (${esc(e.message)}).</div>`; return; }
@@ -797,6 +816,27 @@ const KADIN_KAYNAK = "TFF maç sayfaları (kadın ligleri; kadro ve goller 2008-
 // yabancı (uyruğu TC değil): Türkçe ı kuralı yok ("CAIRU/BA" -> "Cairu/Ba")
 const okunurYer = (s, yabanci) => String(s || "").split(/([ \-\/])/).map(w => w.length > 1 && /\p{L}/u.test(w[0]) ? (yabanci ? w[0].replace("İ", "I") : w[0]) + (yabanci ? w.slice(1).replace(/[Iİ]/g, "i").toLowerCase() : w.slice(1).replace(/I/g, "ı").replace(/İ/g, "i").toLocaleLowerCase("tr")) : w).join("");
 const tffYarAd = (yar, kademe) => yar === "L" ? (KADEME_AD[kademe] || "Lig") : YAR_AD[yar] || yar;
+// kadın oyuncunun Avrupa maçları: özet, sezon-kulüp-kupa tablosu ve maç listesi
+function kadinAvrupaHtml(l, M) {
+  const ms = l.map(([mac, kulup, ilk11, gol, sari, kirmizi, giris, cikis]) => {
+    const [tarih, sezon, lig, tur, ev, dep, evAd, depAd, eg, dg] = M[mac] || [];
+    const evde = ev === kulup;
+    return { mac, kulup, ilk11, gol, sari, kirmizi, giris, cikis, tarih, sezon, lig, tur, ev, dep, evAd, depAd, eg, dg,
+      s: sonuc(evde ? eg : dg, evde ? dg : eg) };
+  }).sort((a, b) => (b.tarih || "").localeCompare(a.tarih || ""));
+  const top = ms.reduce((t, m) => (t.mac++, t.ilk += m.ilk11, t.gol += m.gol, t.sari += m.sari, t.kirmizi += m.kirmizi, t), { mac: 0, ilk: 0, gol: 0, sari: 0, kirmizi: 0 });
+  const gr = [...ms.reduce((g, m) => { const k = `${m.sezon}|${m.kulup}|${m.lig}`; return g.set(k, [...(g.get(k) || []), m]); }, new Map())];
+  return `<div class="kart bolum"><div class="ozet-sat">
+    <div><b>${top.mac}</b><span>Avrupa maçı</span></div><div><b>${top.ilk}</b><span>İlk 11</span></div><div><b>${top.gol}</b><span>Gol</span></div>
+    <div><b>${top.sari}</b><span>Sarı kart</span></div><div><b>${top.kirmizi}</b><span>Kırmızı kart</span></div></div></div>
+  <div class="kart bolum tablo-kap"><table class="tablo"><thead><tr><th>Sezon</th><th class="ad">Kulüp</th><th class="ad">Kupa</th><th class="s">Maç</th><th class="s">İlk 11</th><th class="s">Gol</th><th class="s">Sarı</th><th class="s">Kırm.</th></tr></thead><tbody>
+    ${gr.map(([k, l]) => `<tr><td>${esc(l[0].sezon)}</td><td class="ad">${kulupBag(l[0].kulup)}</td><td class="ad soluk">${esc(l[0].lig || "")}</td><td class="s">${l.length}</td>
+      <td class="s">${l.reduce((s, m) => s + m.ilk11, 0)}</td><td class="s">${l.reduce((s, m) => s + m.gol, 0) || ""}</td><td class="s">${l.reduce((s, m) => s + m.sari, 0) || ""}</td><td class="s">${l.reduce((s, m) => s + m.kirmizi, 0) || ""}</td></tr>`).join("")}
+  </tbody></table></div>
+  <div class="kart bolum"><h3>Maçlar</h3>${ms.map(m => `<div class="akis-satir"><span class="akis-ic"><span class="son ${m.s}">${m.s === "N" ? "–" : m.s}</span> ${tarihYaz(m.tarih)} · ${esc(m.evAd)} ${skorBag(m.mac, `${m.eg ?? "–"} - ${m.dg ?? "–"}`)} ${esc(m.depAd)}
+    <small class="soluk">${esc(m.tur || "")} · ${m.ilk11 ? "İlk 11" : m.giris != null ? `${m.giris}'de girdi` : ""}${m.cikis != null ? ` · ${m.cikis}'de çıktı` : ""}${m.gol ? " · " + "⚽".repeat(m.gol) : ""}${m.sari ? " · 🟨" : ""}${m.kirmizi ? " · 🟥" : ""}</small></span></div>`).join("")}</div>
+  <p class="soluk not">Kaynak: UEFA maç kadroları; oyuncu, aynı kulüpte oynadığı sezon, ad ve doğum tarihiyle TFF kaydına eşlendi.</p>`;
+}
 async function tffOyuncuSayfa(kisi) {
   icerik.innerHTML = `<div class="yukleniyor">Yükleniyor…</div>`;
   const d = await al(`${V}tff/o/${kisi % 500}.json?s=${OZET.surum || ""}`), p = d.oyuncu[kisi];
@@ -840,13 +880,16 @@ async function tffOyuncuSayfa(kisi) {
   const TJ = BOLUM === "erkek" ? await al(`data/teknik.json?s=${OZET.surum || ""}`).catch(() => ({})) : {};
   const tdKs = Object.keys(TJ.oyuncu || {}).filter(k => TJ.oyuncu[k] === kisi), tdK = tdKs[0] || null;   // aynı kişinin birden çok kaydı olabilir (UEFA + TFF)
   const tdArg = tdK ? (tdK.startsWith("a") ? tdK : tdK.slice(1)) : null;
+  // kadın bölümü: Avrupa maçları (kadin/avrupa_oyuncu.json; UEFA kadrolarından TFF oyuncusuyla eşlenen)
+  const AV = BOLUM === "kadin" ? await al(`${V}avrupa_oyuncu.json?s=${OZET.surum || ""}`).catch(() => null) : null;
+  const kAv = AV?.oyuncu?.[kisi] || null;
   const [dg, dyer, uyruk] = p.d || [];
   const dogumYaz = dg ? (["01-01", "07-01"].includes(dg.slice(5)) ? dg.slice(0, 4) : tarihYaz(dg)) : null;
   icerik.innerHTML = `
   <div class="sayfa-bas"><div><h1>${esc(p.ad)}</h1>${p.tam ? `<p class="soluk">Tam adı: ${esc(p.tam)}</p>` : ""}
     <p class="soluk">${ilk.slice(0, 4)}–${son.slice(5) || son.slice(0, 4)} · ${kulupler.map(([k]) => kulupBag(k)).join(", ")}</p>
     ${dogumYaz || dyer || uyruk ? `<p class="soluk">${[dogumYaz ? `Doğum: ${dogumYaz}${dyer ? `, ${esc(okunurYer(dyer, uyruk && uyruk !== "TC"))}` : ""}` : dyer ? `Doğum yeri: ${esc(okunurYer(dyer, uyruk && uyruk !== "TC"))}` : "", uyruk && uyruk !== "TC" ? `Uyruk: ${esc(uyruk)}` : ""].filter(Boolean).join(" · ")}</p>` : ""}</div></div>
-  ${uNo || tdK ? `<nav class="sekmeler bolum" id="oySekme"><a href="#" data-k="lk" class="aktif">Lig ve kupa <small class="soluk">${sayiYaz(T.mac)} maç</small></a>
+  ${uNo || tdK || kAv ? `<nav class="sekmeler bolum" id="oySekme"><a href="#" data-k="lk" class="aktif">Lig ve kupa <small class="soluk">${sayiYaz(T.mac)} maç</small></a>
     <a href="#" data-k="av">Avrupa <small class="soluk" id="avSay"></small></a><a href="#" data-k="td" hidden>Teknik direktör <small class="soluk" id="tdSay"></small></a></nav>` : ""}
   <div id="sk-lk">
   <div class="kart bolum"><div class="ozet-sat">
@@ -870,8 +913,12 @@ async function tffOyuncuSayfa(kisi) {
   </div>
   <div id="sk-av" hidden></div><div id="sk-td" hidden></div>
   <div id="milliOyuncu"></div>`;
-  if (uNo || tdK) {
-    const n = await oyuncuSayfa(uNo, tdArg, { oy: $("#sk-av"), td: $("#sk-td"), tdK: tdKs });
+  if (kAv) {
+    $("#sk-av").innerHTML = kadinAvrupaHtml(kAv, AV.mac);
+    $("#avSay").textContent = `${kAv.length} maç`;
+  }
+  if (uNo || tdK || kAv) {
+    const n = uNo || tdK ? await oyuncuSayfa(uNo, tdArg, { oy: $("#sk-av"), td: $("#sk-td"), tdK: tdKs }) : null;
     if (n) {
       $("#avSay").textContent = `${n.oy} maç`;
       if (n.td) { const a = $('#oySekme a[data-k="td"]'); a.hidden = false; $("#tdSay").textContent = `${n.td} maç`; }

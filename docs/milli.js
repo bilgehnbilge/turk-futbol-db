@@ -75,7 +75,7 @@ async function milliSayfa(sekme = "ozet") {
     <div class="tablo-kap"><table class="tablo milli-rakip">${bas(["Rakip"])}<tbody>${rakipT.map(([k, l]) => `<tr data-rakip="${esc(k)}" class="tiklanir">
       <td class="ad">${l[0].bayrak} ${esc(l[0].rakip)}</td>${hucre(say(l))}</tr>`).join("")}</tbody></table></div>`;
     icerik.innerHTML = `
-    ${BOLUM === "kadin" && BOLUM_UST.kadin ? BOLUM_UST.kadin("milli") : ""}
+    <nav class="sekmeler bolum milli-cins"><a href="#/milli" class="${BOLUM === "erkek" ? "aktif" : ""}">Erkek</a><a href="#/kadin/milli" class="${BOLUM === "kadin" ? "aktif" : ""}">Kadın</a></nav>
     <div class="sayfa-bas"><div><h1>${bayrakImg("tr", "bayrak baslik")} ${milliAd()}</h1>
       <p class="soluk">${tarihYaz(tum[0].tarih)} – ${tarihYaz(tum.at(-1).tarih)} · ${tum.length} resmi ve özel maç</p></div></div>
     <div class="kulup-sekme"><nav class="sekmeler">${SEKME.map(([k, y, ad]) => `<a href="#/${K}milli${y}" class="${k === sekme ? "aktif" : ""}">${ad}</a>`).join("")}</nav></div>

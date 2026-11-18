@@ -51,7 +51,7 @@ const anaDurum = { kulupAra: "", oyuncuAra: "" };
 function kadinUst(sekme) {
   const z = KZ;
   const SEK = [["sezonlar", "#/kadin", "Sezonlar"], ["krallar", "#/kadin/krallar", "Gol kralları"], ["kulupler", "#/kadin/kulupler", "Kulüpler"],
-    ["oyuncular", "#/kadin/oyuncular", "Oyuncular"], ["milli", "#/kadin/milli", "Milli Takım"], ["rekorlar", "#/kadin/rekorlar", "Rekorlar"], ["sayilar", "#/kadin/sayilar", "Sayılar"]];
+    ["oyuncular", "#/kadin/oyuncular", "Oyuncular"], ["rekorlar", "#/kadin/rekorlar", "Rekorlar"], ["sayilar", "#/kadin/sayilar", "Sayılar"]];
   return `${basOn("Kadın Futbolu", `TFF kadın ligleri, ${z.sezonlar[0]}'den bugüne. Erkek liglerinden ayrı tutulur; erkek takımıyla aynı kulüp olanlar "(Kadın)" ekiyle yazılır.`)}
     <div class="kart bolum"><div class="ozet-sat">
       <div><b>${sayiYaz(z.oynanan)}</b><span>Maç</span></div><div><b>${sayiYaz(z.kulupler.filter(k => k.yerli !== false).length)}</b><span>Kulüp</span></div>
