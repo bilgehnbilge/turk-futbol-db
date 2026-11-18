@@ -1095,7 +1095,7 @@ async function oyuncuSayfa(no, tdNo, hedef) {
       <div><b>${t.M}</b><span>Mağlubiyet</span></div><div><b>%${yuzde(t.G, t.O)}</b><span>Kazanma</span></div><div><b>${pm(t)}</b><span>Maç başı puan</span></div></div>
       <div class="cubuk"><i class="g" style="width:${yuzde(t.G, t.O)}%"></i><i class="b" style="width:${yuzde(t.B, t.O)}%"></i><i class="m" style="width:${yuzde(t.M, t.O)}%"></i></div></div>
     <div class="izgara iki bolum ust-hiza">
-      <div class="tablo-kap"><table class="tablo">${bas(["Yarışma"])}<tbody>${yarlar.map(y => satirT(YAR_TD[y], ozetle(td.filter(m => m.yar === y)))).join("")}${yarlar.length > 1 ? satirT("<b>Toplam</b>", t) : ""}</tbody></table></div>
+      <div class="tablo-kap"><table class="tablo">${bas(["Yarışma"])}<tbody>${yarlar.map(y => satirT(YAR_TD[y], ozetle(td.filter(m => m.yar === y)))).join("")}${yarlar.length > 1 ? satirT("<b>Toplam</b>", t).replace("<tr>", '<tr class="toplam">') : ""}</tbody></table></div>
       <div class="tablo-kap"><table class="tablo">${bas(["Kulüp"])}<tbody>${kul.map(([kid, l]) => satirT(kulupBag(kid), ozetle(l))).join("")}</tbody></table></div>
     </div>
     <div class="tablo-kap bolum"><table class="tablo">${bas(["Sezon", "Kulüp", "Yarışma"])}<tbody>${sezon.map(([k, l]) => {

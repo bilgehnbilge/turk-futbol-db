@@ -255,7 +255,13 @@ details.rekor[open] summary::after { content: "Gizle ▴"; }
 .tablo th.sirala { cursor: pointer; user-select: none; }
 .tablo th.sirala:hover { color: var(--yazi); }
 .tablo tr:last-child td { border-bottom: 0; }
-.tablo tbody tr:hover { background: color-mix(in srgb, var(--yuzey2) 70%, transparent); }
+/* satır zeminleri opak: yatay kayan tabloda sabit ad sütunu satırın zeminini alır (background: inherit) */
+.tablo tbody tr { background: var(--yuzey); }
+/* 15 satırı aşan tablolarda dönüşümlü satır rengi (kısa tablolarda gerek yok) */
+.tablo:has(tbody tr:nth-child(16)) tbody tr:nth-child(even) { background: color-mix(in srgb, var(--yuzey2) 55%, var(--yuzey)); }
+.tablo tbody tr:hover { background: color-mix(in srgb, var(--yuzey2) 85%, var(--yazi) 4%); }
+/* toplam satırı: üstte belirgin çizgi, kalın */
+.tablo tr.toplam td { border-top: 2px solid color-mix(in srgb, var(--yazi) 35%, var(--cizgi)); font-weight: 700; background: var(--yuzey2); }
 .tablo td.s, .tablo th.s { text-align: right; font-variant-numeric: tabular-nums; }
 .tablo td.o, .tablo th.o { text-align: center; }
 .tablo td.ad { white-space: normal; min-width: 150px; }
@@ -263,12 +269,31 @@ details.rekor[open] summary::after { content: "Gizle ▴"; }
 .son { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 7px; font-size: 11.5px; font-weight: 700; }
 .son.G { background: var(--g-zemin); color: var(--g); } .son.B { background: var(--b-zemin); color: var(--b); } .son.M { background: var(--m-zemin); color: var(--m); }
 .son.N { background: var(--yuzey2); color: var(--soluk); }
-.tablo tr.vurgu-sat { background: var(--vurgu-zemin); }
+.tablo tr.vurgu-sat { background: color-mix(in srgb, var(--vurgu) 10%, var(--yuzey)); }
+/* telefonda yatay kayan tablolar: ad sütunu (ilk sütun ya da dar bir sıra/sonuç sütunundan sonraki ad) yerinde kalır */
+@media (max-width: 720px) {
+  .tablo-kap .tablo tr > :first-child { position: sticky; left: 0; z-index: 1; background: inherit; }
+  .tablo-kap .tablo thead tr > :first-child { background: var(--yuzey2); }
+  .tablo-kap .tablo tr > :first-child:is(.o, .sira) { min-width: 34px; max-width: 34px; width: 34px; padding-left: 6px; padding-right: 4px; }
+  .tablo-kap .tablo tr > :first-child:is(.o, .sira) + .ad { position: sticky; left: 34px; z-index: 1; background: inherit; }
+  .tablo-kap .tablo thead tr > :first-child:is(.o, .sira) + * { background: var(--yuzey2); }
+  .tablo-kap .tablo tr > :first-child:not(.o, .sira), .tablo-kap .tablo tr > :first-child:is(.o, .sira) + .ad { box-shadow: 1px 0 0 var(--cizgi); }
+  .tablo td.ad { min-width: 120px; }
+}
 .rekor-tablo-kap { container-type: inline-size; }
 .rekor-tablo td { vertical-align: middle; }
 .rekor-tablo td.tarih { font-size: 12.5px; line-height: 1.35; color: var(--soluk); }
 .rekor-tablo td.ad { min-width: 0; max-width: 0; width: 50%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 @container (max-width: 640px) { .rekor-tablo .ek { display: none; } }
+/* dar ekranda rekor tablosunda takım adları kesilmesin: alt satıra geçsin */
+@container (max-width: 520px) {
+  .rekor-tablo td.ad { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: break-word; font-size: 13px; line-height: 1.3; }
+  .rekor-tablo td.ad .logo-k { display: none; }
+  .rekor-tablo td.tarih { font-size: 11px; width: 1%; letter-spacing: -.01em; }
+  .rekor-tablo td.ad { font-size: 12.5px; letter-spacing: -.01em; max-width: none; width: auto; overflow-wrap: normal; }
+  .rekor-tablo th, .rekor-tablo td { padding-left: 4px; padding-right: 4px; }
+  .rekor-tablo .sira { min-width: 14px; }
+}
 
 /* puan tablosu kartı (sezon sayfası): dar kartta ikincil sütunlar gizlenir */
 .puan-kart { padding: 0; overflow: hidden; container-type: inline-size; }
