@@ -300,7 +300,7 @@ function sayfaGecisi() {
   const yap = () => { window.scrollTo(0, 0); return yonlendir(); };
   if (!document.startViewTransition || matchMedia("(prefers-reduced-motion: reduce)").matches) { yap(); return; }
   const g = document.startViewTransition(() => Promise.race([yap(), new Promise(r => setTimeout(r, 350))]));
-  g.ready.catch(() => {});   // sekme gizliyken geçiş atlanır; sayfa yine çizilir
+  g.ready.catch(() => {}); g.updateCallbackDone?.catch(() => {});   // sekme gizliyken geçiş atlanır; sayfa yine çizilir
   g.finished.catch(() => {}).finally(() => document.querySelectorAll("[data-vt]").forEach(e => { e.style.viewTransitionName = ""; delete e.dataset.vt; }));
 }
 window.addEventListener("hashchange", sayfaGecisi);
