@@ -9,6 +9,9 @@ const yuzde = (x, b = 1) => (x * 100).toLocaleString("tr-TR", { minimumFractionD
 const ondalik = (x, b = 2) => x.toLocaleString("tr-TR", { minimumFractionDigits: b, maximumFractionDigits: b });
 const sezonYil = s => +String(s).slice(0, 4);
 const SERI_RENK = ["var(--s1)", "var(--s2)", "var(--s3)", "var(--s4)"];
+// 4. seri (sarı) turuncuyla bütün çiftler denetiminde ayrışmıyor (normal görüşte ΔE 13,7; koyu temada döteranopide 4,8):
+// kesik çizgiyle ikincil kodlama, lejantta da kesik anahtar
+const KESIK = "var(--s4)";
 
 function el(ad, attr = {}, ebeveyn) {
   const e = document.createElementNS(SVGNS, ad);
@@ -76,7 +79,7 @@ function cizgiGrafik(kap, { xler, seriler, bicim, yMin = null, yMax = null, yuks
   for (const s of seriler) {
     let d = "", acik = false;
     s.d.forEach((v, i) => { if (v == null) { acik = false; return; } d += `${acik ? "L" : "M"}${X(i).toFixed(1)},${Y(v).toFixed(1)}`; acik = true; });
-    el("path", { d, class: "cizgi", style: `stroke:${s.renk}` }, svg);
+    el("path", { d, class: "cizgi" + (s.renk === KESIK ? " kesik" : ""), style: `stroke:${s.renk}` }, svg);
   }
   const imlec = el("line", { y1: ust, y2: H - alt, class: "imlec", visibility: "hidden" }, svg);
   const noktalar = seriler.map(s => el("circle", { r: 4.5, class: "nokta", style: `fill:${s.renk}`, visibility: "hidden" }, svg));
@@ -109,7 +112,7 @@ function cizgiGrafik(kap, { xler, seriler, bicim, yMin = null, yMax = null, yuks
   });
 }
 function lejant(seriler, cizgi = true) {
-  return `<div class="lejant">${seriler.map(s => `<span><i class="${cizgi ? "anahtar" : "anahtar kare"}" style="background:${s.renk}"></i>${esc(s.ad)}</span>`).join("")}</div>`;
+  return `<div class="lejant">${seriler.map(s => `<span><i class="${cizgi ? "anahtar" : "anahtar kare"}" style="background:${cizgi && s.renk === KESIK ? `repeating-linear-gradient(90deg, ${s.renk} 0 5px, transparent 5px 8px)` : s.renk}"></i>${esc(s.ad)}</span>`).join("")}</div>`;
 }
 function tabloGorunum(baslik, basliklar, satirlar) {
   return `<details class="tablo-gorunum"><summary>${esc(baslik)}</summary><div class="tablo-kap"><table class="tablo">

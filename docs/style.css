@@ -477,6 +477,7 @@ a.oyuncu-bag:hover { color: var(--vurgu); text-decoration: underline; text-under
 .grafik-svg { display: block; width: 100%; height: auto; overflow: visible; }
 .grafik-svg .izgara-cizgi { stroke: var(--grafik-izgara); stroke-width: 1; }
 .grafik-svg .eksen { stroke: var(--grafik-eksen); stroke-width: 1; }
+.grafik-svg .cizgi.kesik { stroke-dasharray: 7 4; }
 .grafik-svg .eksen-yazi { fill: var(--soluk); font-size: 11px; font-variant-numeric: tabular-nums; }
 .grafik-svg .cizgi { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
 .grafik-svg .cizgi.ince { stroke-width: 1.5; }
