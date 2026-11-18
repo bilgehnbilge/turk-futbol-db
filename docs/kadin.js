@@ -8,7 +8,7 @@ const KK = new Map();
 // bölüm verisi: app.js bolumSec("kadin") bunu çağırır; kulüp, maç ve oyuncu sayfaları erkek bölümünün kodunu kullanır
 BOLUM_YUKLE.kadin = async () => {
   KZ = await al("data/kadin/ozet.json", { cache: "no-cache" });
-  for (const k of KZ.kulupler) KK.set(k.id, k);
+  for (const k of KZ.kulupler) KK.set(k.id, adSadele(k));
   return { OZET: KZ, KULUP: KK, KADEME_AD: { 1: "Kadın Süper Ligi", 2: "Kadınlar 1. Ligi", 3: "Kadınlar 2. Ligi", 4: "Kadınlar 3. Ligi" } };
 };
 const kOzet = async () => KZ;

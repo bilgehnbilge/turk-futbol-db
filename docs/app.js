@@ -33,6 +33,29 @@ async function al(yol, secenek) {
   try { return await p; } catch (e) { onbellek.delete(yol); throw e; }
 }
 const kulupAd = id => KULUP.get(id)?.ad ?? "?";
+// puan durumunda kısa ad: o sezonun resmi adı kulübün bugünkü adını içeriyorsa onu ("Rams Başakşehir Futbol Kulübü" ->
+// "Başakşehir", "Galatasaray A.Ş." -> "Galatasaray"); içermiyorsa (eski adla oynadığı dönem) resmi addan şirket ekleri atılır
+const KISA_EK = /\s+(A\.?\s?Ş\.?|Futbol\s+A\.?\s?Ş\.?|Kulübü|(Spor|Sportif)\s+Faaliyetler(i)?(\s+A\.?\s?Ş\.?)?)$/i;
+// kulübün sitede görünen adı: şirket ekleri ve web adresi önekli sponsor atılır ("Göztepe A.Ş." -> "Göztepe",
+// "Mısırlı.Com.Tr Fatih Karagümrük" -> "Fatih Karagümrük"); tam ad k.tamAd'da (aramada eski adlarla birlikte)
+// "Futbol Kulübü" FK olur (Çorum FK, Bodrum FK gibi adın parçası; atılırsa şehir adı kalır), "A.Ş." ve "Kulübü" atılır
+function adTemiz(s) {
+  let a = String(s || "").replace(/^\S+\.(com|net|org)(\.tr)?\s+/i, "").replace(/\s+Futbol\s+Kulübü(\s+A\.?\s?Ş\.?|\s+SK)?$/i, " FK").replace(/\s+(Futbol\s+Spor|Gençlik\s+ve\s+Spor|Spor)\s+Kulübü$/i, " SK").trim(), once;
+  do { once = a; a = a.replace(KISA_EK, "").trim(); } while (a !== once && a);
+  return a || s;
+}
+function adSadele(k) {
+  if (k.tamAd) return k;
+  k.tamAd = k.ad;
+  k.ad = adTemiz(k.ad);
+  return k;
+}
+function kisaAd(id, resmi) {
+  const k = KULUP.get(id);
+  if (!resmi) return k?.ad ?? "?";
+  const r = adTemiz(resmi);
+  return k && norm(r).includes(norm(k.ad)) ? k.ad : r;
+}
 const logoImg = (id, cls = "logo-k") => { const l = KULUP.get(id)?.logo; return l ? `<img class="${cls}" src="logo/${l}.png" alt="" loading="lazy" onerror="this.remove()">` : ""; };
 const kulupBag = (id, ad) => id != null && KULUP.has(id) ? `<a class="bag" href="#/${K}kulup/${id}">${logoImg(id)}${esc(ad ?? kulupAd(id))}</a>` : esc(ad ?? "?");
 function sonuc(a, y) { if (a == null || y == null) return "N"; return a > y ? "G" : a < y ? "M" : "B"; }
@@ -135,7 +158,7 @@ let KADIN_ARA = null;
 async function kadinAraAl() {
   if (KADIN_ARA) return KADIN_ARA;
   const z = await al("data/kadin/ozet.json", { cache: "no-cache" }).catch(() => ({ kulupler: [] }));
-  KADIN_ARA = z.kulupler.filter(k => k.yerli !== false);
+  KADIN_ARA = z.kulupler.filter(k => k.yerli !== false).map(adSadele);
   for (const k of KADIN_ARA) k._n = [...new Set([k.ad, ...k.adlar.map(a => a[0])])].map(norm);
   return KADIN_ARA;
 }
@@ -1286,7 +1309,7 @@ async function sezonSayfa(sezon) {
       <div class="bas"><h3>${esc(g.lig)}${g.grup ? ` · ${esc(g.grup)}` : ""}</h3>
       <span>${g.ms.length} maç${oynanmamis ? `, ${oynanmamis} oynanmadı` : ""}</span></div>
       <table class="tablo"><thead><tr><th class="s">#</th><th>Takım</th><th class="s">O</th><th class="s ek2">G</th><th class="s ek2">B</th><th class="s ek2">M</th><th class="s ek">AG</th><th class="s ek">YG</th><th class="s">Av</th><th class="s">P</th></tr></thead>
-      <tbody>${l.map((x, i) => `<tr><td class="s soluk">${i + 1}</td><td class="takim" title="${esc(x.ad)}">${typeof x.id === "number" ? kulupBag(x.id, x.ad) : esc(x.ad)}</td><td class="s">${x.O}</td><td class="s ek2">${x.G}</td><td class="s ek2">${x.B}</td><td class="s ek2">${x.M}</td><td class="s ek">${x.AG}</td><td class="s ek">${x.YG}</td><td class="s">${x.Av > 0 ? "+" : ""}${x.Av}</td><td class="s p">${x.P}</td></tr>`).join("")}</tbody></table>
+      <tbody>${l.map((x, i) => `<tr><td class="s soluk">${i + 1}</td><td class="takim" title="${esc(x.ad)}">${typeof x.id === "number" ? kulupBag(x.id, kisaAd(x.id, x.ad)) : esc(kisaAd(null, x.ad))}</td><td class="s">${x.O}</td><td class="s ek2">${x.G}</td><td class="s ek2">${x.B}</td><td class="s ek2">${x.M}</td><td class="s ek">${x.AG}</td><td class="s ek">${x.YG}</td><td class="s">${x.Av > 0 ? "+" : ""}${x.Av}</td><td class="s p">${x.P}</td></tr>`).join("")}</tbody></table>
       <details><summary>Maçlar</summary>${macListesi(g.ms)}</details></div>`;
   };
   const kupa = ms.filter(m => m.yar === "K"), ozel = [...new Set(ms.filter(m => m.yar === "O").map(m => m.lig))].map((lig, i) => ({ k: "oz" + i, lig, ms: ms.filter(m => m.yar === "O" && m.lig === lig) })), avrupa = ms.filter(m => m.yar === "A"), po = ms.filter(m => (m.yar === "L" || m.yar === "T") && m.po);
@@ -1539,7 +1562,7 @@ function hakkindaSayfa() {
     icerik.innerHTML = `<div class="bos">Veri yüklenemedi (${esc(e.message)}). Sayfayı bir web sunucusu üzerinden açın.</div>`;
     return;
   }
-  for (const k of KULUPLER) KULUP.set(k.id, k);
+  for (const k of KULUPLER) { adSadele(k); KULUP.set(k.id, k); }
   aramaIndeksi();
   oneriKutusu($("#ustAra"), $("#ustOneri"), k => { location.hash = `#/kulup/${k.id}`; $("#ustAra").value = ""; });
   yonlendir();
