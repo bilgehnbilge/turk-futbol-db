@@ -219,6 +219,47 @@ def kisi_birlestir(kadro, tersi, m_, ad, okunur):
     return {x: bul(x) for x in ust if bul(x) != x}
 
 
+def istatistik_yaz(O, ad, okunur, tff, n=100):
+    """Oyuncu istatistikleri sayfası (#/oyuncular) -> tff/istatistik.json:
+    liste[yarışma][gol|mac]: ilk n oyuncu [kisi, ad, mac, gol, ilk sezon, son sezon, son kulüp];
+    krallar[sezon][kademe]: lig golü en çok olan ilk 3 [kisi, ad, gol, mac, kulüp]; kart[sari|kirmizi]: ilk 50."""
+    KAPSAM = {"tum": lambda y, k: True, "sl": lambda y, k: y == "L" and k == 1, "lig": lambda y, k: y in ("L", "T"),
+              "kupa": lambda y, k: y == "K"}
+    liste = {}
+    for kp, f in KAPSAM.items():
+        sat = []
+        for kisi, d in O.items():
+            if not kisi:
+                continue
+            rs = [(a, v) for a, v in d.items() if v[0] and f(a[2], a[3])]
+            if not rs:
+                continue
+            mac, gol = sum(v[0] for _, v in rs), sum(v[2] for _, v in rs)
+            son = max(rs, key=lambda x: (x[0][0], x[1][0]))[0]
+            sat.append([kisi, okunur(ad.get(kisi, "")), mac, gol, min(a[0] for a, _ in rs), son[0], son[1]])
+        liste[kp] = {"gol": sorted([x for x in sat if x[3]], key=lambda x: (-x[3], x[2]))[:n], "mac": sorted(sat, key=lambda x: (-x[2], -x[3]))[:n]}
+    kral = collections.defaultdict(lambda: collections.defaultdict(list))
+    for kisi, d in O.items():
+        if not kisi:
+            continue
+        top = collections.defaultdict(lambda: [0, 0, None, 0])   # (sezon, kademe) -> gol, mac, en çok oynadığı kulüp, o kulüpteki maç
+        for (sz, kid, y, kd), v in d.items():
+            if y == "L" and v[0]:
+                r = top[(sz, kd)]
+                r[0] += v[2]; r[1] += v[0]
+                if v[0] > r[3]: r[2], r[3] = kid, v[0]
+        for (sz, kd), r in top.items():
+            if r[0]:
+                kral[sz][kd].append([kisi, okunur(ad.get(kisi, "")), r[0], r[1], r[2]])
+    krallar = {sz: {str(kd): sorted(l, key=lambda x: (-x[2], x[3]))[:3] for kd, l in v.items()} for sz, v in kral.items()}
+    kart = {}
+    for i, k in ((5, "sari"), (6, "kirmizi")):
+        sat = [[kisi, okunur(ad.get(kisi, "")), sum(v[0] for v in d.values()), sum(v[i] for v in d.values())] for kisi, d in O.items() if kisi]
+        kart[k] = sorted([x for x in sat if x[3]], key=lambda x: (-x[3], x[2]))[:50]
+    yaz(os.path.join(tff, "istatistik.json"), {"alanlar": ["kisi", "ad", "mac", "gol", "ilk", "son", "son_kulup"], "liste": liste,
+        "kral_alanlar": ["kisi", "ad", "gol", "mac", "kulup"], "krallar": krallar, "kart_alanlar": ["kisi", "ad", "mac", "sayi"], "kart": kart})
+
+
 def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
     okunur = kisi_okunur_kur(o, okunur_kulup)
     m_ = {m["id"]: m for m in maclar}
@@ -487,6 +528,7 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
     for b, d in okova.items():
         yaz(os.path.join(odir, f"{b}.json"), {"alanlar": ["sezon", "kulup", "yarisma", "kademe", "mac", "ilk11", "gol", "penalti", "kendi_kalesine",
                                                          "sari", "kirmizi", "dakika", "yedek", "kaleci_mac", "gol_yemeden", "yenen_gol"], "oyuncu": d})
+    istatistik_yaz(O, ad, okunur, tff)
     yaz(os.path.join(tff, "oyuncular.json"), {"alanlar": ["kisi", "ad", "mac", "gol", "ilk", "son", "son_kulup"],
                                               "oyuncu": sorted(dizin, key=lambda x: -x[2])})
     kdir = os.path.join(tff, "kulup")
