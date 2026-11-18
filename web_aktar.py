@@ -237,7 +237,8 @@ def teknik_aktar(maclar, okunur):
                 tff[m["kaynak_id"]] = m
         o = sqlite3.connect(oy)
         kisi_ad = tff_detay.kisi_okunur_kur(o, okunur)   # yabancı adlarda I = i
-        for mac, taraf, ant, ad in o.execute("SELECT mac, taraf, kisi, ad FROM teknik"):
+        import mackolik_td   # TFF'de boş kalan teknik direktörler: Maçkolik arşivi takım fikstürleri
+        for mac, taraf, ant, ad in list(o.execute("SELECT mac, taraf, kisi, ad FROM teknik")) + mackolik_td.ek_satirlar(o):
             m = tff.get(str(mac))
             if not m:
                 continue

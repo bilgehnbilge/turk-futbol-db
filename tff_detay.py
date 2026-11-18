@@ -172,7 +172,8 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
     if erkek:
         print(f"Maçkolik arşiv kadroları ({MK_ILK}'den): {dict(ar_say)}; kadro {len(mk_kadro)} maç, yalnız olay {len(mk_olay)} maç")
     teknik = collections.defaultdict(lambda: ([], []))
-    for mac, taraf, kisi, a in o.execute("SELECT mac, taraf, kisi, ad FROM teknik"):
+    import mackolik_td   # TFF'de boş kalan teknik direktörler: Maçkolik arşivi takım fikstürleri (raw/mackolik_td/ek.json)
+    for mac, taraf, kisi, a in list(o.execute("SELECT mac, taraf, kisi, ad FROM teknik")) + (mackolik_td.ek_satirlar(o) if erkek else []):
         if int(mac) in tersi:
             teknik[int(mac)][taraf - 1].append([kisi, okunur(a)])
     hakem = collections.defaultdict(list)
