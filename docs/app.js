@@ -794,7 +794,8 @@ async function avrupaOyunculari(hedef, kid) {
 // ---------------------------------------------------------------- TFF oyuncu sayfası (lig ve kupa: TFF maç sayfalarından)
 const KADIN_KAYNAK = "TFF maç sayfaları (kadın ligleri; kadro ve goller 2008-09'dan bugüne)";
 // doğum yeri: "GARÇA-SAO PAULO-BREZİLYA" -> "Garça-Sao Paulo-Brezilya" (tire ve boşluktan sonra büyük harf)
-const okunurYer = s => String(s || "").split(/([ -])/).map(w => w.length > 2 ? w[0] + w.slice(1).replace(/I/g, "ı").replace(/İ/g, "i").toLocaleLowerCase("tr") : w).join("");
+// yabancı (uyruğu TC değil): Türkçe ı kuralı yok ("CAIRU/BA" -> "Cairu/Ba")
+const okunurYer = (s, yabanci) => String(s || "").split(/([ \-\/])/).map(w => w.length > 1 && /\p{L}/u.test(w[0]) ? (yabanci ? w[0].replace("İ", "I") : w[0]) + (yabanci ? w.slice(1).replace(/[Iİ]/g, "i").toLowerCase() : w.slice(1).replace(/I/g, "ı").replace(/İ/g, "i").toLocaleLowerCase("tr")) : w).join("");
 const tffYarAd = (yar, kademe) => yar === "L" ? (KADEME_AD[kademe] || "Lig") : YAR_AD[yar] || yar;
 async function tffOyuncuSayfa(kisi) {
   icerik.innerHTML = `<div class="yukleniyor">Yükleniyor…</div>`;
@@ -844,7 +845,7 @@ async function tffOyuncuSayfa(kisi) {
   icerik.innerHTML = `
   <div class="sayfa-bas"><div><h1>${esc(p.ad)}</h1>${p.tam ? `<p class="soluk">Tam adı: ${esc(p.tam)}</p>` : ""}
     <p class="soluk">${ilk.slice(0, 4)}–${son.slice(5) || son.slice(0, 4)} · ${kulupler.map(([k]) => kulupBag(k)).join(", ")}</p>
-    ${dogumYaz || dyer || uyruk ? `<p class="soluk">${[dogumYaz ? `Doğum: ${dogumYaz}${dyer ? `, ${esc(okunurYer(dyer))}` : ""}` : dyer ? `Doğum yeri: ${esc(okunurYer(dyer))}` : "", uyruk && uyruk !== "TC" ? `Uyruk: ${esc(uyruk)}` : ""].filter(Boolean).join(" · ")}</p>` : ""}</div></div>
+    ${dogumYaz || dyer || uyruk ? `<p class="soluk">${[dogumYaz ? `Doğum: ${dogumYaz}${dyer ? `, ${esc(okunurYer(dyer, uyruk && uyruk !== "TC"))}` : ""}` : dyer ? `Doğum yeri: ${esc(okunurYer(dyer, uyruk && uyruk !== "TC"))}` : "", uyruk && uyruk !== "TC" ? `Uyruk: ${esc(uyruk)}` : ""].filter(Boolean).join(" · ")}</p>` : ""}</div></div>
   ${uNo || tdK ? `<nav class="sekmeler bolum" id="oySekme"><a href="#" data-k="lk" class="aktif">Lig ve kupa <small class="soluk">${sayiYaz(T.mac)} maç</small></a>
     <a href="#" data-k="av">Avrupa <small class="soluk" id="avSay"></small></a><a href="#" data-k="td" hidden>Teknik direktör <small class="soluk" id="tdSay"></small></a></nav>` : ""}
   <div id="sk-lk">
