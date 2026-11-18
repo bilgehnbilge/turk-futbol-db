@@ -66,7 +66,7 @@ function cizgiGrafik(kap, { xler, seriler, bicim, yMin = null, yMax = null, yuks
   lo = Math.floor(lo / adim) * adim; hi = Math.ceil(hi / adim) * adim;
   const X = i => sol + (xler.length < 2 ? 0 : i * (W - sol - sag) / (xler.length - 1));
   const Y = v => ust + (hi - v) / (hi - lo || 1) * (H - ust - alt);
-  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, class: "grafik-svg", role: "img" });
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, class: "grafik-svg", role: "img", "aria-label": `Çizgi grafik: ${seriler.map(s => s.ad).join(", ")}` });
   for (let v = lo; v <= hi + adim / 2; v += adim) {
     el("line", { x1: sol, x2: W - sag, y1: Y(v), y2: Y(v), class: v === lo ? "eksen" : "izgara-cizgi" }, svg);
     el("text", { x: sol - 6, y: Y(v) + 4, class: "eksen-yazi", "text-anchor": "end" }, svg).textContent = bicim(v, true);

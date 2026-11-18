@@ -16,7 +16,7 @@ const cinsKart = async () => {
       <span class="mc-ad"><small>${cins === "erkek" ? "ERKEK" : "KADIN"}</small><b>${ad}</b>
       <span class="soluk">${ms.length ? `${ms[0][1].slice(0, 4)}–${ms.at(-1)[1].slice(0, 4)} · ${ms.length} maç` : ""}</span></span></a>`;
   };
-  return `<nav class="milli-cins bolum">${kart("Erkek A Milli Takımı", "#/milli", e, BOLUM === "erkek", "erkek")}${kart("Kadın A Milli Takımı", "#/kadin/milli", k, BOLUM === "kadin", "kadin")}</nav>`;
+  return `<nav class="milli-cins bolum" aria-label="Erkek ve kadın milli takımı">${kart("Erkek A Milli Takımı", "#/milli", e, BOLUM === "erkek", "erkek")}${kart("Kadın A Milli Takımı", "#/kadin/milli", k, BOLUM === "kadin", "kadin")}</nav>`;
 };
 const durum = { kat: "", onyil: "", rakip: "", tum: false };
 // bayraklar docs/bayrak/<kod>.svg: circle-flags (MIT); Doğu Almanya Wikimedia Commons'tan (CSS ile daireye kırpılıyor)
@@ -73,7 +73,7 @@ async function milliSayfa(sekme = "ozet") {
     ${macListe(liste.slice(0, 10))}
     <p class="soluk not"><a class="bag" href="#/${K}milli/maclar">Bütün maçlar →</a></p>
     <div id="milliOyuncular"></div>`;
-    const macListe = l => `<div class="tablo-kap"><table class="tablo"><thead><tr><th>Tarih</th><th class="ad">Rakip</th><th class="s">Saha</th><th class="s">Skor</th><th class="s"></th><th class="ad">Yarışma</th></tr></thead>
+    const macListe = l => `<div class="tablo-kap"><table class="tablo"><thead><tr><th>Tarih</th><th class="ad">Rakip</th><th class="s">Saha</th><th class="s">Skor</th><th class="s"><span class="gorunmez">Sonuç</span></th><th class="ad">Yarışma</th></tr></thead>
       <tbody>${l.map(m => `<tr><td class="tarih">${tarihYaz(m.tarih)}</td><td class="ad">${m.bayrak} ${esc(m.rakip)}</td><td class="s soluk">${m.saha === "E" ? "İç" : "Dış"}</td>
         <td class="s">${skorHtml(m)}</td><td class="s"><span class="son ${m.s}">${m.s}</span></td><td class="ad soluk">${esc(m.org)}</td></tr>`).join("")}</tbody></table></div>`;
     const maclarHtml = () => `${rk ? `<h2 class="bolum">${rk.bayrak} ${esc(rk.rakip)} ile oynanan maçlar</h2>
@@ -91,9 +91,9 @@ async function milliSayfa(sekme = "ozet") {
       <p class="soluk">${tarihYaz(tum[0].tarih)} – ${tarihYaz(tum.at(-1).tarih)} · ${tum.length} resmi ve özel maç</p></div></div>
     <div class="kulup-sekme"><nav class="sekmeler">${SEKME.map(([k, y, ad]) => `<a href="#/${K}milli${y}" class="${k === sekme ? "aktif" : ""}">${ad}</a>`).join("")}</nav></div>
     <div class="filtre milli-filtre bolum">
-      <select id="mKat"><option value="">Bütün maçlar</option><option value="resmi" ${durum.kat === "resmi" ? "selected" : ""}>Resmi maçlar (özel maçlar hariç)</option>
+      <select id="mKat" aria-label="Maç türü"><option value="">Bütün maçlar</option><option value="resmi" ${durum.kat === "resmi" ? "selected" : ""}>Resmi maçlar (özel maçlar hariç)</option>
         ${KAT_SIRA.map(k => `<option ${durum.kat === k ? "selected" : ""}>${k}</option>`).join("")}</select>
-      <select id="mOnyil"><option value="">Bütün yıllar</option>${onyillar.map(o => `<option value="${o}" ${durum.onyil === o ? "selected" : ""}>${o}'lar</option>`).join("")}</select>
+      <select id="mOnyil" aria-label="On yıl"><option value="">Bütün yıllar</option>${onyillar.map(o => `<option value="${o}" ${durum.onyil === o ? "selected" : ""}>${o}'lar</option>`).join("")}</select>
       ${rk && sekme !== "rakipler" ? `<span class="rozet">${rk.bayrak} ${esc(rk.rakip)} <a href="#" id="mRakipSil" title="Rakip filtresini kaldır">✕</a></span>` : ""}
     </div>
     ${!msR.length ? `<div class="bos">Bu filtreye uyan maç yok.</div>` : { ozet: ozetHtml, maclar: maclarHtml, rakipler: rakiplerHtml, rekorlar: () => rekorHtml(d, ms) }[sekme]()}`;

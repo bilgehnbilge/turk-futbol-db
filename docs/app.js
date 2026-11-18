@@ -491,7 +491,7 @@ function ozetHtml(ms) {
   const say = (b, ad, ek = "") => `<div${ek}><b>${b}</b><span>${ad}</span></div>`;
   const hucre = t => `<td class="s"><b>${sayiYaz(t.O)}</b></td><td class="s">${sayiYaz(t.G)}</td><td class="s">${sayiYaz(t.B)}</td><td class="s">${sayiYaz(t.M)}</td>
     <td class="s">${sayiYaz(t.AG)}</td><td class="s">${sayiYaz(t.YG)}</td><td class="s">${sayiYaz(t.GY)}</td><td class="s">${yuzde(t.G, t.O)}</td>`;
-  const kartlar = `<div class="kart ozet-ana"><h3>Bütün resmi maçlar</h3>
+  const kartlar = `<div class="kart ozet-ana"><h2>Bütün resmi maçlar</h2>
     <div class="ana-sayilar">${say(sayiYaz(T.O), "Maç", ' class="ilk"')}${say(sayiYaz(T.G), "Galibiyet")}${say(sayiYaz(T.B), "Beraberlik")}${say(sayiYaz(T.M), "Mağlubiyet")}
       ${say(sayiYaz(T.AG), "Attığı gol")}${say(sayiYaz(T.YG), "Yediği gol")}${say(sayiYaz(T.GY), "Gol yemediği maç")}</div>
     <div class="cubuk" aria-hidden="true"><i class="g" style="width:${yuzde(T.G, T.O)}%"></i><i class="b" style="width:${yuzde(T.B, T.O)}%"></i><i class="m" style="width:${yuzde(T.M, T.O)}%"></i></div>
@@ -689,7 +689,7 @@ async function ikiliSayfa(a, b) {
     icerik.innerHTML = `
     <div class="karsilasma">
       ${[a, b].map((id, i) => { const k = KULUP.get(id), tema = takimTema(k);
-        return `${i ? `<span class="vs">vs</span>` : ""}<a class="taraf ${i ? "sag" : ""}" href="#/${K}kulup/${id}" style="--tr:${tema ? tema["--tv-acik"] : "var(--yazi)"}">
+        return `${i ? `<span class="vs">vs</span>` : ""}<a class="taraf ${i ? "sag" : ""}" href="#/${K}kulup/${id}" style="--tr:${tema ? tema["--tv-acik"] : "var(--yazi)"};--trk:${tema ? tema["--tv-koyu"] : "var(--yazi)"}">
           <span class="buyuk-logo">${k.logo ? `<img src="logo/${k.logo}.png" alt="">` : esc(k.ad.slice(0, 2).toLocaleUpperCase("tr"))}</span>
           <span class="ad">${esc(k.ad)}</span></a>`; }).join("")}
     </div>
@@ -719,8 +719,8 @@ function karsilastirSayfa() {
   document.title = "Karşılaştır · Türk Futbol Arşivi";
   icerik.innerHTML = `<h1>İki kulübü karşılaştır</h1><p class="soluk">İki kulüp seç; aralarındaki bütün resmi maçları gör.</p>
   <div class="izgara k2" style="max-width:820px">
-    <div class="kart"><h3>1. kulüp</h3><div style="position:relative"><input id="kA" data-yalniz-kulup="1" type="search" placeholder="Kulüp ara…" autocomplete="off"><div id="oA" class="oneri" hidden></div></div><p id="sA" class="soluk"></p></div>
-    <div class="kart"><h3>2. kulüp</h3><div style="position:relative"><input id="kB" data-yalniz-kulup="1" type="search" placeholder="Kulüp ara…" autocomplete="off"><div id="oB" class="oneri" hidden></div></div><p id="sB" class="soluk"></p></div>
+    <div class="kart"><h2 class="h3"><label for="kA">1. kulüp</label></h2><div style="position:relative"><input id="kA" data-yalniz-kulup="1" type="search" placeholder="Kulüp ara…" autocomplete="off"><div id="oA" class="oneri" hidden></div></div><p id="sA" class="soluk"></p></div>
+    <div class="kart"><h2 class="h3"><label for="kB">2. kulüp</label></h2><div style="position:relative"><input id="kB" data-yalniz-kulup="1" type="search" placeholder="Kulüp ara…" autocomplete="off"><div id="oB" class="oneri" hidden></div></div><p id="sB" class="soluk"></p></div>
   </div>`;
   const yaz = () => {
     $("#sA").innerHTML = karsilastirSecim.a ? `Seçildi: <b>${esc(kulupAd(karsilastirSecim.a))}</b>` : "";
@@ -808,8 +808,8 @@ function macCiz(d) {
   const href = d.kulupHref || (kid => kid != null && KULUP.has(kid) ? `#/${K}kulup/${kid}` : null);   // kadın bölümü kendi kulüp bağlantısını verir
   const ad = ([kid, a]) => href(kid) ? `<a href="${href(kid)}">${esc(a)}</a>` : esc(a);
   const buyuk = ([kid, a], i) => { const k = d.kulupBilgi ? d.kulupBilgi(kid) : KULUP.get(kid), tema = takimTema(k);
-    return `<a class="taraf ${i ? "sag" : ""}" ${href(kid) ? `href="${href(kid)}"` : ""} style="--tr:${tema ? tema["--tv-acik"] : "var(--yazi)"}">
-      <span class="buyuk-logo">${k?.logo ? `<img src="logo/${k.logo}.png" alt="">` : d.bayrak?.[i] ? d.bayrak[i] : esc(a.slice(0, 2).toLocaleUpperCase("tr"))}</span><span class="ad">${esc(a)}</span></a>`; };
+    return `<a class="taraf ${i ? "sag" : ""}" ${href(kid) ? `href="${href(kid)}"` : ""} style="--tr:${tema ? tema["--tv-acik"] : "var(--yazi)"};--trk:${tema ? tema["--tv-koyu"] : "var(--yazi)"}">
+      <span class="buyuk-logo">${k?.logo ? `<img src="logo/${k.logo}.png" alt="">` : d.bayrak?.[i] ? d.bayrak[i] : esc(a.slice(0, 2).toLocaleUpperCase("tr"))}</span><span class="ad" title="${esc(a)}">${esc(d.kulupBilgi ? a : kisaAd(kid, a))}</span></a>`; };
   const dakika = o => o[2] == null ? "" : `${o[2]}${o[3] ? "+" + o[3] : ""}'`;
   // oyuncuya göre olay simgeleri (kadroda göstermek için)
   const simge = new Map(), ekle = (no, s) => no && simge.set(no, (simge.get(no) || "") + s);
@@ -832,6 +832,7 @@ function macCiz(d) {
   }).join("");
   icerik.innerHTML = `
   <div class="mac-bas">
+    <h1 class="gorunmez">${esc(d.ev[1])} ${eg ?? "–"}-${dg ?? "–"} ${esc(d.dep[1])}</h1>
     <div class="mac-ust soluk">${d.ustHtml || `<a class="bag" href="#/${K}sezon/${d.sezon}">${esc(d.sezon)}</a> · ${esc(d.lig)}${d.tur ? ` · ${esc(d.tur)}` : ""}`}</div>
     <div class="karsilasma mac">${buyuk(d.ev, 0)}<div class="mac-skor"><b>${eg ?? "–"} - ${dg ?? "–"}</b>${ep != null ? `<small>pen ${ep}-${dp}</small>` : durum === "UZ" ? `<small>uzatmada</small>` : ""}</div>${buyuk(d.dep, 1)}</div>
     <div class="mac-bilgi">
@@ -845,10 +846,10 @@ function macCiz(d) {
   ${d.uyum === "uyumsuz" ? `<p class="uyari bolum">TFF'nin bu maç için verdiği gol listesi skorla uyuşmuyor; kaynakta bir yazım hatası var. Goller TFF'de yazıldığı gibi gösteriliyor.</p>` : ""}
   ${d.uyum === "yok" ? `<p class="soluk not bolum">TFF bu maçın gollerini kaydetmemiş.</p>` : ""}
   ${istatHtml(d)}
-  ${d.olay.length ? `<div class="kart bolum"><h3>Maçın akışı</h3><div class="akis">${akis}</div></div>` : ""}
+  ${d.olay.length ? `<div class="kart bolum"><h2 class="h3">Maçın akışı</h2><div class="akis">${akis}</div></div>` : ""}
   ${d.kadro[0].length || d.kadro[1].length ? `<div class="izgara iki bolum ust-hiza">
-    <div class="kart"><h3>${ad(d.ev)}</h3>${kadroHtml(d.kadro[0], d.teknik[0])}</div>
-    <div class="kart"><h3>${ad(d.dep)}</h3>${kadroHtml(d.kadro[1], d.teknik[1])}</div>
+    <div class="kart"><h2 class="h3">${ad(d.ev)}</h2>${kadroHtml(d.kadro[0], d.teknik[0])}</div>
+    <div class="kart"><h2 class="h3">${ad(d.dep)}</h2>${kadroHtml(d.kadro[1], d.teknik[1])}</div>
   </div>` : ""}
   <p class="soluk not bolum">${d.olayKaynak ? `Kadro: <a class="bag" href="https://www.tff.org/Default.aspx?pageID=29&macId=${d.tff}" target="_blank" rel="noopener">TFF maç sayfası</a>; goller, kartlar ve değişiklikler: ${esc(d.olayKaynak)}`
     : d.kaynak === "Maçkolik" ? (d.kadro[0].length ? "Kadro, goller, kartlar ve oyuncu değişiklikleri: Maçkolik arşivi" : "Goller, kartlar ve oyuncu değişiklikleri: Maçkolik. Bu dönemin kadroları henüz yok")
@@ -874,7 +875,7 @@ function istatHtml(d) {
   });
   if (satir.filter(Boolean).length < 2) return "";
   const [ta, tb] = [takimTema(KULUP.get(d.ev[0])), takimTema(KULUP.get(d.dep[0]))];
-  return `<div class="kart bolum istatlar" style="--ia:${ta ? ta["--tv-acik"] : "var(--yazi2)"};--ib:${tb ? tb["--tv-acik"] : "var(--soluk)"}"><h3>İstatistikler</h3>${satir.join("")}</div>`;
+  return `<div class="kart bolum istatlar" style="--ia:${ta ? ta["--tv-acik"] : "var(--yazi2)"};--ib:${tb ? tb["--tv-acik"] : "var(--soluk)"}"><h2 class="h3">İstatistikler</h2>${satir.join("")}</div>`;
 }
 
 // kulüp özeti: Avrupa'da en çok gol atan ve en çok maça çıkan oyuncular (UEFA)
@@ -1318,8 +1319,8 @@ async function avrupaUlkeler() {
     kap.innerHTML = `<h2>Avrupa'da ülkelere göre</h2>
       <p class="soluk not">Türk kulüplerinin Avrupa kupası maçları, rakibin ülkesine göre. Bir ülkeye tıklayınca o ülke takımlarıyla oynanan maçlar açılır.</p>
       <div class="filtre">
-        <select id="avKulup"><option value="">Bütün Türk kulüpleri</option>${kulupler.map(([id, n]) => `<option value="${id}" ${+D.kulup === id ? "selected" : ""}>${esc(kulupAd(id))} (${n})</option>`).join("")}</select>
-        <select id="avYar"><option value="">Bütün kupalar</option>${ligler.map(y => `<option ${D.yar === y ? "selected" : ""}>${esc(y)}</option>`).join("")}</select>
+        <select id="avKulup" aria-label="Kulüp"><option value="">Bütün Türk kulüpleri</option>${kulupler.map(([id, n]) => `<option value="${id}" ${+D.kulup === id ? "selected" : ""}>${esc(kulupAd(id))} (${n})</option>`).join("")}</select>
+        <select id="avYar" aria-label="Kupa"><option value="">Bütün kupalar</option>${ligler.map(y => `<option ${D.yar === y ? "selected" : ""}>${esc(y)}</option>`).join("")}</select>
         <span class="soluk">${top.O} maç · ${top.G}G ${top.B}B ${top.M}M · ${top.AG}-${top.YG}</span>
       </div>
       <div class="tablo-kap"><table class="tablo"><thead><tr>
@@ -1387,6 +1388,7 @@ async function sezonSayfa(sezon) {
     <div class="yan-yana">${onceki ? `<a class="cip" href="#/${K}sezon/${onceki}">← ${onceki}</a>` : ""}${sonraki ? `<a class="cip" href="#/${K}sezon/${sonraki}">${sonraki} →</a>` : ""}</div></div>
   <p class="soluk">${ms.length} maç · Puan tabloları sonuçlardan hesaplandı (galibiyet ${p} puan; puan silme ve averaj kuralı farkları dahil değil).</p>
   <nav class="sekmeler">${sirali.length ? `<a href="#lig" data-k="lig" class="aktif">Lig</a>` : ""}${po.length ? `<a href="#po" data-k="po">Play-off / baraj</a>` : ""}${kupa.length ? `<a href="#kupa" data-k="kupa">Türkiye Kupası</a>` : ""}${ozel.map(o => `<a href="#${o.k}" data-k="${o.k}">${esc(o.lig)}</a>`).join("")}${avrupa.length ? `<a href="#avrupa" data-k="avrupa">Avrupa</a>` : ""}</nav>
+  <h2 class="gorunmez">Puan tabloları</h2>
   <div id="sz-lig" class="izgara puan">${sirali.map(tabloHtml).join("") || ""}</div>
   <div id="sz-po" hidden><p class="soluk not">Normal sezondan sonra oynanan yükselme play-off'ları, düşme barajları ve gruplar arası final maçları. Puan tablolarına girmez. Turlar (yarı final, final...) TFF'nin yazdığı yerde ondan, yazmadığı yerde eşleşmelerden çıkarıldı.</p>
     ${playoffHtml(po, ms)}</div>
