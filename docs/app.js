@@ -424,22 +424,25 @@ function filtreBagla(d, yenidenYukle, ciz) {
   $("#fOncul")?.addEventListener("change", e => { d.oncul = e.target.checked; yenidenYukle(); });
 }
 
-function ozetSatir(t) {
-  return `<div class="ozet-sat">
-    <div><b>${sayiYaz(t.O)}</b><span>Maç</span></div><div><b>${sayiYaz(t.G)}</b><span>Galibiyet</span></div>
-    <div><b>${sayiYaz(t.B)}</b><span>Beraberlik</span></div><div><b>${sayiYaz(t.M)}</b><span>Mağlubiyet</span></div>
-    <div><b>${sayiYaz(t.AG)}</b><span>Attığı</span></div><div><b>${sayiYaz(t.YG)}</b><span>Yediği</span></div>
-    <div><b>${sayiYaz(t.GY)}</b><span>Gol yemediği</span></div>
-  </div>
-  <div class="cubuk"><i class="g" style="width:${yuzde(t.G, t.O)}%"></i><i class="b" style="width:${yuzde(t.B, t.O)}%"></i><i class="m" style="width:${yuzde(t.M, t.O)}%"></i></div>
-  <p class="soluk" style="margin:8px 0 0;font-size:13px">Galibiyet oranı %${yuzde(t.G, t.O)} · Kalesini gole kapattığı maç %${yuzde(t.GY, t.O)} · Maç başı ${(t.AG / Math.max(t.O, 1)).toFixed(2)} – ${(t.YG / Math.max(t.O, 1)).toFixed(2)} gol</p>`;
-}
 function ozetHtml(ms) {
-  const bolumler = [["", "Bütün resmi maçlar"], ["L", "Lig"], ["K", "Türkiye Kupası"], ["O", "Diğer kupalar (Cumhurbaşkanlığı, Başbakanlık, Atatürk Kupası, TFF Süper Kupa)"], ["A", "Avrupa kupaları"], ["T", "Terfi maçları"]];
-  const kartlar = bolumler.map(([y, ad]) => {
-    const alt = ms.filter(m => !y || m.yar === y); if (!alt.length) return "";
-    return `<div class="kart"><h3>${ad}</h3>${ozetSatir(toplam(alt))}</div>`;
-  }).join("");
+  // bütün resmi maçlar öne çıkan kartta; yarışmalar (lig, kupalar…) altında tek tabloda, toplam satırı en altta
+  const T = toplam(ms);
+  const bolumler = [["L", "Lig"], ["K", "Türkiye Kupası"], ["A", "Avrupa kupaları"],
+    ["O", "Diğer kupalar", "Cumhurbaşkanlığı, Başbakanlık, Atatürk Kupası, TFF Süper Kupa"], ["T", "Terfi maçları"]]
+    .map(([y, ad, acik]) => { const alt = ms.filter(m => m.yar === y); return alt.length ? [ad, acik, toplam(alt)] : null; }).filter(Boolean);
+  const say = (b, ad, ek = "") => `<div${ek}><b>${b}</b><span>${ad}</span></div>`;
+  const hucre = t => `<td class="s"><b>${sayiYaz(t.O)}</b></td><td class="s">${sayiYaz(t.G)}</td><td class="s">${sayiYaz(t.B)}</td><td class="s">${sayiYaz(t.M)}</td>
+    <td class="s">${sayiYaz(t.AG)}</td><td class="s">${sayiYaz(t.YG)}</td><td class="s">${sayiYaz(t.GY)}</td><td class="s">${yuzde(t.G, t.O)}</td>`;
+  const kartlar = `<div class="kart ozet-ana"><h3>Bütün resmi maçlar</h3>
+    <div class="ana-sayilar">${say(sayiYaz(T.O), "Maç", ' class="ilk"')}${say(sayiYaz(T.G), "Galibiyet")}${say(sayiYaz(T.B), "Beraberlik")}${say(sayiYaz(T.M), "Mağlubiyet")}
+      ${say(sayiYaz(T.AG), "Attığı gol")}${say(sayiYaz(T.YG), "Yediği gol")}${say(sayiYaz(T.GY), "Gol yemediği maç")}</div>
+    <div class="cubuk" aria-hidden="true"><i class="g" style="width:${yuzde(T.G, T.O)}%"></i><i class="b" style="width:${yuzde(T.B, T.O)}%"></i><i class="m" style="width:${yuzde(T.M, T.O)}%"></i></div>
+    <p class="soluk ana-oran">Galibiyet oranı <b>%${yuzde(T.G, T.O)}</b> · Kalesini gole kapattığı maç <b>%${yuzde(T.GY, T.O)}</b> · Maç başı <b>${(T.AG / Math.max(T.O, 1)).toFixed(2)} – ${(T.YG / Math.max(T.O, 1)).toFixed(2)}</b> gol</p></div>
+  ${bolumler.length > 1 ? `<div class="tablo-kap bolum"><table class="tablo"><thead><tr><th>Yarışma</th><th class="s">Maç</th><th class="s" title="Galibiyet">G</th><th class="s" title="Beraberlik">B</th><th class="s" title="Mağlubiyet">M</th>
+    <th class="s">Attığı</th><th class="s">Yediği</th><th class="s" title="Gol yemediği maç">Gol yemeden</th><th class="s" title="Maçların yüzde kaçını kazandı">Galibiyet (%)</th></tr></thead><tbody>
+    ${bolumler.map(([ad, acik, t]) => `<tr><td${acik ? ` title="${acik}"` : ""}>${ad}${acik ? `<small class="soluk"> *</small>` : ""}</td>${hucre(t)}</tr>`).join("")}
+    <tr class="toplam"><td>Toplam</td>${hucre(T)}</tr></tbody></table></div>
+    ${bolumler.some(x => x[1]) ? `<p class="soluk not">* Diğer kupalar: ${bolumler.find(x => x[1])[1]}.</p>` : ""}` : ""}`;
   const son = ms.filter(m => m.s !== "N" && m.tarih).slice(-10).reverse();
   const ligBas = {}, eskiAd = {};
   for (const m of ms) if (m.yar === "L" && m.kademe) {
@@ -452,7 +455,7 @@ function ozetHtml(ms) {
     return `<p style="margin:6px 0"><b>${KADEME_AD[kd]}</b>: ${ss.length} sezon <span class="soluk">(${ss[0].slice(0, 4)}–${ss.at(-1).slice(-4)})</span>
       ${eski.length ? `<br><small class="soluk">Dönemin adıyla: ${eski.map(esc).join(", ")}</small>` : ""}</p>`;
   };
-  return `<div class="izgara k2">${kartlar}</div>
+  return `${kartlar}
   <div class="kart viz" id="yolculuk" hidden></div>
   <div class="kart viz" id="elo" hidden></div>
   <div class="bolum izgara k2">

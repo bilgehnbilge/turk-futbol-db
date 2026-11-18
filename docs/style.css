@@ -215,6 +215,15 @@ a.kart p { margin: 0; font-size: 14px; }
 .ozet-sat div { background: var(--yuzey2); border-radius: var(--r2); padding: 10px 6px; text-align: center; }
 .ozet-sat b { display: block; font-size: 1.3rem; font-weight: 750; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
 .ozet-sat span { font-size: 11.5px; color: var(--soluk); font-weight: 500; }
+.ozet-ana h3 { margin-bottom: 14px; }
+.ana-sayilar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px 18px; }
+.ana-sayilar div { min-width: 0; }
+.ana-sayilar b { display: block; font-size: clamp(1.4rem, 2.6vw, 2rem); font-weight: 750; letter-spacing: -.03em; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.ana-sayilar .ilk b { color: var(--vurgu); }
+.ana-sayilar span { display: block; font-size: 12.5px; line-height: 1.3; color: var(--soluk); font-weight: 500; }
+.ana-oran { margin: 10px 0 0; font-size: 13.5px; }
+.ana-oran b { color: var(--yazi); font-variant-numeric: tabular-nums; }
+@media (max-width: 760px) { .ana-sayilar { grid-template-columns: repeat(3, 1fr); gap: 12px; } .ana-sayilar .ilk { grid-column: span 3; } .ana-sayilar .ilk b { font-size: 2.2rem; } }
 .cubuk { display: flex; height: 6px; border-radius: 99px; overflow: hidden; margin-top: 14px; background: var(--yuzey2); gap: 2px; }
 .cubuk i { display: block; border-radius: 99px; }
 .cubuk .g { background: var(--g); } .cubuk .b { background: var(--b); } .cubuk .m { background: var(--m); }
