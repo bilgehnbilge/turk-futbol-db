@@ -404,6 +404,8 @@ def main():
             "alanlar": ["id", "tarih", "yarisma", "lig", "kademe", "grup_tur", "playoff", "ev_id", "ev", "dep_id", "dep",
                         "ev_gol", "dep_gol", "ev_pen", "dep_pen", "durum", "not"],
             "maclar": ms})
+    import bugun   # ana sayfa "Bugün tarihte": gün başına seçilmiş lig ve kupa maçları
+    bugun.main(os.path.join(CIKTI, "sezon"), os.path.join(CIKTI, "bugun.json"))
 
     # ---- Avrupa maçları (ülkelere göre karşılaştırma için tek dosya)
     yaz(os.path.join(CIKTI, "avrupa.json"), {"ad_ulke": {k[3:]: v for k, v in ulke_es.items() if k.startswith("ad:")},
