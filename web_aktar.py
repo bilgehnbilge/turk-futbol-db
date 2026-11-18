@@ -179,6 +179,10 @@ def mac_detay(maclar, okunur):
         out.append(mid)
         mac_tarih[mid] = m["tarih"]
     kullanilan = {k[0] for k in katilim}
+    for k_, v in json.load(open(os.path.join(KOK, "dogum_duzeltme.json"), encoding="utf-8")).items():   # elle düzeltilen UEFA doğum tarihleri
+        p_ = next((x for x in (k_[1:], int(k_[1:]) if k_[1:].isdigit() else None) if x in oyuncular), None) if k_.startswith("u") else None
+        if p_ is not None:
+            oyuncular[p_][1] = v[0]
     # UEFA bazı oyunculara adaşının doğum tarihini yazmış (ör. 1976-85 Galatasaray'da oynayan Ömer Kılıç'a 1971 doğumlu
     # Bursasporlu Ömer Kılıç'ınki): ilk Avrupa maçında 15 yaşından küçük görünen oyuncunun doğum tarihi gösterilmez
     ilk_mac = {}

@@ -15,7 +15,7 @@ import collections, datetime, json, os, shutil, sqlite3
 
 KOK = os.path.dirname(os.path.abspath(__file__))
 # elle düzeltilen TFF doğum tarihleri (TFF kişi no -> tarih)
-DOGUM_DUZELT = {int(k): v[0] for k, v in json.load(open(os.path.join(KOK, "dogum_duzeltme.json"), encoding="utf-8")).items() if k[0] != "_"}
+DOGUM_DUZELT = {int(k): v[0] for k, v in json.load(open(os.path.join(KOK, "dogum_duzeltme.json"), encoding="utf-8")).items() if k.isdigit()}
 OYUNCU_DB = os.path.join(KOK, "raw", "oyuncu.db")
 KUPA_ES = os.path.join(KOK, "tff_kupa_eslesme.json")   # Maçkolik kupa maçı -> TFF maç no (1990-2007 kupa sayfaları)
 YAR = {"lig": "L", "kupa": "K", "ozel_kupa": "O", "avrupa": "A", "terfi": "T"}
