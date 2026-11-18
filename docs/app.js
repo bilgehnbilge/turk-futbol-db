@@ -793,11 +793,13 @@ async function avrupaOyunculari(hedef, kid) {
 
 // ---------------------------------------------------------------- TFF oyuncu sayfası (lig ve kupa: TFF maç sayfalarından)
 const KADIN_KAYNAK = "TFF maç sayfaları (kadın ligleri; kadro ve goller 2008-09'dan bugüne)";
-const okunurYer = s => String(s || "").split(" ").map(w => w.length > 2 ? w[0] + w.slice(1).replace(/I/g, "ı").replace(/İ/g, "i").toLocaleLowerCase("tr") : w).join(" ");
+// doğum yeri: "GARÇA-SAO PAULO-BREZİLYA" -> "Garça-Sao Paulo-Brezilya" (tire ve boşluktan sonra büyük harf)
+const okunurYer = s => String(s || "").split(/([ -])/).map(w => w.length > 2 ? w[0] + w.slice(1).replace(/I/g, "ı").replace(/İ/g, "i").toLocaleLowerCase("tr") : w).join("");
 const tffYarAd = (yar, kademe) => yar === "L" ? (KADEME_AD[kademe] || "Lig") : YAR_AD[yar] || yar;
 async function tffOyuncuSayfa(kisi) {
   icerik.innerHTML = `<div class="yukleniyor">Yükleniyor…</div>`;
   const d = await al(`${V}tff/o/${kisi % 500}.json?s=${OZET.surum || ""}`), p = d.oyuncu[kisi];
+  if (p?.bk) { location.replace(`#/${K}oyuncu/k${p.bk}`); return; }   // TFF'nin aynı kişiye verdiği ikinci numara
   if (!p) {   // kulüp kaydı yok (ör. yalnız yurt dışında oynamış milli futbolcu): yalnız milli takım bölümü
     icerik.innerHTML = `<div id="milliOyuncu"></div>`;
     if (typeof milliOyuncu === "function" && await milliOyuncu($("#milliOyuncu"), kisi, true)) return;
@@ -840,7 +842,7 @@ async function tffOyuncuSayfa(kisi) {
   const [dg, dyer, uyruk] = p.d || [];
   const dogumYaz = dg ? (["01-01", "07-01"].includes(dg.slice(5)) ? dg.slice(0, 4) : tarihYaz(dg)) : null;
   icerik.innerHTML = `
-  <div class="sayfa-bas"><div><h1>${esc(p.ad)}</h1>
+  <div class="sayfa-bas"><div><h1>${esc(p.ad)}</h1>${p.tam ? `<p class="soluk">Tam adı: ${esc(p.tam)}</p>` : ""}
     <p class="soluk">${ilk.slice(0, 4)}–${son.slice(5) || son.slice(0, 4)} · ${kulupler.map(([k]) => kulupBag(k)).join(", ")}</p>
     ${dogumYaz || dyer || uyruk ? `<p class="soluk">${[dogumYaz ? `Doğum: ${dogumYaz}${dyer ? `, ${esc(okunurYer(dyer))}` : ""}` : dyer ? `Doğum yeri: ${esc(okunurYer(dyer))}` : "", uyruk && uyruk !== "TC" ? `Uyruk: ${esc(uyruk)}` : ""].filter(Boolean).join(" · ")}</p>` : ""}</div></div>
   ${uNo || tdK ? `<nav class="sekmeler bolum" id="oySekme"><a href="#" data-k="lk" class="aktif">Lig ve kupa <small class="soluk">${sayiYaz(T.mac)} maç</small></a>
@@ -880,7 +882,9 @@ async function tffOyuncuSayfa(kisi) {
       for (const k of ["lk", "av", "td"]) $("#sk-" + k).hidden = a.dataset.k !== k;
     }));
   }
-  if (typeof milliOyuncu === "function") milliOyuncu($("#milliOyuncu"), kisi, false);
+  if (typeof milliOyuncu === "function") {   // milli takım kaydı birleşmiş ikinci numarada olabilir
+    for (const k of [kisi, ...(p.es || [])]) if (await milliOyuncu($("#milliOyuncu"), k, false)) break;
+  }
 }
 
 // kulüp rekorları sekmesi: oyuncu rekorları (TFF maç sayfaları; filtreden bağımsız)

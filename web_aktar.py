@@ -259,13 +259,29 @@ def teknik_aktar(maclar, okunur):
         ilk_td = {}
         for r in satir:
             ilk_td[r[0]] = min(ilk_td.get(r[0], r[3]), r[3])
+        oy_no = {r[0] for l in ad_oy.values() for r in l}
+        td_kulup = collections.defaultdict(set)
+        for r in satir:
+            td_kulup[r[0]].add(r[2])
         for k_, (a_, u_) in kisi.items():
             if u_ and str(u_) in bag_:
                 oy_[k_] = bag_[str(u_)]
                 continue
+            if k_.startswith("a") and k_[1:].isdigit():   # TFF'de antrenör no çoğu zaman oyuncu no'suyla aynı (aynı kişi kaydı)
+                n_ = tff_detay.BIRLES.get(int(k_[1:]), int(k_[1:]))
+                if n_ in oy_no:
+                    oy_[k_] = n_
+                    continue
             l = ad_oy.get(sade(a_), [])
             if len(l) == 1 and k_ in ilk_td and l[0][4] <= ilk_td[k_]:
                 oy_[k_] = l[0][0]
+            elif len(l) > 1 and k_ in ilk_td:   # adaşlar: oyunculuğu teknik direktörlükten önce biten ve son kulübünü çalıştırmış tek kişi
+                aday = [r for r in l if r[5] <= ilk_td[k_] and r[6] in td_kulup[k_]]
+                once = sorted((r for r in l if r[4] <= ilk_td[k_]), key=lambda r: -r[2])
+                if len(aday) == 1:
+                    oy_[k_] = aday[0][0]
+                elif once and ((len(once) == 1 and once[0][2] >= 10) or (once[0][2] >= 30 and all(r[2] <= 3 for r in once[1:]))):   # teknik direktörlükten önce başlamış tek oyuncu ya da çok maçlı tek oyuncu (ötekiler 1-3 maçlık adaş)
+                    oy_[k_] = once[0][0]
     print(f"teknik direktör - oyuncu birleşmesi: {len(oy_)} kişi")
     yaz(os.path.join(CIKTI, "teknik.json"), {"kisi": kisi, "tff": ant_, "oyuncu": oy_, "alanlar": ["kisi", "mac", "kulup", "sezon", "yarisma", "attigi", "yedigi", "tarih"],
                                              "maclar": sorted(satir, key=lambda x: (x[0], x[7] or ""))})

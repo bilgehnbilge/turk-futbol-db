@@ -87,8 +87,14 @@ def yukle(maclar, bag, c):
     return out, say
 
 
-def kisi_esle(ar, kadro, ad):
-    """1990-91: aynı maç ve taraftaki ad benzerliğiyle arşiv oyuncu no -> TFF kişi no (çoğunluk oyu)."""
+def kisi_esle(ar, kadro, ad, sezon=None, kulup=None):
+    """Arşiv oyuncu no -> TFF kişi no.
+    1. 1990-91: aynı maç ve taraftaki ad benzerliği (çoğunluk oyu).
+    2. Kalanlar: tam ad (aksan ve büyük/küçük harf farkı gözetmeden) TFF'de tek bir kişide geçiyorsa, o kişi başka bir arşiv
+       oyuncusuna bağlanmadıysa ve iki kariyer aynı sezonda çakışmıyorsa (TFF'deki ilk sezon arşivdeki son sezondan sonra).
+    3. Adı TFF'de birden çok kişide geçenler: arşivdeki son kulübünde, arşivin son sezonunda ya da hemen sonrakinde TFF
+       kariyerine başlayan tek kişi.
+       sezon: TFF maç no -> sezon; kulup(TFF maç no, TFF tarafı 0/1) -> kulüp."""
     oy = collections.defaultdict(collections.Counter)
     for t, (ters, d) in ar.items():
         if t not in kadro:
@@ -99,7 +105,50 @@ def kisi_esle(ar, kadro, ad):
                 p = sorted(((ad_puani(a, ad.get(k, "")), k) for _, k, _ in tl), reverse=True)
                 if p and p[0][0] >= 0.5 and (len(p) == 1 or p[0][0] - p[1][0] >= 0.2):
                     oy[pid][p[0][1]] += 1
-    return {pid: c.most_common(1)[0][0] for pid, c in oy.items()}
+    es = {pid: c.most_common(1)[0][0] for pid, c in oy.items()}
+    if sezon is None:
+        return es
+    from oyuncu_bag import sade
+    tff_ad = collections.defaultdict(set)   # ad -> TFF kişileri
+    tff_ilk = {}
+    tff_ilk_k = {}
+    for t, taraflar in list(kadro.items()):
+        s = sezon.get(t)
+        for i, taraf in enumerate(taraflar):
+            for _, k, _ in taraf:
+                if k and k < MK:
+                    tff_ad[" ".join(sade(ad.get(k, "")))].add(k)
+                    if s and (k not in tff_ilk or s < tff_ilk[k]):
+                        tff_ilk[k] = s
+                        tff_ilk_k[k] = kulup(t, i) if kulup else None
+    ar_ad, ar_son, ar_son_k = {}, {}, {}
+    for t, (ters, d) in ar.items():
+        s = sezon.get(t)
+        for i, l in enumerate((d["h"], d["a"])):
+            for pid, a, _ in l:
+                if pid:
+                    ar_ad[pid] = a
+                    if s and s > ar_son.get(pid, ""):
+                        ar_son[pid] = s
+                        ar_son_k[pid] = kulup(t, i ^ ters) if kulup else None
+    kullanilan = set(es.values())
+    ad_say = collections.Counter(" ".join(sade(a)) for p, a in ar_ad.items() if p not in es)
+    for pid, a in ar_ad.items():
+        if pid in es:
+            continue
+        s_ = " ".join(sade(a))
+        l = tff_ad.get(s_, set())
+        if len(l) == 1 and ad_say[s_] == 1:
+            k = next(iter(l))
+            if k not in kullanilan and tff_ilk.get(k, "9999") > ar_son.get(pid, ""):
+                es[pid] = k; kullanilan.add(k)
+        elif len(l) > 1 and kulup and pid in ar_son:
+            son = ar_son[pid]
+            aday = [k for k in l if k not in kullanilan and k in tff_ilk and tff_ilk_k.get(k) == ar_son_k.get(pid)
+                    and son <= tff_ilk[k] and int(tff_ilk[k][:4]) - int(son[:4]) <= 1]
+            if len(aday) == 1:
+                es[pid] = aday[0]; kullanilan.add(aday[0])
+    return es
 
 
 def kat(ar, es, kadro, olay, ad, ilk_sira, ilk_say, bas_say):

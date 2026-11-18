@@ -18,6 +18,7 @@ KOK = os.path.dirname(os.path.abspath(__file__))
 D = os.path.join(KOK, "docs", "data")
 KISI_DB = os.path.join(KOK, "raw", "kisi.db")
 CIKTI = os.path.join(D, "oyuncu_bag.json")
+BILINEN = os.path.join(KOK, "bilinen_ad.json")
 
 
 def sade(s):
@@ -64,6 +65,8 @@ def bagla(yaz=None):
     tks, tad = collections.defaultdict(set), {}
     for f in glob.glob(os.path.join(D, "tff", "o", "*.json")):
         for kisi, v in json.load(open(f, encoding="utf-8"))["oyuncu"].items():
+            if "s" not in v:
+                continue   # birleşmiş ikinci numara (bk: asıl numara)
             tad[kisi] = v["ad"]
             for r in v["s"]:
                 if r[4]:
@@ -98,6 +101,10 @@ def bagla(yaz=None):
         say["eşlendi (doğum da tuttu)" if puan[0][2] else "eşlendi (doğum bilinmiyor)"] += 1
     yaz = yaz or (lambda y, v: json.dump(v, open(y, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":")))
     yaz(CIKTI, bag)
+    # Brezilyalı oyuncuların bilinen adları (UEFA "Alex", TFF "ALEXSANDRO DE SOUZA") -> bilinen_ad.json (depoda; tff_detay
+    # bir sonraki çalıştırmada sitedeki adı buradan alır, tam adı ayrıca gösterir)
+    bilinen = {str(k): u["oyuncu"][p][0] for p, k in sorted(bag.items(), key=lambda x: x[1]) if u["oyuncu"][p][2] == "BRA"}
+    json.dump(bilinen, open(BILINEN, "w", encoding="utf-8"), ensure_ascii=False, indent=0)
     avrupa_yas(bag, yaz)
     print("UEFA-TFF oyuncu eşlemesi:", dict(say), "->", CIKTI)
     return bag

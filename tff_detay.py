@@ -121,12 +121,68 @@ def kisi_okunur_kur(o, okunur):
         if not a or any(ch.islower() for ch in a):
             return a
         if TR_HARF & set(a):
-            return okunur(a)
-        return " ".join(w.lower() if w in EDAT else okunur(w) if w in tr else okunur(w.replace("I", "İ")) for w in a.split())
+            s = okunur(a)
+        else:
+            s = " ".join(okunur(w) if w in tr else okunur(w.replace("I", "İ")) for w in a.split())
+        # bağlaçlar (DE, DA, DOS…) ilk kelime değilse küçük: "Roberto Carlos da Silva Rocha"
+        # okunur kısa kelimeleri büyük bırakıyor ("EL", "DE"): baştaki büyük harf kalır, gerisi küçülür
+        w = [x[0] + x[1:].replace("I", "ı").replace("İ", "i").lower() if len(x) > 1 and x.isupper() and x.isalpha() else x for x in s.split()]
+        return " ".join([w[0]] + [x.lower() if x.upper().replace("İ", "I") in BAGLAC else x for x in w[1:]]) if w else s
     return f
 
 
+BAGLAC = {"DE", "DA", "DO", "DOS", "DAS", "DI", "DU", "DEL", "VAN", "VON", "DER"}   # ad içinde küçük yazılan bağlaçlar
 EDAT = {"DE", "DA", "DO", "DOS", "DAS", "DI", "DU", "DEL", "VAN", "VON", "DER", "DEN", "LA", "LE", "EL"}
+
+
+BIRLES = {}   # ikinci TFF numarası -> asıl numara (maclari_yaz doldurur)
+
+
+def kisi_birlestir(kadro, tersi, m_, ad, okunur):
+    """TFF bazen aynı oyuncuya iki kişi numarası veriyor (Erkan Sözeri: 21807 ve 547117). Aynı ad (aksansız), aynı sezon
+    aynı kulüpte oynamış ve hiçbir maçta birlikte kadroda olmayan numaralar tek kişi sayılır; asıl numara çok maçlı olan.
+    Dönen: {ikinci no: asıl no}."""
+    from oyuncu_bag import sade
+    S = lambda x: " ".join(sade(okunur(ad.get(x, ""))))
+    grup = collections.defaultdict(set)   # (ad, sezon, kulüp) -> kişiler
+    birlikte = set()
+    mac_say = collections.Counter()
+    for t_, k_ in kadro.items():
+        f_ = tersi.get(t_)
+        if not f_:
+            continue
+        m = m_[f_[0]]
+        for i, taraf in enumerate(k_):
+            kid = m["ev_kulup"] if (i == 0) != bool(f_[1]) else m["dep_kulup"]
+            adlar = collections.defaultdict(list)
+            for p in taraf:
+                if p[1]:
+                    mac_say[p[1]] += 1
+                    adlar[S(p[1])].append(p[1])
+            for a_, l in adlar.items():
+                grup[(a_, m["sezon"], kid)].update(l)
+                for x in l:
+                    for y in l:
+                        if x != y:
+                            birlikte.add((x, y))
+    ust = {}
+    def bul(x):
+        while ust.get(x, x) != x:
+            x = ust[x]
+        return x
+    for (a_, _, _), l in grup.items():
+        if not a_ or len(l) < 2:
+            continue
+        l = sorted(l, key=lambda x: -mac_say[x])
+        for x in l[1:]:
+            if (l[0], x) in birlikte:
+                continue
+            ra, rx = bul(l[0]), bul(x)
+            if ra != rx:
+                if mac_say[rx] > mac_say[ra]:
+                    ra, rx = rx, ra
+                ust[rx] = ra
+    return {x: bul(x) for x in ust if bul(x) != x}
 
 
 def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
@@ -161,16 +217,39 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
         if int(mac) in tersi:
             olay[int(mac)].append([taraf, "S", d1, d2 or 0, cikan, giren, None])
             ad.setdefault(giren, gad); ad.setdefault(cikan, cad)
+    # bilinen adlar (Brezilyalı oyuncular, oyuncu_bag.py -> bilinen_ad.json): sitede bu ad, oyuncu sayfasında tam ad da
+    tam_ad = {}
+    if os.path.basename(OYUNCU_DB) == "oyuncu.db" and os.path.exists(os.path.join(KOK, "bilinen_ad.json")):
+        for k_, a_ in json.load(open(os.path.join(KOK, "bilinen_ad.json"), encoding="utf-8")).items():
+            if int(k_) in ad:
+                tam_ad[int(k_)] = okunur(ad[int(k_)])
+                ad[int(k_)] = a_
     # 1959-1991 Süper Lig: Maçkolik arşiv kadroları ve olayları (mackolik_oyuncu.py)
     import mackolik_oyuncu as MO
     erkek = os.path.basename(OYUNCU_DB) == "oyuncu.db"   # kadın verisi (kadin_site.py) aynı kodla geçer: arşiv yalnız erkek
     ar, ar_say = MO.yukle(maclar, bag, c) if erkek else ({}, {})
-    mk_kadro, mk_olay = MO.kat(ar, MO.kisi_esle(ar, kadro, ad), kadro, olay, ad, ilk_sira, ilk_say, bas_say)
+    mk_kadro, mk_olay = MO.kat(ar, MO.kisi_esle(ar, kadro, ad, {t_: m_[f_]["sezon"] for t_, (f_, _) in tersi.items()},
+                                                    lambda t_, i: m_[tersi[t_][0]]["ev_kulup" if (i == 0) != bool(tersi[t_][1]) else "dep_kulup"]), kadro, olay, ad, ilk_sira, ilk_say, bas_say)
     global MK_ILK
     if erkek:
         MK_ILK = min((m["sezon"] for m in maclar if m["id"] in bag and bag[m["id"]][0] in mk_kadro), default=None)
     if erkek:
         print(f"Maçkolik arşiv kadroları ({MK_ILK}'den): {dict(ar_say)}; kadro {len(mk_kadro)} maç, yalnız olay {len(mk_olay)} maç")
+    # TFF'nin aynı kişiye verdiği ikinci numaralar: aynı ad, aynı sezon aynı kulüpte oynamış, hiçbir maçta birlikte değil
+    global BIRLES
+    BIRLES = kisi_birlestir(kadro, tersi, m_, ad, okunur) if erkek else {}
+    if BIRLES:
+        b_ = lambda k_: BIRLES.get(k_, k_)
+        for t_, k_ in list(kadro.items()):
+            kadro[t_] = tuple([[p[0], b_(p[1]), p[2]] for p in taraf] for taraf in k_)
+        for t_, l in olay.items():
+            for x in l:
+                x[4] = b_(x[4]); x[5] = b_(x[5]) if x[5] else x[5]
+        for k_ in list(ilk_sira):
+            ilk_sira[k_] = b_(ilk_sira[k_])
+        for es, ana in BIRLES.items():
+            ilk_say[ana] += ilk_say.pop(es, 0); bas_say[ana] += bas_say.pop(es, 0)
+        print(f"TFF'de iki numaralı oyuncular birleşti: {len(BIRLES)}")
     teknik = collections.defaultdict(lambda: ([], []))
     import mackolik_td   # TFF'de boş kalan teknik direktörler: Maçkolik arşivi takım fikstürleri (raw/mackolik_td/ek.json)
     for mac, taraf, kisi, a in list(o.execute("SELECT mac, taraf, kisi, ad FROM teknik")) + (mackolik_td.ek_satirlar(o) if erkek else []):
@@ -234,6 +313,9 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
             d_ = DOGUM_DUZELT.get(k_, d_)
             if d_[5:] not in ("01-01", "07-01"):
                 dog[k_] = datetime.date.fromisoformat(d_)
+    for es, ana in BIRLES.items():
+        if ana not in dog and es in dog:
+            dog[ana] = dog[es]
     yas_oy = collections.defaultdict(dict)    # kulüp -> kisi -> [en genç: gün, maç] + [en yaşlı: gün, maç]
     yas_gol = collections.defaultdict(dict)
     ilk_tarih = {}   # kişi -> TFF'deki ilk maçı
@@ -338,11 +420,17 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
     dizin = []
     kisi_db = os.path.join(KOK, "raw", "kisi.db")   # doğum tarihi/yeri, uyruk (oyuncu.py kisi_ayikla)
     kb = {k: [DOGUM_DUZELT.get(k, d), y, u] for k, d, y, u in sqlite3.connect(kisi_db).execute("SELECT kisi, dogum, yer, uyruk FROM kisi")} if os.path.exists(kisi_db) else {}
+    es_l = collections.defaultdict(list)
+    for es, ana in BIRLES.items():
+        okova[es % 500][es] = {"bk": ana}   # eski bağlantılar asıl sayfaya
+        es_l[ana].append(es)
+        if ana not in kb and es in kb:
+            kb[ana] = kb[es]
     for kisi, sat in O.items():
         if not kisi:
             continue
         satir = sorted([[*a, *v] for a, v in sat.items() if v[0] or v[8]], key=lambda x: (x[0], x[2]))
-        okova[kisi % 500][kisi] = {"ad": okunur(ad.get(kisi, "")), "s": satir, **({"d": kb[kisi]} if kisi in kb and any(kb[kisi]) else {})}
+        okova[kisi % 500][kisi] = {"ad": okunur(ad.get(kisi, "")), **({"tam": tam_ad[kisi]} if kisi in tam_ad and tam_ad[kisi] != ad[kisi] else {}), "s": satir, **({"d": kb[kisi]} if kisi in kb and any(kb[kisi]) else {}), **({"es": es_l[kisi]} if kisi in es_l else {})}
         if not any(s[4] for s in satir):
             continue   # hiç oynamamış (yalnız yedek kulübesi): sayfası var (maç kadrolarından bağlantı), arama dizininde yok
         mac = sum(s[4] for s in satir)
