@@ -1049,3 +1049,11 @@ kbd { font: 600 11px/1 Inter, system-ui, sans-serif; padding: 3px 5px; border-ra
 /* üst bar arama yazısı kesilmesin */
 .ust nav a { white-space: nowrap; }
 @media (min-width: 1241px) { .ust-ara { max-width: 330px; min-width: 200px; } }
+/* sezon özeti: uzun kulüp listeleri kısalır */
+.oz-liste.kisa:not(.acik) .fazla { display: none; }
+.oz-liste small b { color: inherit; font-variant-numeric: tabular-nums; margin-left: 2px; }
+.oz-daha { border: 0; background: var(--yuzey2); color: var(--yazi2); border-radius: 999px; padding: 2px 10px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.oz-daha:hover { color: var(--vurgu); }
+.oz-daha:focus-visible { outline: 2px solid var(--vurgu); outline-offset: 2px; }
+.oz-liste.ayr small { color: var(--soluk); }
+.sezon-ozet { align-items: flex-start; }

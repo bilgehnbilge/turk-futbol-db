@@ -58,7 +58,13 @@ async function ozetCiz(kap, sezon, l, o, sec) {
   const g0 = l[0], kd = g0.kademe, lig = l.length > 1 ? g0.lig.replace(/\s*[-–·]\s*\S+$/, "") || g0.lig : g0.lig;
   const kul = id => typeof id === "number" ? KULUP.get(id)?.ad ?? "?" : String(id).slice(1);
   const kutu = (baslik, id, ek = "") => id != null ? `<${typeof id === "number" ? `a href="#/${K}kulup/${id}"` : "div"} class="oz-kutu" style="${typeof id === "number" ? formaSerit(id) : ""}">${typeof id === "number" ? logoImg(id) : ""}<span><small>${baslik}</small><b>${esc(kul(id))}</b>${ek}</span></${typeof id === "number" ? "a" : "div"}>` : "";
-  const liste = (ids, cls, baslik, ek = () => "") => ids?.length ? `<div class="oz-liste ${cls}"><small>${baslik}</small><span>${ids.map(id => `<a href="#/${K}kulup/${id}">${logoImg(id)}${esc(kul(id))}${ek(id)}</a>`).join("")}</span></div>` : "";
+  // 8'den uzun listeler kısaltılır: ilk 6 kulüp, gerisi "+N kulüp daha" düğmesiyle açılır; başlıkta toplam sayı
+  const liste = (ids, cls, baslik, ek = () => "") => {
+    if (!ids?.length) return "";
+    const uzun = ids.length > 8;
+    return `<div class="oz-liste ${cls}${uzun ? " kisa" : ""}"><small>${baslik}${uzun ? ` <b>${ids.length}</b>` : ""}</small><span>${ids.map((id, i) => `<a href="#/${K}kulup/${id}"${uzun && i >= 6 ? ' class="fazla"' : ""}>${logoImg(id)}${esc(kul(id))}${ek(id)}</a>`).join("")}
+      ${uzun ? `<button type="button" class="oz-daha" aria-expanded="false">+${ids.length - 6} kulüp daha</button>` : ""}</span></div>`;
+  };
   const Ls = l.map(g => lh(g, sezon)), bitti = Ls.every(L => L.sonHafta === L.toplamHafta && !L.ms.some(m => m.eg == null && m.durum !== "Çifte H" && !m.iptal));
   // "sürüyor" yalnız son sezonda; eski sezonlarda oynanmamış maç kalmışsa da tablo sonucu birinci sayılır
   const surer = !bitti && sezon === OZET.sezonlar.at(-1);
@@ -66,7 +72,9 @@ async function ozetCiz(kap, sezon, l, o, sec) {
   if (kd === 1 && g0.yar === "L" && o.sampiyon != null) bas = kutu(`${esc(lig)} şampiyonu`, o.sampiyon);
   else if (l.length === 1) { const t = Ls[0].durum(Ls[0].sonHafta)[0]; if (t?.O) bas = kutu(surer ? `${esc(lig)} lideri` : `${esc(lig)} ${bitti ? "şampiyonu" : "birincisi"}`, t.id, surer ? `<small>sezon sürüyor</small>` : ""); }
   else { const bir = l.map((g, i) => [g, Ls[i].durum(Ls[i].sonHafta)[0]]).filter(x => x[1]?.O);
-    bas = bir.length ? `<div class="oz-liste birinci"><small>${surer ? "Grup liderleri · sezon sürüyor" : "Grup birincileri"}</small><span>${bir.map(([g, t]) => `${typeof t.id === "number" ? `<a href="#/${K}kulup/${t.id}">${logoImg(t.id)}` : "<span>"}${esc(kul(t.id))} <small class="soluk">${esc(g.grup || "")}</small>${typeof t.id === "number" ? "</a>" : "</span>"}`).join("")}</span></div>` : ""; }
+    const uzun = bir.length > 8;
+    bas = bir.length ? `<div class="oz-liste birinci${uzun ? " kisa" : ""}"><small>${surer ? "Grup liderleri · sezon sürüyor" : "Grup birincileri"}</small><span>${bir.map(([g, t], i) => `${typeof t.id === "number" ? `<a href="#/${K}kulup/${t.id}"${uzun && i >= 6 ? ' class="fazla"' : ""}>${logoImg(t.id)}` : `<span${uzun && i >= 6 ? ' class="fazla"' : ""}>`}${esc(kul(t.id))} <small class="soluk">${esc(g.grup || "")}</small>${typeof t.id === "number" ? "</a>" : "</span>"}`).join("")}
+      ${uzun ? `<button type="button" class="oz-daha" aria-expanded="false">+${bir.length - 6} grup daha</button>` : ""}</span></div>` : ""; }
   const ms = Ls.flatMap(L => L.ms), oyn = ms.filter(m => m.eg != null), takim = new Set(Ls.flatMap(L => L.takimlar));
   const ort = oyn.length ? (oyn.reduce((t, m) => t + m.eg + m.dg, 0) / oyn.length).toLocaleString("tr-TR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : null;
   const k = o.k || {}, bu = k[String(kd)] || {};
@@ -77,6 +85,10 @@ async function ozetCiz(kap, sezon, l, o, sec) {
     ${kd === 1 ? liste(k["2"]?.c, "cik", `${esc(ligEk(lig, "e"))} çıkanlar ↑`) : liste(bu.c, "cik", "Üst lige çıkanlar ↑")}
     ${liste(bu.d, "dus", kd === 1 ? `${esc(ligEk(lig, "den"))} düşenler ↓` : "Alt lige düşenler ↓")}
     ${kd > 1 ? liste(bu.a, "ayr", "Ertesi sezon profesyonel liglerde yok") : ""}`;
+  kap.querySelectorAll(".oz-daha").forEach(b => b.addEventListener("click", () => {
+    const l2 = b.closest(".oz-liste"), acik = l2.classList.toggle("acik");
+    b.setAttribute("aria-expanded", acik); b.textContent = acik ? "Daha az göster" : `+${l2.querySelectorAll(".fazla").length} ${l2.classList.contains("birinci") ? "grup" : "kulüp"} daha`;
+  }));
   const kr = await sec.kral?.(kd).catch(() => null), e = kap.querySelector(".kral");
   if (!kr?.length || !e || !e.isConnected) return;
   e.innerHTML = `<span><small>Gol kralı</small><b>${kr.map(x => `<a class="oyuncu-bag" href="#/${K}oyuncu/k${x.kisi}">${esc(x.ad)}</a>`).join(", ")}</b><small>${kr[0].gol} gol · ${kr.map(x => esc(KULUP.get(x.kulup)?.ad || "")).join(", ")}</small></span>`;
