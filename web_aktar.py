@@ -4,6 +4,7 @@
 
 Uretilen dosyalar:
   docs/data/ozet.json          genel sayilar, sezon listesi, lig adlari
+  docs/data/eski.json          1959 oncesi (eski_site.py, RSSSF)
   docs/data/kulupler.json      kulup listesi (arama icin): id, ad, donem adlari, ilk/son sezon, mac sayisi, ardillik
   docs/data/kulup/<id>.json    kulubun tum maclari (takim bakis acisiyla)
   docs/data/sezon/<sezon>.json sezonun tum maclari (puan tablosu ve fikstur icin)
@@ -471,6 +472,8 @@ def main():
         "son_tarih": max(m["tarih"] for m in maclar if m["tarih"] and m["ev_gol"] is not None),
         "kapsam": kapsam, "detayli": detayli, "detayli_aralik": araliklar(sorted(set(tff_ayr) | set(mk_ayr))),
         "mk_kadro": tff_detay.MK_ILK})
+    import eski_site   # 1959 öncesi bölümü (RSSSF; raw/rsssf_eski yoksa dokunulmaz) -> data/eski.json
+    eski_site.main()
     toplam = sum(os.path.getsize(os.path.join(d, f)) for d, _, fs in os.walk(CIKTI) for f in fs)
     print(f"{len(liste)} kulup, {len(sez)} sezon, {len(maclar)} mac -> {CIKTI} ({toplam / 1e6:.1f} MB)")
 

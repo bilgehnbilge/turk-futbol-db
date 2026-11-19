@@ -1614,7 +1614,8 @@ async function sezonlarSayfa() {
         ${o.sl?.[0] ? `<span>${o.sl[0]} takım${ort ? ` · ${ort} gol/maç` : ""}</span>` : `<span>${sayiYaz(o.mac || 0)} maç</span>`}
         ${k1?.d?.length ? `<span class="sk-dus" title="Süper Lig'den düşenler: ${esc(k1.d.map(kisa).join(", "))}">↓ ${k1.d.length} düştü</span>` : ""}</span></a>`;
   };
-  icerik.innerHTML = `<div class="sayfa-bas"><div><h1>Sezonlar</h1><p class="soluk">1959'dan bugüne her sezon: Süper Lig şampiyonu, kupa galibi ve ligin gol ortalaması. Puan tabloları maç sonuçlarından hesaplanır.</p></div></div>
+  icerik.innerHTML = `<div class="sayfa-bas"><div><h1>Sezonlar</h1><p class="soluk">1959'dan bugüne her sezon: Süper Lig şampiyonu, kupa galibi ve ligin gol ortalaması. Puan tabloları maç sonuçlarından hesaplanır.</p>
+    <p><a class="bag" href="#/eski">1959 öncesi →</a> <span class="soluk">Millî Küme, Türkiye Futbol Şampiyonası, Başbakanlık ve Federasyon kupaları (1924-1958)</span></p></div></div>
     <div class="cipler sezon-suz" role="group" aria-label="Şampiyona göre vurgula"><button class="cip aktif" data-k="">Tümü</button>${buyuk.map(id => `<button class="cip" data-k="${id}" style="${formaSerit(id)}">${logoImg(id)}${esc(kisa(id))} <b>${say.get(id)}</b></button>`).join("")}<button class="cip" data-k="diger">Diğer şampiyonlar <b>${[...say].filter(([id]) => !buyuk.includes(id)).reduce((t, x) => t + x[1], 0)}</b></button></div>
     <div class="sezon-zaman">${[...on].map(([d, ss]) => `<section class="sz-on"><h2>${d}'lar</h2><div class="sezon-kartlar">${ss.map(kart).join("")}</div></section>`).join("")}</div>`;
   const kap = icerik.querySelector(".sezon-zaman");

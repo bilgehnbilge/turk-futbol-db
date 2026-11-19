@@ -1057,3 +1057,15 @@ kbd { font: 600 11px/1 Inter, system-ui, sans-serif; padding: 3px 5px; border-ra
 .oz-daha:focus-visible { outline: 2px solid var(--vurgu); outline-offset: 2px; }
 .oz-liste.ayr small { color: var(--soluk); }
 .sezon-ozet { align-items: flex-start; }
+
+/* 1959 öncesi: tur tur maç listesi */
+.eski-maclar td.sag { text-align: right; }
+.eski-maclar td.skor-h { width: 64px; text-align: center; white-space: nowrap; }
+.eski-maclar td.kucuk, .eski-ayr td { font-size: 12.5px; }
+.eski-maclar tr.eski-ayr td { padding-top: 0; border-top: 0; }
+.sezon-gez { display: flex; gap: 8px; margin: 8px 0 4px; }
+.ust-bag { margin-bottom: 4px; font-size: 13px; }
+.eski-maclar tr.ayr-var td { border-bottom: 0; }
+.eski-maclar td.ad { width: 45%; }
+.eski-ayr td { text-align: center; }
+.eski-tur { overflow: hidden; }
