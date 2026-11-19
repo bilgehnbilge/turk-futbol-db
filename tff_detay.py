@@ -80,6 +80,15 @@ def aktar(c, maclar, okunur, cikti):
     yerel = os.path.exists(OYUNCU_DB)
     if yerel:
         o = sqlite3.connect(OYUNCU_DB)
+        bal = os.path.join(KOK, "raw", "bal_detay.db")   # Profesyonelliğe Geçiş Ligi maç ayrıntıları (bal.py ayikla)
+        if os.path.basename(OYUNCU_DB) == "oyuncu.db" and os.path.exists(bal) and os.path.getsize(bal):
+            # geçici görünümler aynı adlı ana tabloların önüne geçer: sorgular iki veritabanını birlikte okur
+            o.execute("ATTACH ? AS bal", (bal,))
+            for t in ("mac_bilgi", "gol", "kart", "degisiklik", "teknik", "hakem"):
+                o.execute(f"CREATE TEMP VIEW {t} AS SELECT * FROM main.{t} UNION ALL SELECT * FROM bal.{t}")
+            # kadro sırası önemli (rowid): görünümde rowid yok, sıra sütunu taşınır
+            o.execute("CREATE TEMP VIEW kadro AS SELECT rowid AS sira_, * FROM main.kadro "
+                      "UNION ALL SELECT rowid + 10000000000, * FROM bal.kadro")
         kupa = kupa_eslestir(o, c)
         yaz(KUPA_ES, kupa)
     else:
@@ -268,7 +277,8 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
     ad = {}
     # kaleci: TFF ilk 11'i kaleciyle başlatıyor; bir oyuncunun ilk sırada yazıldığı maçların oranı kalecileri ayırır (~1 / ~0)
     ilk_sira, ilk_say, bas_say = {}, collections.Counter(), collections.Counter()
-    for mac, taraf, kisi, a, forma, ilk11 in o.execute("SELECT mac, taraf, kisi, ad, forma, ilk11 FROM kadro ORDER BY rowid"):
+    for mac, taraf, kisi, a, forma, ilk11 in o.execute("SELECT mac, taraf, kisi, ad, forma, ilk11 FROM kadro ORDER BY "
+                                                         + ("sira_" if "bal" in [r[1] for r in o.execute("PRAGMA database_list")] else "rowid")):
         mac = int(mac)
         if ilk11 and kisi:
             bas_say[kisi] += 1

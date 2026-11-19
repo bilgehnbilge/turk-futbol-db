@@ -1,11 +1,11 @@
   TFF ek maclar (play-off/baraj, ozel kupalar): 130
-Kaynaklar: Mackolik 51875 mac, Avrupa 1506, TFF 99353
-1) Mackolik<->TFF: 4636 ortak mac adayi, 394 Mackolik kulubu TFF numarasina baglandi
+Kaynaklar: Mackolik 51875 mac, Avrupa 1506, TFF 129493
+1) Mackolik<->TFF: 4721 ortak mac adayi, 410 Mackolik kulubu TFF numarasina baglandi
 2) Arsiv<->Mackolik: puan tablosundaki 2907 takim satirinin 2803'i imzayla eslendi, 274 arsiv kimligi
    Mackolik'ten TFF'de de bulunan lig sezonlari cikarildi: 884 mac
 3) Sinir (arsiv<->TFF): 298 aday, 247 eslesme (tam ad disindakiler raporda: 18), 0 supheli
    Avrupa maç numaraları: 1506 maç, 0 yeni numara (avrupa_no.json)
-   TFF grup sayfalarindaki tekil dis takim maclari play-off sayildi: 17
+   TFF grup sayfalarindaki tekil dis takim maclari play-off sayildi: 52
    Vikipedi'den ozel kupa maci: 68
    Cift kayit silindi: 9
    Elle mac duzeltmesi (2022-2023 2022-11-27): 1 mac
@@ -19,30 +19,40 @@ Kaynaklar: Mackolik 51875 mac, Avrupa 1506, TFF 99353
    Elle mac duzeltmesi (2011-2012 2012-03-11): 1 mac
    Elle mac duzeltmesi (2012-2013 2013-01-27): 1 mac
    Elle mac duzeltmesi (2014-2015 2015-04-05): 1 mac
-   Resmi puan durumu: 669 tablo okundu, 499 lig grubuna baglandi; puan silme/ek puan satiri: 158
+   Elle mac duzeltmesi (2026-2027 2026-09-06): 1 mac
+   Elle mac duzeltmesi (2026-2027 2026-09-12): 1 mac
+   Elle mac duzeltmesi (2026-2027 2026-09-20): 1 mac
+   Elle mac duzeltmesi (2026-2027 2026-09-27): 1 mac
+   Elle mac duzeltmesi (2026-2027 2026-10-03): 1 mac
+   Elle mac duzeltmesi (2026-2027 2026-10-11): 1 mac
+   Elle mac duzeltmesi (2026-2027 2026-10-17): 1 mac
+   Elle mac duzeltmesi (2026-2027 2026-10-24): 1 mac
+   Elle mac duzeltmesi (2026-2027 2026-11-01): 1 mac
+   Elle mac duzeltmesi (2026-2027 2026-11-07): 1 mac
+   Resmi puan durumu: 886 tablo okundu, 660 lig grubuna baglandi; puan silme/ek puan satiri: 333
    Resmi tabloda sayilmayan maclar: 47 play-off, 6 gecersiz
-   Hukmen: 5 skorsuz maca resmi tablodan sonuc yazildi, 85 oynanmamis mac eklendi
+   Hukmen: 29 skorsuz maca resmi tablodan sonuc yazildi, 918 oynanmamis mac eklendi
 
-futbol.db: 151994 mac, 1148 kulup
+futbol.db: 182967 mac, 1849 kulup
    avrupa 1506 1956-1957 2026-2027
    kupa 7901 1962-1963 2026-2027
-   lig 141851 1959 2026-2027
+   lig 172824 1959 2026-2027
    ozel_kupa 85 1965-1966 2025-2026
    terfi 651 1959-1960 1982-1983
 
 Birden cok TFF numarasi ya da birden cok Mackolik kimligi tek kulupte birlesen kulupler (ARDILLIK ADAYI):
-  [311] ANADOLU ÜSKÜDAR 1908 SPOR: mackolik:629qqb884l 1994-1995..2018-2019; tff:4485 1998-1999..2026-2027; mackolik:bkq50sxwwn 2024-2025..2025-2026 | adlar: ÖZ SAHRAYİ CEDİTSPOR, ANADOLU ÜSKÜDAR 1908 SPOR, ANADOLU ÜSKÜDAR 1908 SPOR A.Ş., ANADOLU BAĞCILAR SPOR KULÜBÜ, BAĞCILAR SPOR KULÜBÜ, BEYKOZ İSHAKLI SPOR FAALİYETLERİ A.Ş.
-  [1049] ARDEŞENSPOR: tff:5307 1991-1992..1992-1993; tff:272 1998-1999..1998-1999 | adlar: ARDEŞENSPOR, ARDEŞEN BLD.SPOR
-  [197] Gaziemir GOG: mackolik:49d6q1o2xo 2024-2025..2026-2027; mackolik:568q5disre 2024-2025..2024-2025; tff:3095 2024-2025..2026-2027 | adlar: TİRE 2021 FUTBOL KULÜBÜ, GAZİEMİR G.O.G. SPOR YAT. A.Ş.
+  [1049] ARDEŞENSPOR: tff:5307 1991-1992..1992-1993; tff:272 1998-1999..2015-2016 | adlar: ARDEŞENSPOR, ARDEŞEN BLD.SPOR
+  [311] Büyükçekmece Gücü: mackolik:629qqb884l 1994-1995..2018-2019; tff:4485 1998-1999..2026-2027; mackolik:bkq50sxwwn 2024-2025..2025-2026; mackolik:chq8kzws82 2026-2027..2026-2027 | adlar: ÖZ SAHRAYİ CEDİTSPOR, ANADOLU ÜSKÜDAR 1908 SPOR, ANADOLU ÜSKÜDAR 1908 SPOR A.Ş., ANADOLU BAĞCILAR SPOR KULÜBÜ, BAĞCILAR SPOR KULÜBÜ, BEYKOZ İSHAKLI SPOR FAALİYETLERİ A.Ş.
+  [197] Gaziemir GOG: tff:3095 2020-2021..2026-2027; mackolik:49d6q1o2xo 2024-2025..2026-2027; mackolik:568q5disre 2024-2025..2024-2025 | adlar: BUCA ZAFERSPOR, TİRE 2021 FUTBOL KULÜBÜ, GAZİEMİR G.O.G. SPOR YAT. A.Ş.
   [984] GÖZTEPE A.Ş.: mackolik:cjbaf8s09q 1959..2026-2027; tff:106 1990-1991..2006-2007; tff:3688 2007-2008..2026-2027 | adlar: Göztepe, GÖZTEPE, GÖZTEPE A.Ş.
   [1053] HAKKARİSPOR: tff:3588 1991-1992..1992-1993; tff:319 1996-1997..2003-2004 | adlar: HAKKARİ BLD.SPOR, HAKKARİ PTT SPOR, HAKKARİSPOR
-  [880] Hakkarispor: mackolik:c2kt12j7e8 1999-2000..2016-2017; mackolik:macko17201 2016-2017..2016-2017 | adlar: Hakkarispor, Hakkarispor FK
+  [880] Hakkarispor: mackolik:c2kt12j7e8 1999-2000..2016-2017; tff:7267 2013-2014..2016-2017; mackolik:macko17201 2016-2017..2016-2017 | adlar: HAKKARİ SPOR FUTBOL KULÜBÜ
   [652] IĞDIRSPOR: tff:5308 1990-1991..1990-1991; tff:321 1997-1998..2006-2007; mackolik:bq45bwr2or 2001-2002..2001-2002 | adlar: Iğdırspor, IĞDIRSPOR, IĞDIR BELEDİYESPOR
   [1117] KONYA YOLSPOR: tff:5344 1991-1992..1992-1993; tff:4678 1996-1997..2000-2001 | adlar: KONYA YOLSPOR, KONYA KARTALI SPOR A.Ş.
-  [176] Muş Spor FC: mackolik:bt4gef1fvb 1984-1985..2017-2018; mackolik:3ybuekiig8 2014-2015..2014-2015; tff:2328 2016-2017..2017-2018 | adlar: Hasköy Yıldızspor, Muş Spor FC
-  [48] Uşakspor A.Ş.: mackolik:1muac47v9f 2012-2013..2012-2013; mackolik:av9piaoghf 2013-2014..2026-2027; tff:5155 2017-2018..2026-2027 | adlar: UTAŞ UŞAKSPOR A.Ş., UŞAK SPOR A.Ş., AFC KABLO KANALLARI UŞAK SPOR A.Ş., OKTAŞ UŞAK SPOR A.Ş.
-  [283] ZONGULDAKSPOR: tff:2434-once 1984-1985..1987-1988; tff:103 1990-1991..2007-2008; mackolik:5l7a6w16my 1992-1993..2003-2004 | adlar: Kömürspor, Zonguldakspor, ZONGULDAKSPOR
-  [189] Çayelispor: tff:5342 1990-1991..1993-1994; mackolik:43hht36ezr 1992-1993..2025-2026; tff:263 2024-2025..2025-2026 | adlar: Çayelispor, ÇAYELİSPOR, SMART HOLDİNG A.Ş.ÇAYELİ SPOR, ÇAYELİ SPOR KULÜBÜ
+  [176] MUŞ SPOR FC: mackolik:bt4gef1fvb 1984-1985..2017-2018; tff:2328 2013-2014..2023-2024; mackolik:3ybuekiig8 2014-2015..2014-2015 | adlar: HASKÖY YILDIZSPOR, MUŞ SPOR FC
+  [48] Uşakspor A.Ş.: tff:5155 2010-2011..2026-2027; mackolik:1muac47v9f 2012-2013..2012-2013; mackolik:av9piaoghf 2013-2014..2026-2027 | adlar: UŞAK BELEDİYE, UŞAK SPORTİF GENÇLİK SPOR, UTAŞ UŞAKSPOR A.Ş, UTAŞ UŞAKSPOR A.Ş., UŞAK SPOR A.Ş., AFC KABLO KANALLARI UŞAK SPOR A.Ş.
+  [283] ZONGULDAKSPOR: tff:2434-once 1984-1985..1987-1988; tff:103 1990-1991..2010-2011; mackolik:5l7a6w16my 1992-1993..2003-2004 | adlar: Kömürspor, Zonguldakspor, ZONGULDAKSPOR
+  [189] Çayelispor: tff:5342 1990-1991..1993-1994; mackolik:43hht36ezr 1992-1993..2025-2026; tff:263 2011-2012..2025-2026 | adlar: Çayelispor, ÇAYELİSPOR, ÇAYELİ, ÇAYELİ SPOR, SMART HOLDİNG A.Ş.ÇAYELİ SPOR, ÇAYELİ SPOR KULÜBÜ
 
 1990 sinirinda ADLA eslenen kulupler (arsiv adi, son sezon -> TFF adi, ilk sezon, puan) -- kontrol edilmeli:
    (['Düzce Kervan Doğsanspor'], '1989-1990', '->', ['DÜZCE DOĞSANSPOR', 'MUDURNUSPOR'], '1990-1991', 2.17, 'uuid kaniti')
@@ -51,7 +61,7 @@ Birden cok TFF numarasi ya da birden cok Mackolik kimligi tek kulupte birlesen k
    (['Ankaragücü'], '1983-1984', '->', ['MKE ANKARAGUCU', 'MKE ANKARAGÜCÜ'], '1984-1985', 2.0, 'uuid kaniti')
    (['MKE Kırıkkalespor'], '1989-1990', '->', ['KIRIKKALESPOR', 'MKE KIRIKKALESPOR'], '1990-1991', 2.0, 'uuid kaniti')
    (['Siirt Köy Hizmetleri YSE Spor'], '1989-1990', '->', ['SİİRT JETPA SPOR', 'SİİRT KÖY HİZ.YSE SPOR', 'SİİRTSPOR'], '1990-1991', 2.0, 'uuid kaniti')
-   (['Çengelköy Talimhane'], '1988-1989', '->', ['ATLAS MADEN ÇENGELKÖYSPOR', 'ÇENGELKÖYSPOR'], '1990-1991', 2.0, 'uuid kaniti')
+   (['Çengelköy Talimhane'], '1988-1989', '->', ['ATLAS MADEN ÇENGELKÖYSPOR', 'ÇENGELKÖY FUTBOL YATIRIMLARI A.Ş.', 'ÇENGELKÖYSPOR'], '1990-1991', 2.0, 'uuid kaniti')
    (['Yeni Turgutluspor'], '1989-1990', '->', ['7 EYLÜL TURGUTLU 1984 SPORTİF YATIRIMLAR A.Ş.', 'TURGUTLUSPOR', 'Y. TURGUTLUSPOR'], '1990-1991', 2.0, 'uuid kaniti')
    (['Yeni Nazillispor'], '1989-1990', '->', ['EŞİN GROUP NAZİLLİ BELEDİYESPOR', 'NAZİLLİ BELEDİYESPOR', 'NAZİLLİ SPOR A.Ş.'], '1990-1991', 2.0, 'uuid kaniti')
    (['Milas Esnafspor'], '1989-1990', '->', ['Y. MILASSPOR', 'Y. MİLASSPOR', 'Y.MİLASSPOR'], '1990-1991', 2.0, 'uuid kaniti')
@@ -61,12 +71,12 @@ Birden cok TFF numarasi ya da birden cok Mackolik kimligi tek kulupte birlesen k
    (['Sarıyer'], '1983-1984', '->', ['SARIYER', 'SARIYERSPOR', 'SMS GRUP SARIYER'], '1984-1985', 1.83, 'uuid kaniti')
    (['Yeni Akşehirspor'], '1989-1990', '->', ['Y. AKŞEHİRSPOR', 'Y.AKŞEHİRSPOR'], '1990-1991', 1.5, '')
    (['İskenderun Sahilspor'], '1989-1990', '->', ['SAHİLSPOR'], '1990-1991', 1.5, '')
-   (['Besni Akınspor'], '1989-1990', '->', ['BESNİSPOR'], '1990-1991', 1.5, '')
-   (['Yeni Dinarspor'], '1989-1990', '->', ['Y. DİNARSPOR', 'Y.DİNARSPOR'], '1990-1991', 1.5, '')
+   (['Besni Akınspor'], '1989-1990', '->', ['BESNİ AKIN SPOR', 'BESNİSPOR'], '1990-1991', 1.5, '')
+   (['Yeni Dinarspor'], '1989-1990', '->', ['DİNAR BELEDİYE SPOR', 'Y. DİNARSPOR', 'Y.DİNARSPOR'], '1990-1991', 1.5, '')
 
 1990 sinirinda emin olunamayan eslesmeler (BAGLANMADI):
 
-Sezon tamligi: 670 lig grubunun 660'inde mac sayisi tam (n*(n-1)). Tutmayanlar (kademe, sezon, grup, takim, bulunan, beklenen):
+Sezon tamligi: 864 lig grubunun 810'inde mac sayisi tam (n*(n-1)). Tutmayanlar (kademe, sezon, grup, takim, bulunan, beklenen):
    (3, '1979-1980', 'A Grubu', 8, 112, 56)
    (3, '1979-1980', 'Grup B', 10, 180, 90)
    (3, '1997-1998', '01', 16, 241, 240)
@@ -76,6 +86,50 @@ Sezon tamligi: 670 lig grubunun 660'inde mac sayisi tam (n*(n-1)). Tutmayanlar (
    (4, '2009-2010', '02', 11, 93, 110)
    (4, '2009-2010', '2. Klasman Grubu', 9, 61, 72)
    (1, '2011-2012', '', 18, 330, 306)
+   (5, '2011-2012', '01', 11, 111, 110)
+   (5, '2011-2012', '02', 12, 135, 132)
+   (5, '2011-2012', '04', 11, 113, 110)
+   (5, '2011-2012', '05', 12, 135, 132)
+   (5, '2011-2012', '06', 12, 133, 132)
+   (5, '2011-2012', '07', 12, 137, 132)
+   (5, '2011-2012', '11', 12, 133, 132)
+   (5, '2011-2012', '12', 11, 111, 110)
+   (5, '2011-2012', '13', 12, 135, 132)
+   (5, '2012-2013', '02', 14, 184, 182)
+   (5, '2012-2013', '04', 15, 211, 210)
+   (5, '2012-2013', '05', 15, 211, 210)
+   (5, '2012-2013', '10', 14, 183, 182)
+   (5, '2015-2016', '04', 13, 155, 156)
+   (5, '2017-2018', '11.GRUP', 14, 181, 182)
    (2, '2018-2019', '', 18, 307, 306)
+   (5, '2018-2019', '1. GRUP', 14, 184, 182)
+   (5, '2018-2019', '6. GRUP', 13, 157, 156)
+   (5, '2019-2020', '2.GRUP', 14, 167, 182)
+   (5, '2019-2020', '6.GRUP', 14, 180, 182)
+   (5, '2020-2021', '1', 14, 36, 182)
+   (5, '2020-2021', '2', 14, 36, 182)
+   (5, '2020-2021', '3', 14, 36, 182)
+   (5, '2020-2021', '4', 13, 30, 156)
+   (5, '2020-2021', '5', 14, 36, 182)
+   (5, '2020-2021', '6', 12, 24, 132)
+   (5, '2020-2021', '7', 13, 30, 156)
+   (5, '2020-2021', '8', 14, 36, 182)
+   (5, '2021-2022', '2. Bölge 1. Grup', 9, 66, 72)
+   (5, '2021-2022', '4. Bölge 1. Grup', 10, 76, 90)
+   (5, '2021-2022', '4. Bölge 2. Grup', 10, 76, 90)
+   (5, '2021-2022', '5. Bölge 1. Grup', 10, 84, 90)
+   (5, '2021-2022', '7. Bölge 1. Grup', 16, 114, 240)
+   (5, '2021-2022', '7. Bölge 2. Grup', 19, 160, 342)
+   (5, '2021-2022', '7. Bölge 3. Grup', 20, 180, 380)
+   (5, '2021-2022', '9. Bölge 1. Grup', 10, 87, 90)
+   (5, '2022-2023', '1. Grup', 14, 180, 182)
+   (5, '2022-2023', '2. Grup', 14, 109, 182)
+   (5, '2022-2023', '7. Grup', 14, 112, 182)
+   (5, '2023-2024', '11.GRUP', 13, 155, 156)
+   (5, '2023-2024', '12.GRUP', 14, 179, 182)
+   (5, '2023-2024', '4.GRUP', 15, 209, 210)
+   (5, '2023-2024', '9.GRUP', 13, 155, 156)
+   (5, '2025-2026', '1. GRUP', 14, 181, 182)
+   (5, '2025-2026', '3.GRUP', 15, 209, 210)
 
 Kulubu bulunamayan mac tarafi: 62

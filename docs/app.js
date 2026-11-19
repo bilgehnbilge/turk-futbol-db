@@ -60,7 +60,7 @@ const norm = s => String(s || "").toLocaleLowerCase("tr").replace(/[çğıöşü
   .replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
 const tarihYaz = t => { if (!t) return "—"; const [y, a, g] = t.split("-"); return `${g}.${a}.${y}`; };
 const YAR_AD = { L: "Lig", K: "Türkiye Kupası", O: "Diğer kupalar", A: "Avrupa", T: "Terfi" };
-let KADEME_AD = { 1: "Süper Lig", 2: "1. Lig", 3: "TFF 2. Lig", 4: "TFF 3. Lig" };   // bugünkü adlar, seviyeye göre
+let KADEME_AD = { 1: "Süper Lig", 2: "1. Lig", 3: "TFF 2. Lig", 4: "TFF 3. Lig", 5: "Profesyonelliğe Geçiş Ligi" };   // bugünkü adlar, seviyeye göre
 
 // Bölüm: erkek (varsayılan) ya da kadın. Kulüp, maç ve oyuncu sayfaları iki bölümde aynı kodla çizilir; bölüm değişince
 // OZET/KULUP/KADEME_AD ve önbellekler o bölümünkiyle değişir, bağlantılar K ("" | "kadin/"), veri yolları V ön ekini alır.

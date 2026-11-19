@@ -9,7 +9,7 @@ eklenirken 5. seviye olarak bağlanacak.
   python3 bal.py durum
   python3 bal.py hepsi     # liste + kur + mac + ayikla sırayla (gözetimsiz)
 """
-import gzip, os, sqlite3, subprocess, sys, time
+import gzip, os, re, sqlite3, subprocess, sys, time
 
 import topla
 
@@ -35,10 +35,31 @@ def liste():
     print("Bitti, yeni indirilen sayfa:", d.indirilen, flush=True)
 
 
+def bolge_harita(t):
+    """2021-22: lig 9 bölgede, her bölgenin grupları yine "1, 2, 3" adlı. Sayfadaki "BAL N. Bölge Fikstürü" bloklarından
+    grup no -> bölge no."""
+    out = {}
+    p = re.split(r"BAL (\d+)\. Bölge Fikstürü", t)
+    for i in range(1, len(p), 2):
+        for g in re.findall(r'grupID=(\d+)[^"]*"[^>]*_gl"', p[i + 1]):
+            out.setdefault(g, p[i])
+    return out
+
+
 def kur():
     topla.LIG.update(LIG_AD)
     topla.kademe = lambda kaynak, yil: 5
+    asil = topla.gruplar
+
+    def gruplar(t):   # bölgeli sezonlarda grup adı "2. Bölge 1. Grup"
+        g, b = asil(t), bolge_harita(t)
+        for k, v in g.items():
+            if k in b and v.strip().isdigit():
+                g[k] = f"{b[k]}. Bölge {v.strip()}. Grup"
+        return g
+    topla.gruplar = gruplar
     topla.kur(DB, HAM)
+    topla.gruplar = asil
     c = sqlite3.connect(DB)
     for r in c.execute("SELECT sezon, COUNT(DISTINCT grup), COUNT(*), SUM(ev_gol IS NOT NULL) FROM mac GROUP BY 1 ORDER BY 1"):
         print(*r)

@@ -32,6 +32,8 @@ RAPOR = os.path.join(KOK, "birlestirme_raporu.txt")
 DUZELTME = os.path.join(KOK, "kulup_duzeltme.json")
 AVRUPA_NO = os.path.join(KOK, "avrupa_no.json")   # Avrupa maçlarının sabit numaraları
 TFF_DB = os.path.join(KOK, "raw", "tff.db")
+BAL_DB = os.path.join(KOK, "raw", "bal.db")   # Profesyonelliğe Geçiş Ligi (bal.py), 5. seviye; aynı biçim, TFF kulüp numaraları
+TFF_DBS = [TFF_DB] + ([BAL_DB] if os.path.exists(BAL_DB) else [])
 ARSIV = os.path.join(KOK, "raw", "mackolik_arsiv")
 TRM = str.maketrans("İIıŞşĞğÜüÖöÇçÂâÎî", "iiissgguuooccaaii")
 rapor = []
@@ -91,10 +93,12 @@ def avrupa_oku():
 
 
 def tff_oku():
-    c = sqlite3.connect(TFF_DB)
-    c.row_factory = sqlite3.Row
-    ms = [dict(r) for r in c.execute("""SELECT m.*, ke.tff_id ev_tff, kd.tff_id dep_tff FROM mac m
-                                        JOIN kulup ke ON ke.id=m.ev_id JOIN kulup kd ON kd.id=m.dep_id""")]
+    ms = []
+    for yol in TFF_DBS:
+        c = sqlite3.connect(yol)
+        c.row_factory = sqlite3.Row
+        ms += [dict(r) for r in c.execute("""SELECT m.*, ke.tff_id ev_tff, kd.tff_id dep_tff FROM mac m
+                                             JOIN kulup ke ON ke.id=m.ev_id JOIN kulup kd ON kd.id=m.dep_id""")]
     # 1. Lig 2008-09 sayfalarinda kulupID baglantisi yok: ayni adin baska sezonlardaki numarasi
     ad_no = collections.defaultdict(collections.Counter)
     for m in ms:
@@ -787,10 +791,11 @@ def resmi_tablolar(c, no_bul, kes_no, dugum):
     (puan silmeleriyle), sonra resmi tablo ile mac listesi arasindaki farki hukmen maclarla kapatir."""
     import mackolik as M
     tablolar = []   # (kaynak, sezon, kademe, [satir dict(kulup, ad, sira, O,G,B,M,A,Y,P,silme)])
-    t = sqlite3.connect(TFF_DB)
     grp = collections.defaultdict(list)
-    for r in t.execute("SELECT sezon, kademe, COALESCE(grup,''), sira, tff_id, ad, O, G, B, M, A, Y, P FROM puan ORDER BY rowid"):
-        grp[(r[0], r[1], r[2])].append(r)
+    for yol in TFF_DBS:
+        t = sqlite3.connect(yol)
+        for r in t.execute("SELECT sezon, kademe, COALESCE(grup,''), sira, tff_id, ad, O, G, B, M, A, Y, P FROM puan ORDER BY rowid"):
+            grp[(r[0], r[1], r[2])].append(r)
     for (sezon, kademe, _), rs in grp.items():
         w = 3 if sezon[:4] >= "1987" else 2
         tablolar.append(("tff", sezon, kademe, [dict(kulup=no_bul(("tff", kes_no(r[4], sezon))) if r[4] else None, ad=r[5], sira=r[3],
