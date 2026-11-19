@@ -52,7 +52,8 @@ def geri(l):
 
 
 def kupa_eslestir(o, c):
-    """TFF'nin 1990-2007 kupa sayfalarını futbol.db'deki (Maçkolik kaynaklı) kupa maçlarına bağlar: tarih + iki kulüp."""
+    """TFF'nin 1990-2007 kupa sayfalarını ve Süper Kupa maçlarını futbol.db'deki (Maçkolik / Vikipedi kaynaklı) maçlara bağlar:
+    tarih + iki kulüp."""
     tff_kulup = collections.defaultdict(list)   # TFF kulüp no -> [(kulüp, ilk sezon, son sezon)]; '2434-once' gibi dönemli kimlikler
     for kid, tid, ilk, son in c.execute("SELECT kulup_id, kaynak_id, ilk_sezon, son_sezon FROM kulup_kimlik WHERE kaynak='tff'"):
         tff_kulup[int(tid.split("-")[0])].append((kid, ilk or "0000", son or "9999"))
@@ -62,11 +63,11 @@ def kupa_eslestir(o, c):
         l = tff_kulup.get(tid, [])
         return next((k for k, a, b in l if a <= sezon <= b), l[0][0] if len(l) == 1 else None)
     aday = collections.defaultdict(list)
-    for kaynak, kid_, tarih, ev, dep in c.execute("SELECT kaynak, kaynak_id, tarih, ev_kulup, dep_kulup FROM mac WHERE yarisma='kupa'"):
+    for kaynak, kid_, tarih, ev, dep in c.execute("SELECT kaynak, kaynak_id, tarih, ev_kulup, dep_kulup FROM mac WHERE yarisma IN ('kupa', 'ozel_kupa')"):
         aday[tarih].append((f"{kaynak}:{kid_}", ev, dep))
     es = {}
     for mac, org, tarih, et, dt in o.execute("SELECT mac, organizasyon, tarih, ev_tff, dep_tff FROM mac_bilgi WHERE organizasyon LIKE '%Kupa%'"):
-        if "Türkiye Kupası" not in (org or "") and "Kupası (Profesyonel" not in (org or ""):
+        if "Türkiye Kupası" not in (org or "") and "Kupası (Profesyonel" not in (org or "") and "Süper Kupa" not in (org or ""):
             continue
         if not tarih:
             continue
