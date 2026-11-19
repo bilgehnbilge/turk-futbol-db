@@ -1,6 +1,7 @@
 # ham indirmeler (raw/tff 4 GB) depoya girmez; güncelleme için gereken küçük girdiler girer
 raw/*
 !raw/tff.db
+!raw/bal.db
 !raw/tff_kupa/
 !raw/mackolik_arsiv/
 raw/mackolik_arsiv/*
