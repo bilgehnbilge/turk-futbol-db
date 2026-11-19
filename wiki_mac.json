@@ -1,0 +1,5328 @@
+[
+{
+"madde": "1944 Başbakanlık Kupası",
+"tarih": "1944-06-03",
+"ev": "Beşiktaş",
+"dep": "Fenerbahçe",
+"eg": 4,
+"dg": 1,
+"g1": [
+[
+"Kemal Gülçelik",
+20,
+null
+],
+[
+"Şükrü Gülesin",
+46,
+null
+],
+[
+"Hüseyin Saygun",
+52,
+null
+],
+[
+"Vecdi Çapa",
+72,
+null
+]
+],
+"g2": [
+[
+"Naci Bastoncu",
+26,
+null
+]
+],
+"stad": "19 Mayıs Stadyumu, Ankara",
+"hakem": "Tarık Özerengin"
+},
+{
+"madde": "1945 Başbakanlık Kupası",
+"tarih": "1945-06-02",
+"ev": "Fenerbahçe",
+"dep": "Harp Okulu",
+"eg": 3,
+"dg": 2,
+"g1": [
+[
+"Melih Kotanca",
+42,
+null
+],
+[
+"Halit Deringör",
+47,
+null
+],
+[
+"Samim Var",
+82,
+null
+]
+],
+"g2": [
+[
+"Hasan Polat",
+10,
+null
+],
+[
+"Celal Çağlan",
+86,
+null
+]
+],
+"stad": "19 Mayıs Stadyumu, Ankara",
+"hakem": "Şazi Tezcan"
+},
+{
+"madde": "1946 Başbakanlık Kupası",
+"tarih": "1946-06-01",
+"ev": "Fenerbahçe",
+"dep": "Gençlerbirliği",
+"eg": 4,
+"dg": 0,
+"g1": [
+[
+"Naci Bastoncu",
+13,
+null
+],
+[
+"Müzdat Yetkiner",
+56,
+null
+],
+[
+"Halil Köksalan",
+71,
+null
+],
+[
+"Müzdat Yetkiner",
+83,
+null
+]
+],
+"g2": [],
+"stad": "19 Mayıs Stadyumu, Ankara",
+"hakem": "Zülbahar Sağnak"
+},
+{
+"madde": "1947 Başbakanlık Kupası",
+"tarih": "1947-06-01",
+"ev": "Beşiktaş",
+"dep": "Ankara Demirspor",
+"eg": 4,
+"dg": 0,
+"g1": [
+[
+"Şevket Yorulmaz",
+20,
+null
+],
+[
+"Şevket Yorulmaz",
+84,
+null
+],
+[
+"Şükrü Gülesin",
+65,
+null
+],
+[
+"Şükrü Gülesin",
+86,
+null
+]
+],
+"g2": [],
+"stad": "19 Mayıs Stadyumu, Ankara",
+"hakem": "Fethi Karaturgay"
+},
+{
+"madde": "1950 Başbakanlık Kupası",
+"tarih": "1950-06-17",
+"ev": "Fenerbahçe",
+"dep": "Göztepe",
+"eg": 2,
+"dg": 1,
+"g1": [
+[
+"Lefter Küçükandonyadis",
+27,
+null
+],
+[
+"Erol Keskin",
+114,
+null
+]
+],
+"g2": [
+[
+"Yüksel Doğanay",
+72,
+null
+]
+],
+"stad": "19 Mayıs Stadyumu, Ankara",
+"hakem": "Muzaffer Ertuğ"
+},
+{
+"madde": "1963 Türkiye Kupası finali",
+"tarih": "1963-06-29",
+"ev": "Galatasaray",
+"dep": "Fenerbahçe",
+"eg": 2,
+"dg": 1,
+"g1": [
+[
+"Uğur Köken",
+40,
+null
+],
+[
+"Tarık Kutver",
+50,
+null
+]
+],
+"g2": [
+[
+"Selim Soydan",
+60,
+null
+]
+],
+"stad": "Mithatpaşa Stadyumu, İstanbul",
+"hakem": "Paul Schiller"
+},
+{
+"madde": "1963 Türkiye Kupası finali",
+"tarih": "1963-06-30",
+"ev": "Fenerbahçe",
+"dep": "Galatasaray",
+"eg": 1,
+"dg": 2,
+"g1": [
+[
+"Lefter Küçükandonyadis",
+44,
+"P"
+]
+],
+"g2": [
+[
+"Bahri Altıntabak",
+51,
+null
+],
+[
+"Mustafa Yürür",
+71,
+null
+]
+],
+"stad": "Mithatpaşa Stadyumu, İstanbul",
+"hakem": "Josef Stoll"
+},
+{
+"madde": "1964 Türkiye Kupası finali",
+"tarih": "1964-06-21",
+"ev": "Altay",
+"dep": "Galatasaray",
+"eg": 0,
+"dg": 0,
+"g1": [],
+"g2": [],
+"stad": "Alsancak Stadyumu, İzmir",
+"hakem": "Gerhard Schulenburg"
+},
+{
+"madde": "1964 Türkiye Kupası finali",
+"tarih": "1964-06-29",
+"ev": "Galatasaray",
+"dep": "Altay",
+"eg": 3,
+"dg": 0,
+"g1": [],
+"g2": [],
+"stad": "Mithatpaşa Stadyumu, İstanbul",
+"hakem": "Nicolae Mihăilescu"
+},
+{
+"madde": "1965 Türkiye Kupası finali",
+"tarih": "1965-06-27",
+"ev": "Galatasaray",
+"dep": "Fenerbahçe",
+"eg": 0,
+"dg": 0,
+"g1": [],
+"g2": [],
+"stad": "Mithatpaşa Stadyumu, İstanbul",
+"hakem": "Gaston Roversi"
+},
+{
+"madde": "1965 Türkiye Kupası finali",
+"tarih": "1965-09-01",
+"ev": "Fenerbahçe",
+"dep": "Galatasaray",
+"eg": 0,
+"dg": 1,
+"g1": [],
+"g2": [
+[
+"Metin Oktay",
+23,
+"P"
+]
+],
+"stad": "Mithatpaşa Stadyumu, İstanbul",
+"hakem": "Nejat Şener"
+},
+{
+"madde": "1966 Başbakanlık Kupası",
+"tarih": "1966-06-23",
+"ev": "Eskişehirspor",
+"dep": "İdman Ocağı",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Nihat Atacan",
+11,
+null
+]
+],
+"g2": [],
+"stad": "19 Mayıs Stadyumu, Ankara",
+"hakem": "Sabahattin Ladikli"
+},
+{
+"madde": "1966 Cumhurbaşkanlığı Kupası",
+"tarih": "1966-09-21",
+"ev": "Beşiktaş",
+"dep": "Galatasaray",
+"eg": 0,
+"dg": 2,
+"g1": [],
+"g2": [
+[
+"Turan Doğangün",
+10,
+null
+],
+[
+"Ayhan Elmastaşoğlu",
+13,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Sebahattin Ladikli"
+},
+{
+"madde": "1966 Türkiye Kupası finali",
+"tarih": "1966-06-19",
+"ev": "Beşiktaş",
+"dep": "Galatasaray",
+"eg": 0,
+"dg": 1,
+"g1": [],
+"g2": [
+[
+"Turan Doğangün",
+87,
+null
+]
+],
+"stad": "Mithatpaşa Stadyumu, İstanbul",
+"hakem": "Rudolf Kreitlein"
+},
+{
+"madde": "1967 Başbakanlık Kupası",
+"tarih": "1967-06-30",
+"ev": "Mersin İdman Yurdu",
+"dep": "Denizgücü",
+"eg": 2,
+"dg": 0,
+"g1": [
+[
+"İhsan Tınaz",
+38,
+null
+],
+[
+"Osman Arpacıoğlu",
+59,
+null
+]
+],
+"g2": [],
+"stad": "19 Mayıs Stadyumu, Ankara",
+"hakem": "Doğan Babacan"
+},
+{
+"madde": "1967 Cumhurbaşkanlığı Kupası",
+"tarih": "1967-06-30",
+"ev": "Beşiktaş",
+"dep": "Altay",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Faruk Karadoğan",
+102,
+null
+]
+],
+"g2": [],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Veli Necdet Arığ"
+},
+{
+"madde": "1967 Türkiye Kupası finali",
+"tarih": "1967-06-25",
+"ev": "Altay",
+"dep": "Göztepe",
+"eg": 2,
+"dg": 2,
+"g1": [
+[
+"Aydın Yelken",
+64,
+null
+],
+[
+"Aytekin Erhanoğlu",
+66,
+null
+]
+],
+"g2": [
+[
+"Fevzi Zemzem",
+17,
+null
+],
+[
+"Halil Kiraz",
+57,
+null
+]
+],
+"stad": "Alsancak Stadyumu, İzmir",
+"hakem": "Walter Eschweiler"
+},
+{
+"madde": "1968 Başbakanlık Kupası",
+"tarih": "1968-06-30",
+"ev": "İzmirspor",
+"dep": "Denizgücü",
+"eg": 0,
+"dg": 2,
+"g1": [],
+"g2": [
+[
+"Hasan",
+108,
+null
+],
+[
+"Orhan Usta",
+115,
+null
+]
+],
+"stad": "19 Mayıs Stadyumu, Ankara",
+"hakem": "Fehmi Pazarcı"
+},
+{
+"madde": "1968 Türkiye Kupası finali",
+"tarih": "1968-06-16",
+"ev": "Fenerbahçe",
+"dep": "Altay",
+"eg": 2,
+"dg": 0,
+"g1": [
+[
+"Ogün Altıparmak",
+26,
+null
+],
+[
+"Nedim Doğan",
+64,
+null
+]
+],
+"g2": [],
+"stad": "Mithatpaşa Stadyumu, İstanbul",
+"hakem": "Alfred Ott"
+},
+{
+"madde": "1968 Türkiye Kupası finali",
+"tarih": "1968-06-23",
+"ev": "Altay",
+"dep": "Fenerbahçe",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Aytekin Erhanoğlu",
+11,
+null
+]
+],
+"g2": [],
+"stad": "Alsancak Stadyumu, İzmir",
+"hakem": "Ottmar Huber"
+},
+{
+"madde": "1969 Başbakanlık Kupası",
+"tarih": "1969-06-18",
+"ev": "Ankaragücü",
+"dep": "Sebat Gençlik",
+"eg": 3,
+"dg": 0,
+"g1": [],
+"g2": [],
+"stad": "19 Mayıs Stadyumu",
+"hakem": null
+},
+{
+"madde": "1969 Cumhurbaşkanlığı Kupası",
+"tarih": "1969-06-29",
+"ev": "Galatasaray",
+"dep": "Göztepe",
+"eg": 2,
+"dg": 0,
+"g1": [
+[
+"Gökmen Özdenak",
+76,
+null
+],
+[
+"Ahmet Celović",
+80,
+null
+]
+],
+"g2": [],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Sebahattin Ladikli"
+},
+{
+"madde": "1969 Türkiye Kupası finali",
+"tarih": "1969-06-15",
+"ev": "Göztepe",
+"dep": "Galatasaray",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Ertan Öznur",
+26,
+null
+]
+],
+"g2": [],
+"stad": "Alsancak Stadyumu, İzmir",
+"hakem": "Cezmi Başar"
+},
+{
+"madde": "1969 Türkiye Kupası finali",
+"tarih": "1969-06-18",
+"ev": "Galatasaray",
+"dep": "Göztepe",
+"eg": 1,
+"dg": 1,
+"g1": [
+[
+"Ahmet Čelović",
+23,
+null
+]
+],
+"g2": [
+[
+"Nihat Yayöz",
+99,
+null
+]
+],
+"stad": "Mithatpaşa Stadyumu, İstanbul",
+"hakem": "Ferdinand Biwersi"
+},
+{
+"madde": "1970 Başbakanlık Kupası",
+"tarih": "1970-09-13",
+"ev": "Boluspor",
+"dep": "Muhafızgücü",
+"eg": 8,
+"dg": 1,
+"g1": [
+[
+"Çetiner Erdoğan",
+18,
+null
+],
+[
+"Vedat Artık",
+25,
+null
+],
+[
+"Cengiz Tomaç",
+47,
+null
+],
+[
+"Cengiz Tomaç",
+87,
+null
+],
+[
+"Ahmet Yılmaz",
+58,
+null
+],
+[
+"Ahmet Yılmaz",
+64,
+null
+],
+[
+"Ahmet Yılmaz",
+74,
+null
+],
+[
+"Ahmet Yılmaz",
+82,
+null
+]
+],
+"g2": [
+[
+"İrfan",
+35,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Doğan Babacan"
+},
+{
+"madde": "1970 Cumhurbaşkanlığı Kupası",
+"tarih": "1970-06-28",
+"ev": "Fenerbahçe",
+"dep": "Göztepe",
+"eg": 1,
+"dg": 3,
+"g1": [
+[
+"Nedim Doğan",
+3,
+null
+]
+],
+"g2": [
+[
+"Ertan Öznur",
+44,
+null
+],
+[
+"Gürsel Aksel",
+70,
+null
+],
+[
+"Fevzi Zemzem",
+89,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Cezmi Başar"
+},
+{
+"madde": "1970 Gençlik ve Spor Bakanlığı Kupası",
+"tarih": "1970-09-09",
+"ev": "Boluspor",
+"dep": "Karşıyaka",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Cengiz Tomaç",
+83,
+null
+]
+],
+"g2": [],
+"stad": "19 Mayıs Stadı, Ankara",
+"hakem": "Nevzat Tansuk"
+},
+{
+"madde": "1970 Türkiye Kupası finali",
+"tarih": "1970-05-13",
+"ev": "Eskişehirspor",
+"dep": "Göztepe",
+"eg": 2,
+"dg": 1,
+"g1": [
+[
+"Ender Konca",
+29,
+null
+],
+[
+"Ayhan Aşut",
+33,
+null
+]
+],
+"g2": [
+[
+"Nevzat Güzelırmak",
+13,
+null
+]
+],
+"stad": "Eskişehir Atatürk Stadyumu, Eskişehir",
+"hakem": "Alfred Ott"
+},
+{
+"madde": "1970 Türkiye Kupası finali",
+"tarih": "1970-05-20",
+"ev": "Göztepe",
+"dep": "Eskişehirspor",
+"eg": 3,
+"dg": 1,
+"g1": [
+[
+"Fevzi Zemzem",
+27,
+null
+],
+[
+"Fevzi Zemzem",
+76,
+null
+],
+[
+"John Nielsen",
+73,
+null
+]
+],
+"g2": [
+[
+"Mustafa Yuvalar",
+36,
+null
+]
+],
+"stad": "Alsancak Stadyumu, İzmir",
+"hakem": "Karl Riegg"
+},
+{
+"madde": "1971 Başbakanlık Kupası",
+"tarih": "1971-06-27",
+"ev": "Fenerbahçe",
+"dep": "Bursaspor",
+"eg": 0,
+"dg": 1,
+"g1": [],
+"g2": [
+[
+"Vahit Kolukısa",
+111,
+null
+]
+],
+"stad": "19 Mayıs Stadyumu, Ankara",
+"hakem": "Muzaffer Sarvan"
+},
+{
+"madde": "1971 Cumhurbaşkanlığı Kupası",
+"tarih": "1971-06-30",
+"ev": "Galatasaray",
+"dep": "Eskişehirspor",
+"eg": 2,
+"dg": 3,
+"g1": [
+[
+"Metin Kurt",
+4,
+null
+],
+[
+"Gökmen Özdenak",
+87,
+null
+]
+],
+"g2": [
+[
+"Fethi Heper",
+51,
+null
+],
+[
+"Ender Konca",
+64,
+null
+],
+[
+"Fethi Heper",
+89,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Doğan Babacan"
+},
+{
+"madde": "1971 Türkiye Kupası finali",
+"tarih": "1971-06-13",
+"ev": "Bursaspor",
+"dep": "Eskişehirspor",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Ersel Altıparmak",
+85,
+null
+]
+],
+"g2": [],
+"stad": "Bursa Atatürk Stadyumu, Bursa",
+"hakem": "Doğan Babacan"
+},
+{
+"madde": "1971 Türkiye Kupası finali",
+"tarih": "1971-06-20",
+"ev": "Eskişehirspor",
+"dep": "Bursaspor",
+"eg": 2,
+"dg": 0,
+"g1": [
+[
+"Halil Güngördü",
+27,
+null
+],
+[
+"Halil Güngördü",
+65,
+null
+]
+],
+"g2": [],
+"stad": "Eskişehir Atatürk Stadyumu, Eskişehir",
+"hakem": "Ömer Karadağ"
+},
+{
+"madde": "1972 Başbakanlık Kupası",
+"tarih": "1972-06-07",
+"ev": "Eskişehirspor",
+"dep": "Altay",
+"eg": 2,
+"dg": 0,
+"g1": [
+[
+"Halil Güngördü",
+15,
+null
+],
+[
+"Halil Güngördü",
+34,
+null
+]
+],
+"g2": [],
+"stad": "19 Mayıs Stadyumu, Ankara",
+"hakem": "Ziya Türkdoğan"
+},
+{
+"madde": "1972 Cumhurbaşkanlığı Kupası",
+"tarih": "1972-06-11",
+"ev": "Galatasaray",
+"dep": "Ankaragücü",
+"eg": 3,
+"dg": 0,
+"g1": [
+[
+"Gökmen Özdenak",
+26,
+null
+],
+[
+"Gökmen Özdenak",
+83,
+null
+],
+[
+"Ahmet Akkuş",
+53,
+null
+]
+],
+"g2": [],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Ömer Karadağ"
+},
+{
+"madde": "1972 Türkiye Kupası finali",
+"tarih": "1972-05-17",
+"ev": "Altay",
+"dep": "MKE Ankaragücü",
+"eg": 0,
+"dg": 0,
+"g1": [],
+"g2": [],
+"stad": "Alsancak Stadyumu, İzmir",
+"hakem": "Hilmi Ok"
+},
+{
+"madde": "1972 Türkiye Kupası finali",
+"tarih": "1972-05-31",
+"ev": "MKE Ankaragücü",
+"dep": "Altay",
+"eg": 3,
+"dg": 0,
+"g1": [
+[
+"Coşkun Süer",
+18,
+null
+],
+[
+"Coşkun Süer",
+78,
+null
+],
+[
+"Müjdat Yalman",
+47,
+"P"
+]
+],
+"g2": [],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Doğan Babacan"
+},
+{
+"madde": "1973 Başbakanlık Kupası",
+"tarih": "1973-06-06",
+"ev": "Fenerbahçe",
+"dep": "Ankaragücü",
+"eg": 5,
+"dg": 2,
+"g1": [
+[
+"Cemil Turan",
+21,
+null
+],
+[
+"Cemil Turan",
+72,
+null
+],
+[
+"Cemil Turan",
+91,
+null
+],
+[
+"Ersoy Sandalcı",
+110,
+null
+],
+[
+"Yaşar Mumcuoğlu",
+117,
+null
+]
+],
+"g2": [
+[
+"Ekrem Karaç",
+43,
+null
+],
+[
+"Müjdat Yalman",
+88,
+null
+]
+],
+"stad": "19 Mayıs Stadyumu, Ankara",
+"hakem": "Fehmi Pazarcı"
+},
+{
+"madde": "1973 Cumhurbaşkanlığı Kupası",
+"tarih": "1973-06-09",
+"ev": "Galatasaray",
+"dep": "Fenerbahçe",
+"eg": 1,
+"dg": 2,
+"g1": [
+[
+"Metin Kurt",
+5,
+null
+]
+],
+"g2": [
+[
+"Cemil Turan",
+19,
+null
+],
+[
+"Fuat Saner",
+45,
+"P"
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Doğan Babacan"
+},
+{
+"madde": "1973 Türkiye Kupası finali",
+"tarih": "1973-05-02",
+"ev": "Galatasaray",
+"dep": "Ankaragücü",
+"eg": 3,
+"dg": 1,
+"g1": [
+[
+"Gökmen Özdenak",
+36,
+null
+],
+[
+"Gökmen Özdenak",
+72,
+null
+],
+[
+"Mehmet Oğuz",
+89,
+null
+]
+],
+"g2": [
+[
+"Metin Yılmaz",
+17,
+null
+]
+],
+"stad": "Mithatpaşa Stadyumu, İstanbul",
+"hakem": "Sedat Özselçuk"
+},
+{
+"madde": "1973 Türkiye Kupası finali",
+"tarih": "1973-05-23",
+"ev": "Ankaragücü",
+"dep": "Galatasaray",
+"eg": 1,
+"dg": 1,
+"g1": [
+[
+"Erman Toroğlu",
+73,
+null
+]
+],
+"g2": [
+[
+"Metin Kurt",
+70,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Ziya Türkdoğan"
+},
+{
+"madde": "1974 Başbakanlık Kupası",
+"tarih": "1974-06-05",
+"ev": "Beşiktaş",
+"dep": "Bursaspor",
+"eg": 3,
+"dg": 2,
+"g1": [
+[
+"Vedat Okyar",
+30,
+"P"
+],
+[
+"Ahmet Yılmaz",
+69,
+null
+],
+[
+"Nikos Kovis",
+115,
+null
+]
+],
+"g2": [
+[
+"Vahit Kolukısa",
+10,
+null
+],
+[
+"Tezcan Ozan",
+21,
+null
+]
+],
+"stad": "19 Mayıs Stadyumu, Ankara",
+"hakem": "Talat Tokat"
+},
+{
+"madde": "1974 Cumhurbaşkanlığı Kupası",
+"tarih": "1974-06-08",
+"ev": "Beşiktaş",
+"dep": "Fenerbahçe",
+"eg": 3,
+"dg": 0,
+"g1": [
+[
+"Ahmet Yılmaz",
+20,
+null
+],
+[
+"Lütfü Isıgöllü",
+36,
+null
+],
+[
+"Mesut Şen",
+72,
+null
+]
+],
+"g2": [],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Ertuğrul Dilek"
+},
+{
+"madde": "1974 Türkiye Kupası finali",
+"tarih": "1974-05-01",
+"ev": "Bursaspor",
+"dep": "Fenerbahçe",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Tezcan Ozan",
+1,
+null
+]
+],
+"g2": [],
+"stad": "Bursa Atatürk Stadyumu, Bursa",
+"hakem": "Fehmi Pazarcı"
+},
+{
+"madde": "1974 Türkiye Kupası finali",
+"tarih": "1974-05-22",
+"ev": "Fenerbahçe",
+"dep": "Bursaspor",
+"eg": 3,
+"dg": 0,
+"g1": [
+[
+"Cemil Turan",
+14,
+null
+],
+[
+"Selahattin Karasu",
+17,
+null
+],
+[
+"Osman Arpacıoğlu",
+69,
+null
+]
+],
+"g2": [],
+"stad": "BJK İnönü Stadyumu, İstanbul",
+"hakem": "Orhan Cebe"
+},
+{
+"madde": "1975 Başbakanlık Kupası",
+"tarih": "1975-06-07",
+"ev": "Galatasaray",
+"dep": "Trabzonspor",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Gökmen Özdenak",
+76,
+null
+]
+],
+"g2": [],
+"stad": "Cebeci İnönü Stadyumu, Ankara",
+"hakem": "Talat Tokat"
+},
+{
+"madde": "1975 Cumhurbaşkanlığı Kupası",
+"tarih": "1975-06-11",
+"ev": "Beşiktaş",
+"dep": "Fenerbahçe",
+"eg": 0,
+"dg": 2,
+"g1": [],
+"g2": [
+[
+"Osman Arpacıoğlu",
+21,
+null
+],
+[
+"Cemil Turan",
+53,
+null
+]
+],
+"stad": "Cebeci İnönü Stadyumu, Ankara",
+"hakem": "Ertuğrul Dilek"
+},
+{
+"madde": "1975 Türkiye Kupası finali",
+"tarih": "1975-05-07",
+"ev": "Trabzonspor",
+"dep": "Beşiktaş",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Kadir Özcan",
+58,
+null
+]
+],
+"g2": [],
+"stad": "Hüseyin Avni Aker Stadyumu, Trabzon",
+"hakem": "Orhan Cebe"
+},
+{
+"madde": "1975 Türkiye Kupası finali",
+"tarih": "1975-05-21",
+"ev": "Beşiktaş",
+"dep": "Trabzonspor",
+"eg": 2,
+"dg": 0,
+"g1": [
+[
+"Nikos Kovis",
+31,
+null
+],
+[
+"Lütfü Isıgöllü",
+75,
+null
+]
+],
+"g2": [],
+"stad": "Mithatpaşa Stadyumu, İstanbul",
+"hakem": "Doğan Babacan"
+},
+{
+"madde": "1976 Başbakanlık Kupası",
+"tarih": "1976-06-06",
+"ev": "Fenerbahçe",
+"dep": "Trabzonspor",
+"eg": 2,
+"dg": 2,
+"g1": [
+[
+"Hüseyin Tok",
+15,
+null
+],
+[
+"Hüseyin Tok",
+40,
+null
+]
+],
+"g2": [
+[
+"Alpaslan Eradlı",
+35,
+null
+],
+[
+"Cemil Turan",
+78,
+null
+]
+],
+"stad": "19 Mayıs Stadyumu, Ankara",
+"hakem": "Hilmi Ok"
+},
+{
+"madde": "1976 Cumhurbaşkanlığı Kupası",
+"tarih": "1976-06-09",
+"ev": "Trabzonspor",
+"dep": "Galatasaray",
+"eg": 2,
+"dg": 1,
+"g1": [
+[
+"Hüseyin Tok",
+4,
+null
+],
+[
+"Hüseyin Tok",
+29,
+null
+]
+],
+"g2": [
+[
+"Şevki Şenlen",
+35,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Ziya Türkdoğan"
+},
+{
+"madde": "1976 Gençlik ve Spor Bakanlığı Kupası",
+"tarih": "1976-06-24",
+"ev": "Samsunspor",
+"dep": "Bursaspor (Amatör)",
+"eg": 2,
+"dg": 1,
+"g1": [
+[
+"Osman Yılmaz",
+16,
+null
+],
+[
+"Atakan Aksu",
+78,
+null
+]
+],
+"g2": [
+[
+"Küçük İbrahim",
+74,
+null
+]
+],
+"stad": "19 Mayıs Stadı, Ankara",
+"hakem": "Sebahattin Ladikli"
+},
+{
+"madde": "1976 Türkiye Kupası finali",
+"tarih": "1976-05-12",
+"ev": "Trabzonspor",
+"dep": "Galatasaray",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Necmi Perekli",
+26,
+null
+]
+],
+"g2": [],
+"stad": "Trabzon Şehir Stadyumu, Trabzon",
+"hakem": "Ziya Türkdoğan"
+},
+{
+"madde": "1976 Türkiye Kupası finali",
+"tarih": "1976-05-26",
+"ev": "Galatasaray",
+"dep": "Trabzonspor",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Bülent Ünder",
+49,
+null
+]
+],
+"g2": [],
+"stad": "BJK İnönü Stadyumu, İstanbul",
+"hakem": "Orhan Cebe"
+},
+{
+"madde": "1977 Başbakanlık Kupası",
+"tarih": "1977-06-08",
+"ev": "Fenerbahçe",
+"dep": "Beşiktaş",
+"eg": 1,
+"dg": 2,
+"g1": [
+[
+"Cemil Turan",
+62,
+null
+]
+],
+"g2": [
+[
+"Mehmet Akpınar",
+7,
+null
+],
+[
+"Mehmet Akpınar",
+20,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Ertuğrul Dilek"
+},
+{
+"madde": "1977 Cumhurbaşkanlığı Kupası",
+"tarih": "1977-06-12",
+"ev": "Trabzonspor",
+"dep": "Beşiktaş",
+"eg": 1,
+"dg": 1,
+"g1": [
+[
+"Serdar Bali",
+43,
+null
+]
+],
+"g2": [
+[
+"Reşit Kaynak",
+46,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Hilmi Ok"
+},
+{
+"madde": "1977 Gençlik ve Spor Bakanlığı Kupası",
+"tarih": "1977-06-07",
+"ev": "MKE Ankaragücü",
+"dep": "Konya Demirspor",
+"eg": 4,
+"dg": 0,
+"g1": [
+[
+"Müjdat Yalman",
+68,
+null
+],
+[
+"Ali Osman Renklibay",
+69,
+null
+],
+[
+"Ali Osman Renklibay",
+75,
+null
+],
+[
+"Mustafa Başkan",
+85,
+null
+]
+],
+"g2": [],
+"stad": "19 Mayıs Stadı, Ankara",
+"hakem": "Nihat Özbirgül"
+},
+{
+"madde": "1977 Türkiye Kupası finali",
+"tarih": "1977-05-18",
+"ev": "Trabzonspor",
+"dep": "Beşiktaş",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Ahmet Ceyhan",
+22,
+null
+]
+],
+"g2": [],
+"stad": "Trabzon Şehir Stadyumu, Trabzon",
+"hakem": "Ziya Türkdoğan"
+},
+{
+"madde": "1977 Türkiye Kupası finali",
+"tarih": "1977-05-25",
+"ev": "Beşiktaş",
+"dep": "Trabzonspor",
+"eg": 0,
+"dg": 0,
+"g1": [],
+"g2": [],
+"stad": "BJK İnönü Stadyumu, İstanbul",
+"hakem": "Talat Tokat"
+},
+{
+"madde": "1978 Başbakanlık Kupası",
+"tarih": "1978-06-08",
+"ev": "Trabzonspor",
+"dep": "Adana Demirspor",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Orhan Akyüz",
+30,
+null
+],
+[
+"Ahmet Ceyhan",
+71,
+null
+]
+],
+"g2": [
+[
+"Rasin Gürcan",
+69,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Ertuğrul Aybay"
+},
+{
+"madde": "1978 Cumhurbaşkanlığı Kupası",
+"tarih": "1978-06-13",
+"ev": "Fenerbahçe",
+"dep": "Trabzonspor",
+"eg": 0,
+"dg": 1,
+"g1": [],
+"g2": [
+[
+"Yaşar Alemdaroğlu",
+53,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Doğan Babacan"
+},
+{
+"madde": "1978 Gençlik ve Spor Bakanlığı Kupası",
+"tarih": "1978-06-04",
+"ev": "MKE Kırıkkalespor",
+"dep": "Sakarya Karadenizspor",
+"eg": 4,
+"dg": 2,
+"g1": [
+[
+"Hamit Ayden",
+37,
+null
+],
+[
+"Eyüp Develi",
+40,
+null
+],
+[
+"Eyüp Develi",
+55,
+null
+],
+[
+"Mehmet Kunduzoğlu",
+87,
+null
+]
+],
+"g2": [
+[
+"Küçük İsmail",
+47,
+null
+],
+[
+"İrfan",
+79,
+null
+]
+],
+"stad": "19 Mayıs Stadı, Ankara",
+"hakem": "Talat Tokat"
+},
+{
+"madde": "1978 Türkiye Kupası finali",
+"tarih": "1978-05-10",
+"ev": "Trabzonspor",
+"dep": "Adana Demirspor",
+"eg": 3,
+"dg": 0,
+"g1": [
+[
+"Ali Kemal Denizci",
+1,
+null
+],
+[
+"Mehmet Ekşi",
+13,
+null
+],
+[
+"Cemil Usta",
+90,
+"P"
+]
+],
+"g2": [],
+"stad": "Trabzon Şehir Stadyumu, Trabzon",
+"hakem": "Ziya Türkdoğan"
+},
+{
+"madde": "1978 Türkiye Kupası finali",
+"tarih": "1978-05-24",
+"ev": "Adana Demirspor",
+"dep": "Trabzonspor",
+"eg": 0,
+"dg": 0,
+"g1": [],
+"g2": [],
+"stad": "Adana Şehir Stadyumu, Adana",
+"hakem": "İhsan Türe"
+},
+{
+"madde": "1979 Başbakanlık Kupası",
+"tarih": "1979-06-10",
+"ev": "Galatasaray",
+"dep": "Altay",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Fatih Terim",
+25,
+"P"
+]
+],
+"g2": [],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Nihat Özbirgül"
+},
+{
+"madde": "1979 Cumhurbaşkanlığı Kupası",
+"tarih": "1979-06-17",
+"ev": "Trabzonspor",
+"dep": "Fenerbahçe",
+"eg": 2,
+"dg": 1,
+"g1": [
+[
+"Cengiz Akçay",
+14,
+null
+],
+[
+"Selahattin Babul",
+107,
+null
+]
+],
+"g2": [
+[
+"Erol Togay",
+15,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Orhan Cebe"
+},
+{
+"madde": "1979 Gençlik ve Spor Bakanlığı Kupası",
+"tarih": "1979-06-07",
+"ev": "Gaziantepspor",
+"dep": "Kayseri Sümerspor",
+"eg": 2,
+"dg": 0,
+"g1": [
+[
+"Fatih Zambak",
+7,
+null
+],
+[
+"Ömer Erkorkmaz",
+65,
+null
+]
+],
+"g2": [],
+"stad": "19 Mayıs Stadyumu, Ankara",
+"hakem": "Erkan Göksel"
+},
+{
+"madde": "1979 Türkiye Kupası finali",
+"tarih": "1979-05-09",
+"ev": "Altay",
+"dep": "Fenerbahçe",
+"eg": 2,
+"dg": 1,
+"g1": [
+[
+"Zafer Bilgetay",
+40,
+null
+],
+[
+"Bora Öztürk",
+80,
+null
+]
+],
+"g2": [
+[
+"Engin Verel",
+34,
+null
+]
+],
+"stad": "Alsancak Stadyumu, İzmir",
+"hakem": "İhsan Türe"
+},
+{
+"madde": "1979 Türkiye Kupası finali",
+"tarih": "1979-05-23",
+"ev": "Fenerbahçe",
+"dep": "Altay",
+"eg": 2,
+"dg": 0,
+"g1": [
+[
+"Raşit Çetiner",
+3,
+null
+],
+[
+"Önder Mustafaoğlu",
+58,
+null
+]
+],
+"g2": [],
+"stad": "İnönü Stadyumu, İstanbul",
+"hakem": "Hilmi Ok"
+},
+{
+"madde": "1980 Başbakanlık Kupası",
+"tarih": "1980-06-01",
+"ev": "Fenerbahçe",
+"dep": "Galatasaray",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Selçuk Yula",
+103,
+null
+]
+],
+"g2": [],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Talat Tokat"
+},
+{
+"madde": "1980 Cumhurbaşkanlığı Kupası",
+"tarih": "1980-06-08",
+"ev": "Trabzonspor",
+"dep": "Altay",
+"eg": 3,
+"dg": 0,
+"g1": [
+[
+"Güngör Şahinkaya",
+39,
+null
+],
+[
+"Galip Değerli",
+70,
+null
+],
+[
+"Galip Değerli",
+86,
+null
+]
+],
+"g2": [],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Hilmi Ok"
+},
+{
+"madde": "1980 Türkiye Kupası finali",
+"tarih": "1980-05-14",
+"ev": "Altay",
+"dep": "Galatasaray",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Ümit Kayıhan",
+47,
+null
+]
+],
+"g2": [],
+"stad": "Alsancak Stadyumu, İzmir",
+"hakem": "İlyas Ayan"
+},
+{
+"madde": "1980 Türkiye Kupası finali",
+"tarih": "1980-05-28",
+"ev": "Galatasaray",
+"dep": "Altay",
+"eg": 1,
+"dg": 1,
+"g1": [
+[
+"Öner Kılıç",
+10,
+null
+]
+],
+"g2": [
+[
+"Mustafa Denizli",
+63,
+"P"
+]
+],
+"stad": "İnönü Stadyumu, İstanbul",
+"hakem": "Nihat Özbirgül"
+},
+{
+"madde": "1981 Başbakanlık Kupası",
+"tarih": "1981-05-31",
+"ev": "Adanaspor",
+"dep": "Boluspor",
+"eg": 1,
+"dg": 3,
+"g1": [
+[
+"Bora Öztürk",
+39,
+null
+]
+],
+"g2": [
+[
+"Mehmet Akdülger",
+14,
+null
+],
+[
+"Mehmet Akdülger",
+32,
+null
+],
+[
+"Mehmet Akdülger",
+64,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Erkan Göksel"
+},
+{
+"madde": "1981 Devlet Başkanlığı Kupası",
+"tarih": "1981-06-03",
+"ev": "Trabzonspor",
+"dep": "Ankaragücü",
+"eg": 0,
+"dg": 1,
+"g1": [],
+"g2": [
+[
+"Nazmi Erdenerin",
+59,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Talat Tokat"
+},
+{
+"madde": "1981 Federasyon Kupası finali",
+"tarih": "1981-05-06",
+"ev": "MKE Ankaragücü",
+"dep": "Boluspor",
+"eg": 2,
+"dg": 1,
+"g1": [
+[
+"Mehmet Şahin",
+19,
+null
+],
+[
+"Sadık Aksöz",
+33,
+null
+]
+],
+"g2": [
+[
+"Minas Asa",
+42,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Cumhur Demir"
+},
+{
+"madde": "1981 Federasyon Kupası finali",
+"tarih": "1981-05-13",
+"ev": "Boluspor",
+"dep": "MKE Ankaragücü",
+"eg": 0,
+"dg": 0,
+"g1": [],
+"g2": [],
+"stad": "Bolu Atatürk Stadyumu, Bolu",
+"hakem": "Sadık Deda"
+},
+{
+"madde": "1982 Devlet Başkanlığı Kupası",
+"tarih": "1982-06-16",
+"ev": "Beşiktaş",
+"dep": "Galatasaray",
+"eg": 0,
+"dg": 2,
+"g1": [],
+"g2": [
+[
+"Mirza Sejdić",
+28,
+null
+],
+[
+"Tarik Hodžić",
+62,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Talat Tokat"
+},
+{
+"madde": "1982 Federasyon Kupası finali",
+"tarih": "1982-05-19",
+"ev": "Galatasaray",
+"dep": "MKE Ankaragücü",
+"eg": 3,
+"dg": 0,
+"g1": [
+[
+"Sinan Turhan",
+28,
+null
+],
+[
+"Tarik Hodžić",
+37,
+null
+],
+[
+"Bülent Alkılıç",
+58,
+null
+]
+],
+"g2": [],
+"stad": "Ali Sami Yen Stadyumu, İstanbul",
+"hakem": "İhsan Türe"
+},
+{
+"madde": "1982 Federasyon Kupası finali",
+"tarih": "1982-05-26",
+"ev": "MKE Ankaragücü",
+"dep": "Galatasaray",
+"eg": 2,
+"dg": 1,
+"g1": [
+[
+"Halil İbrahim Eren",
+32,
+"P"
+],
+[
+"Halil İbrahim Eren",
+85,
+"P"
+]
+],
+"g2": [
+[
+"Tarik Hodžić",
+3,
+null
+]
+],
+"stad": "19 Mayıs Stadyumu, Ankara",
+"hakem": "Sadık Deda"
+},
+{
+"madde": "1983 Cumhurbaşkanlığı Kupası",
+"tarih": "1983-06-22",
+"ev": "Fenerbahçe",
+"dep": "Trabzonspor",
+"eg": 0,
+"dg": 2,
+"g1": [],
+"g2": [
+[
+"Tuncay Soyak",
+7,
+null
+],
+[
+"İskender Günen",
+82,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Erkan Göksel"
+},
+{
+"madde": "1983 Federasyon Kupası finali",
+"tarih": "1983-06-08",
+"ev": "Fenerbahçe",
+"dep": "Mersin İdman Yurdu",
+"eg": 2,
+"dg": 0,
+"g1": [
+[
+"Selçuk Yula",
+19,
+null
+],
+[
+"Mehmet Hacıoğlu",
+29,
+null
+]
+],
+"g2": [],
+"stad": "Fenerbahçe Stadı, İstanbul",
+"hakem": "Necmi Temizel"
+},
+{
+"madde": "1983 Federasyon Kupası finali",
+"tarih": "1983-06-15",
+"ev": "Mersin İdman Yurdu",
+"dep": "Fenerbahçe",
+"eg": 1,
+"dg": 2,
+"g1": [
+[
+"Sertaç Yüzbaş",
+59,
+null
+]
+],
+"g2": [
+[
+"Selçuk Yula",
+16,
+null
+],
+[
+"Mustafa Arabacıbaşı",
+20,
+null
+]
+],
+"stad": "Tevfik Sırrı Gür Stadyumu, Mersin",
+"hakem": "Sadık Deda"
+},
+{
+"madde": "1984 Cumhurbaşkanlığı Kupası",
+"tarih": "1984-06-02",
+"ev": "Trabzonspor",
+"dep": "Fenerbahçe",
+"eg": 0,
+"dg": 1,
+"g1": [],
+"g2": [
+[
+"İlyas Tüfekçi",
+79,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Yusuf Namoğlu"
+},
+{
+"madde": "1984 Federasyon Kupası finali",
+"tarih": "1984-05-30",
+"ev": "Trabzonspor",
+"dep": "Beşiktaş",
+"eg": 2,
+"dg": 0,
+"g1": [
+[
+"Levent Erköse",
+90,
+null
+],
+[
+"Levent Erköse",
+90,
+null
+]
+],
+"g2": [],
+"stad": "İzmir Atatürk Stadyumu, İzmir",
+"hakem": "İhsan Türe"
+},
+{
+"madde": "1985 Başbakanlık Kupası",
+"tarih": "1985-06-09",
+"ev": "Trabzonspor",
+"dep": "Kayserispor",
+"eg": 6,
+"dg": 2,
+"g1": [
+[
+"İskender Günen",
+20,
+null
+],
+[
+"Tuncay Soyak",
+30,
+null
+],
+[
+"Tuncay Soyak",
+53,
+null
+],
+[
+"Tuncay Soyak",
+57,
+null
+],
+[
+"Şenol Ustaömer",
+72,
+null
+],
+[
+"Hasan Şengün",
+90,
+null
+]
+],
+"g2": [
+[
+"Çetin Aktaş",
+15,
+null
+],
+[
+"Serol Emlek",
+73,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "İhsan Türe"
+},
+{
+"madde": "1985 Cumhurbaşkanlığı Kupası",
+"tarih": "1985-06-12",
+"ev": "Fenerbahçe",
+"dep": "Galatasaray",
+"eg": 1,
+"dg": 1,
+"g1": [
+[
+"Hüseyin",
+78,
+null
+]
+],
+"g2": [
+[
+"Bülent",
+37,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Sadık Deda"
+},
+{
+"madde": "1985 Federasyon Kupası finali",
+"tarih": "1985-04-10",
+"ev": "Trabzonspor",
+"dep": "Galatasaray",
+"eg": 1,
+"dg": 2,
+"g1": [
+[
+"Bahaddin Güneş",
+74,
+null
+]
+],
+"g2": [
+[
+"İsmail Demiriz",
+44,
+null
+],
+[
+"Fatih Terim",
+61,
+null
+]
+],
+"stad": "Hüseyin Avni Aker Stadyumu, Trabzon",
+"hakem": "İhsan Türe"
+},
+{
+"madde": "1985 Federasyon Kupası finali",
+"tarih": "1985-04-17",
+"ev": "Galatasaray",
+"dep": "Trabzonspor",
+"eg": 0,
+"dg": 0,
+"g1": [],
+"g2": [],
+"stad": "BJK İnönü Stadyumu, İstanbul",
+"hakem": "Talat Tokat"
+},
+{
+"madde": "1986 Başbakanlık Kupası",
+"tarih": "1986-06-06",
+"ev": "Galatasaray",
+"dep": "Altay",
+"eg": 8,
+"dg": 1,
+"g1": [
+[
+"Erdal Keser",
+6,
+null
+],
+[
+"Erdal Keser",
+30,
+null
+],
+[
+"Erdal Keser",
+60,
+null
+],
+[
+"Erdal Keser",
+70,
+null
+],
+[
+"Erdal Keser",
+89,
+null
+],
+[
+"Raşit Çetiner",
+24,
+null
+],
+[
+"Cevad Prekazi",
+80,
+null
+],
+[
+"Erhan Önal",
+82,
+null
+]
+],
+"g2": [
+[
+"Erdi Demir",
+76,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Ahmet Akçay"
+},
+{
+"madde": "1986 Cumhurbaşkanlığı Kupası",
+"tarih": "1986-06-15",
+"ev": "Beşiktaş",
+"dep": "Bursaspor",
+"eg": 2,
+"dg": 1,
+"g1": [
+[
+"Metin Tekin",
+61,
+null
+],
+[
+"Gökhan Keskin",
+92,
+null
+]
+],
+"g2": [
+[
+"Salih Salimoğlu",
+77,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Talat Tokat"
+},
+{
+"madde": "1986 Federasyon Kupası finali",
+"tarih": "1986-05-28",
+"ev": "Bursaspor",
+"dep": "Altay",
+"eg": 2,
+"dg": 0,
+"g1": [
+[
+"Mihály Tulipán",
+45,
+null
+],
+[
+"Beyhan Çalışkan",
+60,
+"P"
+]
+],
+"g2": [],
+"stad": "Bursa Atatürk Stadyumu, Bursa",
+"hakem": "Coşkun Kutay"
+},
+{
+"madde": "1987 Başbakanlık Kupası",
+"tarih": "1987-06-10",
+"ev": "Beşiktaş",
+"dep": "Eskişehirspor",
+"eg": 2,
+"dg": 2,
+"g1": [
+[
+"Rıza Çalımbay",
+50,
+null
+],
+[
+"Ziya Doğan",
+78,
+null
+]
+],
+"g2": [
+[
+"Ahmet Kılıç",
+13,
+null
+],
+[
+"Nedim Demirbilek",
+34,
+null
+]
+],
+"stad": "19 Mayıs Stadyumu, Ankara",
+"hakem": "Coşkun Kutay"
+},
+{
+"madde": "1987 Cumhurbaşkanlığı Kupası",
+"tarih": "1987-06-14",
+"ev": "Galatasaray",
+"dep": "Gençlerbirliği",
+"eg": 3,
+"dg": 2,
+"g1": [
+[
+"İlyas Tüfekçi",
+42,
+"P"
+],
+[
+"Uğur Tütüneker",
+72,
+null
+],
+[
+"Uğur Tütüneker",
+116,
+null
+]
+],
+"g2": [
+[
+"Osman Özdemir",
+65,
+null
+],
+[
+"Avni Okumuş",
+90,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Özcan Oal"
+},
+{
+"madde": "1987 Federasyon Kupası finali",
+"tarih": "1987-05-13",
+"ev": "Gençlerbirliği",
+"dep": "Eskişehirspor",
+"eg": 5,
+"dg": 0,
+"g1": [
+[
+"Avni Okumuş",
+25,
+null
+],
+[
+"Özcan Duman",
+37,
+null
+],
+[
+"Halil İbrahim Eren",
+39,
+null
+],
+[
+"Harun Erol",
+46,
+null
+],
+[
+"Harun Erol",
+52,
+null
+]
+],
+"g2": [],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Özcan Oal"
+},
+{
+"madde": "1987 Federasyon Kupası finali",
+"tarih": "1987-05-20",
+"ev": "Eskişehirspor",
+"dep": "Gençlerbirliği",
+"eg": 2,
+"dg": 1,
+"g1": [
+[
+"Fuat Yaman",
+36,
+null
+],
+[
+"Erdoğan Koç",
+85,
+null
+]
+],
+"g2": [
+[
+"Özcan Duman",
+42,
+null
+]
+],
+"stad": "Eskişehir Atatürk Stadyumu, Eskişehir",
+"hakem": "Ayhan Köseoğlu"
+},
+{
+"madde": "1988 Başbakanlık Kupası",
+"tarih": "1988-06-01",
+"ev": "Beşiktaş",
+"dep": "Samsunspor",
+"eg": 3,
+"dg": 2,
+"g1": [
+[
+"Feyyaz Uçar",
+61,
+null
+],
+[
+"Samet Aybaba",
+86,
+null
+],
+[
+"Feyyaz Uçar",
+90,
+null
+]
+],
+"g2": [
+[
+"Yücel Çolak",
+18,
+null
+],
+[
+"Yücel Çolak",
+26,
+null
+]
+],
+"stad": "19 Mayıs Stadyumu, Ankara",
+"hakem": "Erman Toroğlu"
+},
+{
+"madde": "1988 Cumhurbaşkanlığı Kupası",
+"tarih": "1988-06-05",
+"ev": "Galatasaray",
+"dep": "Sakaryaspor",
+"eg": 2,
+"dg": 0,
+"g1": [
+[
+"Mirsad Kovačevič",
+10,
+null
+],
+[
+"Tanju Çolak",
+18,
+null
+]
+],
+"g2": [],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Yusuf Namoğlu"
+},
+{
+"madde": "1988 Federasyon Kupası finali",
+"tarih": "1988-05-11",
+"ev": "Sakaryaspor",
+"dep": "Samsunspor",
+"eg": 2,
+"dg": 0,
+"g1": [
+[
+"Oğuz Çetin",
+38,
+null
+],
+[
+"Sinan Turhan",
+63,
+null
+]
+],
+"g2": [],
+"stad": "Sakarya Atatürk Stadyumu, Sakarya",
+"hakem": "İlyas Ayan"
+},
+{
+"madde": "1988 Federasyon Kupası finali",
+"tarih": "1988-05-18",
+"ev": "Samsunspor",
+"dep": "Sakaryaspor",
+"eg": 1,
+"dg": 1,
+"g1": [
+[
+"Mustafa Sinecek",
+64,
+null
+]
+],
+"g2": [
+[
+"Sinan Turhan",
+18,
+null
+]
+],
+"stad": "Samsun 19 Mayıs Stadyumu, Samsun",
+"hakem": "İhsan Türe"
+},
+{
+"madde": "1989 Başbakanlık Kupası",
+"tarih": "1989-08-20",
+"ev": "Galatasaray",
+"dep": "Fenerbahçe",
+"eg": 2,
+"dg": 3,
+"g1": [
+[
+"Bülent Alkılıç",
+13,
+null
+],
+[
+"İlyas Tüfekçi",
+22,
+null
+]
+],
+"g2": [
+[
+"Şenol Çorlu",
+27,
+null
+],
+[
+"Şenol Çorlu",
+69,
+null
+],
+[
+"Aykut Kocaman",
+91,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Hasan Ceylan"
+},
+{
+"madde": "1989 Cumhurbaşkanlığı Kupası",
+"tarih": "1989-08-26",
+"ev": "Fenerbahçe",
+"dep": "Beşiktaş",
+"eg": 0,
+"dg": 1,
+"g1": [],
+"g2": [
+[
+"Ali Gültiken",
+53,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Coşkun Kutay"
+},
+{
+"madde": "1989 Federasyon Kupası finali",
+"tarih": "1989-06-21",
+"ev": "Fenerbahçe",
+"dep": "Beşiktaş",
+"eg": 0,
+"dg": 1,
+"g1": [],
+"g2": [
+[
+"Les Ferdinand",
+15,
+null
+]
+],
+"stad": "Fenerbahçe Stadı, İstanbul",
+"hakem": "Özcan Oal"
+},
+{
+"madde": "1989 Federasyon Kupası finali",
+"tarih": "1989-06-25",
+"ev": "Beşiktaş",
+"dep": "Fenerbahçe",
+"eg": 2,
+"dg": 1,
+"g1": [
+[
+"Ali Gültiken",
+73,
+null
+],
+[
+"Feyyaz Uçar",
+86,
+null
+]
+],
+"g2": [
+[
+"Oğuz Çetin",
+46,
+null
+]
+],
+"stad": "BJK İnönü Stadyumu, İstanbul",
+"hakem": "İhsan Türe"
+},
+{
+"madde": "1990 Başbakanlık Kupası",
+"tarih": "1990-05-23",
+"ev": "Galatasaray",
+"dep": "Trabzonspor",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Tanju Çolak",
+71,
+null
+]
+],
+"g2": [],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Kazım Ünlüsoy"
+},
+{
+"madde": "1990 Cumhurbaşkanlığı Kupası",
+"tarih": "1990-05-30",
+"ev": "Beşiktaş",
+"dep": "Fenerbahçe",
+"eg": 2,
+"dg": 3,
+"g1": [
+[
+"Metin Tekin",
+63,
+null
+],
+[
+"Metin Tekin",
+66,
+null
+]
+],
+"g2": [
+[
+"Hakan Tecimer",
+7,
+null
+],
+[
+"Şenol Çorlu",
+38,
+null
+],
+[
+"Aykut Kocaman",
+56,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Sadık Deda"
+},
+{
+"madde": "1990 Federasyon Kupası finali",
+"tarih": "1990-05-02",
+"ev": "Beşiktaş",
+"dep": "Trabzonspor",
+"eg": 2,
+"dg": 0,
+"g1": [
+[
+"Feyyaz Uçar",
+68,
+null
+],
+[
+"Mehmet Özdilek",
+74,
+null
+]
+],
+"g2": [],
+"stad": "İzmir Atatürk Stadyumu, İzmir",
+"hakem": "Hasan Ceylan"
+},
+{
+"madde": "1991 Başbakanlık Kupası",
+"tarih": "1991-05-22",
+"ev": "Trabzonspor",
+"dep": "Ankaragücü",
+"eg": 1,
+"dg": 3,
+"g1": [
+[
+"Ünal Karaman",
+21,
+null
+]
+],
+"g2": [
+[
+"Ziya Yıldız",
+22,
+null
+],
+[
+"Ziya Yıldız",
+52,
+null
+],
+[
+"Ergün Yücel",
+70,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Yüksel Okçuoğlu"
+},
+{
+"madde": "1991 Cumhurbaşkanlığı Kupası",
+"tarih": "1991-05-26",
+"ev": "Beşiktaş",
+"dep": "Galatasaray",
+"eg": 0,
+"dg": 1,
+"g1": [],
+"g2": [
+[
+"Roman Kosecki",
+78,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Ahmet Çakar"
+},
+{
+"madde": "1991 Federasyon Kupası finali",
+"tarih": "1991-05-08",
+"ev": "MKE Ankaragücü",
+"dep": "Galatasaray",
+"eg": 1,
+"dg": 3,
+"g1": [
+[
+"Alp",
+17,
+null
+]
+],
+"g2": [
+[
+"Çolak",
+18,
+null
+],
+[
+"Tütüneker",
+106,
+null
+],
+[
+"Kerimoğlu",
+120,
+null
+]
+],
+"stad": "Atatürk Stadyumu, İzmir",
+"hakem": "Hasan Ceylan"
+},
+{
+"madde": "1992 Başbakanlık Kupası",
+"tarih": "1992-05-22",
+"ev": "Fenerbahçe",
+"dep": "Bursaspor",
+"eg": 1,
+"dg": 3,
+"g1": [
+[
+"Aykut Kocaman",
+3,
+null
+]
+],
+"g2": [
+[
+"Ali Nail Durmuş",
+21,
+"P"
+],
+[
+"Hakan Şükür",
+62,
+null
+],
+[
+"Vedat Vatansever",
+71,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Kazım Ünlüsoy"
+},
+{
+"madde": "1992 Cumhurbaşkanlığı Kupası",
+"tarih": "1992-05-24",
+"ev": "Beşiktaş",
+"dep": "Trabzonspor",
+"eg": 2,
+"dg": 1,
+"g1": [
+[
+"Feyyaz Uçar",
+57,
+null
+],
+[
+"Mehmet Özdilek",
+70,
+null
+]
+],
+"g2": [
+[
+"Hami Mandıralı",
+48,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Sadık Deda"
+},
+{
+"madde": "1992 Federasyon Kupası finali",
+"tarih": "1992-04-22",
+"ev": "Bursaspor",
+"dep": "Trabzonspor",
+"eg": 3,
+"dg": 0,
+"g1": [
+[
+"Gabriel",
+27,
+null
+],
+[
+"Şükür",
+56,
+null
+],
+[
+"Durmuş",
+89,
+"P"
+]
+],
+"g2": [],
+"stad": "Bursa Atatürk Stadyumu, Bursa",
+"hakem": "Serdar Çakman"
+},
+{
+"madde": "1992 Federasyon Kupası finali",
+"tarih": "1992-04-29",
+"ev": "Trabzonspor",
+"dep": "Bursaspor",
+"eg": 5,
+"dg": 1,
+"g1": [
+[
+"Boz",
+1,
+null
+],
+[
+"Mandıralı",
+36,
+"P"
+],
+[
+"Ertaş",
+49,
+"K"
+],
+[
+"Aslan",
+60,
+null
+],
+[
+"Suna",
+86,
+null
+]
+],
+"g2": [
+[
+"Vatansever",
+14,
+null
+]
+],
+"stad": "Hüseyin Avni Aker Stadyumu, Trabzon",
+"hakem": "Bülent Yavuz"
+},
+{
+"madde": "1993 Başbakanlık Kupası",
+"tarih": "1993-08-11",
+"ev": "Trabzonspor",
+"dep": "Fenerbahçe",
+"eg": 0,
+"dg": 1,
+"g1": [],
+"g2": [
+[
+"Mecnur Çolak",
+109,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Serdar Çakman"
+},
+{
+"madde": "1993 Cumhurbaşkanlığı Kupası",
+"tarih": "1993-08-14",
+"ev": "Galatasaray",
+"dep": "Beşiktaş",
+"eg": 2,
+"dg": 0,
+"g1": [
+[
+"Mustafa Kocabey",
+1,
+null
+],
+[
+"Hakan Şükür",
+64,
+null
+]
+],
+"g2": [],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Erman Toroğlu"
+},
+{
+"madde": "1993 Türkiye Kupası finali",
+"tarih": "1993-03-24",
+"ev": "Galatasaray",
+"dep": "Beşiktaş",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Keser",
+44,
+null
+]
+],
+"g2": [],
+"stad": "Ali Sami Yen Stadyumu, İstanbul",
+"hakem": "Bülent Yavuz"
+},
+{
+"madde": "1993 Türkiye Kupası finali",
+"tarih": "1993-04-07",
+"ev": "Beşiktaş",
+"dep": "Galatasaray",
+"eg": 2,
+"dg": 2,
+"g1": [
+[
+"Uçar",
+44,
+null
+],
+[
+"Güveneroğlu",
+84,
+null
+]
+],
+"g2": [
+[
+"Şükür",
+2,
+null
+],
+[
+"Erdem",
+26,
+null
+]
+],
+"stad": "BJK İnönü Stadyumu, İstanbul",
+"hakem": "Ahmet Çakar"
+},
+{
+"madde": "1994 Başbakanlık Kupası",
+"tarih": "1994-05-21",
+"ev": "Fenerbahçe",
+"dep": "Trabzonspor",
+"eg": 3,
+"dg": 4,
+"g1": [
+[
+"Bülent Uygun",
+32,
+null
+],
+[
+"Bülent Uygun",
+44,
+null
+],
+[
+"Kemalettin Şentürk",
+72,
+null
+]
+],
+"g2": [
+[
+"Şota Arveladze",
+4,
+null
+],
+[
+"Arçil Arveladze",
+18,
+null
+],
+[
+"Hami Mandıralı",
+38,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Hasan Ceylan"
+},
+{
+"madde": "1994 Cumhurbaşkanlığı Kupası",
+"tarih": "1994-05-22",
+"ev": "Galatasaray",
+"dep": "Beşiktaş",
+"eg": 1,
+"dg": 3,
+"g1": [
+[
+"Suat Kaya",
+2,
+null
+]
+],
+"g2": [
+[
+"Feyyaz Uçar",
+17,
+null
+],
+[
+"Metin Tekin",
+66,
+null
+],
+[
+"Sergen Yalçın",
+69,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Bülent Yavuz"
+},
+{
+"madde": "1994 Türkiye Kupası finali",
+"tarih": "1994-04-06",
+"ev": "Galatasaray",
+"dep": "Beşiktaş",
+"eg": 0,
+"dg": 0,
+"g1": [],
+"g2": [],
+"stad": "Ali Sami Yen Stadyumu, İstanbul",
+"hakem": "Bülent Yavuz"
+},
+{
+"madde": "1994 Türkiye Kupası finali",
+"tarih": "1994-05-04",
+"ev": "Beşiktaş",
+"dep": "Galatasaray",
+"eg": 3,
+"dg": 2,
+"g1": [
+[
+"Metin Tekin",
+15,
+null
+],
+[
+"Fani Madida",
+22,
+null
+],
+[
+"Alpay Özalan",
+83,
+null
+]
+],
+"g2": [
+[
+"Hakan Şükür",
+11,
+null
+],
+[
+"Bülent Korkmaz",
+78,
+null
+]
+],
+"stad": "İnönü Stadyumu, İstanbul",
+"hakem": "Ahmet Çakar"
+},
+{
+"madde": "1995 Başbakanlık Kupası",
+"tarih": "1995-05-25",
+"ev": "Galatasaray",
+"dep": "Fenerbahçe",
+"eg": 1,
+"dg": 1,
+"g1": [
+[
+"Kubilay Türkyılmaz",
+93,
+null
+]
+],
+"g2": [
+[
+"Kemalettin Şentürk",
+116,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Oğuz Sarvan"
+},
+{
+"madde": "1995 Cumhurbaşkanlığı Kupası",
+"tarih": "1995-05-27",
+"ev": "Beşiktaş",
+"dep": "Trabzonspor",
+"eg": 0,
+"dg": 2,
+"g1": [],
+"g2": [
+[
+"Hami Mandıralı",
+30,
+null
+],
+[
+"Abdullah Ercan",
+89,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Ahmet Çakar"
+},
+{
+"madde": "1995 Türkiye Kupası finali",
+"tarih": "1995-04-05",
+"ev": "Galatasaray",
+"dep": "Trabzonspor",
+"eg": 2,
+"dg": 3,
+"g1": [
+[
+"Balkanlı",
+66,
+null
+],
+[
+"Kerimoğlu",
+84,
+null
+]
+],
+"g2": [
+[
+"Mandıralı",
+11,
+null
+],
+[
+"Mandıralı",
+88,
+null
+],
+[
+"Ş. Arveladze",
+60,
+null
+]
+],
+"stad": "Ali Sami Yen Stadyumu, İstanbul",
+"hakem": "Mustafa Çulcu"
+},
+{
+"madde": "1995 Türkiye Kupası finali",
+"tarih": "1995-04-12",
+"ev": "Trabzonspor",
+"dep": "Galatasaray",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Kaynak",
+16,
+null
+]
+],
+"g2": [],
+"stad": "Hüseyin Avni Aker Stadyumu, Trabzon",
+"hakem": "Ayhan Yücebilgiç"
+},
+{
+"madde": "1996 Başbakanlık Kupası",
+"tarih": "1997-03-11",
+"ev": "Trabzonspor",
+"dep": "Beşiktaş",
+"eg": 4,
+"dg": 0,
+"g1": [
+[
+"Şota Arveladze",
+24,
+null
+],
+[
+"Şota Arveladze",
+54,
+null
+],
+[
+"Tolunay Kafkas",
+61,
+null
+],
+[
+"Hami Mandıralı",
+65,
+null
+]
+],
+"g2": [],
+"stad": "19 Mayıs Stadyumu, Ankara",
+"hakem": "Ayhan Yücebilgiç"
+},
+{
+"madde": "1996 Cumhurbaşkanlığı Kupası",
+"tarih": "1997-03-12",
+"ev": "Fenerbahçe",
+"dep": "Galatasaray",
+"eg": 0,
+"dg": 3,
+"g1": [],
+"g2": [
+[
+"Hakan Şükür",
+20,
+null
+],
+[
+"Hakan Şükür",
+68,
+"P"
+],
+[
+"Hakan Şükür",
+76,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Oğuz Sarvan"
+},
+{
+"madde": "1996 Türkiye Kupası finali",
+"tarih": "1996-04-11",
+"ev": "Galatasaray",
+"dep": "Fenerbahçe",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Saunders",
+5,
+null
+]
+],
+"g2": [],
+"stad": "Ali Sami Yen Stadyumu, İstanbul",
+"hakem": "Ahmet Çakar"
+},
+{
+"madde": "1996 Türkiye Kupası finali",
+"tarih": "1996-04-24",
+"ev": "Fenerbahçe",
+"dep": "Galatasaray",
+"eg": 1,
+"dg": 1,
+"g1": [
+[
+"Kocaman",
+34,
+null
+]
+],
+"g2": [
+[
+"Saunders",
+116,
+null
+]
+],
+"stad": "Fenerbahçe Stadı, İstanbul",
+"hakem": "Ayhan Yücebilgiç"
+},
+{
+"madde": "1997 Başbakanlık Kupası",
+"tarih": "1997-05-30",
+"ev": "Beşiktaş",
+"dep": "Trabzonspor",
+"eg": 4,
+"dg": 3,
+"g1": [
+[
+"Serdar Topraktepe",
+37,
+null
+],
+[
+"Serdar Topraktepe",
+73,
+null
+],
+[
+"Oktay Derelioğlu",
+53,
+null
+],
+[
+"Mehmet Özdilek",
+117,
+null
+]
+],
+"g2": [
+[
+"Osman Özköylü",
+60,
+null
+],
+[
+"Hami Mandıralı",
+78,
+null
+],
+[
+"Georgi Nemsadze",
+83,
+null
+]
+],
+"stad": "19 Mayıs Stadyumu, Ankara",
+"hakem": "Erol Ersoy"
+},
+{
+"madde": "1997 Cumhurbaşkanlığı Kupası",
+"tarih": "1997-05-31",
+"ev": "Galatasaray",
+"dep": "Kocaelispor",
+"eg": 2,
+"dg": 1,
+"g1": [
+[
+"Ümit",
+59,
+null
+],
+[
+"Hakan Ş.",
+116,
+"P"
+]
+],
+"g2": [
+[
+"Dąbrowski",
+90,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Sabri Çelik"
+},
+{
+"madde": "1997 Türkiye Kupası finali",
+"tarih": "1997-03-19",
+"ev": "Trabzonspor",
+"dep": "Kocaelispor",
+"eg": 1,
+"dg": 1,
+"g1": [
+[
+"İskender Eroğlu",
+25,
+null
+]
+],
+"g2": [
+[
+"Soner Boz",
+67,
+null
+]
+],
+"stad": "Hüseyin Avni Aker Stadyumu, Trabzon",
+"hakem": "Ahmet Çakar"
+},
+{
+"madde": "1997 Türkiye Kupası finali",
+"tarih": "1997-04-16",
+"ev": "Kocaelispor",
+"dep": "Trabzonspor",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Nuri Çolak",
+85,
+null
+]
+],
+"g2": [],
+"stad": "İsmetpaşa Stadyumu, Kocaeli",
+"hakem": "Muhittin Boşat"
+},
+{
+"madde": "1998 Başbakanlık Kupası",
+"tarih": "1998-05-14",
+"ev": "Fenerbahçe",
+"dep": "Trabzonspor",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"John Moshoeu",
+118,
+"P"
+]
+],
+"g2": [],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Ayhan Yücebilgiç"
+},
+{
+"madde": "1998 Cumhurbaşkanlığı Kupası",
+"tarih": "1998-05-15",
+"ev": "Galatasaray",
+"dep": "Beşiktaş",
+"eg": 1,
+"dg": 2,
+"g1": [
+[
+"Mehmet Gönülaçar",
+67,
+null
+]
+],
+"g2": [
+[
+"Daniel Amokachi",
+17,
+null
+],
+[
+"Nihat Kahveci",
+113,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Erol Ersoy"
+},
+{
+"madde": "1998 Türkiye Kupası finali",
+"tarih": "1998-03-25",
+"ev": "Beşiktaş",
+"dep": "Galatasaray",
+"eg": 1,
+"dg": 1,
+"g1": [
+[
+"Ertuğrul Sağlam",
+85,
+null
+]
+],
+"g2": [
+[
+"Okan Buruk",
+61,
+null
+]
+],
+"stad": "BJK İnönü Stadyumu, İstanbul",
+"hakem": "Orhan Erdemir"
+},
+{
+"madde": "1998 Türkiye Kupası finali",
+"tarih": "1998-04-08",
+"ev": "Galatasaray",
+"dep": "Beşiktaş",
+"eg": 1,
+"dg": 1,
+"g1": [
+[
+"Arif Erdem",
+71,
+null
+]
+],
+"g2": [
+[
+"Mehmet Özdilek",
+44,
+null
+]
+],
+"stad": "Ali Sami Yen Stadyumu, İstanbul",
+"hakem": "Erol Ersoy"
+},
+{
+"madde": "1999 Türkiye Kupası finali",
+"tarih": null,
+"ev": "Galatasaray",
+"dep": "Beşiktaş",
+"eg": 0,
+"dg": 0,
+"g1": [],
+"g2": [],
+"stad": "Ali Sami Yen Stadyumu",
+"hakem": "Muhittin Boşat"
+},
+{
+"madde": "1999 Türkiye Kupası finali",
+"tarih": null,
+"ev": "Beşiktaş",
+"dep": "Galatasaray",
+"eg": 0,
+"dg": 2,
+"g1": [],
+"g2": [
+[
+"Ümit Davala",
+52,
+null
+],
+[
+"Ümit Davala",
+68,
+null
+]
+],
+"stad": "BJK İnönü Stadyumu, İstanbul",
+"hakem": "Oğuz Sarvan"
+},
+{
+"madde": "2000 Türkiye Kupası finali",
+"tarih": "2000-05-03",
+"ev": "Antalyaspor",
+"dep": "Galatasaray",
+"eg": 2,
+"dg": 2,
+"g1": [
+[
+"Mustafa Gürsel",
+40,
+null
+],
+[
+"Zafer Demiray",
+70,
+null
+],
+[
+"Kamil Çakır",
+94,
+null
+]
+],
+"g2": [
+[
+"Ümit Davala",
+13,
+null
+],
+[
+"Márcio Mixirica",
+72,
+null
+],
+[
+"Hakan Ünsal",
+99,
+null
+],
+[
+"Mehmet Yozgatlı",
+112,
+null
+],
+[
+"Hakan Şükür",
+113,
+null
+]
+],
+"stad": "Diyarbakır Atatürk Stadyumu, Diyarbakır",
+"hakem": "Metin Tokat"
+},
+{
+"madde": "2000 UEFA Kupası finali",
+"tarih": "2000-05-17",
+"ev": "Galatasaray",
+"dep": "Arsenal",
+"eg": 0,
+"dg": 0,
+"g1": [],
+"g2": [],
+"stad": "Parken Stadyumu, Kopenhag",
+"hakem": "Antonio Jesús López Nieto"
+},
+{
+"madde": "2000 UEFA Süper Kupası",
+"tarih": "2000-08-25",
+"ev": "Real Madrid",
+"dep": "Galatasaray",
+"eg": 1,
+"dg": 2,
+"g1": [
+[
+"Raúl",
+79,
+"P"
+]
+],
+"g2": [
+[
+"Jardel",
+41,
+"P"
+]
+],
+"stad": "II. Louis Stadyumu, Monako",
+"hakem": "Günther Benko"
+},
+{
+"madde": "2001 Türkiye Kupası finali",
+"tarih": "2001-04-11",
+"ev": "Fenerbahçe",
+"dep": "Gençlerbirliği",
+"eg": 2,
+"dg": 2,
+"g1": [
+[
+"Samuel Johnson",
+6,
+null
+],
+[
+"Kennet Andersson",
+65,
+null
+]
+],
+"g2": [
+[
+"Marcel Kimemba Mbayo",
+13,
+null
+],
+[
+"Ümit Karan",
+54,
+null
+]
+],
+"stad": "Kayseri Atatürk Stadyumu, Kayseri",
+"hakem": "Ali Aydın (hakem)"
+},
+{
+"madde": "2002 Türkiye Kupası finali",
+"tarih": "2002-04-03",
+"ev": "Kocaelispor",
+"dep": "Beşiktaş",
+"eg": 4,
+"dg": 0,
+"g1": [
+[
+"Cihan Haspolatlı",
+44,
+null
+],
+[
+"Zdravko Lazarov",
+59,
+null
+],
+[
+"Kaan Dobra",
+82,
+null
+],
+[
+"Serdar Topraktepe",
+83,
+null
+]
+],
+"g2": [],
+"stad": "Bursa Atatürk Stadyumu, Bursa",
+"hakem": "Metin Tokat"
+},
+{
+"madde": "2003 Türkiye Kupası finali",
+"tarih": "2003-04-23",
+"ev": "Trabzonspor",
+"dep": "Gençlerbirliği",
+"eg": 3,
+"dg": 1,
+"g1": [
+[
+"Mehmet Yılmaz",
+9,
+null
+],
+[
+"Gökdeniz Karadeniz",
+31,
+null
+],
+[
+"Gökdeniz Karadeniz",
+70,
+null
+]
+],
+"g2": [
+[
+"Ahmed Hasan",
+44,
+null
+]
+],
+"stad": "Antalya Atatürk Stadyumu, Antalya",
+"hakem": "Mustafa Çulcu"
+},
+{
+"madde": "2004 Türkiye Kupası finali",
+"tarih": "2004-05-05",
+"ev": "Trabzonspor",
+"dep": "Gençlerbirliği",
+"eg": 4,
+"dg": 0,
+"g1": [
+[
+"Yılmaz",
+22,
+null
+],
+[
+"Karadeniz",
+70,
+null
+],
+[
+"Karadeniz",
+77,
+null
+],
+[
+"Ahinful",
+88,
+null
+]
+],
+"g2": [],
+"stad": "Atatürk Olimpiyat Stadyumu, İstanbul",
+"hakem": "Kuddusi Müftüoğlu"
+},
+{
+"madde": "2005 Türkiye Kupası finali",
+"tarih": "2005-05-11",
+"ev": "Galatasaray",
+"dep": "Fenerbahçe",
+"eg": 5,
+"dg": 1,
+"g1": [
+[
+"Franck Ribéry",
+15,
+null
+],
+[
+"Necati Ateş",
+23,
+null
+],
+[
+"Hakan Şükür",
+36,
+null
+],
+[
+"Hakan Şükür",
+71,
+null
+],
+[
+"Hakan Şükür",
+88,
+null
+]
+],
+"g2": [
+[
+"Fábio Luciano",
+40,
+null
+]
+],
+"stad": "Atatürk Olimpiyat Stadyumu, İstanbul",
+"hakem": "Serdar Tatlı"
+},
+{
+"madde": "2006 Süper Kupa",
+"tarih": "2006-07-30",
+"ev": "Galatasaray",
+"dep": "Beşiktaş",
+"eg": 0,
+"dg": 1,
+"g1": [],
+"g2": [],
+"stad": "Commerzbank-Arena",
+"hakem": "Bülent Demirlek"
+},
+{
+"madde": "2006 Türkiye Kupası finali",
+"tarih": "2006-05-03",
+"ev": "Fenerbahçe",
+"dep": "Beşiktaş",
+"eg": 2,
+"dg": 3,
+"g1": [
+[
+"Alex de Souza",
+54,
+null
+],
+[
+"Mehmet Yozgatlı",
+80,
+null
+]
+],
+"g2": [
+[
+"Tümer Metin",
+31,
+null
+],
+[
+"Tümer Metin",
+115,
+null
+],
+[
+"Gökhan Güleç",
+35,
+null
+]
+],
+"stad": "İzmir Atatürk Stadyumu, İzmir",
+"hakem": "Bülent Demirlek"
+},
+{
+"madde": "2007 Süper Kupa",
+"tarih": "2007-08-05",
+"ev": "Fenerbahçe",
+"dep": "Beşiktaş",
+"eg": 2,
+"dg": 1,
+"g1": [],
+"g2": [],
+"stad": "RheinEnergie Stadyumu",
+"hakem": null
+},
+{
+"madde": "2007 Türkiye Kupası finali",
+"tarih": "2007-05-09",
+"ev": "Kayseri Erciyesspor",
+"dep": "Beşiktaş",
+"eg": 0,
+"dg": 1,
+"g1": [],
+"g2": [
+[
+"Bobô",
+101,
+null
+]
+],
+"stad": "İzmir Atatürk Stadyumu, İzmir",
+"hakem": "İsmet Arzuman"
+},
+{
+"madde": "2008 Süper Kupa",
+"tarih": "2008-08-17",
+"ev": "Galatasaray",
+"dep": "Kayserispor",
+"eg": 2,
+"dg": 1,
+"g1": [
+[
+"Kewell",
+66,
+null
+],
+[
+"Nonda",
+73,
+null
+]
+],
+"g2": [
+[
+"Topuz",
+88,
+null
+]
+],
+"stad": "MSV-Arena, Duisburg",
+"hakem": "Selçuk Dereli"
+},
+{
+"madde": "2008 Türkiye Kupası finali",
+"tarih": "2008-05-07",
+"ev": "Gençlerbirliği",
+"dep": "Kayserispor",
+"eg": 0,
+"dg": 0,
+"g1": [],
+"g2": [],
+"stad": "Bursa Atatürk Stadyumu, Bursa",
+"hakem": "Yunus Yıldırım"
+},
+{
+"madde": "2009 Süper Kupa",
+"tarih": "2009-08-02",
+"ev": "Beşiktaş",
+"dep": "Fenerbahçe",
+"eg": 0,
+"dg": 2,
+"g1": [],
+"g2": [],
+"stad": "Atatürk Olimpiyat Stadyumu",
+"hakem": "Yunus Yıldırım"
+},
+{
+"madde": "2009 Türkiye Kupası finali",
+"tarih": "2009-05-13",
+"ev": "Fenerbahçe",
+"dep": "Beşiktaş",
+"eg": 2,
+"dg": 4,
+"g1": [
+[
+"Güiza",
+27,
+null
+],
+[
+"Alex",
+90,
+"P"
+]
+],
+"g2": [
+[
+"Yusuf",
+6,
+null
+],
+[
+"Bobô",
+56,
+null
+],
+[
+"Bobô",
+74,
+null
+],
+[
+"Hološko",
+80,
+null
+]
+],
+"stad": "İzmir Atatürk Stadyumu, İzmir",
+"hakem": "Bünyamin Gezer"
+},
+{
+"madde": "2010 Süper Kupa",
+"tarih": "2010-08-07",
+"ev": "Bursaspor",
+"dep": "Trabzonspor",
+"eg": 0,
+"dg": 3,
+"g1": [],
+"g2": [],
+"stad": "Atatürk Olimpiyat Stadyumu",
+"hakem": "Kuddusi Müftüoğlu (Antalya)"
+},
+{
+"madde": "2010 Türkiye Kupası finali",
+"tarih": "2010-05-05",
+"ev": "Trabzonspor",
+"dep": "Fenerbahçe",
+"eg": 3,
+"dg": 1,
+"g1": [
+[
+"Umut Bulut",
+66,
+null
+],
+[
+"Engin Baytar",
+80,
+null
+],
+[
+"Gustavo Colman",
+90,
+null
+]
+],
+"g2": [
+[
+"Alex",
+55,
+null
+]
+],
+"stad": "Şanlıurfa GAP Stadyumu, Şanlıurfa",
+"hakem": "Cüneyt Çakır"
+},
+{
+"madde": "2011 Türkiye Kupası finali",
+"tarih": "2011-05-11",
+"ev": "Beşiktaş",
+"dep": "İstanbul BB",
+"eg": 2,
+"dg": 2,
+"g1": [
+[
+"Ricardo Quaresma",
+33,
+null
+],
+[
+"Tomáš Sivok",
+78,
+null
+]
+],
+"g2": [
+[
+"İbrahim Akın",
+53,
+"P"
+],
+[
+"Gökhan Ünal",
+68,
+null
+]
+],
+"stad": "Kayseri Kadir Has Şehir Stadyumu, Kayseri",
+"hakem": "Yunus Yıldırım"
+},
+{
+"madde": "2012 Süper Kupa",
+"tarih": "2012-08-12",
+"ev": "Galatasaray",
+"dep": "Fenerbahçe",
+"eg": 3,
+"dg": 2,
+"g1": [],
+"g2": [],
+"stad": "Kâzım Karabekir Stadyumu",
+"hakem": "Cüneyt Çakır"
+},
+{
+"madde": "2012 Türkiye Kupası finali",
+"tarih": "2012-05-16",
+"ev": "Bursaspor",
+"dep": "Fenerbahçe",
+"eg": 0,
+"dg": 4,
+"g1": [],
+"g2": [
+[
+"Caner Erkin",
+2,
+null
+],
+[
+"Baroni",
+45,
+null
+],
+[
+"Semih Şentürk",
+58,
+null
+],
+[
+"Alex",
+77,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu",
+"hakem": "Bülent Yıldırım Yayın: atv ve a Haber"
+},
+{
+"madde": "2013 Süper Kupa",
+"tarih": "2013-08-11",
+"ev": "Galatasaray",
+"dep": "Fenerbahçe",
+"eg": 1,
+"dg": 0,
+"g1": [],
+"g2": [],
+"stad": "Kadir Has Stadyumu",
+"hakem": "Bülent Yıldırım"
+},
+{
+"madde": "2013 Türkiye Kupası finali",
+"tarih": "2013-05-22",
+"ev": "Fenerbahçe",
+"dep": "Trabzonspor",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Moussa Sow",
+9,
+null
+]
+],
+"g2": [],
+"stad": "Ankara 19 Mayıs Stadyumu",
+"hakem": "Fırat Aydınus Yayın: atv"
+},
+{
+"madde": "2014 Süper Kupa",
+"tarih": "2014-08-25",
+"ev": "Fenerbahçe",
+"dep": "Galatasaray",
+"eg": 0,
+"dg": 0,
+"g1": [],
+"g2": [],
+"stad": "19 Mayıs Stadyumu, Manisa",
+"hakem": "Mustafa Kâmil Abitoğlu Yayın : atv"
+},
+{
+"madde": "2014 Türkiye Kupası finali",
+"tarih": "2014-05-07",
+"ev": "Galatasaray",
+"dep": "Eskişehirspor",
+"eg": 1,
+"dg": 0,
+"g1": [],
+"g2": [],
+"stad": "Atatürk Stadyumu",
+"hakem": "Hüseyin Göçek"
+},
+{
+"madde": "2015 Süper Kupa",
+"tarih": "2015-08-08",
+"ev": "Galatasaray",
+"dep": "Bursaspor",
+"eg": 1,
+"dg": 0,
+"g1": [],
+"g2": [],
+"stad": "Osmanlı Stadyumu",
+"hakem": "Cüneyt Çakır"
+},
+{
+"madde": "2015 Türkiye Kupası finali",
+"tarih": "2015-06-03",
+"ev": "Bursaspor",
+"dep": "Galatasaray",
+"eg": 2,
+"dg": 3,
+"g1": [],
+"g2": [],
+"stad": "Bursa Atatürk Stadyumu",
+"hakem": "Bülent Yıldırım"
+},
+{
+"madde": "2016 Süper Kupa",
+"tarih": "2016-08-13",
+"ev": "Beşiktaş",
+"dep": "Galatasaray",
+"eg": 1,
+"dg": 1,
+"g1": [
+[
+"Aurélien Chedjou",
+107,
+"K"
+]
+],
+"g2": [
+[
+"Hakan Balta",
+99,
+null
+]
+],
+"stad": "Konya Büyükşehir Belediye Stadyumu, Konya",
+"hakem": "Mete Kalkavan"
+},
+{
+"madde": "2016 Türkiye Kupası finali",
+"tarih": "2016-05-26",
+"ev": "Galatasaray",
+"dep": "Fenerbahçe",
+"eg": 1,
+"dg": 0,
+"g1": [],
+"g2": [],
+"stad": "Antalya Stadyumu",
+"hakem": "Mete Kalkavan"
+},
+{
+"madde": "2017 Süper Kupa",
+"tarih": "2017-08-06",
+"ev": "Beşiktaş",
+"dep": "Konyaspor",
+"eg": 1,
+"dg": 2,
+"g1": [
+[
+"Cenk Tosun",
+78,
+null
+]
+],
+"g2": [
+[
+"Abdou Traoré",
+33,
+null
+],
+[
+"Nejc Skubic",
+90,
+"P"
+]
+],
+"stad": "Samsun 19 Mayıs Stadyumu",
+"hakem": null
+},
+{
+"madde": "2017 Türkiye Kupası finali",
+"tarih": null,
+"ev": "Konyaspor",
+"dep": "İstanbul Başakşehir",
+"eg": 0,
+"dg": 0,
+"g1": [],
+"g2": [],
+"stad": "Yeni Eskişehir Stadyumu",
+"hakem": "Fırat Aydınus"
+},
+{
+"madde": "2018 Süper Kupa",
+"tarih": null,
+"ev": "Galatasaray",
+"dep": "Akhisar Belediyespor",
+"eg": 1,
+"dg": 1,
+"g1": [
+[
+"Eren Derdiyok",
+79,
+null
+]
+],
+"g2": [
+[
+"Yevhen Seleznyov",
+4,
+null
+]
+],
+"stad": "Konya Büyükşehir Belediye Stadyumu Konya, Türkiye",
+"hakem": "Cüneyt Çakır"
+},
+{
+"madde": "2018 Türkiye Kupası finali",
+"tarih": null,
+"ev": "Akhisar Belediyespor",
+"dep": "Fenerbahçe",
+"eg": 3,
+"dg": 2,
+"g1": [
+[
+"Miguel Lopes",
+32,
+null
+],
+[
+"Abdoul Sissoko",
+70,
+null
+],
+[
+"Hélder Barbosa",
+81,
+null
+]
+],
+"g2": [
+[
+"Fernandão",
+56,
+null
+],
+[
+"Josef de Souza",
+86,
+null
+]
+],
+"stad": "Diyarbakır Stadyumu",
+"hakem": "Cüneyt Çakır"
+},
+{
+"madde": "2019 Süper Kupa",
+"tarih": null,
+"ev": "Galatasaray",
+"dep": "Akhisar Belediyespor",
+"eg": 1,
+"dg": 0,
+"g1": [
+[
+"Younès Belhanda",
+39,
+null
+]
+],
+"g2": [],
+"stad": "Eryaman Stadyumu Ankara, Türkiye",
+"hakem": "Halil Umut Meler"
+},
+{
+"madde": "2020 Süper Kupa",
+"tarih": "2021-01-27",
+"ev": "İstanbul Başakşehir",
+"dep": "Trabzonspor",
+"eg": 1,
+"dg": 2,
+"g1": [
+[
+"Demba Ba",
+58,
+"P"
+]
+],
+"g2": [
+[
+"Djaniny",
+47,
+null
+],
+[
+"Caleb Ekuban",
+85,
+null
+]
+],
+"stad": "Atatürk Olimpiyat Stadyumu İstanbul, Türkiye",
+"hakem": "Yaşar Kemal Uğurlu"
+},
+{
+"madde": "2021 Süper Kupa",
+"tarih": "2022-01-05",
+"ev": "Beşiktaş",
+"dep": "Antalyaspor",
+"eg": 1,
+"dg": 1,
+"g1": [
+[
+"Hutchinson",
+33,
+null
+]
+],
+"g2": [
+[
+"Hutchinson",
+74,
+"K"
+]
+],
+"stad": "Ahmed bin Ali Stadyumu Doha, Katar",
+"hakem": "Halil Umut Meler"
+},
+{
+"madde": "2021 Türkiye Kupası finali",
+"tarih": null,
+"ev": "Antalyaspor",
+"dep": "Beşiktaş",
+"eg": 0,
+"dg": 2,
+"g1": [],
+"g2": [
+[
+"Josef de Souza",
+3,
+null
+],
+[
+"Valentin Rosier",
+30,
+null
+]
+],
+"stad": "Gürsel Aksel Stadyumu",
+"hakem": "Ali Palabıyık"
+},
+{
+"madde": "2022 Süper Kupa",
+"tarih": "2022-07-30",
+"ev": "Trabzonspor",
+"dep": "Sivasspor",
+"eg": 4,
+"dg": 0,
+"g1": [
+[
+"Cornelius",
+37,
+null
+],
+[
+"Cornelius",
+50,
+null
+],
+[
+"Larsen",
+64,
+null
+],
+[
+"Bakasetas",
+76,
+"P"
+]
+],
+"g2": [],
+"stad": "Atatürk Olimpiyat Stadyumu, İstanbul",
+"hakem": "Mete Kalkavan"
+},
+{
+"madde": "2022 Türkiye Kupası finali",
+"tarih": null,
+"ev": "Kayserispor",
+"dep": "Sivasspor",
+"eg": 2,
+"dg": 3,
+"g1": [
+[
+"Ramazan Civelek",
+33,
+null
+],
+[
+"İlhan Parlak",
+107,
+null
+]
+],
+"g2": [
+[
+"Aaron Appindangoyé",
+60,
+null
+],
+[
+"Max Gradel",
+95,
+null
+],
+[
+"Moussa Konaté",
+113,
+null
+]
+],
+"stad": "Atatürk Olimpiyat Stadyumu",
+"hakem": "Halil Umut Meler"
+},
+{
+"madde": "2023 Süper Kupa",
+"tarih": "2024-04-07",
+"ev": "Galatasaray",
+"dep": "Fenerbahçe",
+"eg": 3,
+"dg": 0,
+"g1": [
+[
+"Icardi",
+1,
+null
+]
+],
+"g2": [],
+"stad": "11 Nisan Stadyumu, Şanlıurfa",
+"hakem": "Volkan Bayarslan"
+},
+{
+"madde": "2023 Türkiye Kupası finali",
+"tarih": null,
+"ev": "Fenerbahçe",
+"dep": "İstanbul Başakşehir",
+"eg": 2,
+"dg": 0,
+"g1": [
+[
+"Michy Batshuayi",
+1,
+null
+],
+[
+"Michy Batshuayi",
+29,
+null
+]
+],
+"g2": [],
+"stad": "Gürsel Aksel Stadyumu",
+"hakem": "Atilla Karaoğlan"
+},
+{
+"madde": "2024 Süper Kupa",
+"tarih": null,
+"ev": "Galatasaray",
+"dep": "Beşiktaş",
+"eg": 0,
+"dg": 5,
+"g1": [],
+"g2": [
+[
+"Immobile",
+1,
+"P"
+],
+[
+"Immobile",
+81,
+"P"
+],
+[
+"Svensson",
+53,
+null
+],
+[
+"Rafa",
+90,
+null
+],
+[
+"Hekimoğlu",
+90,
+null
+]
+],
+"stad": "Atatürk Olimpiyat Stadyumu, İstanbul",
+"hakem": "Atilla Karaoğlan"
+},
+{
+"madde": "2024 Türkiye Kupası finali",
+"tarih": null,
+"ev": "Beşiktaş",
+"dep": "Trabzonspor",
+"eg": 3,
+"dg": 2,
+"g1": [
+[
+"Rachid Ghezzal",
+45,
+"P"
+],
+[
+"Salih Uçan",
+54,
+null
+],
+[
+"El-Musrati",
+90,
+null
+]
+],
+"g2": [
+[
+"Paul Onuachu",
+13,
+null
+],
+[
+"Nicolas Pépé",
+89,
+null
+]
+],
+"stad": "Atatürk Olimpiyat Stadyumu",
+"hakem": "Ali Şansalan"
+},
+{
+"madde": "2025 Süper Kupa",
+"tarih": null,
+"ev": "Galatasaray",
+"dep": "Trabzonspor",
+"eg": 4,
+"dg": 1,
+"g1": [
+[
+"Barış Alper Yılmaz",
+38,
+null
+],
+[
+"Eren Elmalı",
+45,
+null
+],
+[
+"Yunus Akgün",
+63,
+null
+],
+[
+"Mauro Icardi",
+81,
+null
+]
+],
+"g2": [
+[
+"Felipe Augusto",
+55,
+null
+]
+],
+"stad": "Gaziantep Stadyumu, Gaziantep",
+"hakem": "Cihan Aydın"
+},
+{
+"madde": "2025 Süper Kupa",
+"tarih": null,
+"ev": "Fenerbahçe",
+"dep": "Samsunspor",
+"eg": 2,
+"dg": 0,
+"g1": [
+[
+"Kerem Aktürkoğlu",
+4,
+null
+],
+[
+"Jhon Durán",
+67,
+null
+]
+],
+"g2": [],
+"stad": "Yeni Adana Stadyumu, Adana",
+"hakem": "Ali Şansalan"
+},
+{
+"madde": "2025 Süper Kupa",
+"tarih": null,
+"ev": "Galatasaray",
+"dep": "Fenerbahçe",
+"eg": 0,
+"dg": 2,
+"g1": [],
+"g2": [
+[
+"Mattéo Guendouzi",
+28,
+null
+],
+[
+"Jayden Oosterwolde",
+48,
+null
+]
+],
+"stad": "Atatürk Olimpiyat Stadyumu, İstanbul",
+"hakem": "Halil Umut Meler"
+},
+{
+"madde": "2025 Türkiye Kupası finali",
+"tarih": null,
+"ev": "Trabzonspor",
+"dep": "Galatasaray",
+"eg": 0,
+"dg": 3,
+"g1": [],
+"g2": [
+[
+"Barış Alper Yılmaz",
+5,
+null
+],
+[
+"Victor Osimhen",
+46,
+null
+],
+[
+"Victor Osimhen",
+63,
+null
+]
+],
+"stad": "Gaziantep Stadyumu",
+"hakem": "Cihan Aydın"
+},
+{
+"madde": "2026 Türkiye Kupası finali",
+"tarih": null,
+"ev": "Trabzonspor",
+"dep": "Konyaspor",
+"eg": 2,
+"dg": 1,
+"g1": [
+[
+"Paul Onuachu",
+18,
+"P"
+],
+[
+"Paul Onuachu",
+79,
+"P"
+]
+],
+"g2": [
+[
+"Jackson Muleka",
+50,
+null
+]
+],
+"stad": "Antalya Stadyumu",
+"hakem": "Halil Umut Meler"
+},
+{
+"madde": "50. Yıl Kupası",
+"tarih": "1973-10-30",
+"ev": "Galatasaray",
+"dep": "Fenerbahçe",
+"eg": 0,
+"dg": 0,
+"g1": [],
+"g2": [],
+"stad": "Ankara 19 Mayıs Stadyumu",
+"hakem": "Macit Sarıdana"
+},
+{
+"madde": "Atatürk Kupası (1998)",
+"tarih": "1998-11-10",
+"ev": "Beşiktaş",
+"dep": "Fenerbahçe",
+"eg": 0,
+"dg": 2,
+"g1": [],
+"g2": [
+[
+"Tayfun Korkut",
+38,
+null
+],
+[
+"John Moshoeu",
+56,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Oğuz Sarvan"
+},
+{
+"madde": "Atatürk Kupası (2000)",
+"tarih": "2000-11-01",
+"ev": "Galatasaray",
+"dep": "Beşiktaş",
+"eg": 1,
+"dg": 2,
+"g1": [
+[
+"Serkan Aykut",
+90,
+null
+]
+],
+"g2": [
+[
+"İlhan Şahin",
+38,
+null
+],
+[
+"Pascal Nouma",
+75,
+null
+]
+],
+"stad": "Ankara 19 Mayıs Stadyumu, Ankara",
+"hakem": "Metin Tokat"
+},
+{
+"madde": "Beşiktaş 10-0 Adana Demirspor",
+"tarih": "1989-10-15",
+"ev": "Beşiktaş",
+"dep": "Adana Demirspor",
+"eg": 10,
+"dg": 0,
+"g1": [
+[
+"Ali Gültiken",
+2,
+null
+],
+[
+"Ali Gültiken",
+57,
+null
+],
+[
+"Ali Gültiken",
+61,
+null
+],
+[
+"Ali Gültiken",
+82,
+null
+],
+[
+"Feyyaz Uçar",
+12,
+null
+],
+[
+"Feyyaz Uçar",
+65,
+null
+],
+[
+"Feyyaz Uçar",
+85,
+null
+],
+[
+"Metin Tekin",
+24,
+null
+],
+[
+"Metin Tekin",
+43,
+null
+],
+[
+"Metin Tekin",
+76,
+null
+]
+],
+"g2": [],
+"stad": "Ali Sami Yen Stadı, İstanbul",
+"hakem": "Engin Kurt"
+},
+{
+"madde": "Beşiktaş 2-9 Galatasaray",
+"tarih": "1940-06-30",
+"ev": "Galatasaray",
+"dep": "Beşiktaş",
+"eg": 9,
+"dg": 2,
+"g1": [
+[
+"Gündüz Kılıç",
+43,
+null
+],
+[
+"Gündüz Kılıç",
+58,
+null
+],
+[
+"Gündüz Kılıç",
+73,
+null
+],
+[
+"Gündüz Kılıç",
+75,
+null
+],
+[
+"Gündüz Kılıç",
+89,
+null
+],
+[
+"Süleyman Tekil",
+49,
+null
+],
+[
+"Süleyman Tekil",
+54,
+null
+],
+[
+"Süleyman Tekil",
+77,
+null
+],
+[
+"Cemil Gürgen Erlertürk",
+87,
+null
+]
+],
+"g2": [
+[
+"Hayati Ozgan",
+13,
+null
+],
+[
+"Şeref Görkey",
+60,
+null
+]
+],
+"stad": "Şeref Stadyumu, İstanbul",
+"hakem": "Ahmet Adem"
+},
+{
+"madde": "Fenerbahçe 0-7 Galatasaray",
+"tarih": "1911-02-12",
+"ev": "Fenerbahçe",
+"dep": "Galatasaray",
+"eg": 0,
+"dg": 7,
+"g1": [],
+"g2": [],
+"stad": null,
+"hakem": null
+},
+{
+"madde": "Fenerbahçe 6-0 Galatasaray",
+"tarih": "2002-11-06",
+"ev": "Fenerbahçe",
+"dep": "Galatasaray",
+"eg": 6,
+"dg": 0,
+"g1": [
+[
+"Tuncay",
+9,
+null
+],
+[
+"Ortega",
+38,
+null
+],
+[
+"Serhat",
+68,
+null
+],
+[
+"Serhat",
+75,
+null
+],
+[
+"Ceyhun",
+78,
+null
+],
+[
+"Ümit",
+86,
+null
+]
+],
+"g2": [],
+"stad": "Fenerbahçe Şükrü Saracoğlu Stadyumu, Kadıköy, İstanbul",
+"hakem": "Mustafa Çulcu"
+},
+{
+"madde": "Galatasaray 0-7 Güneş",
+"tarih": "1938-03-20",
+"ev": "Galatasaray",
+"dep": "Güneş",
+"eg": 0,
+"dg": 7,
+"g1": [],
+"g2": [
+[
+"Melih Kotanca",
+8,
+null
+],
+[
+"Melih Kotanca",
+55,
+null
+],
+[
+"Melih Kotanca",
+80,
+null
+],
+[
+"Melih Kotanca",
+85,
+null
+],
+[
+"Selahattin Almay",
+24,
+null
+],
+[
+"Selahattin Almay",
+66,
+null
+],
+[
+"Rasih Minkari",
+64,
+null
+]
+],
+"stad": "Taksim Stadyumu",
+"hakem": "Herlinder (Avusturya)"
+},
+{
+"madde": "Gazi Büstü",
+"tarih": "1928-08-10",
+"ev": "Fenerbahçe",
+"dep": "Galatasaray",
+"eg": 3,
+"dg": 3,
+"g1": [
+[
+"Alaattin",
+12,
+null
+],
+[
+"Fikret",
+25,
+"P"
+],
+[
+"Sadi",
+45,
+null
+]
+],
+"g2": [
+[
+"Kemal",
+16,
+null
+],
+[
+"Muslihittin",
+77,
+null
+],
+[
+"Latif",
+81,
+null
+]
+],
+"stad": "Taksim Stadyumu, Beyoğlu, İstanbul",
+"hakem": "Şeref Bey"
+},
+{
+"madde": "Gazi Büstü",
+"tarih": "1928-08-31",
+"ev": "Galatasaray",
+"dep": "Fenerbahçe",
+"eg": 4,
+"dg": 0,
+"g1": [
+[
+"Necdet",
+15,
+null
+],
+[
+"Necdet",
+80,
+null
+],
+[
+"Necdet",
+89,
+null
+],
+[
+"Şadli",
+60,
+null
+]
+],
+"g2": [],
+"stad": "Taksim Stadyumu, Beyoğlu, İstanbul",
+"hakem": "Şeref Bey"
+},
+{
+"madde": "Paris Saint-Germain - İstanbul Başakşehir (2020-21 UEFA Şampiyonlar Ligi)",
+"tarih": null,
+"ev": "Paris Saint-Germain",
+"dep": "İstanbul Başakşehir",
+"eg": 5,
+"dg": 1,
+"g1": [
+[
+"Neymar",
+21,
+null
+],
+[
+"Neymar",
+38,
+null
+],
+[
+"Neymar",
+50,
+null
+],
+[
+"Kylian Mbappé",
+42,
+"P"
+],
+[
+"Kylian Mbappé",
+62,
+"P"
+]
+],
+"g2": [
+[
+"Mehmet Topal",
+57,
+null
+]
+],
+"stad": "Prensler Parkı, Paris",
+"hakem": "Ovidiu Haţegan ()"
+}
+]

@@ -428,6 +428,8 @@ def main():
     # ---- Maçkolik maç olayları: Süper Lig 1959-1991, 1. Lig 1990-91 (mackolik_olay.py) -> data/mk/
     import mackolik_olay
     mk_ayr = mackolik_olay.aktar(maclar, CIKTI, yaz, okunur)
+    import wiki_mac   # Vikipedi tek maç maddelerinin golcüleri (kupa finalleri, özel kupalar) -> data/wk.json
+    mk_ayr = list(mk_ayr) + list(wiki_mac.aktar(maclar, CIKTI, yaz) or [])
 
     # ---- UEFA oyuncusu -> TFF oyuncusu (oyuncu_bag.py; ad + ortak sezon-kulüp + doğum yılı) -> data/oyuncu_bag.json
     if os.path.exists(os.path.join(KOK, "raw", "oyuncu.db")):

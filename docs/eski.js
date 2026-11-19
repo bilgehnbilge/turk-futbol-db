@@ -5,7 +5,7 @@
 (() => {
 let ESKI = null;
 const eskiAl = async () => ESKI ||= await al("data/eski.json");
-const YAR_RENK = { milli_kume: "var(--vurgu)", sampiyona: "var(--g)", basbakanlik: "var(--b)", federasyon: "var(--m)", istanbul: "var(--soluk)" };
+const YAR_RENK = { milli_kume: "var(--vurgu)", sampiyona: "var(--g)", basbakanlik: "var(--b)", federasyon: "var(--m)", istanbul: "var(--soluk)", diger: "var(--yazi2)" };
 
 // eski kulüp: sitedeki kulübe bağlıysa onun sayfasına (logosuyla), değilse düz ad
 const kAd = (d, i) => { const k = d.kulupler[i]; return k ? k.ad : "?"; };
@@ -14,7 +14,7 @@ const yarAd = (d, y) => (d.yarismalar.find(x => x[0] === y) || [, y])[1];
 const sezonAd = s => s.length === 4 ? s : s.replace("-", "–");
 const ust = (baslik, alt) => `<p class="soluk ust-bag"><a class="bag" href="#/sezonlar">Sezonlar</a> · <a class="bag" href="#/eski">1959 öncesi</a></p>
   <h1>${baslik}</h1>${alt ? `<p class="soluk">${alt}</p>` : ""}`;
-const KAYNAK = `<p class="soluk not bolum">Kaynak: <a class="bag" href="https://www.rsssf.org/tablest/turkhist.html" target="_blank" rel="noopener">RSSSF</a> (Baki Demirkiran). Bu maçlar 1959'da başlayan profesyonel ligin istatistiklerine, rekorlara ve kulüp sayfalarındaki sayılara katılmaz. Gol atanlar yalnız Başbakanlık Kupası ve bazı finallerde var.</p>`;
+const KAYNAK = `<p class="soluk not bolum">Kaynak: <a class="bag" href="https://www.rsssf.org/tablest/turkhist.html" target="_blank" rel="noopener">RSSSF</a> (Baki Demirkiran); ayrı maddesi olan maçların golcüleri <a class="bag" href="https://tr.wikipedia.org/wiki/Kategori:T%C3%BCrkiye_futbol_kul%C3%BCplerinin_ma%C3%A7lar%C4%B1" target="_blank" rel="noopener">Vikipedi</a>'den. Bu maçlar 1959'da başlayan profesyonel ligin istatistiklerine, rekorlara ve kulüp sayfalarındaki sayılara katılmaz. Gol atanlar yalnız Başbakanlık Kupası, bazı finaller ve Vikipedi'de ayrı maddesi olan maçlarda var.</p>`;
 
 async function eskiSayfa() {
   document.title = "1959 öncesi · Türk Futbol Arşivi";
@@ -29,9 +29,11 @@ async function eskiSayfa() {
     const l = d.sezonlar.filter(s => s.yarisma === k);
     return `<div class="kart"><h2 class="h3" style="box-shadow:inset 3px 0 0 ${YAR_RENK[k]};padding-left:10px">${esc(ad)}</h2>
       <p class="soluk">${esc(ac)}</p>
-      <table class="tablo"><thead><tr><th>Sezon</th><th class="ad">Şampiyon</th><th class="s">Maç</th></tr></thead><tbody>
+      ${k === "diger" ? `<table class="tablo"><thead><tr><th>Tarih</th><th class="ad">Maç</th></tr></thead><tbody>
+      ${l.flatMap(s => s.maclar.map(m => `<tr><td><a class="bag" href="#/eski/${k}/${s.sezon}">${tarihYaz(m[5])}</a></td><td class="ad">${kBag(d, m[0])} <b>${m[2]}-${m[3]}</b> ${kBag(d, m[1])}</td></tr>`)).join("")}
+      </tbody></table></div>` : `<table class="tablo"><thead><tr><th>Sezon</th><th class="ad">Şampiyon</th><th class="s">Maç</th></tr></thead><tbody>
       ${l.map(s => `<tr><td><a class="bag" href="#/eski/${k}/${s.sezon}">${sezonAd(s.sezon)}</a></td><td class="ad">${s.sampiyon != null ? kBag(d, s.sampiyon) : "<span class='soluk'>—</span>"}</td><td class="s">${s.maclar.length}</td></tr>`).join("")}
-      </tbody></table></div>`;
+      </tbody></table></div>`}`;
   }).join("")}</div>
   <h2 class="bolum">En çok şampiyonluk</h2>
   <p class="soluk not">Millî Küme ve Türkiye Futbol Şampiyonası birlikte.</p>
@@ -42,6 +44,13 @@ async function eskiSayfa() {
   ${KAYNAK}`;
 }
 
+// goller: [ad, dakika, tip, taraf]; aynı oyuncunun golleri birleşir ("Celal İbrahim 4", "Necdet 15', 80', 89'")
+const golHtml = (d, m) => [1, 2].map(t => {
+  const l = m[11].filter(g => g[3] === t); if (!l.length) return "";
+  const by = new Map(); for (const g of l) (by.get(g[0]) || by.set(g[0], []).get(g[0])).push(g);
+  return `${esc(kAd(d, m[t - 1]))}: ${[...by].map(([ad, gs]) => `${esc(ad)} ${gs.every(g => g[1] == null) ? (gs.length > 1 ? gs.length : "") : gs.map(g => `${g[1]}'${g[2] === "pen" ? " (pen.)" : g[2] === "og" ? " (k.k.)" : ""}`).join(", ")}`.trim()).join(", ")}`;
+}).filter(Boolean).join(" · ");
+const wikiBag = madde => `<a class="bag" href="https://tr.wikipedia.org/wiki/${encodeURIComponent(madde.replace(/ /g, "_"))}" target="_blank" rel="noopener">Vikipedi maddesi</a>`;
 const skorHtml = m => m[2] == null ? `<span class="soluk">${esc({ abd: "yarıda kaldı", "o/w": "hükmen", "w/o": "hükmen", awd: "hükmen", "n/p": "oynanmadı" }[m[6]] || m[6] || "–")}</span>` : `<b>${m[2]}-${m[3]}</b>`;
 
 async function eskiSezonSayfa(y, sz) {
@@ -75,12 +84,15 @@ async function eskiSezonSayfa(y, sz) {
     }).join("")}</tr>`).join("")}</tbody></table></div>`;
     const ek = s.maclar.filter(m => m[2] == null || m[7]);
     if (ek.length) maclar += `<p class="soluk not">${ek.map(m => `${esc(kAd(d, m[0]))} – ${esc(kAd(d, m[1]))}: ${esc(m[7] || m[6] || "")}`).join("<br>")}</p>`;
+    const gl = s.maclar.filter(m => m[11]?.length);
+    if (gl.length) maclar += `<div class="kart bolum"><h3 class="h3">Golcüleri bilinen maçlar</h3>${gl.map(m => `<p><b>${esc(kAd(d, m[0]))} ${m[2]}-${m[3]} ${esc(kAd(d, m[1]))}</b>${m[5] ? ` <span class="soluk">· ${tarihYaz(m[5])}</span>` : ""}<br><span class="soluk kucuk">${golHtml(d, m)}${m[12] ? ` · ${wikiBag(m[12])}` : ""}</span></p>`).join("")}</div>`;
   } else {
     const turlar = []; for (const m of s.maclar) { const t = m[4] || "Maçlar"; let g = turlar.at(-1); if (!g || g.tur !== t) turlar.push(g = { tur: t, ms: [] }); g.ms.push(m); }
     maclar = `<h2 class="bolum">Maçlar</h2>${turlar.map(g => `<div class="kart bolum eski-tur"><h3 class="h3">${esc(g.tur)}${g.ms[0][5] ? ` <span class="soluk">· ${tarihYaz(g.ms[0][5])}</span>` : ""}</h3>
       <table class="tablo eski-maclar"><tbody>${g.ms.map(m => {
         const ayr = [m[8], m[5] && m[5] !== g.ms[0][5] ? tarihYaz(m[5]) : "", m[9] ? `Stat: ${m[9]}` : "", m[10] ? `Hakem: ${m[10]}` : "", m[7]].filter(Boolean).map(esc);
-        if (m[11]?.length) ayr.push(`Goller: ${m[11].map(x => `${esc(x[2])} ${x[3]}'${x[4] === "pen" ? " (pen.)" : x[4] === "og" ? " (k.k.)" : ""}`).join(", ")}`);
+        if (m[11]?.length) ayr.push(golHtml(d, m));
+        if (m[12]) ayr.push(wikiBag(m[12]));
         return `<tr${ayr.length ? ` class="ayr-var"` : ""}><td class="ad sag">${kBag(d, m[0])}</td><td class="s skor-h">${skorHtml(m)}</td><td class="ad">${kBag(d, m[1])}</td></tr>
         ${ayr.length ? `<tr class="eski-ayr"><td colspan="3" class="soluk kucuk">${ayr.join(" · ")}</td></tr>` : ""}`; }).join("")}</tbody></table></div>`).join("")}`;
   }

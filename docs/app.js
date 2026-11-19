@@ -916,6 +916,17 @@ async function mkMacAl(id) {
   return { id, tarih, saat, sezon, lig, tur, ev, dep, skor, kaynak: "Maçkolik", kadro: [[], []], teknik: [[], []],
     olay: r.o.map(([taraf, tur, dk, ek, a1, a2, ay]) => [taraf, tur, dk, ek, a1, a2, ay, null, null]) };
 }
+// Vikipedi'deki tek maç maddelerinin golcüleri (kupa finalleri, Cumhurbaşkanlığı / Başbakanlık kupaları): data/wk.json
+let WK = null;
+async function wkMacAl(id) {
+  if (BOLUM !== "erkek") return null;
+  WK ||= await al(`data/wk.json?s=${OZET.surum || ""}`).catch(() => ({}));
+  const r = WK[id];
+  if (!r) return null;
+  const [tarih, saat, sezon, lig, tur, ev, dep, skor] = r.m;
+  return { id, tarih, saat, sezon, lig, tur, ev, dep, skor, stad: r.s, hakem: r.h, kaynak: "Vikipedi", madde: r.q, kadro: [[], []], teknik: [[], []],
+    olay: r.o.map(([taraf, tur, dk, ek, a1, a2, ay]) => [taraf, tur, dk, ek, a1, a2, ay, null, null]) };
+}
 async function macSayfa(id) {
   icerik.innerHTML = `<div class="yukleniyor">Maç yükleniyor…</div>`;
   let d = (DETAYLI ||= new Set(OZET.detayli || [])).has(id) ? await al(`${V}mac/${id}.json?s=${OZET.surum || ""}`) : await tffMacAl(id);
@@ -923,6 +934,11 @@ async function macSayfa(id) {
     const mk = await mkMacAl(id);   // 1990-91: TFF'nin kadrosu + Maçkolik'in golleri, kartları, değişiklikleri
     if (mk && d) { d.olay = mk.olay; d.uyum = null; d.olayKaynak = "Maçkolik"; }
     else if (mk) d = mk;
+  }
+  if (!d || (!d.olay.some(o => o[1] === "GOAL") && (d.skor[0] || d.skor[1]))) {
+    const wk = await wkMacAl(id);   // TFF'de / Maçkolik'te golü olmayan kupa maçları: Vikipedi maddesinin golcüleri
+    if (wk && d) { d.olay = wk.olay; d.uyum = null; d.olayKaynak = `Vikipedi (${wk.madde})`; }
+    else if (wk) d = wk;
   }
   if (!d) { icerik.innerHTML = `<div class="bos">Bu maçın ayrıntısı yok.</div>`; return; }
   macCiz(d);
@@ -980,8 +996,9 @@ function macCiz(d) {
     <div class="kart"><h2 class="h3">${ad(d.ev)}</h2>${kadroHtml(d.kadro[0], d.teknik[0])}</div>
     <div class="kart"><h2 class="h3">${ad(d.dep)}</h2>${kadroHtml(d.kadro[1], d.teknik[1])}</div>
   </div>` : ""}
-  <p class="soluk not bolum">${d.olayKaynak ? `Kadro: <a class="bag" href="https://www.tff.org/Default.aspx?pageID=29&macId=${d.tff}" target="_blank" rel="noopener">TFF maç sayfası</a>; goller, kartlar ve değişiklikler: ${esc(d.olayKaynak)}`
+  <p class="soluk not bolum">${d.olayKaynak && !d.tff ? `Goller: ${esc(d.olayKaynak)}` : d.olayKaynak ? `Kadro: <a class="bag" href="https://www.tff.org/Default.aspx?pageID=29&macId=${d.tff}" target="_blank" rel="noopener">TFF maç sayfası</a>; goller, kartlar ve değişiklikler: ${esc(d.olayKaynak)}`
     : d.kaynak === "Maçkolik" ? (d.kadro[0].length ? "Kadro, goller, kartlar ve oyuncu değişiklikleri: Maçkolik arşivi" : "Goller, kartlar ve oyuncu değişiklikleri: Maçkolik. Bu dönemin kadroları henüz yok")
+    : d.kaynak === "Vikipedi" ? `Goller: <a class="bag" href="https://tr.wikipedia.org/wiki/${encodeURIComponent(d.madde.replace(/ /g, "_"))}" target="_blank" rel="noopener">Vikipedi</a>. Kadro bilgisi yok`
     : `Kadro ve olaylar: ${d.tff ? `<a class="bag" href="${d.kaynakUrl || `https://www.tff.org/Default.aspx?pageID=29&macId=${d.tff}`}" target="_blank" rel="noopener">TFF maç sayfası</a>` : esc(d.kaynak)}`}. Oyuncu adları kaynakta yazıldığı gibidir.</p>`;
   icerik.querySelectorAll(".akis-bas .cip").forEach(b => b.addEventListener("click", () => {
     icerik.querySelectorAll(".akis-bas .cip").forEach(x => { x.classList.toggle("aktif", x === b); x.setAttribute("aria-pressed", x === b); });
