@@ -6,7 +6,8 @@
 
 Lig: TFF (~250 sayfa x 2 sn). Avrupa kupaları: UEFA'nın maç verisi (avrupa.py uefa; takım eşlemesi uefa_kimlik.json).
 Süre: ~10 dakika indirme + 3 dakika birleştirme. Tam kurulum (topla.py kur) gerekmez.
-TFF'nin güncel sezon sayfaları (arşive geçmeden önce): Süper Lig 198, 1. Lig 142, 2. Lig 976, 3. Lig 971.
+TFF'nin güncel sezon sayfaları (arşive geçmeden önce): Süper Lig 198, 1. Lig 142, 2. Lig 976, 3. Lig 971,
+Profesyonelliğe Geçiş Ligi 1596 (bal.py, raw/bal.db).
 """
 import argparse, datetime, os, shutil, subprocess, sys
 
@@ -48,6 +49,11 @@ def main():
         sys.exit("Hiçbir lig indirilemedi")
 
     topla.kur(os.path.join(KOK, "raw", "tff.db"), topla.HAM, sadece=klasorler)
+    try:   # Profesyonelliğe Geçiş Ligi (5. seviye) ayrı veritabanında: raw/bal.db
+        import bal
+        print("BAL indirilen sayfa:", bal.guncel(a.sezon), flush=True)
+    except (Exception, SystemExit) as e:   # indirici art arda hatada sys.exit yapıyor; bot durmasın
+        print("BAL güncellenemedi:", e, flush=True)
     try:   # Avrupa kupaları: UEFA'nın maç verisi (Maçkolik GitHub sunucularına 403 veriyor); alınamazsa eski veri kalır
         import avrupa
         avrupa.uefa_guncel(a.sezon)

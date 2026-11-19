@@ -19,11 +19,12 @@ MAC_HAM = os.path.join(KOK, "raw", "tff_bal_mac")
 DB = os.path.join(KOK, "raw", "bal.db")
 DETAY_DB = os.path.join(KOK, "raw", "bal_detay.db")
 
+GUNCEL_PID = 1596   # güncel sezonun "Puan Cetveli ve Fikstür" sayfası (arşive geçene kadar)
 # arşiv sayfasındaki sezonlar (2026-11-17, pageID=1290)
 SEZONLAR = [("2010-2011", 1107), ("2011-2012", 1178), ("2012-2013", 1241), ("2013-2014", 998), ("2014-2015", 1325),
             ("2015-2016", 1389), ("2016-2017", 1418), ("2017-2018", 1447), ("2018-2019", 1474), ("2019-2020", 1500),
             ("2020-2021", 1535), ("2021-2022", 1592), ("2022-2023", 1627), ("2023-2024", 1652), ("2024-2025", 1739),
-            ("2025-2026", 1793)]
+            ("2025-2026", 1793), ("2026-2027", GUNCEL_PID)]
 LIG_AD = {"bal": "Profesyonelliğe Geçiş Ligi"}
 
 
@@ -46,10 +47,10 @@ def bolge_harita(t):
     return out
 
 
-def kur():
+def kur(sadece=None):
     topla.LIG.update(LIG_AD)
+    asil, asil_kademe = topla.gruplar, topla.kademe
     topla.kademe = lambda kaynak, yil: 5
-    asil = topla.gruplar
 
     def gruplar(t):   # bölgeli sezonlarda grup adı "2. Bölge 1. Grup"
         g, b = asil(t), bolge_harita(t)
@@ -58,12 +59,33 @@ def kur():
                 g[k] = f"{b[k]}. Bölge {v.strip()}. Grup"
         return g
     topla.gruplar = gruplar
-    topla.kur(DB, HAM)
-    topla.gruplar = asil
+    try:
+        topla.kur(DB, HAM, sadece=sadece)
+    finally:
+        topla.gruplar, topla.kademe = asil, asil_kademe
     c = sqlite3.connect(DB)
     for r in c.execute("SELECT sezon, COUNT(DISTINCT grup), COUNT(*), SUM(ev_gol IS NOT NULL) FROM mac GROUP BY 1 ORDER BY 1"):
         print(*r)
     print("toplam:", c.execute("SELECT COUNT(*) FROM mac").fetchone()[0], flush=True)
+
+
+def guncel(sezon, pid=GUNCEL_PID):
+    """Güncel sezonun sayfalarını baştan indirip yalnız o sezonu bal.db'de yeniler (guncelle.py çağırır)."""
+    import shutil
+    ad = f"bal_{sezon}_{pid}"
+    yol = os.path.join(HAM, ad)
+    if os.path.isdir(yol):
+        shutil.rmtree(yol)   # sonuçlar değiştiği için her seferinde baştan
+    eski = topla.HAM
+    topla.HAM = HAM
+    try:
+        d = topla.Indirici()
+        topla.sezon_indir(d, "bal", sezon, pid)
+    finally:
+        topla.HAM = eski
+    if os.path.isdir(yol):
+        kur(sadece=[ad])
+    return d.indirilen
 
 
 def mac_yol(m):
