@@ -19,6 +19,11 @@ DOGUM_DUZELT = {int(k): v[0] for k, v in json.load(open(os.path.join(KOK, "dogum
 OYUNCU_DB = os.path.join(KOK, "raw", "oyuncu.db")
 KUPA_ES = os.path.join(KOK, "tff_kupa_eslesme.json")   # Maçkolik kupa maçı -> TFF maç no (1990-2007 kupa sayfaları)
 YAR = {"lig": "L", "kupa": "K", "ozel_kupa": "O", "avrupa": "A", "terfi": "T"}
+MK_MAC = 70_000_000   # TFF'de olmayan (Maçkolik kaynaklı, 1984-85 öncesi Süper Lig) maçların ayrıntı numarası:
+# MK_MAC + Maçkolik maç kimliklerinin sıralı listesindeki yeri (sıkışık numara: ayrıntı dosyaları no // 250 ile gruplanır;
+# bu maçların listesi tarihî ve sabit olduğu için numaralar her kurulumda aynı kalır)
+
+
 MK_ILK = None   # Maçkolik arşiv kadrolarının en eski sezonu (maclari_yaz doldurur; site notları için ozet.json'a)
 KART = {"Sarı Kart": "Y", "Kırmızı Kart": "R", "Çift Sarı Kart": "YR"}
 
@@ -97,11 +102,16 @@ def aktar(c, maclar, okunur, cikti):
         kupa = json.load(open(KUPA_ES, encoding="utf-8")) if os.path.exists(KUPA_ES) else {}
     # futbol.db maçı -> (TFF maç no, taraflar ters mi)
     bag = {}
+    mk_sira = {k: MK_MAC + i for i, k in enumerate(sorted(
+        m["kaynak_id"] for m in maclar if m["kaynak"] == "mackolik" and m["kaynak_id"] and m["yarisma"] == "lig" and m["kademe"] == 1))}
     for m in maclar:
         if m["yarisma"] == "avrupa" or m["ev_gol"] is None:
             continue
         if m["kaynak"] == "tff" and m["kaynak_id"]:
             bag[m["id"]] = (int(m["kaynak_id"]), 0)
+        elif m["kaynak"] == "mackolik" and m["kaynak_id"] and m["yarisma"] == "lig" and m["kademe"] == 1:
+            # 1984-85 öncesi Süper Lig: maç TFF'de yok, Maçkolik'ten; ayrıntısı (arşiv kadrosu) sabit bir numarayla yazılır
+            bag[m["id"]] = (mk_sira[m["kaynak_id"]], 0)
         elif f"{m['kaynak']}:{m['kaynak_id']}" in kupa:
             bag[m["id"]] = tuple(kupa[f"{m['kaynak']}:{m['kaynak_id']}"])
     if yerel:

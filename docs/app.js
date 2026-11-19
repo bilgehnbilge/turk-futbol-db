@@ -1847,7 +1847,7 @@ async function rekorlarSayfa(kap) {
     ${BOLUM_UST[BOLUM] ? `${BOLUM_UST[BOLUM]("rekorlar")}<h2>Tüm zamanlar rekorları</h2>` : "<h1>Tüm zamanlar rekorları</h1>"}
     <nav class="sekmeler">${R.kapsamlar.map(([k, ad]) => `<a href="#/${K}rekorlar/${k}" class="${k === kap ? "aktif" : ""}">${esc(ad)}</a>`).join("")}</nav>
     <p class="soluk">${esc(kapAd)} · ${esc(v.sezon[0])} – ${esc(v.sezon[1])} · ${sayiYaz(v.mac)} maç.
-      ${kap === "pro" ? `Bütün lig seviyeleri bir arada: bir kulübün ${esc(KADEME_AD[1])}'nden alt lige geçişi seriyi bozmaz.` : ""}</p>
+      ${kap === "pro" || kap === "lig" ? `${KADEME_AD[5] ? (kap === "pro" ? `Profesyonel lig seviyeleri (${esc(KADEME_AD[1])} – ${esc(KADEME_AD[4])}) bir arada; ${esc(KADEME_AD[5])} dahil değil.` : `${esc(KADEME_AD[5])} dahil bütün lig seviyeleri bir arada.`) : "Bütün lig seviyeleri bir arada."} Bir kulübün üst ligden alt lige geçişi seriyi bozmaz.` : ""}</p>
     <div class="tabela-kartlar bolum">${tabelaKart("En farklı galibiyet", v.fark[0])}${tabelaKart("En gollü maç", v.gollu[0])}${tabelaKart("Deplasmanda en farklı", v.dep_fark[0])}${oyuncuTabela()}</div>
 
     ${v.tablo ? `<h2 class="bolum">Tüm zamanlar tablosu</h2>

@@ -1,4 +1,4 @@
-"""Tüm zamanlar rekorları: lig kademeleri, bütün profesyonel ligler, Türkiye Kupası ve lig + kupa birlikte (yalnız maç rekorları).
+"""Tüm zamanlar rekorları: lig kademeleri, profesyonel ligler (Süper Lig - 3. Lig), bütün ligler (BAL dahil), Türkiye Kupası ve lig + kupa birlikte (yalnız maç rekorları).
 
 web_aktar.py çağırır -> docs/data/rekorlar.json
 
@@ -21,7 +21,8 @@ KAPSAMLAR = [
     ("2", "1. Lig", lambda m: m["yarisma"] == "lig" and m["kademe"] == 2),
     ("3", "TFF 2. Lig", lambda m: m["yarisma"] == "lig" and m["kademe"] == 3),
     ("4", "TFF 3. Lig", lambda m: m["yarisma"] == "lig" and m["kademe"] == 4),
-    ("pro", "Bütün profesyonel ligler", lambda m: m["yarisma"] == "lig"),
+    ("pro", "Profesyonel ligler", lambda m: m["yarisma"] == "lig" and m["kademe"] in (1, 2, 3, 4)),   # BAL (5) hariç
+    ("lig", "Bütün ligler", lambda m: m["yarisma"] == "lig"),   # Profesyonelliğe Geçiş Ligi dahil
     ("kupa", "Türkiye Kupası", lambda m: m["yarisma"] == "kupa"),
 ]
 HUKMEN = ("Hük.", "Çifte H")

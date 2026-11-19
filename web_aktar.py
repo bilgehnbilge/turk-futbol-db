@@ -340,7 +340,11 @@ def main():
     logo_es = json.load(open(os.path.join(KOK, "logo_eslesme.json"), encoding="utf-8")) if os.path.exists(os.path.join(KOK, "logo_eslesme.json")) else {}
     wiki_yol = os.path.join(KOK, "logo_wiki.json")   # FM paketinde olmayanlar: Vikipedi arması (wiki_logo.py)
     uefa_yol = os.path.join(KOK, "logo_uefa.json")   # Avrupa rakipleri: UEFA logosu (uefa_logo.py)
+    tff_yol = os.path.join(KOK, "logo_tff.json")     # ikisinde de olmayanlar: TFF maç sayfasındaki logo (tff_logo.py)
+    ist_yol = os.path.join(KOK, "logo_tffist.json")  # İstanbul amatör kulüpleri: tffistanbul.org grup sayfaları (tffist_logo.py)
     logo_es = {**(json.load(open(uefa_yol, encoding="utf-8")) if os.path.exists(uefa_yol) else {}),
+               **(json.load(open(ist_yol, encoding="utf-8")) if os.path.exists(ist_yol) else {}),
+               **(json.load(open(tff_yol, encoding="utf-8")) if os.path.exists(tff_yol) else {}),
                **(json.load(open(wiki_yol, encoding="utf-8")) if os.path.exists(wiki_yol) else {}), **logo_es}
     logo = {}
     for r in c.execute("SELECT kulup_id, kaynak || ':' || kaynak_id FROM kulup_kimlik ORDER BY kaynak <> 'tff', son_sezon DESC"):

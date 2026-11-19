@@ -28,7 +28,7 @@ def api(**p):
                 time.sleep(10); continue
             return d
         except Exception as e:
-            print("hata", e, file=sys.stderr); time.sleep(5 * (deneme + 1))
+            print("hata", e, file=sys.stderr, flush=True); time.sleep((90 if "429" in str(e) else 5) * (deneme + 1))
     raise SystemExit("API cevap vermiyor")
 
 
@@ -57,7 +57,10 @@ def eksikler():
     kim = {}
     for kid, k in c.execute("SELECT kulup_id, kaynak || ':' || kaynak_id FROM kulup_kimlik ORDER BY kaynak <> 'tff', son_sezon DESC"):
         kim.setdefault(kid, k)
+    # TFF maç sayfasından logosu gelenler (tff_logo.py) de eksik sayılmaz
+    tff_l = json.load(open(os.path.join(KOK, "logo_tff.json"), encoding="utf-8")) if os.path.exists(os.path.join(KOK, "logo_tff.json")) else {}
     return [dict(k, kimlik=kim[k["id"]]) for k in K if k["yerli"] and "logo" not in k and k["id"] in kim
+            and not any(f"tff:{t}" in tff_l for t in k["tff"])
             and not re.search(r"\b(II|2P)\b|\(2P\)", k["ad"])]
 
 
@@ -68,8 +71,11 @@ def bul():
         for t in w["tff"]:
             tff_sayfa.setdefault(t, w["baslik"])
     eksik = eksikler()
-    aday = {}   # kimlik -> [başlık...]
-    for k in eksik:
+    ara_yol = os.path.join(DIZ, "arama_sonuc.json")   # kaldığı yerden: arama sonuçları her 25 kulüpte kaydedilir
+    aday = json.load(open(ara_yol, encoding="utf-8")) if os.path.exists(ara_yol) else {}   # kimlik -> [[yol, başlık]...]
+    for i, k in enumerate(eksik, 1):
+        if k["kimlik"] in aday:
+            continue
         b = [tff_sayfa[t] for t in k["tff"] if t in tff_sayfa]
         if b:
             aday[k["kimlik"]] = [("tff", b[0])]
@@ -77,9 +83,14 @@ def bul():
         sonuc = api(action="query", list="search", srsearch=f'{k["ad"]} futbol kulübü', srlimit=5, srnamespace=0)
         aday[k["kimlik"]] = [("ara", s["title"]) for s in sonuc["query"]["search"]]
         time.sleep(0.4)
+        if i % 25 == 0:
+            json.dump(aday, open(ara_yol, "w", encoding="utf-8"), ensure_ascii=False)
+            print(f"  {i}/{len(eksik)} kulüp arandı", flush=True)
+    json.dump(aday, open(ara_yol, "w", encoding="utf-8"), ensure_ascii=False)
     basliklar = sorted({b for l in aday.values() for _, b in l})
     metin = wikitext(basliklar)
-    out = {}
+    yol_ = os.path.join(DIZ, "logo_aday.json")   # önceki adaylar korunur (indir logo_wiki.json'u bunlardan yazar)
+    out = json.load(open(yol_, encoding="utf-8")) if os.path.exists(yol_) else {}
     for k in eksik:
         adlar = [k["ad"]] + [a[0] for a in k["adlar"]]
         for yol, b in aday.get(k["kimlik"], []):
