@@ -8,6 +8,7 @@ Millî Küme ve profesyonel liglerde ise kadro ve goller var (2026-11-19, 1938 G
 
   python3 mackolik_eski.py say      # ağa çıkmadan: hangi sezonların listesi indi
   python3 mackolik_eski.py indir    # yarıda kalırsa aynı komut kaldığı yerden sürer (istekler arası 40 sn)
+  python3 mackolik_eski.py hepsi    # tek iş, yeniden eskiye: her sezonun listesi ve hemen ardından kadroları (önerilen)
   python3 mackolik_eski.py kadro    # maç kadroları ve olayları (goller): her lig-sezonda önce ilk 3 maç denenir,
                                     # hiçbiri gelmezse (İstanbul Ligi'nin eski sezonlarında HTTP 500) o lig-sezon atlanır
 
@@ -38,31 +39,54 @@ def indir():
     print("Bitti.", flush=True)
 
 
-def kadro():
+ATLANAN = os.path.join(K.HAM, "eski_kadrosuz.json")   # kadro sayfası olmayan lig-sezonlar (yeniden denenmez)
+
+
+def kadro_sezon(e, gr, yok):
+    """Bir sezonun liglerinde maç kadroları ve olayları; ilk 3 maçı gelmeyen lig-sezon atlanır (yok kümesine)."""
     import json, random
-    atlanan = os.path.join(K.HAM, "eski_kadrosuz.json")   # kadro sayfası olmayan lig-sezonlar (yeniden denenmez)
-    yok = set(json.load(open(atlanan))) if os.path.exists(atlanan) else set()
-    for e, gr in sorted(sezonlar(), reverse=True):   # yeniden eskiye: profesyonel ligler, sonra Millî Küme
-        for s, ad in gr:
-            if f"{e}|{s}" in yok:
-                continue
-            ms = K.sezon_maclari(e, [(s, ad)])
-            eksik = [m for m in ms if not os.path.exists(K.mac_yol(m[0]))]
-            if not eksik:
-                continue
-            var_ = sum(os.path.exists(K.mac_yol(m[0])) for m in ms)
-            print(f"{e} {ad}: {len(ms)} maç, {len(eksik)} indirilecek {time.strftime('%H:%M')}", flush=True)
-            ok = 0
-            for i, (mid, mad) in enumerate(eksik, 1):
-                ok += K.mac_indir(mid, mad)
-                time.sleep(K.BEKLE + random.uniform(0, 5))
-                if i == 3 and not ok and not var_:
-                    print(f"  ilk 3 maçın kadrosu yok, {e} {ad} atlanıyor", flush=True)
-                    yok.add(f"{e}|{s}")
-                    json.dump(sorted(yok), open(atlanan, "w"))
-                    break
-                if i % 50 == 0:
-                    print(f"  {i}/{len(eksik)} {time.strftime('%H:%M')}", flush=True)
+    for s, ad in gr:
+        if f"{e}|{s}" in yok:
+            continue
+        ms = K.sezon_maclari(e, [(s, ad)])
+        eksik = [m for m in ms if not os.path.exists(K.mac_yol(m[0]))]
+        if not eksik:
+            continue
+        var_ = sum(os.path.exists(K.mac_yol(m[0])) for m in ms)
+        print(f"{e} {ad}: {len(ms)} maç, {len(eksik)} kadro indirilecek {time.strftime('%H:%M')}", flush=True)
+        ok = 0
+        for i, (mid, mad) in enumerate(eksik, 1):
+            ok += K.mac_indir(mid, mad)
+            time.sleep(K.BEKLE + random.uniform(0, 5))
+            if i == 3 and not ok and not var_:
+                print(f"  ilk 3 maçın kadrosu yok, {e} {ad} atlanıyor", flush=True)
+                yok.add(f"{e}|{s}")
+                json.dump(sorted(yok), open(ATLANAN, "w"))
+                break
+            if i % 50 == 0:
+                print(f"  {i}/{len(eksik)} {time.strftime('%H:%M')} (inen: {ok})", flush=True)
+
+
+def _yok():
+    import json
+    return set(json.load(open(ATLANAN))) if os.path.exists(ATLANAN) else set()
+
+
+def kadro():
+    yok = _yok()
+    for e, gr in sorted(sezonlar(), reverse=True):   # yeniden eskiye
+        kadro_sezon(e, gr, yok)
+    print("Bitti.", flush=True)
+
+
+def hepsi():
+    """Tek iş: yeniden eskiye her sezonun maç listesi, hemen ardından kadroları ve golleri (önce 1950'lerin profesyonel
+    ligleri ve Millî Küme; İstanbul Ligi'nin kadrosuz eski sezonları ilk 3 maçta atlanır)."""
+    yok = _yok()
+    for e, gr in sorted(sezonlar(), key=lambda x: x[0][:4], reverse=True):
+        print(f"{e}: {', '.join(a for _, a in gr)} {time.strftime('%H:%M')}", flush=True)
+        M.arsiv_gruplari_indir(os.path.join(K.FIKSTUR, e), gr)
+        kadro_sezon(e, gr, yok)
     print("Bitti.", flush=True)
 
 
@@ -75,4 +99,4 @@ def say():
 
 
 if __name__ == "__main__":
-    {"indir": indir, "say": say, "kadro": kadro}[sys.argv[1]]()
+    {"indir": indir, "say": say, "kadro": kadro, "hepsi": hepsi}[sys.argv[1]]()
