@@ -9,8 +9,7 @@ Millî Küme ve profesyonel liglerde ise kadro ve goller var (2026-11-19, 1938 G
   python3 mackolik_eski.py say      # ağa çıkmadan: hangi sezonların listesi indi
   python3 mackolik_eski.py indir    # yarıda kalırsa aynı komut kaldığı yerden sürer (istekler arası 40 sn)
   python3 mackolik_eski.py hepsi    # tek iş, yeniden eskiye: her sezonun listesi ve hemen ardından kadroları (önerilen)
-  python3 mackolik_eski.py kadro    # maç kadroları ve olayları (goller): her lig-sezonda önce ilk 3 maç denenir,
-                                    # hiçbiri gelmezse (İstanbul Ligi'nin eski sezonlarında HTTP 500) o lig-sezon atlanır
+  python3 mackolik_eski.py kadro    # maç kadroları ve olayları (goller): her maç denenir
 
 Sonuç: raw/mackolik_kadro/fikstur/<sezon>/ (mackolik_kadro.py ile aynı yer ve biçim).
 """
@@ -43,7 +42,8 @@ ATLANAN = os.path.join(K.HAM, "eski_kadrosuz.json")   # kadro sayfası olmayan l
 
 
 def kadro_sezon(e, gr, yok):
-    """Bir sezonun liglerinde maç kadroları ve olayları; ilk 3 maçı gelmeyen lig-sezon atlanır (yok kümesine)."""
+    """Bir sezonun liglerinde maç kadroları ve olayları; her maç denenir (aynı sezonda bir maçın sayfası olup öbürünün
+    olmayabilir). HTTP 500 verenler atlanır, sonraki çalıştırmada yeniden denenir."""
     import json, random
     for s, ad in gr:
         if f"{e}|{s}" in yok:
@@ -58,11 +58,6 @@ def kadro_sezon(e, gr, yok):
         for i, (mid, mad) in enumerate(eksik, 1):
             ok += K.mac_indir(mid, mad)
             time.sleep(K.BEKLE + random.uniform(0, 5))
-            if i == 3 and not ok and not var_:
-                print(f"  ilk 3 maçın kadrosu yok, {e} {ad} atlanıyor", flush=True)
-                yok.add(f"{e}|{s}")
-                json.dump(sorted(yok), open(ATLANAN, "w"))
-                break
             if i % 50 == 0:
                 print(f"  {i}/{len(eksik)} {time.strftime('%H:%M')} (inen: {ok})", flush=True)
 
@@ -81,7 +76,7 @@ def kadro():
 
 def hepsi():
     """Tek iş: yeniden eskiye her sezonun maç listesi, hemen ardından kadroları ve golleri (önce 1950'lerin profesyonel
-    ligleri ve Millî Küme; İstanbul Ligi'nin kadrosuz eski sezonları ilk 3 maçta atlanır)."""
+    ligleri ve Millî Küme)."""
     yok = _yok()
     for e, gr in sorted(sezonlar(), key=lambda x: x[0][:4], reverse=True):
         print(f"{e}: {', '.join(a for _, a in gr)} {time.strftime('%H:%M')}", flush=True)
