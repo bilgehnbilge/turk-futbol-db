@@ -1645,16 +1645,11 @@ async function sezonSayfa(sezon) {
   const o = Z[sezon] || {}, kul = id => KULUP.get(id)?.ad ?? "?";
   const kutu = (baslik, id, ek = "") => id != null ? `<a class="oz-kutu" href="#/${K}kulup/${id}" style="${formaSerit(id)}">${logoImg(id)}<span><small>${baslik}</small><b>${esc(kul(id))}</b>${ek}</span></a>` : "";
   const liste = (l, cls, baslik) => l?.length ? `<div class="oz-liste ${cls}"><small>${baslik}</small><span>${l.map(id => `<a href="#/${K}kulup/${id}">${logoImg(id)}${esc(kul(id))}</a>`).join("")}</span></div>` : "";
-  const ort = golOrt(o.sl);
   icerik.innerHTML = `
   <div class="sayfa-bas"><h1>${esc(sezon)} sezonu</h1>
     <div class="yan-yana">${onceki ? `<a class="cip" href="#/${K}sezon/${onceki}">← ${onceki}</a>` : ""}${sonraki ? `<a class="cip" href="#/${K}sezon/${sonraki}">${sonraki} →</a>` : ""}</div></div>
-  <section class="sezon-ozet" aria-label="Sezon özeti">
-    ${kutu(o.sampiyon != null ? "Süper Lig şampiyonu" : "Süper Lig lideri", o.sampiyon ?? o.lider, o.sampiyon == null && o.lider != null ? `<small>sezon sürüyor</small>` : "")}
-    ${kutu("Türkiye Kupası", o.kupa)}
-    <div class="oz-kutu kral" hidden></div>
-    ${o.sl?.[0] ? `<div class="oz-kutu sayi-k"><span><small>Süper Lig</small><b>${o.sl[0]} takım · ${sayiYaz(o.sl[1])} maç</b>${ort ? `<small>${ort} gol/maç</small>` : ""}</span></div>` : ""}
-    ${liste(o.k?.["2"]?.c, "cik", "Süper Lig'e çıkanlar ↑")}${liste(o.k?.["1"]?.d, "dus", "Süper Lig'den düşenler ↓")}
+  <section class="sezon-ozet" id="szOzet" aria-label="Sezon özeti (seçili lig)" aria-live="polite">
+    ${sirali.length ? "" : `${kutu(o.sampiyon != null ? "Süper Lig şampiyonu" : "Süper Lig lideri", o.sampiyon ?? o.lider)}${kutu("Türkiye Kupası", o.kupa)}`}
   </section>
   <p class="soluk not">${sayiYaz(ms.length)} maç · Puan tabloları sonuçlardan hesaplandı (galibiyet ${p} puan; puan silme ve averaj kuralı farkları dahil değil).</p>
   <nav class="sekmeler">${sirali.length ? `<a href="#lig" data-k="lig" class="aktif">Lig</a>` : ""}${po.length ? `<a href="#po" data-k="po">Play-off / baraj</a>` : ""}${kupa.length ? `<a href="#kupa" data-k="kupa">Türkiye Kupası</a>` : ""}${ozel.map(o => `<a href="#${o.k}" data-k="${o.k}">${esc(o.lig)}</a>`).join("")}${avrupa.length ? `<a href="#avrupa" data-k="avrupa">Avrupa</a>` : ""}</nav>
@@ -1665,14 +1660,12 @@ async function sezonSayfa(sezon) {
   <div id="sz-kupa" hidden>${turlara(kupa).map(([t, l]) => `<div class="kart" style="margin-bottom:12px"><h3>${esc(t)}</h3>${macListesi(l)}</div>`).join("")}</div>
   ${ozel.map(o => `<div id="sz-${o.k}" hidden>${macListesi(o.ms)}</div>`).join("")}
   <div id="sz-avrupa" hidden>${turlara(avrupa.map(m => ({ ...m, tur: `${m.lig}${m.tur ? " · " + m.tur : ""}` }))).map(([t, l]) => `<div class="kart" style="margin-bottom:12px"><h3>${esc(t)}</h3>${macListesi(l)}</div>`).join("")}</div>`;
-  if (sirali.length) ligBolumu($("#sz-lig"), sezon, sirali, Z);
-  // gol kralı (Süper Lig, TFF istatistikleri) arka planda
-  if (BOLUM === "erkek") al(`data/tff/istatistik.json?s=${OZET.surum || ""}`).then(d => {
-    const l = d.krallar?.[sezon]?.[1], k = icerik.querySelector(".sezon-ozet .kral"); if (!l?.length || !k) return;
-    const esit = l.filter(x => x[2] === l[0][2]);
-    k.innerHTML = `<span><small>Gol kralı</small><b>${esit.map(x => `<a class="oyuncu-bag" href="#/oyuncu/k${x[0]}">${esc(x[1])}</a>`).join(", ")}</b><small>${l[0][2]} gol · ${esit.map(x => esc(kul(x[4]))).join(", ")}</small></span>`;
-    k.hidden = false;
-  }).catch(() => {});
+  // özet şeridi seçili lige göre (sezon.js ozetCiz); gol kralı TFF istatistiklerinden, kademe kademe
+  const kral = kd => BOLUM !== "erkek" ? Promise.resolve(null) : al(`data/tff/istatistik.json?s=${OZET.surum || ""}`).then(d => {
+    const l = d.krallar?.[sezon]?.[kd]; if (!l?.length) return null;
+    return l.filter(x => x[2] === l[0][2]).map(x => ({ kisi: x[0], ad: x[1], gol: x[2], kulup: x[4] }));
+  });
+  if (sirali.length) ligBolumu($("#sz-lig"), sezon, sirali, Z, { ozet: $("#szOzet"), kupa: o.kupa, kral });
   const ilk = sirali.length ? "lig" : po.length ? "po" : kupa.length ? "kupa" : ozel.length ? ozel[0].k : "avrupa";
   const goster = k => { ["lig", "po", "kupa", ...ozel.map(o => o.k), "avrupa"].forEach(x => { const e = $("#sz-" + x); if (e) e.hidden = x !== k; }); icerik.querySelectorAll(".sekmeler a").forEach(a => a.classList.toggle("aktif", a.dataset.k === k)); };
   icerik.querySelectorAll(".sekmeler a").forEach(a => a.addEventListener("click", e => { e.preventDefault(); goster(a.dataset.k); }));

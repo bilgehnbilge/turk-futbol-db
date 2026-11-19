@@ -488,24 +488,24 @@ a.oyuncu-bag:hover { color: var(--vurgu); text-decoration: underline; text-under
    Seri renkleri: kategorik 4'lü sıra (mavi, turuncu, su yeşili, sarı) açık/koyu zeminde doğrulandı;
    kademe matrisi tek tonlu sıralı mavi; derbi farkı iki yönlü mavi ↔ kırmızı. */
 :root {
-  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
-  --kd1: #104281; --kd2: #256abf; --kd3: #5598e7; --kd4: #86b6ef;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #8a4fd8;
+  --kd1: #104281; --kd2: #256abf; --kd3: #5598e7; --kd4: #86b6ef; --kd5: #bcd6f6;
   --div-a: #2a78d6; --div-b: #e34948;
   --isi-uc: #104281; --isi-yazi: #fff;
   --grafik-izgara: #eceef2; --grafik-eksen: #c3c8d0;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
-    --kd1: #9ec5f4; --kd2: #5598e7; --kd3: #256abf; --kd4: #184f95;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #a47ef0;
+    --kd1: #9ec5f4; --kd2: #5598e7; --kd3: #256abf; --kd4: #184f95; --kd5: #12345f;
     --div-a: #3987e5; --div-b: #e66767;
     --isi-uc: #9ec5f4; --isi-yazi: #0c0e12;
     --grafik-izgara: #20252d; --grafik-eksen: #3a414c;
   }
 }
 :root[data-theme="dark"] {
-  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
-  --kd1: #9ec5f4; --kd2: #5598e7; --kd3: #256abf; --kd4: #184f95;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #a47ef0;
+  --kd1: #9ec5f4; --kd2: #5598e7; --kd3: #256abf; --kd4: #184f95; --kd5: #12345f;
   --div-a: #3987e5; --div-b: #e66767;
   --isi-uc: #9ec5f4; --isi-yazi: #0c0e12;
   --grafik-izgara: #20252d; --grafik-eksen: #3a414c;
@@ -572,7 +572,7 @@ a.oyuncu-bag:hover { color: var(--vurgu); text-decoration: underline; text-under
 .m-yil { font-size: 10px; color: var(--soluk); white-space: nowrap; overflow: visible; line-height: 14px; }
 .m-h { height: 12px; border-radius: 2px; }
 .m-h[data-k] { cursor: default; }
-.kd1 { background: var(--kd1); } .kd2 { background: var(--kd2); } .kd3 { background: var(--kd3); } .kd4 { background: var(--kd4); }
+.kd1 { background: var(--kd1); } .kd2 { background: var(--kd2); } .kd3 { background: var(--kd3); } .kd4 { background: var(--kd4); } .kd5 { background: var(--kd5); }
 .m-h.sampiyon, .anahtar.sampiyon { background-image: radial-gradient(circle, var(--yuzey) 0 28%, transparent 32%); }
 .matris-lejant { margin-bottom: 12px; }
 #yolculuk { margin-top: 16px; }

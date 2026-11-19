@@ -149,16 +149,13 @@ async function kadinSezon(sezon, kademeSec) {
   <div class="sayfa-bas"><h1>Kadın ligleri ${esc(sezon)}</h1>
     <div class="yan-yana">${onceki ? `<a class="cip" href="#/kadin/sezon/${onceki}">← ${onceki}</a>` : ""}${sonraki ? `<a class="cip" href="#/kadin/sezon/${sonraki}">${sonraki} →</a>` : ""}</div></div>
   <p class="soluk"><a class="bag" href="#/kadin">Kadın Futbolu</a> · ${ms.length} maç · Puan tabloları sonuçlardan hesaplandı (galibiyet 3 puan; puan silme cezaları dahil değil).</p>
-  <section class="sezon-ozet" aria-label="Sezon özeti">
-    ${Zk[sezon].sampiyon != null ? `<a class="oz-kutu" href="#/kadin/kulup/${Zk[sezon].sampiyon}" style="${formaSerit(Zk[sezon].sampiyon)}">${kLogo(Zk[sezon].sampiyon)}<span><small>${esc(kademeAd(sezon, 1))} şampiyonu</small><b>${esc(kAd(Zk[sezon].sampiyon))}</b></span></a>` : ""}
-    ${kral ? `<div class="oz-kutu"><span><small>Gol kralı (${esc(kademeAd(sezon, kad))})</small><b>${kral.map(x => oyBag(x[0], x[1])).join(", ")}</b><small>${kral[0][2]} gol · ${kral.map(x => esc(kAd(x[3]))).join(", ")}</small></span></div>` : ""}
-    ${kk[2]?.c?.length ? `<div class="oz-liste cik"><small>${esc(kademeAd(sezon, 1))}'ne çıkanlar ↑</small><span>${kk[2].c.map(id => kBag(id)).join("")}</span></div>` : ""}
-    ${kk[1]?.d?.length ? `<div class="oz-liste dus"><small>${esc(kademeAd(sezon, 1))}'nden düşenler ↓</small><span>${kk[1].d.map(id => kBag(id)).join("")}</span></div>` : ""}
+  <section class="sezon-ozet" id="kOzet" aria-label="Sezon özeti (seçili lig)" aria-live="polite">
   </section>
   <div id="kLig"></div>
   ${po.size ? `<h2 class="bolum">Play-off ve final maçları</h2>${[...po].map(([k, l]) => `<div class="kart" style="margin-bottom:12px"><h3>${esc(k)}${l[0].grup ? ` · ${esc(l[0].grup)}` : ""}</h3>${macListe(l)}</div>`).join("")}` : ""}
   <p class="soluk not bolum">${NOT}</p>`;
-  if (sirali.length) ligBolumu($("#kLig"), sezon, sirali, Zk);
+  if (sirali.length) ligBolumu($("#kLig"), sezon, sirali, Zk, { ozet: $("#kOzet"),
+    kral: async kd => { const l = z.krallar[sezon]?.[kd]; return l?.length ? l.map(x => ({ kisi: x[0], ad: x[1], gol: x[2], kulup: x[3] })) : null; } });
 }
 
 yollar.splice(yollar.length - 1, 0,

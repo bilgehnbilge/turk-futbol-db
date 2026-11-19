@@ -8,7 +8,7 @@ const SVGNS = "http://www.w3.org/2000/svg";
 const yuzde = (x, b = 1) => (x * 100).toLocaleString("tr-TR", { minimumFractionDigits: b, maximumFractionDigits: b }) + "%";
 const ondalik = (x, b = 2) => x.toLocaleString("tr-TR", { minimumFractionDigits: b, maximumFractionDigits: b });
 const sezonYil = s => +String(s).slice(0, 4);
-const SERI_RENK = ["var(--s1)", "var(--s2)", "var(--s3)", "var(--s4)"];
+const SERI_RENK = ["var(--s1)", "var(--s2)", "var(--s3)", "var(--s4)", "var(--s5)"];   // 5.: Profesyonelliğe Geçiş Ligi (mor)
 // 4. seri (sarı) turuncuyla bütün çiftler denetiminde ayrışmıyor (normal görüşte ΔE 13,7; koyu temada döteranopide 4,8):
 // kesik çizgiyle ikincil kodlama, lejantta da kesik anahtar
 const KESIK = "var(--s4)";
@@ -456,7 +456,7 @@ function matrisCiz(kap, Y, xler) {
     .filter(r => r.sl > 0).sort((a, b) => b.sl - a.sl || b.sam - a.sam || kulupAd(a.id).localeCompare(kulupAd(b.id), "tr"));
   const sutun = xler.filter(s => s !== "1959");   // 1959 tek yıllık sezon: 1959-60 ile aynı yıla düşer
   const idx = new Map(sutun.map((s, i) => [s, i]));
-  kap.innerHTML = `<div class="matris-lejant lejant">${[1, 2, 3, 4].map(k => `<span><i class="anahtar kare kd${k}"></i>${esc(KADEME_AD[k])}</span>`).join("")}<span><i class="anahtar kare kd1 sampiyon"></i>Şampiyon</span></div>
+  kap.innerHTML = `<div class="matris-lejant lejant">${Object.keys(KADEME_AD).map(Number).sort().map(k => `<span><i class="anahtar kare kd${k}"></i>${esc(KADEME_AD[k])}</span>`).join("")}<span><i class="anahtar kare kd1 sampiyon"></i>Şampiyon</span></div>
     <div class="matris-kap"><div class="matris" style="--sutun:${sutun.length}">
       <span class="m-ad"></span>${sutun.map(s => `<span class="m-yil">${sezonYil(s) % 10 === 0 ? sezonYil(s) : ""}</span>`).join("")}
       ${satir.map(r => {
