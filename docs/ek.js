@@ -211,7 +211,7 @@ function rekorZaman(kap, v) {
     ip.goster(e, `<div class="ipucu-bas">${tarihYaz(m[0])} · ${esc(m[2] || "")}${m[3] ? ` · ${esc(m[3])}` : ""}</div><div class="ipucu-satir"><span>${esc(m[5])}</span><b>${m[8]}-${m[9]}</b><span>${esc(m[7])}</span></div><div class="soluk">${ad}</div>`);
   });
   svg.addEventListener("pointerleave", () => ip.gizle());
-  svg.addEventListener("click", e => { const c = e.target.closest(".rz"); if (!c) return; const m = l[+c.dataset.i].m; location.hash = detayVar(m[13]) ? `#/${K}mac/${m[13]}` : `#/${K}sezon/${m[1]}`; });
+  svg.addEventListener("click", e => { const c = e.target.closest(".rz"); if (!c) return; const m = l[+c.dataset.i].m; location.hash = detayVar(m[13]) ? `#/${K}mac/${m[13]}` : m[14] ? `#/${m[14]}` : `#/${K}sezon/${m[1]}`; });
 }
 
 // ---------------------------------------------------------------- Elo yarışı: sezon sonu Elo'ya göre ilk 12 kulüp, çubuk yarışı

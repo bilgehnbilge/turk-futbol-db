@@ -446,7 +446,10 @@ def main():
 
     # ---- tüm zamanlar rekorları
     sezon_sira = {s: i for i, s in enumerate(sorted(sez, key=lambda s: (s[:4], s)))}
-    yaz(os.path.join(CIKTI, "rekorlar.json"), rekor.hesapla(maclar, sezon_sira, okunur))
+    import eski_site   # 1959 öncesi bölümü (RSSSF; raw/rsssf_eski yoksa dokunulmaz) -> data/eski.json; rekorlarda "1959 öncesi dahil"
+    eski_site.main()
+    ep = os.path.join(CIKTI, "eski.json")
+    yaz(os.path.join(CIKTI, "rekorlar.json"), rekor.hesapla(maclar, sezon_sira, okunur, json.load(open(ep, encoding="utf-8")) if os.path.exists(ep) else None))
 
     # ---- Sayılarla Türk futbolu + kulüplerin lig yolculuğu
     sy, yol = sayilar.hesapla(maclar, c)
@@ -474,8 +477,7 @@ def main():
         "son_tarih": max(m["tarih"] for m in maclar if m["tarih"] and m["ev_gol"] is not None),
         "kapsam": kapsam, "detayli": detayli, "detayli_aralik": araliklar(sorted(set(tff_ayr) | set(mk_ayr))),
         "mk_kadro": tff_detay.MK_ILK})
-    import eski_site   # 1959 öncesi bölümü (RSSSF; raw/rsssf_eski yoksa dokunulmaz) -> data/eski.json
-    eski_site.main()
+
     toplam = sum(os.path.getsize(os.path.join(d, f)) for d, _, fs in os.walk(CIKTI) for f in fs)
     print(f"{len(liste)} kulup, {len(sez)} sezon, {len(maclar)} mac -> {CIKTI} ({toplam / 1e6:.1f} MB)")
 

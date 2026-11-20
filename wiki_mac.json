@@ -3665,7 +3665,269 @@ null
 "g1": [],
 "g2": [],
 "stad": "Ali Sami Yen Stadyumu",
-"hakem": "Muhittin Boşat"
+"hakem": "Muhittin Boşat",
+"k1": [
+[
+"1",
+"Cláudio Taffarel",
+1,
+null,
+null
+],
+[
+"2",
+"Ümit Davala",
+1,
+null,
+null
+],
+[
+"3",
+"Bülent Korkmaz",
+1,
+null,
+null
+],
+[
+"4",
+"Fatih Akyel",
+1,
+null,
+null
+],
+[
+"11",
+"Hakan Ünsal",
+1,
+null,
+null
+],
+[
+"8",
+"Suat Kaya",
+1,
+null,
+null
+],
+[
+"7",
+"Okan Buruk",
+1,
+null,
+null
+],
+[
+"5",
+"Emre Belözoğlu",
+1,
+null,
+73
+],
+[
+"10",
+"Gheorghe Hagi",
+1,
+null,
+null
+],
+[
+"6",
+"Arif Erdem",
+1,
+null,
+83
+],
+[
+"9",
+"Hakan Şükür",
+1,
+null,
+null
+],
+[
+"12",
+"Mehmet Bölükbaşı",
+0,
+null,
+null
+],
+[
+"13",
+"Tolunay Kafkas",
+0,
+null,
+null
+],
+[
+"14",
+"Tugay Kerimoğlu",
+0,
+83,
+null
+],
+[
+"15",
+"Vedat İnceefe",
+0,
+null,
+null
+],
+[
+"16",
+"Ergün Penbe",
+0,
+73,
+null
+],
+[
+"17",
+"Ufuk Talay",
+0,
+null,
+null
+],
+[
+"18",
+"Burak Akdiş",
+0,
+null,
+null
+]
+],
+"k2": [
+[
+"1",
+"Fevzi Tuncay",
+1,
+null,
+null
+],
+[
+"2",
+"Savaş Kaya",
+1,
+null,
+null
+],
+[
+"5",
+"Jamal Sellami",
+1,
+null,
+null
+],
+[
+"4",
+"Ali Eren Beşerler",
+1,
+null,
+null
+],
+[
+"7",
+"Mutlu Topçu",
+1,
+null,
+null
+],
+[
+"3",
+"Yasin Sülün",
+1,
+null,
+null
+],
+[
+"6",
+"Ertuğrul Sağlam",
+1,
+null,
+null
+],
+[
+"8",
+"Ayhan Akman",
+1,
+null,
+68
+],
+[
+"10",
+"Mehmet Özdilek",
+1,
+null,
+null
+],
+[
+"9",
+"Oktay Derelioğlu",
+1,
+null,
+76
+],
+[
+"11",
+"Daniel Amokachi",
+1,
+null,
+88
+],
+[
+"12",
+"Ekrem Köse",
+0,
+null,
+null
+],
+[
+"13",
+"Serdar Topraktepe",
+0,
+88,
+null
+],
+[
+"14",
+"Erkan Avseren",
+0,
+null,
+null
+],
+[
+"15",
+"José del Solar",
+0,
+68,
+null
+],
+[
+"16",
+"Nihat Kahveci",
+0,
+76,
+null
+],
+[
+"17",
+"Aydın Tuna",
+0,
+null,
+null
+],
+[
+"18",
+"Hikmet Çapanoğlu",
+0,
+null,
+null
+]
+],
+"t1": [
+"Fatih Terim"
+],
+"t2": [
+"Karl-Heinz Feldkamp"
+]
 },
 {
 "madde": "1999 Türkiye Kupası finali",
@@ -3688,7 +3950,262 @@ null
 ]
 ],
 "stad": "BJK İnönü Stadyumu, İstanbul",
-"hakem": "Oğuz Sarvan"
+"hakem": "Oğuz Sarvan",
+"k1": [
+[
+"1",
+"Fevzi Tuncay",
+1,
+null,
+null
+],
+[
+"5",
+"Alpay Özalan",
+1,
+null,
+null
+],
+[
+"4",
+"Jamal Sellami",
+1,
+null,
+82
+],
+[
+"3",
+"Tayfur Havutçu",
+1,
+null,
+null
+],
+[
+"2",
+"Savaş Kaya",
+1,
+null,
+null
+],
+[
+"8",
+"Ayhan Akman",
+1,
+null,
+75
+],
+[
+"9",
+"Yasin Sülün",
+1,
+null,
+null
+],
+[
+"7",
+"Mutlu Topçu",
+1,
+null,
+null
+],
+[
+"10",
+"Mehmet Özdilek",
+1,
+null,
+null
+],
+[
+"6",
+"Ertuğrul Sağlam",
+1,
+null,
+65
+],
+[
+"11",
+"Daniel Amokachi",
+1,
+null,
+null
+],
+[
+"12",
+"Hakan Çalışkan",
+0,
+null,
+null
+],
+[
+"13",
+"Erkan Avseren",
+0,
+82,
+null
+],
+[
+"14",
+"Christopher Ohen",
+0,
+75,
+null
+],
+[
+"15",
+"Nihat Kahveci",
+0,
+65,
+null
+],
+[
+"16",
+"Hikmet Çapanoğlu",
+0,
+null,
+null
+],
+[
+"17",
+"Rahim Zafer",
+0,
+null,
+null
+],
+[
+"18",
+"Serdar Topraktepe",
+0,
+null,
+null
+]
+],
+"k2": [
+[
+"1",
+"Cláudio Taffarel",
+1,
+null,
+null
+],
+[
+"2",
+"Fatih Akyel",
+1,
+null,
+null
+],
+[
+"4",
+"Gheorghe Popescu",
+1,
+null,
+null
+],
+[
+"3",
+"Bülent Korkmaz",
+1,
+null,
+null
+],
+[
+"11",
+"Hakan Ünsal",
+1,
+null,
+null
+],
+[
+"8",
+"Suat Kaya",
+1,
+null,
+null
+],
+[
+"7",
+"Okan Buruk",
+1,
+null,
+85
+],
+[
+"6",
+"Ergün Penbe",
+1,
+null,
+83
+],
+[
+"10",
+"Emre Belözoğlu",
+1,
+null,
+null
+],
+[
+"5",
+"Ümit Davala",
+1,
+null,
+89
+],
+[
+"9",
+"Hakan Şükür",
+1,
+null,
+null
+],
+[
+"12",
+"Kerem İnan",
+0,
+null,
+null
+],
+[
+"13",
+"Burak Akdiş",
+0,
+null,
+null
+],
+[
+"14",
+"Tugay Kerimoğlu",
+0,
+83,
+null
+],
+[
+"15",
+"Vedat İnceefe",
+0,
+85,
+null
+],
+[
+"16",
+"Tolunay Kafkas",
+0,
+null,
+null
+],
+[
+"17",
+"Ufuk Talay",
+0,
+89,
+null
+]
+],
+"t1": [
+"Karl-Heinz Feldkamp"
+],
+"t2": [
+"Fatih Terim"
+]
 },
 {
 "madde": "2000 Türkiye Kupası finali",
@@ -3754,7 +4271,269 @@ null
 "g1": [],
 "g2": [],
 "stad": "Parken Stadyumu, Kopenhag",
-"hakem": "Antonio Jesús López Nieto"
+"hakem": "Antonio Jesús López Nieto",
+"k1": [
+[
+"1",
+"Taffarel",
+1,
+null,
+null
+],
+[
+"35",
+"Capone",
+1,
+null,
+null
+],
+[
+"3",
+"Bülent Korkmaz",
+1,
+null,
+null
+],
+[
+"4",
+"Gheorghe Popescu",
+1,
+null,
+null
+],
+[
+"67",
+"Ergün Penbe",
+1,
+null,
+null
+],
+[
+"8",
+"Suat Kaya",
+1,
+null,
+95
+],
+[
+"10",
+"Gheorghe Hagi",
+1,
+null,
+null
+],
+[
+"22",
+"Ümit Davala",
+1,
+null,
+null
+],
+[
+"7",
+"Okan Buruk",
+1,
+null,
+84
+],
+[
+"6",
+"Arif Erdem",
+1,
+null,
+95
+],
+[
+"9",
+"Hakan Şükür",
+1,
+null,
+null
+],
+[
+"30",
+"Kerem İnan",
+0,
+null,
+null
+],
+[
+"14",
+"Fatih Akyel",
+0,
+null,
+null
+],
+[
+"13",
+"Mehmet Yozgatlı",
+0,
+null,
+null
+],
+[
+"15",
+"Marcio",
+0,
+null,
+null
+],
+[
+"16",
+"Ahmet Yıldırım",
+0,
+95,
+null
+],
+[
+"33",
+"Hakan Ünsal",
+0,
+84,
+null
+],
+[
+"23",
+"Hasan Şaş",
+0,
+95,
+null
+]
+],
+"k2": [
+[
+"1",
+"David Seaman",
+1,
+null,
+null
+],
+[
+"5",
+"Martin Keown",
+1,
+null,
+null
+],
+[
+"2",
+"Lee Dixon",
+1,
+null,
+null
+],
+[
+"16",
+"Sylvinho",
+1,
+null,
+null
+],
+[
+"6",
+"Tony Adams",
+1,
+null,
+null
+],
+[
+"11",
+"Marc Overmars",
+1,
+null,
+115
+],
+[
+"17",
+"Emmanuel Petit",
+1,
+null,
+null
+],
+[
+"15",
+"Ray Parlour",
+1,
+null,
+null
+],
+[
+"4",
+"Patrick Vieira",
+1,
+null,
+null
+],
+[
+"10",
+"Dennis Bergkamp",
+1,
+null,
+75
+],
+[
+"14",
+"Thierry Henry",
+1,
+null,
+null
+],
+[
+"24",
+"John Lukic",
+0,
+null,
+null
+],
+[
+"22",
+"Oleh Luzhny",
+0,
+null,
+null
+],
+[
+"3",
+"Nigel Winterburn",
+0,
+null,
+null
+],
+[
+"18",
+"Gilles Grimandi",
+0,
+null,
+null
+],
+[
+"19",
+"Stefan Malz",
+0,
+null,
+null
+],
+[
+"9",
+"Davor Šuker",
+0,
+115,
+null
+],
+[
+"25",
+"Nwankwo Kanu",
+0,
+75,
+null
+]
+],
+"t1": [
+"Fatih Terim"
+],
+"t2": [
+"Arsène Wenger"
+]
 },
 {
 "madde": "2000 UEFA Süper Kupası",
@@ -3968,7 +4747,269 @@ null
 "g1": [],
 "g2": [],
 "stad": "Commerzbank-Arena",
-"hakem": "Bülent Demirlek"
+"hakem": "Bülent Demirlek",
+"k1": [
+[
+"1",
+"Aly Faryd Mondragon",
+1,
+null,
+null
+],
+[
+"4",
+"Rigobert Song",
+1,
+null,
+null
+],
+[
+"28",
+"Tolga Seyhan",
+1,
+null,
+null
+],
+[
+"55",
+"Sabri Sarıoğlu",
+1,
+null,
+77
+],
+[
+"67",
+"Ergün Penbe",
+1,
+null,
+null
+],
+[
+"11",
+"Hasan Şaş",
+1,
+null,
+null
+],
+[
+"19",
+"Cihan Haspolatlı",
+1,
+null,
+null
+],
+[
+"22",
+"Saša Ilić",
+1,
+null,
+72
+],
+[
+"24",
+"Mehmet Güven",
+1,
+null,
+null
+],
+[
+"9",
+"Hakan Şükür",
+1,
+null,
+null
+],
+[
+"10",
+"Necati Ateş",
+1,
+null,
+72
+],
+[
+"17",
+"Fevzi Elmas",
+0,
+null,
+null
+],
+[
+"2",
+"Stjepan Tomas",
+0,
+null,
+null
+],
+[
+"18",
+"Ayhan Akman",
+0,
+72,
+null
+],
+[
+"25",
+"Ferhat Öztorun",
+0,
+null,
+null
+],
+[
+"26",
+"Aydın Yılmaz",
+0,
+77,
+null
+],
+[
+"27",
+"Özgürcan Özcan",
+0,
+72,
+null
+],
+[
+"66",
+"Arda Turan",
+0,
+null,
+null
+]
+],
+"k2": [
+[
+"1",
+"Vedran Runje",
+1,
+null,
+null
+],
+[
+"58",
+"İbrahim Toraman",
+1,
+null,
+null
+],
+[
+"5",
+"Gökhan Zan",
+1,
+null,
+null
+],
+[
+"8",
+"Baki Mercimek",
+1,
+null,
+null
+],
+[
+"19",
+"İbrahim Üzülmez",
+1,
+null,
+null
+],
+[
+"41",
+"Koray Avcı",
+1,
+null,
+null
+],
+[
+"15",
+"José Kléberson",
+1,
+null,
+null
+],
+[
+"53",
+"Fahri Tatan",
+1,
+null,
+70
+],
+[
+"10",
+"Matias Delgado",
+1,
+null,
+null
+],
+[
+"11",
+"Mert Nobre",
+1,
+null,
+null
+],
+[
+"9",
+"Gökhan Güleç",
+1,
+null,
+70
+],
+[
+"29",
+"Murat Şahin",
+0,
+null,
+null
+],
+[
+"22",
+"Ali Tandoğan",
+0,
+null,
+null
+],
+[
+"13",
+"Bobô",
+0,
+70,
+null
+],
+[
+"3",
+"Mehmet Sedef",
+0,
+null,
+null
+],
+[
+"2",
+"Serdar Kurtuluş",
+0,
+70,
+null
+],
+[
+"4",
+"Mustafa Doğan",
+0,
+null,
+null
+],
+[
+"55",
+"İbrahim Akın",
+0,
+null,
+null
+]
+],
+"t1": [
+"Eric Gerets"
+],
+"t2": [
+"Jean Tigana"
+]
 },
 {
 "madde": "2006 Türkiye Kupası finali",
@@ -4019,7 +5060,269 @@ null
 "g1": [],
 "g2": [],
 "stad": "RheinEnergie Stadyumu",
-"hakem": null
+"hakem": null,
+"k1": [
+[
+"22",
+"Serdar Kulbilge",
+1,
+null,
+null
+],
+[
+"19",
+"Önder Turacı",
+1,
+null,
+null
+],
+[
+"17",
+"Can Arat",
+1,
+null,
+null
+],
+[
+"36",
+"Edu",
+1,
+null,
+null
+],
+[
+"3",
+"Roberto Carlos",
+1,
+null,
+null
+],
+[
+"99",
+"Deivid",
+1,
+null,
+null
+],
+[
+"24",
+"Deniz Barış",
+1,
+null,
+null
+],
+[
+"15",
+"Mehmet Aurelio",
+1,
+null,
+null
+],
+[
+"25",
+"Uğur Boral",
+1,
+null,
+null
+],
+[
+"20",
+"Alex de Souza",
+1,
+null,
+null
+],
+[
+"9",
+"Mateja Kežman",
+1,
+null,
+null
+],
+[
+"1",
+"Volkan Demirel",
+0,
+null,
+null
+],
+[
+"6",
+"Gökçek Vederson",
+0,
+null,
+null
+],
+[
+"8",
+"Kazım Kazım",
+0,
+null,
+null
+],
+[
+"18",
+"Ali Bilgin",
+0,
+null,
+null
+],
+[
+"21",
+"Selçuk Şahin",
+0,
+null,
+null
+],
+[
+"32",
+"Gürhan Gürsoy",
+0,
+null,
+null
+],
+[
+"77",
+"Gökhan Gönül",
+0,
+null,
+null
+]
+],
+"k2": [
+[
+"84",
+"Hakan Arıkan",
+1,
+null,
+null
+],
+[
+"2",
+"Serdar Kurtuluş",
+1,
+null,
+null
+],
+[
+"58",
+"İbrahim Toraman",
+1,
+null,
+null
+],
+[
+"78",
+"İbrahim Kaş",
+1,
+null,
+null
+],
+[
+"19",
+"İbrahim Üzülmez",
+1,
+null,
+null
+],
+[
+"41",
+"Koray Avcı",
+1,
+null,
+null
+],
+[
+"18",
+"Édouard Cissé",
+1,
+null,
+null
+],
+[
+"6",
+"Mehmet Yozgatlı",
+1,
+null,
+null
+],
+[
+"55",
+"İbrahim Akın",
+1,
+null,
+null
+],
+[
+"10",
+"Matias Delgado",
+1,
+null,
+null
+],
+[
+"13",
+"Bobô",
+1,
+null,
+null
+],
+[
+"1",
+"Rüştü Reçber",
+0,
+null,
+null
+],
+[
+"22",
+"Ali Tandoğan",
+0,
+null,
+null
+],
+[
+"8",
+"Baki Mercimek",
+0,
+null,
+null
+],
+[
+"21",
+"Serdar Özkan",
+0,
+null,
+null
+],
+[
+"14",
+"Rodrigo Tello",
+0,
+null,
+null
+],
+[
+"26",
+"Can Erdem",
+0,
+null,
+null
+],
+[
+"53",
+"Fahri Tatan",
+0,
+null,
+null
+]
+],
+"t1": [
+"Zico"
+],
+"t2": [
+"Ertuğrul Sağlam"
+]
 },
 {
 "madde": "2007 Türkiye Kupası finali",
@@ -4066,7 +5369,269 @@ null
 ]
 ],
 "stad": "MSV-Arena, Duisburg",
-"hakem": "Selçuk Dereli"
+"hakem": "Selçuk Dereli",
+"k1": [
+[
+"1",
+"Aykut Erçetin",
+1,
+null,
+null
+],
+[
+"5",
+"Fernando Meira",
+1,
+null,
+null
+],
+[
+"76",
+"Servet Çetin",
+1,
+null,
+null
+],
+[
+"55",
+"Sabri Sarıoğlu",
+1,
+null,
+null
+],
+[
+"22",
+"Hakan Balta",
+1,
+null,
+73
+],
+[
+"11",
+"Hasan Şaş",
+1,
+null,
+83
+],
+[
+"18",
+"Ayhan Akman",
+1,
+null,
+null
+],
+[
+"14",
+"Mehmet Topal",
+1,
+null,
+null
+],
+[
+"8",
+"Barış Özbek",
+1,
+null,
+66
+],
+[
+"10",
+"Lincoln",
+1,
+null,
+null
+],
+[
+"9",
+"Shabani Nonda",
+1,
+null,
+null
+],
+[
+"26",
+"Morgan de Sanctis",
+0,
+null,
+null
+],
+[
+"74",
+"Volkan Yaman",
+0,
+73,
+null
+],
+[
+"21",
+"Emre Aşık",
+0,
+null,
+null
+],
+[
+"19",
+"Harry Kewell",
+0,
+66,
+null
+],
+[
+"60",
+"Alparslan Erdem",
+0,
+83,
+null
+],
+[
+"17",
+"Yaser Yıldız",
+0,
+null,
+null
+],
+[
+"83",
+"Erhan Şentürk",
+0,
+null,
+null
+]
+],
+"k2": [
+[
+"1",
+"Souleymanou Hamidou",
+1,
+null,
+null
+],
+[
+"12",
+"Delio Toledo",
+1,
+null,
+null
+],
+[
+"35",
+"Eren Güngör",
+1,
+null,
+null
+],
+[
+"2",
+"Ali Turan",
+1,
+null,
+null
+],
+[
+"51",
+"Koray Çölgeçen",
+1,
+null,
+70
+],
+[
+"67",
+"Mehmet Eren Boyraz",
+1,
+null,
+null
+],
+[
+"6",
+"Escobar",
+1,
+null,
+88
+],
+[
+"7",
+"Alioum Saidou",
+1,
+null,
+null
+],
+[
+"66",
+"Mehmet Topuz",
+1,
+null,
+null
+],
+[
+"11",
+"Milan Purović",
+1,
+null,
+74
+],
+[
+"17",
+"Julius Aghahowa",
+1,
+null,
+null
+],
+[
+"13",
+"Ali Üçkulak",
+0,
+null,
+null
+],
+[
+"2",
+"Durmuş Bayram",
+0,
+70,
+null
+],
+[
+"77",
+"Orkun Bal",
+0,
+null,
+null
+],
+[
+"20",
+"Salomon Olembe",
+0,
+null,
+null
+],
+[
+"90",
+"Furkan Özçal",
+0,
+null,
+null
+],
+[
+"87",
+"Abdullah Durak",
+0,
+88,
+null
+],
+[
+"11",
+"Umut Koçin",
+0,
+74,
+null
+]
+],
+"t1": [
+"Michael Skibbe"
+],
+"t2": [
+"Tolunay Kafkas"
+]
 },
 {
 "madde": "2008 Türkiye Kupası finali",
@@ -4078,7 +5643,269 @@ null
 "g1": [],
 "g2": [],
 "stad": "Bursa Atatürk Stadyumu, Bursa",
-"hakem": "Yunus Yıldırım"
+"hakem": "Yunus Yıldırım",
+"k1": [
+[
+"22",
+"Nicolás Peric",
+1,
+null,
+null
+],
+[
+"24",
+"Daniel Addo",
+1,
+null,
+null
+],
+[
+"35",
+"Tuna Üzümcü",
+1,
+null,
+null
+],
+[
+"6",
+"Erkan Özbey",
+1,
+null,
+92
+],
+[
+"3",
+"Ergün Teber",
+1,
+null,
+null
+],
+[
+"7",
+"Mehmet Nas",
+1,
+null,
+null
+],
+[
+"61",
+"Kerem Şeras",
+1,
+null,
+null
+],
+[
+"12",
+"Ahmed Hasan",
+1,
+null,
+null
+],
+[
+"25",
+"Engin Baytar",
+1,
+null,
+null
+],
+[
+"8",
+"Kahê",
+1,
+null,
+null
+],
+[
+"14",
+"Isaac Promise",
+1,
+null,
+80
+],
+[
+"1",
+"Recep Öztürk",
+0,
+null,
+null
+],
+[
+"11",
+"Burhan Eşer",
+0,
+null,
+null
+],
+[
+"15",
+"Adamu Mohammed",
+0,
+null,
+null
+],
+[
+"17",
+"Ferhat Kiraz",
+0,
+null,
+null
+],
+[
+"25",
+"Hakan Aslantaş",
+0,
+92,
+null
+],
+[
+"10",
+"Mehmet Çakır",
+0,
+80,
+null
+],
+[
+"9",
+"Okan Öztürk",
+0,
+null,
+null
+]
+],
+"k2": [
+[
+"27",
+"Dimitar İvankov",
+1,
+null,
+null
+],
+[
+"5",
+"Ali Turan",
+1,
+null,
+null
+],
+[
+"25",
+"Aydın Toscalı",
+1,
+null,
+null
+],
+[
+"51",
+"Koray Çölgeçen",
+1,
+null,
+null
+],
+[
+"12",
+"Delio Toledo",
+1,
+null,
+null
+],
+[
+"20",
+"Alioum Saidou",
+1,
+null,
+null
+],
+[
+"8",
+"Ragıp Başdağ",
+1,
+null,
+100
+],
+[
+"66",
+"Mehmet Topuz",
+1,
+null,
+null
+],
+[
+"67",
+"Mehmet Eren Boyraz",
+1,
+null,
+88
+],
+[
+"7",
+"Leonardo Iglesias",
+1,
+null,
+null
+],
+[
+"19",
+"Franco Cángele",
+1,
+null,
+114
+],
+[
+"1",
+"Hasan Sönmez",
+0,
+null,
+null
+],
+[
+"2",
+"Durmuş Bayram",
+0,
+null,
+null
+],
+[
+"4",
+"Juan Pablo Avendaño",
+0,
+null,
+null
+],
+[
+"11",
+"Kemal Okyay",
+0,
+114,
+null
+],
+[
+"18",
+"Ali Çamdalı",
+0,
+null,
+null
+],
+[
+"38",
+"Kamber Arslan",
+0,
+100,
+null
+],
+[
+"22",
+"Turgay Bahadır",
+0,
+88,
+null
+]
+],
+"t1": [
+"Mesut Bakkal"
+],
+"t2": [
+"Tolunay Kafkas"
+]
 },
 {
 "madde": "2009 Süper Kupa",
@@ -4090,7 +5917,262 @@ null
 "g1": [],
 "g2": [],
 "stad": "Atatürk Olimpiyat Stadyumu",
-"hakem": "Yunus Yıldırım"
+"hakem": "Yunus Yıldırım",
+"k1": [
+[
+"1",
+"Rüştü Reçber",
+1,
+null,
+null
+],
+[
+"44",
+"Erhan Güven",
+1,
+null,
+81
+],
+[
+"27",
+"Matteo Ferrari",
+1,
+null,
+null
+],
+[
+"6",
+"Tomas Sivok",
+1,
+null,
+null
+],
+[
+"3",
+"İsmail Köybaşı",
+1,
+null,
+null
+],
+[
+"28",
+"Fabian Ernst",
+1,
+null,
+null
+],
+[
+"14",
+"Tello",
+1,
+null,
+79
+],
+[
+"29",
+"Yusuf Şimşek",
+1,
+null,
+46
+],
+[
+"5",
+"Michael Fink",
+1,
+null,
+null
+],
+[
+"11",
+"Mert Nobre 12px|captain",
+1,
+null,
+null
+],
+[
+"13",
+"Bobô",
+1,
+null,
+null
+],
+[
+"84",
+"Hakan Arıkan",
+0,
+null,
+null
+],
+[
+"7",
+"Rıdvan Şimşek",
+0,
+81,
+null
+],
+[
+"19",
+"İbrahim Üzülmez",
+0,
+null,
+null
+],
+[
+"25",
+"Uğur İnceman",
+0,
+null,
+null
+],
+[
+"18",
+"Necip Uysal",
+0,
+null,
+null
+],
+[
+"8",
+"Nihat Kahveci",
+0,
+46,
+null
+],
+[
+"23",
+"Filip Hološko",
+0,
+79,
+null
+]
+],
+"k2": [
+[
+"1",
+"Volkan Demirel",
+1,
+null,
+null
+],
+[
+"77",
+"Gökhan Gönül",
+1,
+null,
+null
+],
+[
+"58",
+"Bilica",
+1,
+null,
+null
+],
+[
+"19",
+"Önder Turacı",
+1,
+null,
+null
+],
+[
+"6",
+"Gökçek Vederson",
+1,
+null,
+null
+],
+[
+"16",
+"Cristian",
+1,
+null,
+null
+],
+[
+"27",
+"André Santos",
+1,
+null,
+83
+],
+[
+"5",
+"Emre Belözoğlu",
+1,
+null,
+78
+],
+[
+"8",
+"Colin Kâzım-Richards",
+1,
+null,
+58
+],
+[
+"10",
+"Alex 12px|captain",
+1,
+null,
+null
+],
+[
+"9",
+"Daniel Güiza",
+1,
+null,
+null
+],
+[
+"88",
+"Volkan Babacan",
+0,
+null,
+null
+],
+[
+"15",
+"Bekir İrtegün",
+0,
+null,
+null
+],
+[
+"38",
+"Mehmet Topuz",
+0,
+null,
+null
+],
+[
+"25",
+"Uğur Boral",
+0,
+83,
+null
+],
+[
+"99",
+"Deivid",
+0,
+58,
+null
+],
+[
+"21",
+"Selçuk Şahin",
+0,
+78,
+null
+]
+],
+"t1": [
+"Mustafa Denizli"
+],
+"t2": [
+"Christoph Daum"
+]
 },
 {
 "madde": "2009 Türkiye Kupası finali",
@@ -4134,7 +6216,269 @@ null
 ]
 ],
 "stad": "İzmir Atatürk Stadyumu, İzmir",
-"hakem": "Bünyamin Gezer"
+"hakem": "Bünyamin Gezer",
+"k1": [
+[
+"88",
+"Volkan Babacan",
+1,
+null,
+null
+],
+[
+"2",
+"Diego Lugano",
+1,
+null,
+null
+],
+[
+"18",
+"Ali Bilgin",
+1,
+null,
+null
+],
+[
+"77",
+"Gökhan Gönül",
+1,
+null,
+null
+],
+[
+"3",
+"Roberto Carlos",
+1,
+null,
+null
+],
+[
+"5",
+"Emre Belözoğlu",
+1,
+null,
+65
+],
+[
+"21",
+"Selçuk Şahin",
+1,
+null,
+null
+],
+[
+"99",
+"Deivid",
+1,
+null,
+null
+],
+[
+"25",
+"Uğur Boral",
+1,
+null,
+49
+],
+[
+"10",
+"Alex de Souza 12px|Kaptan",
+1,
+null,
+null
+],
+[
+"14",
+"Daniel Güiza",
+1,
+null,
+null
+],
+[
+"1",
+"Volkan Demirel",
+0,
+null,
+null
+],
+[
+"6",
+"Gökçek Vederson",
+0,
+null,
+null
+],
+[
+"19",
+"Önder Turacı",
+0,
+null,
+null
+],
+[
+"24",
+"Deniz Barış",
+0,
+65,
+null
+],
+[
+"33",
+"Claudio Maldonado",
+0,
+null,
+null
+],
+[
+"23",
+"Semih Şentürk",
+0,
+49,
+null
+],
+[
+"8",
+"Colin Kâzım-Richards",
+0,
+null,
+null
+]
+],
+"k2": [
+[
+"84",
+"Hakan Arıkan",
+1,
+null,
+null
+],
+[
+"5",
+"Gökhan Zan",
+1,
+null,
+null
+],
+[
+"6",
+"Tomáš Sivok",
+1,
+null,
+null
+],
+[
+"17",
+"Ekrem Dağ",
+1,
+null,
+null
+],
+[
+"58",
+"İbrahim Toraman 12px|Kaptan",
+1,
+null,
+46
+],
+[
+"28",
+"Fabian Ernst",
+1,
+null,
+68
+],
+[
+"4",
+"Édouard Cissé",
+1,
+null,
+null
+],
+[
+"23",
+"Filip Hološko",
+1,
+null,
+null
+],
+[
+"20",
+"Rodrigo Tello",
+1,
+null,
+null
+],
+[
+"29",
+"Yusuf Şimşek",
+1,
+null,
+75
+],
+[
+"13",
+"Bobô",
+1,
+null,
+80
+],
+[
+"1",
+"Rüştü Reçber",
+0,
+null,
+null
+],
+[
+"19",
+"İbrahim Üzülmez",
+0,
+46,
+null
+],
+[
+"26",
+"Tomáš Zápotočný",
+0,
+null,
+null
+],
+[
+"8",
+"Uğur İnceman",
+0,
+75,
+null
+],
+[
+"9",
+"Erkan Zengin",
+0,
+null,
+null
+],
+[
+"21",
+"Serdar Özkan",
+0,
+null,
+null
+],
+[
+"11",
+"Mert Nobre",
+0,
+80,
+null
+]
+],
+"t1": [
+"Luis Aragonés"
+],
+"t2": [
+"Mustafa Denizli"
+]
 },
 {
 "madde": "2010 Süper Kupa",
@@ -4146,7 +6490,262 @@ null
 "g1": [],
 "g2": [],
 "stad": "Atatürk Olimpiyat Stadyumu",
-"hakem": "Kuddusi Müftüoğlu (Antalya)"
+"hakem": "Kuddusi Müftüoğlu (Antalya)",
+"k1": [
+[
+"27",
+"Dimitar İvankov",
+1,
+null,
+null
+],
+[
+"4",
+"Ömer Erdoğan 12px|Kaptan",
+1,
+null,
+null
+],
+[
+"38",
+"İbrahim Öztürk",
+1,
+null,
+null
+],
+[
+"21",
+"Ali Tandoğan",
+1,
+null,
+null
+],
+[
+"3",
+"Gökçek Vederson",
+1,
+null,
+null
+],
+[
+"25",
+"Ivan Ergić",
+1,
+null,
+null
+],
+[
+"17",
+"Pablo Batalla",
+1,
+null,
+63
+],
+[
+"10",
+"Volkan Şen",
+1,
+null,
+null
+],
+[
+"20",
+"Ozan İpek",
+1,
+null,
+null
+],
+[
+"8",
+"Giani Stelian Kiriţă",
+1,
+null,
+46
+],
+[
+"22",
+"Turgay Bahadır",
+1,
+null,
+null
+],
+[
+"1",
+"Yavuz Özkan",
+0,
+null,
+null
+],
+[
+"2",
+"Serdar Aziz",
+0,
+75,
+null
+],
+[
+"8",
+"Eren Albayrak",
+0,
+null,
+null
+],
+[
+"23",
+"Mustafa Keçeli",
+0,
+null,
+null
+],
+[
+"9",
+"Sercan Yıldırım",
+0,
+63,
+null
+],
+[
+"6",
+"Bekir Ozan Has",
+0,
+46,
+null
+],
+[
+"15",
+"Muhammet Demir",
+0,
+null,
+null
+]
+],
+"k2": [
+[
+"25",
+"Onur Kıvrak",
+1,
+null,
+null
+],
+[
+"30",
+"Serkan Balcı",
+1,
+null,
+null
+],
+[
+"16",
+"Egemen Korkmaz 12px|Kaptan",
+1,
+null,
+null
+],
+[
+"4",
+"Arkadiusz Głowacki",
+1,
+null,
+null
+],
+[
+"3",
+"Hrvoje Čale",
+1,
+null,
+null
+],
+[
+"17",
+"Burak Yılmaz",
+1,
+null,
+66
+],
+[
+"8",
+"Selçuk İnan",
+1,
+null,
+null
+],
+[
+"20",
+"Gustavo Colman",
+1,
+null,
+null
+],
+[
+"6",
+"Ceyhun Gülselam",
+1,
+null,
+null
+],
+[
+"25",
+"Alanzinho",
+1,
+null,
+79
+],
+[
+"9",
+"Teófilo Gutiérrez",
+1,
+null,
+90
+],
+[
+"29",
+"Tolga Zengin",
+0,
+null,
+null
+],
+[
+"23",
+"Giray Kaçar",
+0,
+90,
+null
+],
+[
+"21",
+"Barış Ataş",
+0,
+79,
+null
+],
+[
+"11",
+"Barış Memiş",
+0,
+null,
+null
+],
+[
+"61",
+"Ibrahim Yattara",
+0,
+66,
+null
+],
+[
+"10",
+"Umut Bulut",
+0,
+null,
+null
+]
+],
+"t1": [
+"Ertuğrul Sağlam"
+],
+"t2": [
+"Şenol Güneş"
+]
 },
 {
 "madde": "2010 Türkiye Kupası finali",
@@ -4180,7 +6779,269 @@ null
 ]
 ],
 "stad": "Şanlıurfa GAP Stadyumu, Şanlıurfa",
-"hakem": "Cüneyt Çakır"
+"hakem": "Cüneyt Çakır",
+"k1": [
+[
+"35",
+"Onur Kıvrak",
+1,
+null,
+null
+],
+[
+"30",
+"Serkan Balcı",
+1,
+null,
+null
+],
+[
+"16",
+"Egemen Korkmaz",
+1,
+null,
+null
+],
+[
+"4",
+"Rigobert Song 12px|Kaptan",
+1,
+null,
+null
+],
+[
+"3",
+"Hrvoje Čale",
+1,
+null,
+null
+],
+[
+"17",
+"Burak Yılmaz",
+1,
+null,
+null
+],
+[
+"5",
+"Engin Baytar",
+1,
+null,
+86
+],
+[
+"8",
+"Selçuk İnan",
+1,
+null,
+83
+],
+[
+"20",
+"Gustavo Colman",
+1,
+null,
+null
+],
+[
+"25",
+"Alanzinho",
+1,
+null,
+91
+],
+[
+"10",
+"Umut Bulut",
+1,
+null,
+null
+],
+[
+"29",
+"Tolga Zengin",
+0,
+null,
+null
+],
+[
+"27",
+"Sezer Badur",
+0,
+83,
+null
+],
+[
+"11",
+"Barış Memiş",
+0,
+null,
+null
+],
+[
+"90",
+"Teófilo Gutiérrez",
+0,
+null,
+null
+],
+[
+"23",
+"Remzi Giray Kaçar",
+0,
+91,
+null
+],
+[
+"6",
+"Ceyhun Gülselam",
+0,
+86,
+null
+],
+[
+"33",
+"Drago Gabrić",
+0,
+null,
+null
+]
+],
+"k2": [
+[
+"1",
+"Volkan Demirel",
+1,
+null,
+null
+],
+[
+"2",
+"Diego Lugano",
+1,
+null,
+null
+],
+[
+"58",
+"Fábio Bilica",
+1,
+null,
+null
+],
+[
+"77",
+"Gökhan Gönül",
+1,
+null,
+87
+],
+[
+"6",
+"Gökçek Vederson",
+1,
+null,
+null
+],
+[
+"5",
+"Emre Belözoğlu",
+1,
+null,
+68
+],
+[
+"66",
+"Mehmet Topuz",
+1,
+null,
+null
+],
+[
+"10",
+"Alex de Souza 12px|Kaptan",
+1,
+null,
+null
+],
+[
+"20",
+"Özer Hurmacı",
+1,
+null,
+null
+],
+[
+"21",
+"Selçuk Şahin",
+1,
+null,
+null
+],
+[
+"9",
+"Daniel Güiza",
+1,
+null,
+null
+],
+[
+"88",
+"Volkan Babacan",
+0,
+null,
+null
+],
+[
+"15",
+"Bekir İrtegün",
+0,
+null,
+null
+],
+[
+"19",
+"Önder Turacı",
+0,
+null,
+null
+],
+[
+"24",
+"Deniz Barış",
+0,
+null,
+null
+],
+[
+"23",
+"Semih Şentürk",
+0,
+null,
+null
+],
+[
+"39",
+"Gökhan Ünal",
+0,
+87,
+null
+],
+[
+"99",
+"Deivid",
+0,
+68,
+null
+]
+],
+"t1": [
+"Şenol Güneş"
+],
+"t2": [
+"Christoph Daum"
+]
 },
 {
 "madde": "2011 Türkiye Kupası finali",
@@ -4214,7 +7075,269 @@ null
 ]
 ],
 "stad": "Kayseri Kadir Has Şehir Stadyumu, Kayseri",
-"hakem": "Yunus Yıldırım"
+"hakem": "Yunus Yıldırım",
+"k1": [
+[
+"1",
+"Rüştü Reçber",
+1,
+null,
+null
+],
+[
+"17",
+"Ekrem Dağ",
+1,
+null,
+null
+],
+[
+"6",
+"Tomáš Sivok",
+1,
+null,
+null
+],
+[
+"55",
+"Mehmet Aurelio",
+1,
+null,
+null
+],
+[
+"3",
+"İsmail Köybaşı",
+1,
+null,
+null
+],
+[
+"18",
+"Necip Uysal",
+1,
+null,
+null
+],
+[
+"4",
+"Manuel Fernandes",
+1,
+null,
+null
+],
+[
+"14",
+"Guti",
+1,
+null,
+105
+],
+[
+"7",
+"Ricardo Quaresma",
+1,
+null,
+null
+],
+[
+"31",
+"Simão Sabrosa",
+1,
+null,
+null
+],
+[
+"13",
+"Bobô",
+1,
+null,
+56
+],
+[
+"99",
+"Cenk Gönen",
+0,
+null,
+null
+],
+[
+"92",
+"Furkan Şeker",
+0,
+null,
+null
+],
+[
+"44",
+"Erhan Güven",
+0,
+null,
+null
+],
+[
+"77",
+"Rıdvan Şimşek",
+0,
+null,
+null
+],
+[
+"9",
+"Roberto Hilbert",
+0,
+105,
+null
+],
+[
+"26",
+"Onur Bayramoğlu",
+0,
+null,
+null
+],
+[
+"34",
+"Hugo Almeida",
+0,
+56,
+null
+]
+],
+"k2": [
+[
+"1",
+"Kenan Hasagić",
+1,
+null,
+null
+],
+[
+"53",
+"Rızvan Şahin",
+1,
+null,
+null
+],
+[
+"3",
+"Metin Depe",
+1,
+null,
+null
+],
+[
+"2",
+"Can Arat",
+1,
+null,
+null
+],
+[
+"17",
+"Ekrem Ekşioğlu",
+1,
+null,
+null
+],
+[
+"20",
+"Cihan Haspolatlı",
+1,
+null,
+null
+],
+[
+"21",
+"Mahmut Tekdemir",
+1,
+null,
+null
+],
+[
+"23",
+"Samuel Holmén",
+1,
+null,
+null
+],
+[
+"11",
+"İbrahim Akın",
+1,
+null,
+83
+],
+[
+"12",
+"İskender Alın",
+1,
+null,
+105
+],
+[
+"18",
+"Hervé Tum",
+1,
+null,
+56
+],
+[
+"61",
+"Oğuzhan Bahadır",
+0,
+null,
+null
+],
+[
+"28",
+"Marcin Kuś",
+0,
+null,
+null
+],
+[
+"81",
+"Gökhan Süzen",
+0,
+null,
+83
+],
+[
+"6",
+"Efe İnanç",
+0,
+null,
+null
+],
+[
+"8",
+"Zeki Korkmaz",
+0,
+null,
+null
+],
+[
+"88",
+"Tevfik Köse",
+0,
+null,
+105
+],
+[
+"39",
+"Gökhan Ünal",
+0,
+null,
+56
+]
+],
+"t1": [
+"Tayfur Havutçu"
+],
+"t2": [
+"Abdullah Avcı"
+]
 },
 {
 "madde": "2012 Süper Kupa",
@@ -4226,7 +7349,269 @@ null
 "g1": [],
 "g2": [],
 "stad": "Kâzım Karabekir Stadyumu",
-"hakem": "Cüneyt Çakır"
+"hakem": "Cüneyt Çakır",
+"k1": [
+[
+"25",
+"Fernando Muslera",
+1,
+null,
+null
+],
+[
+"27",
+"Emmanuel Eboué",
+1,
+null,
+null
+],
+[
+"26",
+"Semih Kaya",
+1,
+null,
+null
+],
+[
+"13",
+"Dany Nounkeu",
+1,
+null,
+null
+],
+[
+"22",
+"Hakan Balta 12px|Kaptan",
+1,
+null,
+null
+],
+[
+"8",
+"Selçuk İnan",
+1,
+null,
+null
+],
+[
+"50",
+"Engin Baytar",
+1,
+null,
+null
+],
+[
+"52",
+"Emre Çolak",
+1,
+null,
+82
+],
+[
+"4",
+"Hamit Altıntop",
+1,
+null,
+null
+],
+[
+"19",
+"Umut Bulut",
+1,
+null,
+90
+],
+[
+"9",
+"Johan Elmander",
+1,
+null,
+69
+],
+[
+"86",
+"Ufuk Ceylan",
+0,
+null,
+null
+],
+[
+"5",
+"Gökhan Zan",
+0,
+null,
+null
+],
+[
+"11",
+"Albert Riera",
+0,
+null,
+null
+],
+[
+"35",
+"Yekta Kurtuluş",
+0,
+null,
+null
+],
+[
+"53",
+"Nordin Amrabat",
+0,
+69,
+null
+],
+[
+"7",
+"Aydın Yılmaz",
+0,
+82,
+null
+],
+[
+"77",
+"Necati Ateş",
+0,
+90,
+null
+]
+],
+"k2": [
+[
+"1",
+"Volkan Demirel",
+1,
+null,
+16
+],
+[
+"3",
+"Hasan Ali Kaldırım",
+1,
+null,
+null
+],
+[
+"2",
+"Egemen Korkmaz",
+1,
+null,
+null
+],
+[
+"4",
+"Bekir İrtegün",
+1,
+null,
+null
+],
+[
+"6",
+"Orhan Şam",
+1,
+null,
+90
+],
+[
+"5",
+"Mehmet Topal",
+1,
+null,
+69
+],
+[
+"16",
+"Cristian Baroni",
+1,
+null,
+null
+],
+[
+"38",
+"Mehmet Topuz",
+1,
+null,
+null
+],
+[
+"10",
+"Alex de Souza 12px|Kaptan",
+1,
+null,
+null
+],
+[
+"88",
+"Caner Erkin",
+1,
+null,
+null
+],
+[
+"11",
+"Dirk Kuyt",
+1,
+null,
+null
+],
+[
+"34",
+"Mert Günok",
+0,
+16,
+null
+],
+[
+"17",
+"Recep Niyaz",
+0,
+null,
+null
+],
+[
+"9",
+"Miroslav Stoch",
+0,
+null,
+null
+],
+[
+"27",
+"Miloš Krasić",
+0,
+69,
+null
+],
+[
+"21",
+"Selçuk Şahin",
+0,
+null,
+null
+],
+[
+"23",
+"Semih Şentürk",
+0,
+null,
+null
+],
+[
+"7",
+"Moussa Sow",
+0,
+90,
+null
+]
+],
+"t1": [
+"Fatih Terim"
+],
+"t2": [
+"Aykut Kocaman"
+]
 },
 {
 "madde": "2012 Türkiye Kupası finali",
@@ -4259,7 +7644,269 @@ null
 ]
 ],
 "stad": "Ankara 19 Mayıs Stadyumu",
-"hakem": "Bülent Yıldırım Yayın: atv ve a Haber"
+"hakem": "Bülent Yıldırım Yayın: atv ve a Haber",
+"k1": [
+[
+"12",
+"Scott Carson",
+1,
+null,
+null
+],
+[
+"20",
+"Michaël Chrétien Basser",
+1,
+null,
+null
+],
+[
+"38",
+"İbrahim Öztürk",
+1,
+null,
+null
+],
+[
+"23",
+"Serdar Aziz",
+1,
+null,
+null
+],
+[
+"6",
+"Gökçek Vederson",
+1,
+null,
+null
+],
+[
+"7",
+"Alfred N'Diaye",
+1,
+null,
+63
+],
+[
+"21",
+"Adem Koçak",
+1,
+null,
+56
+],
+[
+"10",
+"Pablo Batalla",
+1,
+null,
+null
+],
+[
+"33",
+"Ozan İpek",
+1,
+null,
+null
+],
+[
+"9",
+"Stanislav Šesták",
+1,
+null,
+71
+],
+[
+"11",
+"Sebastián Pinto",
+1,
+null,
+null
+],
+[
+"1",
+"Yavuz Özkan",
+0,
+null,
+null
+],
+[
+"4",
+"Ömer Erdoğan",
+0,
+null,
+null
+],
+[
+"30",
+"Musa Çağıran",
+0,
+56,
+null
+],
+[
+"13",
+"Gustav Svensson",
+0,
+null,
+null
+],
+[
+"35",
+"Hakan Aslantaş",
+0,
+null,
+null
+],
+[
+"14",
+"Okan Deniz",
+0,
+71,
+null
+],
+[
+"22",
+"Turgay Bahadır",
+0,
+63,
+null
+]
+],
+"k2": [
+[
+"1",
+"Volkan Demirel",
+1,
+null,
+null
+],
+[
+"77",
+"Gökhan Gönül",
+1,
+null,
+58
+],
+[
+"4",
+"Bekir İrtegün",
+1,
+null,
+null
+],
+[
+"6",
+"Joseph Yobo",
+1,
+null,
+31
+],
+[
+"3",
+"Reto Ziegler",
+1,
+null,
+null
+],
+[
+"16",
+"Cristian Baroni",
+1,
+null,
+null
+],
+[
+"5",
+"Emre Belözoğlu",
+1,
+null,
+null
+],
+[
+"38",
+"Mehmet Topuz",
+1,
+null,
+null
+],
+[
+"88",
+"Caner Erkin",
+1,
+null,
+null
+],
+[
+"10",
+"Alex de Souza",
+1,
+null,
+81
+],
+[
+"23",
+"Semih Şentürk",
+1,
+null,
+null
+],
+[
+"34",
+"Mert Günok",
+0,
+null,
+null
+],
+[
+"53",
+"Serdar Kesimal",
+0,
+31,
+null
+],
+[
+"67",
+"Orhan Şam",
+0,
+58,
+null
+],
+[
+"62",
+"Selçuk Şahin",
+0,
+null,
+null
+],
+[
+"20",
+"Özer Hurmacı",
+0,
+null,
+null
+],
+[
+"9",
+"Miroslav Stoch",
+0,
+null,
+null
+],
+[
+"7",
+"Moussa Sow",
+0,
+81,
+null
+]
+],
+"t1": [
+"Ertuğrul Sağlam"
+],
+"t2": [
+"Aykut Kocaman"
+]
 },
 {
 "madde": "2013 Süper Kupa",
@@ -4271,7 +7918,267 @@ null
 "g1": [],
 "g2": [],
 "stad": "Kadir Has Stadyumu",
-"hakem": "Bülent Yıldırım"
+"hakem": "Bülent Yıldırım",
+"k1": [
+[
+"25",
+"Fernando Muslera",
+1,
+null,
+null
+],
+[
+"5",
+"Gökhan Zan",
+1,
+null,
+null
+],
+[
+"22",
+"Hakan Balta",
+1,
+null,
+null
+],
+[
+"26",
+"Semih Kaya",
+1,
+null,
+null
+],
+[
+"27",
+"Emmanuel Eboué",
+1,
+null,
+null
+],
+[
+"3",
+"Felipe Melo",
+1,
+null,
+null
+],
+[
+"4",
+"Hamit Altıntop",
+1,
+null,
+81
+],
+[
+"8",
+"Selçuk İnan",
+1,
+null,
+null
+],
+[
+"10",
+"Wesley Sneijder",
+1,
+null,
+108
+],
+[
+"53",
+"Nordin Amrabat",
+1,
+null,
+81
+],
+[
+"11",
+"Didier Drogba",
+1,
+null,
+null
+],
+[
+"67",
+"Eray İşcan",
+0,
+null,
+null
+],
+[
+"6",
+"Ceyhun Gülselam",
+0,
+null,
+null
+],
+[
+"23",
+"Colin Kâzım-Richards",
+0,
+null,
+null
+],
+[
+"24",
+"Erman Kılıç",
+0,
+81,
+null
+],
+[
+"52",
+"Emre Çolak",
+0,
+108,
+null
+],
+[
+"17",
+"Burak Yılmaz",
+0,
+null,
+null
+],
+[
+"19",
+"Umut Bulut",
+0,
+81,
+null
+]
+],
+"k2": [
+[
+"34",
+"Mert Günok",
+1,
+null,
+null
+],
+[
+"38",
+"Mehmet Topuz",
+1,
+null,
+null
+],
+[
+"4",
+"Bekir İrtegün",
+1,
+null,
+null
+],
+[
+"22",
+"Bruno Alves",
+1,
+null,
+null
+],
+[
+"3",
+"Hasan Ali Kaldırım",
+1,
+null,
+null
+],
+[
+"5",
+"Mehmet Topal",
+1,
+null,
+null
+],
+[
+"25",
+"Emre Belözoğlu",
+1,
+null,
+105
+],
+[
+"16",
+"Cristian Baroni",
+1,
+null,
+58
+],
+[
+"11",
+"Dirk Kuyt",
+1,
+null,
+null
+],
+[
+"9",
+"Pierre Webó",
+1,
+null,
+81
+],
+[
+"7",
+"Moussa Sow",
+1,
+null,
+null
+],
+[
+"85",
+"Serkan Kırıntılı",
+0,
+null,
+null
+],
+[
+"53",
+"Serdar Kesimal",
+0,
+null,
+null
+],
+[
+"24",
+"Michal Kadlec",
+0,
+81,
+null
+],
+[
+"21",
+"Selçuk Şahin",
+0,
+null,
+null
+],
+[
+"26",
+"Alper Potuk",
+0,
+58,
+null
+],
+[
+"48",
+"Salih Uçan",
+0,
+null,
+null
+],
+[
+"88",
+"Caner Erkin",
+0,
+105,
+null
+]
+],
+"t1": [],
+"t2": [
+"Ersun Yanal"
+]
 },
 {
 "madde": "2013 Türkiye Kupası finali",
@@ -4289,7 +8196,269 @@ null
 ],
 "g2": [],
 "stad": "Ankara 19 Mayıs Stadyumu",
-"hakem": "Fırat Aydınus Yayın: atv"
+"hakem": "Fırat Aydınus Yayın: atv",
+"k1": [
+[
+"34",
+"Mert Günok",
+1,
+null,
+null
+],
+[
+"2",
+"Egemen Korkmaz",
+1,
+null,
+51
+],
+[
+"3",
+"Hasan Ali Kaldırım",
+1,
+null,
+null
+],
+[
+"6",
+"Joseph Yobo",
+1,
+null,
+null
+],
+[
+"77",
+"Gökhan Gönül",
+1,
+null,
+null
+],
+[
+"5",
+"Mehmet Topal",
+1,
+null,
+null
+],
+[
+"16",
+"Cristian Baroni",
+1,
+null,
+85
+],
+[
+"25",
+"Emre Belözoğlu 12px|link=Kaptan (futbol)",
+1,
+null,
+76
+],
+[
+"7",
+"Moussa Sow",
+1,
+null,
+null
+],
+[
+"11",
+"Dirk Kuyt",
+1,
+null,
+null
+],
+[
+"99",
+"Pierre Webó",
+1,
+null,
+null
+],
+[
+"85",
+"Serkan Kırıntılı",
+0,
+null,
+null
+],
+[
+"4",
+"Bekir İrtegün",
+0,
+51,
+null
+],
+[
+"9",
+"Miroslav Stoch",
+0,
+null,
+null
+],
+[
+"38",
+"Mehmet Topuz",
+0,
+76,
+null
+],
+[
+"88",
+"Caner Erkin",
+0,
+85,
+null
+],
+[
+"23",
+"Semih Şentürk",
+0,
+null,
+null
+],
+[
+"28",
+"Beykan Şimşek",
+0,
+null,
+null
+]
+],
+"k2": [
+[
+"29",
+"Tolga Zengin 12px|link=Kaptan (futbol)",
+1,
+null,
+null
+],
+[
+"5",
+"Marek Čech",
+1,
+null,
+null
+],
+[
+"22",
+"Mustafa Yumlu",
+1,
+null,
+null
+],
+[
+"23",
+"Giray Kaçar",
+1,
+null,
+null
+],
+[
+"30",
+"Serkan Balcı",
+1,
+null,
+null
+],
+[
+"10",
+"Adrian Mierzejewski",
+1,
+null,
+null
+],
+[
+"14",
+"Soner Aydoğdu",
+1,
+null,
+84
+],
+[
+"15",
+"Didier Zokora",
+1,
+null,
+46
+],
+[
+"40",
+"Volkan Şen",
+1,
+null,
+68
+],
+[
+"92",
+"Olcan Adın",
+1,
+null,
+null
+],
+[
+"21",
+"Halil Altıntop",
+1,
+null,
+null
+],
+[
+"1",
+"Onur Kıvrak",
+0,
+null,
+null
+],
+[
+"28",
+"Ondřej Čelůstka",
+0,
+null,
+null
+],
+[
+"11",
+"Yasin Öztekin",
+0,
+null,
+null
+],
+[
+"18",
+"Aykut Akgün",
+0,
+46,
+null
+],
+[
+"27",
+"Marek Sapara",
+0,
+84,
+null
+],
+[
+"91",
+"Zeki Yavru",
+0,
+null,
+null
+],
+[
+"12",
+"Paulo Henrique",
+0,
+68,
+null
+]
+],
+"t1": [
+"Aykut Kocaman"
+],
+"t2": [
+"Tolunay Kafkas"
+]
 },
 {
 "madde": "2014 Süper Kupa",
@@ -4301,7 +8470,269 @@ null
 "g1": [],
 "g2": [],
 "stad": "19 Mayıs Stadyumu, Manisa",
-"hakem": "Mustafa Kâmil Abitoğlu Yayın : atv"
+"hakem": "Mustafa Kâmil Abitoğlu Yayın : atv",
+"k1": [
+[
+"1",
+"Volkan Demirel",
+1,
+null,
+null
+],
+[
+"4",
+"Bekir İrtegün",
+1,
+null,
+null
+],
+[
+"22",
+"Bruno Alves",
+1,
+null,
+82
+],
+[
+"77",
+"Gökhan Gönül",
+1,
+null,
+null
+],
+[
+"88",
+"Caner Erkin",
+1,
+null,
+null
+],
+[
+"5",
+"Mehmet Topal",
+1,
+null,
+null
+],
+[
+"14",
+"Raul Meireles",
+1,
+null,
+null
+],
+[
+"20",
+"Emre Belözoğlu",
+1,
+null,
+88
+],
+[
+"11",
+"Dirk Kuyt",
+1,
+null,
+null
+],
+[
+"7",
+"Moussa Sow",
+1,
+null,
+116
+],
+[
+"29",
+"Emmanuel Emenike",
+1,
+null,
+null
+],
+[
+"23",
+"Mert Günok",
+0,
+null,
+null
+],
+[
+"3",
+"Hasan Ali Kaldırım",
+0,
+null,
+null
+],
+[
+"24",
+"Michal Kadlec",
+0,
+82,
+null
+],
+[
+"21",
+"Selçuk Şahin",
+0,
+null,
+null
+],
+[
+"26",
+"Alper Potuk",
+0,
+88,
+null
+],
+[
+"38",
+"Mehmet Topuz",
+0,
+116,
+null
+],
+[
+"9",
+"Pierre Webó",
+0,
+null,
+null
+]
+],
+"k2": [
+[
+"1",
+"Fernando Muslera",
+1,
+null,
+null
+],
+[
+"13",
+"Alex Telles",
+1,
+null,
+104
+],
+[
+"21",
+"Aurélien Chedjou",
+1,
+null,
+null
+],
+[
+"26",
+"Semih Kaya",
+1,
+null,
+null
+],
+[
+"88",
+"Veysel Sarı",
+1,
+null,
+null
+],
+[
+"3",
+"Felipe Melo",
+1,
+null,
+null
+],
+[
+"29",
+"Olcan Adın",
+1,
+null,
+null
+],
+[
+"8",
+"Selçuk İnan",
+1,
+null,
+null
+],
+[
+"10",
+"Wesley Sneijder",
+1,
+null,
+60
+],
+[
+"23",
+"Yasin Öztekin",
+1,
+null,
+60
+],
+[
+"17",
+"Burak Yılmaz",
+1,
+null,
+null
+],
+[
+"38",
+"Sinan Bolat",
+0,
+null,
+null
+],
+[
+"2",
+"Hakan Balta",
+0,
+104,
+null
+],
+[
+"20",
+"Furkan Özçal",
+0,
+null,
+null
+],
+[
+"35",
+"Yekta Kurtuluş",
+0,
+60,
+null
+],
+[
+"53",
+"Nordin Amrabat",
+0,
+null,
+null
+],
+[
+"11",
+"Bruma",
+0,
+60,
+null
+],
+[
+"9",
+"Umut Bulut",
+0,
+null,
+null
+]
+],
+"t1": [
+"İsmail Kartal"
+],
+"t2": [
+"Cesare Prandelli"
+]
 },
 {
 "madde": "2014 Türkiye Kupası finali",
@@ -4313,7 +8744,269 @@ null
 "g1": [],
 "g2": [],
 "stad": "Atatürk Stadyumu",
-"hakem": "Hüseyin Göçek"
+"hakem": "Hüseyin Göçek",
+"k1": [
+[
+"25",
+"Fernando Muslera",
+1,
+null,
+null
+],
+[
+"15",
+"Alex Telles",
+1,
+null,
+null
+],
+[
+"22",
+"Hakan Balta",
+1,
+null,
+null
+],
+[
+"21",
+"Aurélien Chedjou",
+1,
+null,
+null
+],
+[
+"26",
+"Semih Kaya",
+1,
+null,
+null
+],
+[
+"10",
+"Wesley Sneijder",
+1,
+null,
+null
+],
+[
+"8",
+"Selçuk İnan",
+1,
+null,
+null
+],
+[
+"3",
+"Felipe Melo",
+1,
+null,
+null
+],
+[
+"55",
+"Sabri Sarıoğlu",
+1,
+null,
+null
+],
+[
+"35",
+"Yekta Kurtuluş",
+1,
+null,
+82
+],
+[
+"17",
+"Burak Yılmaz",
+1,
+null,
+null
+],
+[
+"86",
+"Ufuk Ceylan",
+0,
+null,
+null
+],
+[
+"27",
+"Emmanuel Eboué",
+0,
+null,
+null
+],
+[
+"28",
+"Koray Günter",
+0,
+null,
+null
+],
+[
+"4",
+"Hamit Altıntop",
+0,
+82,
+null
+],
+[
+"6",
+"Ceyhun Gülselam",
+0,
+null,
+null
+],
+[
+"52",
+"Emre Çolak",
+0,
+null,
+null
+],
+[
+"19",
+"Umut Bulut",
+0,
+null,
+null
+]
+],
+"k2": [
+[
+"25",
+"Ruud Boffin",
+1,
+null,
+null
+],
+[
+"38",
+"Tarık Çamdal",
+1,
+null,
+null
+],
+[
+"5",
+"Sezgin Coşkun",
+1,
+null,
+null
+],
+[
+"30",
+"Jerry Akaminko",
+1,
+null,
+null
+],
+[
+"65",
+"Kâmil Ahmet Çörekçi",
+1,
+null,
+null
+],
+[
+"60",
+"Özgür Çek",
+1,
+null,
+46
+],
+[
+"50",
+"Hürriyet Gücer",
+1,
+null,
+78
+],
+[
+"12",
+"Raheem Lawal",
+1,
+null,
+null
+],
+[
+"10",
+"Erkan Zengin",
+1,
+null,
+null
+],
+[
+"80",
+"Cristóbal Jorquera",
+1,
+null,
+null
+],
+[
+"15",
+"Diomansy Kamara",
+1,
+null,
+null
+],
+[
+"1",
+"Kayacan Erdoğan",
+0,
+null,
+null
+],
+[
+"4",
+"Dedê",
+0,
+null,
+null
+],
+[
+"6",
+"Serol Demirhan",
+0,
+null,
+null
+],
+[
+"8",
+"Erman Kılıç",
+0,
+78,
+null
+],
+[
+"19",
+"Erkut Şentürk",
+0,
+null,
+null
+],
+[
+"35",
+"Aytaç Kara",
+0,
+null,
+null
+],
+[
+"77",
+"Necati Ateş",
+0,
+46,
+null
+]
+],
+"t1": [
+"Roberto Mancini"
+],
+"t2": [
+"Ertuğrul Sağlam"
+]
 },
 {
 "madde": "2015 Süper Kupa",
@@ -4325,7 +9018,269 @@ null
 "g1": [],
 "g2": [],
 "stad": "Osmanlı Stadyumu",
-"hakem": "Cüneyt Çakır"
+"hakem": "Cüneyt Çakır",
+"k1": [
+[
+"1",
+"Fernando Muslera",
+1,
+null,
+null
+],
+[
+"13",
+"Alex Telles",
+1,
+null,
+null
+],
+[
+"22",
+"Hakan Balta",
+1,
+null,
+null
+],
+[
+"21",
+"Aurélien Chedjou",
+1,
+null,
+null
+],
+[
+"55",
+"Sabri Sarıoğlu",
+1,
+null,
+null
+],
+[
+"5",
+"Bilal Kısa",
+1,
+null,
+null
+],
+[
+"7",
+"Yasin Öztekin",
+1,
+null,
+null
+],
+[
+"8",
+"Selçuk İnan",
+1,
+null,
+null
+],
+[
+"10",
+"Wesley Sneijder",
+1,
+null,
+77
+],
+[
+"11",
+"Lukas Podolski",
+1,
+null,
+84
+],
+[
+"17",
+"Burak Yılmaz",
+1,
+null,
+63
+],
+[
+"67",
+"Eray İşcan",
+0,
+null,
+null
+],
+[
+"28",
+"Koray Günter",
+0,
+null,
+null
+],
+[
+"38",
+"Tarık Çamdal",
+0,
+null,
+null
+],
+[
+"6",
+"Jem Paul Karacan",
+0,
+84,
+null
+],
+[
+"29",
+"Olcan Adın",
+0,
+null,
+null
+],
+[
+"52",
+"Emre Çolak",
+0,
+63,
+null
+],
+[
+"9",
+"Umut Bulut",
+0,
+77,
+null
+]
+],
+"k2": [
+[
+"17",
+"Mert Günok",
+1,
+null,
+null
+],
+[
+"4",
+"Serdar Aziz",
+1,
+null,
+null
+],
+[
+"22",
+"Erdem Özgenç",
+1,
+null,
+null
+],
+[
+"23",
+"Aziz Behich",
+1,
+null,
+71
+],
+[
+"66",
+"Tomáš Sivok",
+1,
+null,
+null
+],
+[
+"3",
+"Emre Taşdemir",
+1,
+null,
+null
+],
+[
+"6",
+"Şamil Çinaz",
+1,
+null,
+null
+],
+[
+"7",
+"Ozan Tufan",
+1,
+null,
+null
+],
+[
+"10",
+"Josué Pesqueira",
+1,
+null,
+null
+],
+[
+"14",
+"Cristóbal Jorquera",
+1,
+null,
+72
+],
+[
+"94",
+"Cédric Bakambu",
+1,
+null,
+null
+],
+[
+"1",
+"Harun Tekin",
+0,
+null,
+null
+],
+[
+"13",
+"Dany Nounkeu",
+0,
+null,
+null
+],
+[
+"82",
+"Luis Advíncula",
+0,
+72,
+null
+],
+[
+"5",
+"Bekir Yılmaz",
+0,
+null,
+null
+],
+[
+"11",
+"Furkan Soyalp",
+0,
+null,
+null
+],
+[
+"20",
+"Aydın Karabulut",
+0,
+null,
+null
+],
+[
+"33",
+"Ozan İpek",
+0,
+71,
+null
+]
+],
+"t1": [
+"Hamza Hamzaoğlu"
+],
+"t2": [
+"Ertuğrul Sağlam"
+]
 },
 {
 "madde": "2015 Türkiye Kupası finali",
@@ -4373,7 +9328,269 @@ null
 "g1": [],
 "g2": [],
 "stad": "Antalya Stadyumu",
-"hakem": "Mete Kalkavan"
+"hakem": "Mete Kalkavan",
+"k1": [
+[
+"1",
+"Fernando Muslera",
+1,
+null,
+null
+],
+[
+"22",
+"Hakan Balta",
+1,
+null,
+null
+],
+[
+"23",
+"Lionel Carole",
+1,
+null,
+null
+],
+[
+"26",
+"Semih Kaya",
+1,
+null,
+null
+],
+[
+"64",
+"Jason Denayer",
+1,
+null,
+null
+],
+[
+"7",
+"Yasin Öztekin",
+1,
+null,
+null
+],
+[
+"8",
+"Selçuk İnan",
+1,
+null,
+null
+],
+[
+"10",
+"Wesley Sneijder",
+1,
+null,
+46
+],
+[
+"18",
+"Sinan Gümüş",
+1,
+null,
+65
+],
+[
+"52",
+"Emre Çolak",
+1,
+null,
+89
+],
+[
+"11",
+"Lukas Podolski",
+1,
+null,
+null
+],
+[
+"99",
+"Cenk Gönen",
+0,
+null,
+null
+],
+[
+"21",
+"Aurelien Chedjou",
+0,
+46,
+null
+],
+[
+"27",
+"Martin Linnes",
+0,
+89,
+null
+],
+[
+"55",
+"Sabri Sarıoğlu",
+0,
+65,
+null
+],
+[
+"5",
+"Bilal Kısa",
+0,
+null,
+null
+],
+[
+"29",
+"Olcan Adın",
+0,
+null,
+null
+],
+[
+"9",
+"Umut Bulut",
+0,
+null,
+null
+]
+],
+"k2": [
+[
+"40",
+"Fabiano",
+1,
+null,
+null
+],
+[
+"3",
+"Hasan Ali Kaldırım",
+1,
+null,
+null
+],
+[
+"4",
+"Simon Kjær",
+1,
+null,
+null
+],
+[
+"19",
+"Şener Özbayraklı",
+1,
+null,
+79
+],
+[
+"53",
+"Abdoulaye Ba",
+1,
+null,
+null
+],
+[
+"5",
+"Mehmet Topal",
+1,
+null,
+null
+],
+[
+"6",
+"Josef de Souza",
+1,
+null,
+null
+],
+[
+"17",
+"Luis Nani",
+1,
+null,
+null
+],
+[
+"20",
+"Volkan Şen",
+1,
+null,
+null
+],
+[
+"26",
+"Alper Potuk",
+1,
+null,
+68
+],
+[
+"11",
+"Robin van Persie",
+1,
+null,
+46
+],
+[
+"25",
+"Ertuğrul Taşkıran",
+0,
+null,
+null
+],
+[
+"24",
+"Michal Kadlec",
+0,
+null,
+null
+],
+[
+"77",
+"Gökhan Gönül",
+0,
+79,
+null
+],
+[
+"8",
+"Ozan Tufan",
+0,
+null,
+null
+],
+[
+"10",
+"Diego",
+0,
+null,
+null
+],
+[
+"50",
+"Lazar Marković",
+0,
+68,
+null
+],
+[
+"9",
+"Fernandão",
+0,
+46,
+null
+]
+],
+"t1": [
+"Jan Olde Riekerink"
+],
+"t2": [
+"Vítor Pereira"
+]
 },
 {
 "madde": "2017 Süper Kupa",
@@ -4414,7 +9631,269 @@ null
 "g1": [],
 "g2": [],
 "stad": "Yeni Eskişehir Stadyumu",
-"hakem": "Fırat Aydınus"
+"hakem": "Fırat Aydınus",
+"k1": [
+[
+"30",
+"Serkan Kırıntılı",
+1,
+null,
+null
+],
+[
+"3",
+"Barry Douglas",
+1,
+null,
+null
+],
+[
+"4",
+"Ali Turan",
+1,
+null,
+119
+],
+[
+"26",
+"Jagos Vukovic",
+1,
+null,
+null
+],
+[
+"89",
+"Nejc Skubic",
+1,
+null,
+null
+],
+[
+"6",
+"Jens Jønsson",
+1,
+null,
+78
+],
+[
+"7",
+"Ömer Ali Şahiner",
+1,
+null,
+null
+],
+[
+"8",
+"Ali Çamdalı",
+1,
+null,
+null
+],
+[
+"11",
+"Deni Milošević",
+1,
+null,
+106
+],
+[
+"18",
+"Amir Hadžiahmetović",
+1,
+null,
+null
+],
+[
+"10",
+"Riad Bajić",
+1,
+null,
+null
+],
+[
+"1",
+"Kaya Tarakçı",
+0,
+null,
+null
+],
+[
+"5",
+"Selim Ay",
+0,
+null,
+null
+],
+[
+"54",
+"Mehmet Uslu",
+0,
+null,
+null
+],
+[
+"2",
+"Volkan Fındıklı",
+0,
+78,
+null
+],
+[
+"27",
+"Alban Meha",
+0,
+null,
+null
+],
+[
+"21",
+"Moryké Fofana",
+0,
+106,
+null
+],
+[
+"88",
+"Ioan Hora",
+0,
+119,
+null
+]
+],
+"k2": [
+[
+"1",
+"Volkan Babacan",
+1,
+null,
+null
+],
+[
+"6",
+"Alexandru Epureanu",
+1,
+null,
+null
+],
+[
+"11",
+"Eren Albayrak",
+1,
+null,
+74
+],
+[
+"14",
+"Bekir İrtegün",
+1,
+null,
+null
+],
+[
+"33",
+"Uğur Uçar",
+1,
+null,
+null
+],
+[
+"5",
+"Emre Belözoğlu",
+1,
+null,
+null
+],
+[
+"7",
+"Edin Višća",
+1,
+null,
+null
+],
+[
+"8",
+"Mossoró",
+1,
+null,
+null
+],
+[
+"17",
+"Cengiz Ünder",
+1,
+null,
+null
+],
+[
+"21",
+"Mahmut Tekdemir",
+1,
+null,
+null
+],
+[
+"26",
+"Emmanuel Adebayor",
+1,
+null,
+82
+],
+[
+"86",
+"Ufuk Ceylan",
+0,
+null,
+null
+],
+[
+"2",
+"Yalçın Ayhan",
+0,
+null,
+null
+],
+[
+"39",
+"Alparslan Erdem",
+0,
+74,
+null
+],
+[
+"15",
+"Attamah",
+0,
+null,
+null
+],
+[
+"23",
+"Holmén",
+0,
+null,
+null
+],
+[
+"18",
+"Stefano Napoleoni",
+0,
+106,
+null
+],
+[
+"19",
+"Mustafa Pektemek",
+0,
+82,
+106
+]
+],
+"t1": [
+"Aykut Kocaman"
+],
+"t2": [
+"Abdullah Avcı"
+]
 },
 {
 "madde": "2018 Süper Kupa",
@@ -4571,7 +10050,304 @@ null
 ]
 ],
 "stad": "Gürsel Aksel Stadyumu",
-"hakem": "Ali Palabıyık"
+"hakem": "Ali Palabıyık",
+"k1": [
+[
+"25",
+"Ruud Boffin",
+1,
+null,
+null
+],
+[
+"77",
+"Bünyamin Balcı",
+1,
+null,
+70
+],
+[
+"89",
+"Veysel Sarı",
+1,
+null,
+null
+],
+[
+"4",
+"Naldo",
+1,
+null,
+null
+],
+[
+"13",
+"Fyodor Kudryaşov",
+1,
+null,
+null
+],
+[
+"88",
+"Hakan Özmert",
+1,
+null,
+46
+],
+[
+"8",
+"Nuri Şahin",
+1,
+null,
+79
+],
+[
+"41",
+"Gökdeniz Bayrakdar",
+1,
+null,
+null
+],
+[
+"16",
+"Fredy",
+1,
+null,
+null
+],
+[
+"23",
+"Amilton",
+1,
+null,
+79
+],
+[
+"10",
+"Lukas Podolski",
+1,
+null,
+null
+],
+[
+"35",
+"Ferhat Kaplan",
+0,
+null,
+null
+],
+[
+"2",
+"Ersan Gülüm",
+0,
+null,
+null
+],
+[
+"5",
+"Bahadır Öztürk",
+0,
+null,
+null
+],
+[
+"99",
+"Ali Eren İyican",
+0,
+null,
+null
+],
+[
+"53",
+"Mert Yılmaz",
+0,
+46,
+null
+],
+[
+"19",
+"Ufuk Akyol",
+0,
+79,
+null
+],
+[
+"28",
+"Omar Imeri",
+0,
+null,
+null
+],
+[
+"9",
+"Sidney Sam",
+0,
+70,
+null
+],
+[
+"14",
+"Jean-Armel Drolé",
+0,
+null,
+null
+],
+[
+"11",
+"Dever Orgill",
+0,
+79,
+null
+]
+],
+"k2": [
+[
+"97",
+"Utku Yuvakuran",
+1,
+null,
+null
+],
+[
+"2",
+"Valentin Rosier",
+1,
+null,
+null
+],
+[
+"24",
+"Domagoj Vida",
+1,
+null,
+null
+],
+[
+"23",
+"Welinton",
+1,
+null,
+null
+],
+[
+"21",
+"Fabrice N'Sakala",
+1,
+null,
+null
+],
+[
+"5",
+"Josef de Souza",
+1,
+null,
+null
+],
+[
+"18",
+"Rachid Ghezzal",
+1,
+null,
+86
+],
+[
+"20",
+"Necip Uysal",
+1,
+null,
+65
+],
+[
+"13",
+"Atiba Hutchinson",
+1,
+null,
+78
+],
+[
+"7",
+"Georges-Kévin N'Koudou",
+1,
+null,
+65
+],
+[
+"17",
+"Cyle Larin",
+1,
+null,
+null
+],
+[
+"30",
+"Ersin Destanoğlu",
+0,
+null,
+null
+],
+[
+"61",
+"Emre Bilgin",
+0,
+null,
+null
+],
+[
+"46",
+"Serdar Saatçı",
+0,
+null,
+null
+],
+[
+"4",
+"Javi Montero",
+0,
+null,
+null
+],
+[
+"33",
+"Rıdvan Yılmaz",
+0,
+86,
+null
+],
+[
+"28",
+"Bilal Ceylan",
+0,
+null,
+null
+],
+[
+"70",
+"Gökhan Töre",
+0,
+65,
+null
+],
+[
+"43",
+"Bernard Mensah",
+0,
+78,
+null
+],
+[
+"26",
+"Dorukhan Toköz",
+0,
+65,
+null
+]
+],
+"t1": [
+"Ersun Yanal"
+],
+"t2": [
+"Sergen Yalçın"
+]
 },
 {
 "madde": "2022 Süper Kupa",
@@ -4684,7 +10460,311 @@ null
 ],
 "g2": [],
 "stad": "Gürsel Aksel Stadyumu",
-"hakem": "Atilla Karaoğlan"
+"hakem": "Atilla Karaoğlan",
+"k1": [
+[
+"70",
+"İrfan Can Eğribayat",
+1,
+null,
+null
+],
+[
+"4",
+"Serdar Aziz",
+1,
+null,
+null
+],
+[
+"7",
+"Ferdi Kadıoğlu",
+1,
+null,
+null
+],
+[
+"28",
+"Luan Peres",
+1,
+null,
+null
+],
+[
+"41",
+"Attila Szalai",
+1,
+null,
+null
+],
+[
+"5",
+"Willian Arão",
+1,
+null,
+null
+],
+[
+"10",
+"Arda Güler",
+1,
+null,
+90
+],
+[
+"17",
+"İrfan Can Kahveci",
+1,
+null,
+84
+],
+[
+"26",
+"Miha Zajc",
+1,
+null,
+75
+],
+[
+"13",
+"Enner Valencia",
+1,
+null,
+75
+],
+[
+"23",
+"Michy Batshuayi",
+1,
+null,
+90
+],
+[
+"54",
+"Ertuğrul Çetin",
+0,
+null,
+null
+],
+[
+"3",
+"Samet Akaydin",
+0,
+null,
+null
+],
+[
+"21",
+"Bright Osayi-Samuel",
+0,
+75,
+null
+],
+[
+"24",
+"Jayden Oosterwolde",
+0,
+null,
+null
+],
+[
+"8",
+"Mert Hakan Yandaş",
+0,
+90,
+null
+],
+[
+"80",
+"İsmail Yüksek",
+0,
+75,
+null
+],
+[
+"9",
+"Diego Rossi",
+0,
+84,
+null
+],
+[
+"19",
+"Serdar Dursun",
+0,
+90,
+null
+],
+[
+"20",
+"João Pedro",
+0,
+null,
+null
+],
+[
+"99",
+"Emre Mor",
+0,
+null,
+null
+]
+],
+"k2": [
+[
+"16",
+"Muhammed Şengezer",
+1,
+null,
+null
+],
+[
+"5",
+"Léo Duarte",
+1,
+null,
+null
+],
+[
+"42",
+"Ömer Ali Şahiner",
+1,
+null,
+null
+],
+[
+"59",
+"Ahmed Touba",
+1,
+null,
+78
+],
+[
+"88",
+"Caner Erkin",
+1,
+null,
+34
+],
+[
+"7",
+"Serdar Gürler",
+1,
+null,
+34
+],
+[
+"15",
+"Lucas Biglia",
+1,
+null,
+34
+],
+[
+"19",
+"Berkay Özcan",
+1,
+null,
+null
+],
+[
+"23",
+"Deniz Türüç",
+1,
+null,
+85
+],
+[
+"17",
+"Philippe Keny",
+1,
+null,
+null
+],
+[
+"25",
+"Joao Figueiredo",
+1,
+null,
+null
+],
+[
+"1",
+"Volkan Babacan",
+0,
+null,
+null
+],
+[
+"2",
+"Şener Özbayraklı",
+0,
+85,
+null
+],
+[
+"4",
+"Wu Shaocong",
+0,
+null,
+null
+],
+[
+"51",
+"Edgar Ié",
+0,
+null,
+null
+],
+[
+"60",
+"Lucas Lima",
+0,
+34,
+null
+],
+[
+"8",
+"Danijel Aleksic",
+0,
+78,
+null
+],
+[
+"11",
+"Adnan Januzaj",
+0,
+34,
+null
+],
+[
+"72",
+"Eden Karzev",
+0,
+34,
+null
+],
+[
+"80",
+"Berkay Aydoğmuş",
+0,
+null,
+null
+],
+[
+"34",
+"Muhammet Arslantaş",
+0,
+null,
+null
+]
+],
+"t1": [
+"Jorge Jesus"
+],
+"t2": [
+"Emre Belözoğlu"
+]
 },
 {
 "madde": "2024 Süper Kupa",
@@ -4722,7 +10802,311 @@ null
 ]
 ],
 "stad": "Atatürk Olimpiyat Stadyumu, İstanbul",
-"hakem": "Atilla Karaoğlan"
+"hakem": "Atilla Karaoğlan",
+"k1": [
+[
+"1",
+"Fernando Muslera 12px|link=Kaptan (futbol)",
+1,
+null,
+null
+],
+[
+"23",
+"Kaan Ayhan",
+1,
+null,
+null
+],
+[
+"25",
+"Victor Nelsson",
+1,
+null,
+null
+],
+[
+"42",
+"Abdülkerim Bardakcı",
+1,
+null,
+null
+],
+[
+"17",
+"Derrick Köhn",
+1,
+null,
+null
+],
+[
+"18",
+"Berkan Kutlu",
+1,
+null,
+60
+],
+[
+"34",
+"Lucas Torreira",
+1,
+null,
+75
+],
+[
+"22",
+"Hakim Ziyech",
+1,
+null,
+60
+],
+[
+"10",
+"Dries Mertens",
+1,
+null,
+46
+],
+[
+"7",
+"Kerem Aktürkoğlu",
+1,
+null,
+46
+],
+[
+"9",
+"Mauro Icardi",
+1,
+null,
+null
+],
+[
+"19",
+"Günay Güvenç",
+0,
+null,
+null
+],
+[
+"6",
+"Davinson Sánchez",
+0,
+null,
+null
+],
+[
+"90",
+"Metehan Baltacı",
+0,
+null,
+null
+],
+[
+"15",
+"Léo Dubois",
+0,
+null,
+null
+],
+[
+"8",
+"Kerem Demirbay",
+0,
+60,
+null
+],
+[
+"14",
+"Wilfried Zaha",
+0,
+75,
+null
+],
+[
+"11",
+"Yunus Akgün",
+0,
+60,
+null
+],
+[
+"53",
+"Barış Alper Yılmaz",
+0,
+46,
+null
+],
+[
+"30",
+"Yusuf Demir",
+0,
+null,
+null
+],
+[
+"44",
+"Michy Batshuayi",
+0,
+46,
+null
+]
+],
+"k2": [
+[
+"34",
+"Mert Günok 12px|link=Kaptan (futbol)",
+1,
+null,
+null
+],
+[
+"2",
+"Jonas Svensson",
+1,
+null,
+null
+],
+[
+"3",
+"Gabriel Paulista",
+1,
+null,
+null
+],
+[
+"6",
+"Omar Colley",
+1,
+null,
+null
+],
+[
+"26",
+"Arthur Masuaku",
+1,
+null,
+null
+],
+[
+"28",
+"Al-Musrati",
+1,
+null,
+null
+],
+[
+"83",
+"Gedson Fernandes",
+1,
+null,
+90
+],
+[
+"7",
+"Milot Rashica",
+1,
+null,
+86
+],
+[
+"27",
+"Rafa Silva",
+1,
+null,
+null
+],
+[
+"9",
+"Semih Kılıçsoy",
+1,
+null,
+68
+],
+[
+"17",
+"Ciro Immobile",
+1,
+null,
+85
+],
+[
+"30",
+"Ersin Destanoğlu",
+0,
+null,
+null
+],
+[
+"5",
+"Tayyip Talha Sanuç",
+0,
+null,
+null
+],
+[
+"20",
+"Necip Uysal",
+0,
+null,
+null
+],
+[
+"4",
+"Onur Bulut",
+0,
+86,
+null
+],
+[
+"71",
+"Jean Onana",
+0,
+68,
+null
+],
+[
+"8",
+"Salih Uçan",
+0,
+90,
+null
+],
+[
+"21",
+"Demir Ege Tıknaz",
+0,
+null,
+null
+],
+[
+"23",
+"Ernest Muçi",
+0,
+null,
+null
+],
+[
+"91",
+"Mustafa Erhan Hekimoğlu",
+0,
+85,
+null
+],
+[
+"40",
+"Jackson Muleka",
+0,
+null,
+null
+]
+],
+"t1": [
+"Okan Buruk"
+],
+"t2": [
+"Giovanni van Bronckhorst"
+]
 },
 {
 "madde": "2024 Türkiye Kupası finali",
@@ -4761,7 +11145,311 @@ null
 ]
 ],
 "stad": "Atatürk Olimpiyat Stadyumu",
-"hakem": "Ali Şansalan"
+"hakem": "Ali Şansalan",
+"k1": [
+[
+"34",
+"Mert Günok",
+1,
+null,
+null
+],
+[
+"2",
+"Jonas Svensson",
+1,
+null,
+null
+],
+[
+"6",
+"Omar Colley",
+1,
+null,
+null
+],
+[
+"20",
+"Necip Uysal",
+1,
+null,
+90
+],
+[
+"26",
+"Arthur Masuaku",
+1,
+null,
+null
+],
+[
+"28",
+"Al-Musrati",
+1,
+null,
+null
+],
+[
+"8",
+"Salih Uçan",
+1,
+null,
+null
+],
+[
+"83",
+"Gedson Fernandes",
+1,
+null,
+null
+],
+[
+"18",
+"Rachid Ghezzal",
+1,
+null,
+64
+],
+[
+"23",
+"Ernest Muçi",
+1,
+null,
+90
+],
+[
+"40",
+"Jackson Muleka",
+1,
+null,
+75
+],
+[
+"1",
+"Ersin Destanoğlu",
+0,
+null,
+null
+],
+[
+"4",
+"Onur Bulut",
+0,
+null,
+null
+],
+[
+"17",
+"Joe Worrall",
+0,
+90,
+null
+],
+[
+"15",
+"Alex Oxlade-Chamberlain",
+0,
+null,
+null
+],
+[
+"11",
+"Milot Rashica",
+0,
+64,
+null
+],
+[
+"21",
+"Demir Ege Tıknaz",
+0,
+null,
+null
+],
+[
+"22",
+"Bahtiyar Zaynutdinov",
+0,
+null,
+null
+],
+[
+"9",
+"Cenk Tosun",
+0,
+null,
+null
+],
+[
+"10",
+"Vincent Aboubakar",
+0,
+75,
+null
+],
+[
+"90",
+"Semih Kılıçsoy",
+0,
+90,
+null
+]
+],
+"k2": [
+[
+"1",
+"Uğurcan Çakır",
+1,
+null,
+null
+],
+[
+"12",
+"Thomas Meunier",
+1,
+null,
+null
+],
+[
+"6",
+"Batista Mendy",
+1,
+null,
+null
+],
+[
+"24",
+"Stefano Denswil",
+1,
+null,
+null
+],
+[
+"18",
+"Eren Elmalı",
+1,
+null,
+null
+],
+[
+"5",
+"Berat Özdemir",
+1,
+null,
+68
+],
+[
+"23",
+"Umut Güneş",
+1,
+null,
+83
+],
+[
+"7",
+"Edin Višća",
+1,
+null,
+null
+],
+[
+"8",
+"Enis Bardhi",
+1,
+null,
+null
+],
+[
+"14",
+"Taxiarchis Fountas",
+1,
+null,
+55
+],
+[
+"30",
+"Paul Onuachu",
+1,
+null,
+null
+],
+[
+"54",
+"Muhammet Taha Tepe",
+0,
+null,
+null
+],
+[
+"2",
+"Rayyan Baniya",
+0,
+null,
+null
+],
+[
+"3",
+"Joaquín Fernández",
+0,
+null,
+null
+],
+[
+"73",
+"Arif Boşluk",
+0,
+null,
+null
+],
+[
+"10",
+"Trézéguet",
+0,
+55,
+null
+],
+[
+"16",
+"Kerem Şen",
+0,
+null,
+null
+],
+[
+"50",
+"Mehmet Can Aydın",
+0,
+null,
+null
+],
+[
+"9",
+"Umut Bozok",
+0,
+83,
+null
+],
+[
+"19",
+"Nicolas Pépé",
+0,
+68,
+null
+],
+[
+"99",
+"Mislav Oršić",
+0,
+null,
+null
+]
+],
+"t1": [
+"Serdar Topraktepe"
+],
+"t2": [
+"Abdullah Avcı"
+]
 },
 {
 "madde": "2025 Süper Kupa",
@@ -4800,7 +11488,311 @@ null
 ]
 ],
 "stad": "Gaziantep Stadyumu, Gaziantep",
-"hakem": "Cihan Aydın"
+"hakem": "Cihan Aydın",
+"k1": [
+[
+"19",
+"Günay Güvenç",
+1,
+null,
+null
+],
+[
+"6",
+"Davinson Sánchez",
+1,
+null,
+46
+],
+[
+"17",
+"Eren Elmalı",
+1,
+null,
+87
+],
+[
+"42",
+"Abdülkerim Bardakcı",
+1,
+null,
+null
+],
+[
+"7",
+"Roland Sallai",
+1,
+null,
+null
+],
+[
+"10",
+"Leroy Sané",
+1,
+null,
+79
+],
+[
+"34",
+"Lucas Torreira",
+1,
+null,
+72
+],
+[
+"99",
+"Mario Lemina",
+1,
+null,
+null
+],
+[
+"11",
+"Yunus Akgün",
+1,
+null,
+null
+],
+[
+"53",
+"Barış Alper Yılmaz",
+1,
+null,
+null
+],
+[
+"9",
+"Mauro Icardi",
+1,
+null,
+null
+],
+[
+"1",
+"Uğurcan Çakır",
+0,
+null,
+null
+],
+[
+"23",
+"Kaan Ayhan",
+0,
+87,
+null
+],
+[
+"88",
+"Kazımcan Karataş",
+0,
+87,
+null
+],
+[
+"91",
+"Arda Ünyay",
+0,
+null,
+null
+],
+[
+"8",
+"Gabriel Sara",
+0,
+46,
+null
+],
+[
+"20",
+"İlkay Gündoğan",
+0,
+72,
+null
+],
+[
+"33",
+"Gökdeniz Gürpüz",
+0,
+null,
+null
+],
+[
+"21",
+"Ahmed Kutucu",
+0,
+79,
+null
+],
+[
+"30",
+"Yusuf Demir",
+0,
+null,
+null
+],
+[
+"62",
+"Ada Yüzgeç",
+0,
+null,
+null
+]
+],
+"k2": [
+[
+"31",
+"Ederson",
+1,
+null,
+null
+],
+[
+"18",
+"Mert Müldür",
+1,
+null,
+90
+],
+[
+"22",
+"Levent Mercan",
+1,
+null,
+null
+],
+[
+"24",
+"Jayden Oosterwolde",
+1,
+null,
+82
+],
+[
+"37",
+"Milan Skriniar",
+1,
+null,
+null
+],
+[
+"5",
+"İsmail Yüksek",
+1,
+null,
+null
+],
+[
+"6",
+"Matteo Guendouzi",
+1,
+null,
+null
+],
+[
+"21",
+"Marco Asensio",
+1,
+null,
+null
+],
+[
+"9",
+"Kerem Aktürkoğlu",
+1,
+null,
+90
+],
+[
+"20",
+"Anthony Musaba",
+1,
+null,
+68
+],
+[
+"10",
+"Jhon Durán",
+1,
+null,
+68
+],
+[
+"34",
+"Mert Günok",
+0,
+null,
+null
+],
+[
+"13",
+"Tarık Çetin",
+0,
+null,
+null
+],
+[
+"4",
+"Çağlar Söyüncü",
+0,
+82,
+null
+],
+[
+"14",
+"Yiğit Efe Demir",
+0,
+90,
+null
+],
+[
+"67",
+"Kamil Efe Üregen",
+0,
+null,
+null
+],
+[
+"28",
+"Bartuğ Elmaz",
+0,
+null,
+null
+],
+[
+"53",
+"Sebastian Szymański",
+0,
+null,
+null
+],
+[
+"70",
+"Oğuz Aydın",
+0,
+90,
+null
+],
+[
+"45",
+"Dorgeles Nene",
+0,
+68,
+null
+],
+[
+"94",
+"Talisca",
+0,
+68,
+null
+]
+],
+"t1": [
+"Okan Buruk"
+],
+"t2": [
+"Domenico Tedesco"
+]
 },
 {
 "madde": "2025 Süper Kupa",
@@ -5030,7 +12022,190 @@ null
 ],
 "g2": [],
 "stad": "Ali Sami Yen Stadı, İstanbul",
-"hakem": "Engin Kurt"
+"hakem": "Engin Kurt",
+"k1": [
+[
+"1",
+"Engin İpekoğlu",
+1,
+null,
+64
+],
+[
+"3",
+"Kadir Akbulut",
+1,
+null,
+null
+],
+[
+"5",
+"Ulvi Güveneroğlu",
+1,
+null,
+null
+],
+[
+"4",
+"Gökhan Keskin",
+1,
+null,
+null
+],
+[
+"2",
+"Recep Çetin",
+1,
+null,
+null
+],
+[
+"6",
+"Şenol Fidan",
+1,
+null,
+null
+],
+[
+"9",
+"Zeki Önatlı",
+1,
+null,
+null
+],
+[
+"8",
+"Rıza Çalımbay",
+1,
+null,
+null
+],
+[
+"11",
+"Metin Tekin",
+1,
+null,
+null
+],
+[
+"10",
+"Ali Gültiken",
+1,
+null,
+null
+],
+[
+"7",
+"Feyyaz Uçar",
+1,
+null,
+null
+],
+[
+null,
+"Metin Akçevre",
+0,
+64,
+null
+]
+],
+"k2": [
+[
+null,
+"Fatih Yılmaz",
+1,
+null,
+null
+],
+[
+null,
+"Cengizhan Köksal",
+1,
+null,
+null
+],
+[
+null,
+"Murat Sönmez",
+1,
+null,
+null
+],
+[
+null,
+"Muammer Birdal",
+1,
+null,
+null
+],
+[
+null,
+"Erol Demirhan",
+1,
+null,
+null
+],
+[
+null,
+"Mehmet Demirtaş",
+1,
+null,
+null
+],
+[
+null,
+"Sedat Varak",
+1,
+null,
+46
+],
+[
+null,
+"İbrahim Uzunca",
+1,
+null,
+null
+],
+[
+null,
+"Ümit Özkalp",
+1,
+null,
+null
+],
+[
+null,
+"İsmail Akbaşlı",
+1,
+null,
+null
+],
+[
+null,
+"İbrahim Çolak",
+1,
+null,
+null
+],
+[
+null,
+"Haluk Uğurludoğan",
+0,
+46,
+null
+],
+[
+null,
+"Çetin Kahraman",
+0,
+46,
+null
+]
+],
+"t1": [],
+"t2": [
+"Ali Hoşfikirer"
+]
 },
 {
 "madde": "Beşiktaş 2-9 Galatasaray",
@@ -5099,7 +12274,167 @@ null
 ]
 ],
 "stad": "Şeref Stadyumu, İstanbul",
-"hakem": "Ahmet Adem"
+"hakem": "Ahmet Adem",
+"k1": [
+[
+"1",
+"Osman İncili",
+1,
+null,
+null
+],
+[
+"2",
+"Faruk Barlas",
+1,
+null,
+null
+],
+[
+"3",
+"Salim Şatıroğlu",
+1,
+null,
+null
+],
+[
+"4",
+"Musa Sezer",
+1,
+null,
+null
+],
+[
+"5",
+"Enver Arslanalp",
+1,
+null,
+null
+],
+[
+"6",
+"Eşfak Aykaç",
+1,
+null,
+null
+],
+[
+"7",
+"Süleyman Tekil",
+1,
+null,
+null
+],
+[
+"8",
+"Cemil Gürgen Erlertürk",
+1,
+null,
+null
+],
+[
+"9",
+"Gündüz Kılıç",
+1,
+null,
+null
+],
+[
+"10",
+"Selahattin Almay",
+1,
+null,
+null
+],
+[
+"11",
+"Serafim Madenli",
+1,
+null,
+null
+]
+],
+"k2": [
+[
+"1",
+"Mehmet Ali Tanman",
+1,
+null,
+null
+],
+[
+"2",
+"Taci Erce",
+1,
+null,
+null
+],
+[
+"3",
+"Feyzi Uman",
+1,
+null,
+null
+],
+[
+"4",
+"Cihat",
+1,
+null,
+null
+],
+[
+"5",
+"Hüsnü Savman",
+1,
+null,
+null
+],
+[
+"6",
+"İbrahim Tusder",
+1,
+null,
+null
+],
+[
+"7",
+"Faruk Bilginoğlu",
+1,
+null,
+null
+],
+[
+"8",
+"Eşref Bilgiç",
+1,
+null,
+null
+],
+[
+"9",
+"Hayati Ozgan",
+1,
+null,
+null
+],
+[
+"10",
+"Şeref Görkey",
+1,
+null,
+null
+],
+[
+"11",
+"Hakkı Yeten 80'",
+1,
+null,
+null
+]
+],
+"t1": [],
+"t2": []
 },
 {
 "madde": "Fenerbahçe 0-7 Galatasaray",
@@ -5111,7 +12446,143 @@ null
 "g1": [],
 "g2": [],
 "stad": null,
-"hakem": null
+"hakem": null,
+"k1": [
+[
+null,
+"Ali Sait",
+1,
+null,
+25
+],
+[
+null,
+"Galip",
+1,
+null,
+null
+],
+[
+null,
+"Mazhar",
+1,
+null,
+null
+],
+[
+null,
+"Sabri",
+1,
+null,
+null
+],
+[
+null,
+"Gustave Haenny",
+1,
+null,
+null
+],
+[
+null,
+"Hüseyin İzzi",
+1,
+null,
+null
+],
+[
+null,
+"Fethi",
+1,
+null,
+null
+],
+[
+null,
+"Şevkati Hulusi",
+1,
+null,
+null
+],
+[
+null,
+"Memiş",
+1,
+null,
+null
+],
+[
+null,
+"Tevfik Haccar",
+1,
+null,
+null
+],
+[
+null,
+"Yahya Berki",
+1,
+null,
+null
+]
+],
+"k2": [
+[
+null,
+"Ahmet Robenson",
+1,
+null,
+null
+],
+[
+null,
+"Ali Sami",
+1,
+null,
+null
+],
+[
+null,
+"Mehmet Ali",
+1,
+null,
+null
+],
+[
+null,
+"Bekir Sıtkı",
+1,
+null,
+null
+],
+[
+null,
+"Celal İbrahim",
+1,
+null,
+null
+],
+[
+null,
+"İdris Bey",
+1,
+null,
+null
+],
+[
+null,
+"Emin Bülent",
+0,
+10,
+null
+]
+],
+"t1": [
+"Galip"
+],
+"t2": [
+"Emin Bülent"
+]
 },
 {
 "madde": "Fenerbahçe 6-0 Galatasaray",
@@ -5154,7 +12625,262 @@ null
 ],
 "g2": [],
 "stad": "Fenerbahçe Şükrü Saracoğlu Stadyumu, Kadıköy, İstanbul",
-"hakem": "Mustafa Çulcu"
+"hakem": "Mustafa Çulcu",
+"k1": [
+[
+"1",
+"Rüştü Reçber",
+1,
+null,
+null
+],
+[
+"20",
+"Yusuf Şimşek",
+1,
+null,
+85
+],
+[
+"22",
+"Fatih Akyel",
+1,
+null,
+null
+],
+[
+"3",
+"Ogün Temizkanoğlu",
+1,
+null,
+null
+],
+[
+"5",
+"Ümit Özat",
+1,
+null,
+null
+],
+[
+"28",
+"Samuel Johnson",
+1,
+null,
+null
+],
+[
+"23",
+"Ariel Ortega",
+1,
+null,
+null
+],
+[
+"32",
+"Miroslav Stević",
+1,
+null,
+null
+],
+[
+"17",
+"Tuncay Şanlı",
+1,
+null,
+null
+],
+[
+"21",
+"Washington",
+1,
+null,
+57
+],
+[
+"9",
+"Serhat Akın",
+1,
+null,
+80
+],
+[
+"13",
+"Oğuz Dağlaroğlu",
+0,
+null,
+null
+],
+[
+"26",
+"Erman Yıldırım",
+0,
+85,
+null
+],
+[
+"16",
+"Cem Karaca",
+0,
+null,
+null
+],
+[
+"30",
+"Ali Güneş",
+0,
+80,
+null
+],
+[
+"8",
+"Ceyhun Eriş",
+0,
+57,
+null
+],
+[
+"10",
+"Haim Revivo",
+0,
+null,
+null
+]
+],
+"k2": [
+[
+"1",
+"Faryd Mondragon",
+1,
+null,
+null
+],
+[
+"22",
+"Ümit Davala",
+1,
+null,
+null
+],
+[
+"3",
+"Bülent Korkmaz",
+1,
+null,
+77
+],
+[
+"5",
+"Emre Aşık",
+1,
+null,
+null
+],
+[
+"16",
+"Hakan Ünsal",
+1,
+null,
+null
+],
+[
+"17",
+"Fabio Pinto",
+1,
+null,
+null
+],
+[
+"18",
+"Ayhan Akman",
+1,
+null,
+46
+],
+[
+"4",
+"Mertol Karatay (João Batista)",
+1,
+null,
+73
+],
+[
+"67",
+"Ergün Penbe",
+1,
+null,
+null
+],
+[
+"11",
+"Hasan Şaş",
+1,
+null,
+null
+],
+[
+"25",
+"Christian",
+1,
+null,
+null
+],
+[
+"16",
+"Kerem İnan",
+0,
+null,
+null
+],
+[
+"21",
+"Sergio Almaguer",
+0,
+null,
+null
+],
+[
+"23",
+"Vedat İnceefe",
+0,
+77,
+null
+],
+[
+"8",
+"Suat Kaya",
+0,
+null,
+null
+],
+[
+"7",
+"Berkant Göktan",
+0,
+null,
+null
+],
+[
+"6",
+"Arif Erdem",
+0,
+46,
+null
+],
+[
+"9",
+"Ümit Karan",
+0,
+73,
+null
+]
+],
+"t1": [
+"Werner Lorant"
+],
+"t2": [
+"Fatih Terim"
+]
 },
 {
 "madde": "Galatasaray 0-7 Güneş",
@@ -5202,7 +12928,171 @@ null
 ]
 ],
 "stad": "Taksim Stadyumu",
-"hakem": "Herlinder (Avusturya)"
+"hakem": "Herlinder (Avusturya)",
+"k1": [
+[
+null,
+"Sacit Öget",
+1,
+null,
+null
+],
+[
+null,
+"Reşat Erkal",
+1,
+null,
+null
+],
+[
+null,
+"Adnan İncirmen",
+1,
+null,
+null
+],
+[
+null,
+"Musa Sezer",
+1,
+null,
+null
+],
+[
+null,
+"Suavi Atasagun",
+1,
+null,
+null
+],
+[
+null,
+"Süleyman Tekil",
+1,
+null,
+null
+],
+[
+null,
+"Mehmet Yılmaz",
+1,
+null,
+null
+],
+[
+null,
+"Eşfak Aykaç",
+1,
+null,
+null
+],
+[
+null,
+"Bülent Ediz",
+1,
+null,
+null
+],
+[
+null,
+"Haşim Birkan",
+1,
+null,
+null
+],
+[
+null,
+"Necdet Cici",
+1,
+null,
+null
+]
+],
+"k2": [
+[
+null,
+"Cihat Arman",
+1,
+null,
+null
+],
+[
+null,
+"Reşat Aydınlı",
+1,
+null,
+null
+],
+[
+null,
+"Faruk Barlas",
+1,
+null,
+null
+],
+[
+null,
+"Rıza Köprülü",
+1,
+null,
+null
+],
+[
+null,
+"Ömer Boncuk",
+1,
+null,
+null
+],
+[
+null,
+"Yusuf Aygener",
+1,
+null,
+null
+],
+[
+null,
+"Niyazi Öztunç",
+1,
+null,
+null
+],
+[
+null,
+"Rasih Minkari",
+1,
+null,
+null
+],
+[
+null,
+"Rebii Erkal",
+1,
+null,
+null
+],
+[
+null,
+"Selahattin Almay",
+1,
+null,
+null
+],
+[
+null,
+"Melih Kotanca",
+1,
+null,
+null
+]
+],
+"t1": [
+"Péter Szabó"
+],
+"t2": [
+"Uygar Yiğit"
+]
 },
 {
 "madde": "Gazi Büstü",
@@ -5246,7 +13136,171 @@ null
 ]
 ],
 "stad": "Taksim Stadyumu, Beyoğlu, İstanbul",
-"hakem": "Şeref Bey"
+"hakem": "Şeref Bey",
+"k1": [
+[
+null,
+"Fehmi Eriş",
+1,
+null,
+null
+],
+[
+null,
+"Kadri Göktulga",
+1,
+null,
+null
+],
+[
+null,
+"Sabih Arca",
+1,
+null,
+null
+],
+[
+null,
+"Cevat Seyit",
+1,
+null,
+null
+],
+[
+null,
+"İsmet Uluğ",
+1,
+null,
+null
+],
+[
+null,
+"Sadi Çoban",
+1,
+null,
+null
+],
+[
+null,
+"Alaattin Baydar",
+1,
+null,
+null
+],
+[
+null,
+"Muzaffer Çizer",
+1,
+null,
+null
+],
+[
+null,
+"Zeki Rıza Sporel",
+1,
+null,
+null
+],
+[
+null,
+"Fikret Arıcan",
+1,
+null,
+null
+],
+[
+null,
+"Bedri Gürsoy",
+1,
+null,
+null
+]
+],
+"k2": [
+[
+null,
+"Ulvi Yenal",
+1,
+null,
+null
+],
+[
+null,
+"Burhan Atak",
+1,
+null,
+null
+],
+[
+null,
+"Mehmet Nazif Gerçin",
+1,
+null,
+null
+],
+[
+null,
+"Suphi Batur",
+1,
+null,
+null
+],
+[
+null,
+"Nihat Bekdik",
+1,
+null,
+null
+],
+[
+null,
+"Mithat Ertuğ",
+1,
+null,
+null
+],
+[
+null,
+"Mehmet Leblebi",
+1,
+null,
+null
+],
+[
+null,
+"Muslihittin Peykoğlu",
+1,
+null,
+null
+],
+[
+null,
+"Kemal Faruki",
+1,
+null,
+null
+],
+[
+null,
+"Latif Yalınlı",
+1,
+null,
+null
+],
+[
+null,
+"Rebii Erkal",
+1,
+null,
+null
+]
+],
+"t1": [
+"Hikmet Mocuk"
+],
+"t2": [
+"Billy Hunter"
+]
 },
 {
 "madde": "Gazi Büstü",
@@ -5279,7 +13333,171 @@ null
 ],
 "g2": [],
 "stad": "Taksim Stadyumu, Beyoğlu, İstanbul",
-"hakem": "Şeref Bey"
+"hakem": "Şeref Bey",
+"k1": [
+[
+null,
+"Ulvi Yenal",
+1,
+null,
+null
+],
+[
+null,
+"Burhan Atak",
+1,
+null,
+null
+],
+[
+null,
+"Mehmet Nazif Gerçin",
+1,
+null,
+null
+],
+[
+null,
+"Suphi Batur",
+1,
+null,
+null
+],
+[
+null,
+"Nihat Bekdik",
+1,
+null,
+null
+],
+[
+null,
+"Mithat Ertuğ",
+1,
+null,
+null
+],
+[
+null,
+"Mehmet Leblebi",
+1,
+null,
+null
+],
+[
+null,
+"Şadli Alioğlu",
+1,
+null,
+null
+],
+[
+null,
+"Necdet Cici",
+1,
+null,
+null
+],
+[
+null,
+"Kemal Faruki",
+1,
+null,
+null
+],
+[
+null,
+"Muslihittin Peykoğlu",
+1,
+null,
+null
+]
+],
+"k2": [
+[
+null,
+"Fehmi Eriş",
+1,
+null,
+null
+],
+[
+null,
+"Firuzan Şansal",
+1,
+null,
+null
+],
+[
+null,
+"Kadri Göktulga",
+1,
+null,
+null
+],
+[
+null,
+"Cevat Seyit",
+1,
+null,
+null
+],
+[
+null,
+"Sadi Çoban",
+1,
+null,
+null
+],
+[
+null,
+"İsmet Uluğ",
+1,
+null,
+null
+],
+[
+null,
+"Alaattin Baydar",
+1,
+null,
+null
+],
+[
+null,
+"Muzaffer Çizer",
+1,
+null,
+null
+],
+[
+null,
+"Zeki Rıza Sporel",
+1,
+null,
+null
+],
+[
+null,
+"Fikret Arıcan",
+1,
+null,
+null
+],
+[
+null,
+"Bedri Gürsoy",
+1,
+null,
+null
+]
+],
+"t1": [
+"Billy Hunter"
+],
+"t2": [
+"Hikmet Mocuk"
+]
 },
 {
 "madde": "Paris Saint-Germain - İstanbul Başakşehir (2020-21 UEFA Şampiyonlar Ligi)",

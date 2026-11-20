@@ -1,6 +1,9 @@
 {
-"_aciklama": "Süper Lig (1. Lig, Milli Lig) şampiyonları: sezon -> kulüp no. Elle tutulur; sezon puan tablosundan hesaplanan liderle karşılaştırıldı (1962-63 grup+final biçimi: Galatasaray).",
+"_aciklama": "1956-57 ve 1957-58 Federasyon Kupası (Beşiktaş) TFF'nin saydığı gibi Süper Lig şampiyonluğu (sayfası 1959 öncesi bölümünde; eski: sezon -> o sayfanın yolu). Süper Lig (1. Lig, Milli Lig) şampiyonları: sezon -> kulüp no. Elle tutulur; sezon puan tablosundan hesaplanan liderle karşılaştırıldı (1962-63 grup+final biçimi: Galatasaray).",
+"eski": {"1956-1957": "eski/federasyon/1956-1957", "1957-1958": "eski/federasyon/1957-1958"},
 "sampiyon": {
+"1956-1957": 95,
+"1957-1958": 95,
 "1959": 463,
 "1959-1960": 95,
 "1960-1961": 463,

@@ -138,10 +138,67 @@ def goller(s):
     return out
 
 
+POZ = r"(?:KL|K|GK|DF|D|OS|MF|O|FV|FW|F|SB|SĞB|SLB|STP|DOS|OOS|KOS|SF|SĞK|SLK|LB|RB|CB|DM|CM|AM|LW|RW|CF|ST|LM|RM)"
+KALIN = "'" * 3
+
+
+def kadrolar(t):
+    """Maç kutularının ardındaki kadro tabloları (kalın 'TAKIM:' başlıklı; satır: | KL || no || {{bayraksimge|X}} [[Ad]] (K) ||
+    {{suboff|25}}) -> sırayla [{takim, oyuncu: [[forma, ad, ilk11, girdiği dk, çıktığı dk]], td: [ad]}]. 7'den az oyunculu tablo alınmaz."""
+    out = []
+    for blok in re.split(r"\n\{\|", t):
+        bas = re.search(KALIN + r"([^'\n]{2,40}?):?" + KALIN + r"\s*:?", blok)
+        if not bas or not re.search(r"\n\|\s*" + POZ + r"\s*\|\|", blok):
+            continue
+        oy, td, yedek = [], [], False
+        for sat in blok.split("\n|-"):
+            s = sat.strip()
+            if re.search(r"Yedek|Substitut", s, re.I):
+                yedek = True
+            m = re.match(r"\|\s*" + POZ + r"\s*\|\|\s*([^|]*?)\s*\|\|(.*)", s, re.S)
+            if not m:
+                continue
+            parca = m.group(2).split("||")
+            ad = temiz(re.sub(r"\{\{bayraksimge\|[^}]*\}\}|\(\s*\[\[Kaptan[^\]]*\]\]\s*\)|\(K\)", "", parca[0], flags=re.S))
+            ek = " ".join(parca[1:])
+            gir = re.search(r"\{\{\s*sub\s*on\s*\|\s*(\d+)", ek, re.I)
+            cik = re.search(r"\{\{\s*sub\s*off\s*\|\s*(\d+)", ek, re.I)
+            if ad:
+                oy.append([temiz(m.group(1)) or None, ad, 0 if (yedek or gir) else 1, int(gir.group(1)) if gir else None,
+                           int(cik.group(1)) if cik else None])
+        tm = re.search(r"(?:Teknik direktör|Antrenör):?'*\s*\n\|-\s*\n\|[^|\n]*\|(.*?)(?:\n\|\}|\n\|-)", blok, re.S)
+        if tm:
+            td = [x for x in [temiz(re.sub(r"\{\{bayraksimge\|[^}]*\}\}", "", tm.group(1), flags=re.S))] if x]
+        if len(oy) >= 7:
+            out.append({"takim": temiz(bas.group(1)), "oyuncu": oy, "td": td})
+    return out
+
+
+def kadro_ata(maclar, tablolar):
+    """Maddenin maçlarına kadro tablolarını sırayla ikişer ikişer verir; takım adı tutmazsa (ters sıra) yer değiştirir."""
+    import unicodedata
+    def k(a):
+        a = unicodedata.normalize("NFKD", (a or "").replace("İ", "I").replace("ı", "i")).encode("ascii", "ignore").decode().lower()
+        return re.sub(r"\b(sk|jk|fk|spor|kulubu|futbol|takimi)\b|[^a-z]", "", a)
+    tut = lambda p, q: bool(p) and bool(q) and (p in q or q in p)
+    for i, x in enumerate(maclar):
+        cift = tablolar[2 * i: 2 * i + 2]
+        if len(cift) != 2:
+            break
+        a, b, ev, dep = k(cift[0]["takim"]), k(cift[1]["takim"]), k(x["ev"]), k(x["dep"])
+        if tut(a, dep) and tut(b, ev):
+            cift = cift[::-1]
+        elif not (tut(a, ev) or tut(b, dep)):
+            continue
+        x["k1"], x["k2"] = cift[0]["oyuncu"], cift[1]["oyuncu"]
+        x["t1"], x["t2"] = cift[0]["td"], cift[1]["td"]
+
+
 def ayikla():
     sayfalar = json.load(open(os.path.join(HAM, "sayfalar.json"), encoding="utf-8"))
     out = []
     for baslik, t in sorted(sayfalar.items()):
+        bas_ = len(out)
         kutular = sablonlar(t, r"(?:Futbol maçı kutusu|Footballbox(?: collapsible)?|Football box(?: collapsible)?)")
         if kutular:
             for k in kutular:
@@ -160,13 +217,15 @@ def ayikla():
                 out.append({"madde": baslik, "tarih": tarih_coz(a.get("tarih", "")), "ev": temiz(a.get("takım1")), "dep": temiz(a.get("takım2")),
                             "eg": n(a.get("takım1skor")), "dg": n(a.get("takım2skor")), "g1": [], "g2": [],
                             "stad": temiz(a.get("stadyum", "")) or None, "hakem": temiz(a.get("hakem", "")) or None})
+        kadro_ata(out[bas_:], kadrolar(t))
     for x in out:
         if x["hakem"]:
             x["hakem"] = temiz(x["hakem"]).strip(" '") or None
     json.dump(out, open(CIKTI, "w", encoding="utf-8"), ensure_ascii=False, indent=0)
     gol = sum(len(x["g1"]) + len(x["g2"]) for x in out)
     uyum = sum(1 for x in out if x["eg"] is not None and x["g1"] + x["g2"] and len(x["g1"]) == x["eg"] and len(x["g2"]) == x["dg"])
-    print(f"{len(sayfalar)} madde -> {len(out)} maç, {gol} gol ({uyum} maçta gol sayısı skorla tutuyor) -> {CIKTI}")
+    print(f"{len(sayfalar)} madde -> {len(out)} maç, {gol} gol ({uyum} maçta gol sayısı skorla tutuyor), "
+          f"{sum(1 for x in out if x.get('k1'))} maçta kadro -> {CIKTI}")
 
 
 if __name__ == "__main__":
@@ -219,6 +278,10 @@ def aktar(maclar, cikti, yaz):
         out[m["id"]] = {"m": [m["tarih"], m["saat"], m["sezon"], m["lig"], m["grup"] or "", [m["ev_kulup"], m["ev_adi"]], [m["dep_kulup"], m["dep_adi"]],
                               [m["ev_gol"], m["dep_gol"], m["ev_pen"], m["dep_pen"], m["durum"]]],
                         "o": olay, "q": x["madde"], "s": x.get("stad"), "h": x.get("hakem")}
+        if x.get("k1"):   # kadro: [forma, ad, ilk11] ve teknik direktör (sitedeki ev/konuk sırasıyla)
+            k1, k2, t1, t2 = (x["k2"], x["k1"], x.get("t2"), x.get("t1")) if ters else (x["k1"], x["k2"], x.get("t1"), x.get("t2"))
+            out[m["id"]]["k"] = [[[p[0], p[1], p[2]] for p in k1], [[p[0], p[1], p[2]] for p in k2]]
+            out[m["id"]]["t"] = [t1 or [], t2 or []]
     yaz(os.path.join(cikti, "wk.json"), out)
     print(f"Vikipedi maç maddeleri: {len(W)} maçın {len(out)}'i sitedeki maçlara bağlandı -> wk.json", flush=True)
     return list(out)

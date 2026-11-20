@@ -1,4 +1,5 @@
-"""Tüm zamanlar rekorları: lig kademeleri, profesyonel ligler (Süper Lig - 3. Lig), bütün ligler (BAL dahil), Türkiye Kupası ve lig + kupa birlikte (yalnız maç rekorları).
+"""Tüm zamanlar rekorları: lig kademeleri, profesyonel ligler (Süper Lig - 3. Lig), bütün ligler (BAL dahil), Türkiye Kupası, lig + kupa birlikte
+(yalnız maç rekorları) ve 1959 öncesi dahil (Süper Lig + Millî Küme, Türkiye Futbol Şampiyonası, Federasyon Kupası, İstanbul / Ankara / İzmir ligleri).
 
 web_aktar.py çağırır -> docs/data/rekorlar.json
 
@@ -38,19 +39,64 @@ SERILER = [   # anahtar, saha filtresi, koşul (attığı, yediği)
 ]
 
 
-def hesapla(maclar, sezon_sira, okunur):
-    """maclar: futbol.db mac satırları (dict, tarih sırasıyla). sezon_sira: sezon -> sıra no."""
+# 1959 öncesi dahil: Süper Lig ile 1959 öncesinin lig ve şampiyonluk yarışmaları (docs/data/eski.json): Millî Küme, Türkiye Futbol
+# Şampiyonası, Federasyon Kupası ve şehir ligleri (İstanbul, Ankara, İzmir; 1959 öncesi bölümüne eklendikçe). Başbakanlık Kupası ve
+# tek tük ünlü maçlar dahil değil.
+ESKI_YAR = {"milli_kume": "Millî Küme", "sampiyona": "Türkiye Futbol Şampiyonası", "federasyon": "Federasyon Kupası",
+            "istanbul": "İstanbul Ligi", "ankara": "Ankara Ligi", "izmir": "İzmir Ligi"}
+
+
+def eski_maclar(eski):
+    """eski.json -> rekor maç satırları. Sitedeki kulübe bağlı olmayan eski kulüplere "e<sıra>" kimliği (aynı kulübün dönem
+    adları tek kimlik). Döner: (maçlar, {kimlik: [ad, logo]})."""
+    K = eski["kulupler"]
+    def kim(i):
+        k = K[i]
+        if k.get("kulup") is not None:
+            return k["kulup"]
+        return f"e{min(i, k['ayni'])}" if k.get("ayni") is not None else f"e{i}"
+    ek = {}
+    for i, k in enumerate(K):
+        if k.get("kulup") is None:
+            ek.setdefault(kim(i), [k["ad"], k.get("logo")])
+    out = []
+    for s in eski["sezonlar"]:
+        if s["yarisma"] not in ESKI_YAR:
+            continue
+        for m in s["maclar"]:
+            ev, dep, eg, dg, tur, tarih, durum = m[:7]
+            out.append({"yarisma": "eski", "kademe": None, "asama": "", "sezon": s["sezon"], "lig": ESKI_YAR[s["yarisma"]], "tur": tur,
+                        "grup": None, "tarih": tarih, "ev_kulup": kim(ev), "dep_kulup": kim(dep), "ev_adi": K[ev]["ad"], "dep_adi": K[dep]["ad"],
+                        "ev_gol": eg, "dep_gol": dg, "ev_pen": None, "dep_pen": None, "durum": "Hük." if durum in ("w/o", "o/w", "awd") else "MS",
+                        "id": None, "eski": f"eski/{s['yarisma']}/{s['sezon']}"})
+    return out, ek
+
+
+def hesapla(maclar, sezon_sira, okunur, eski=None):
+    """maclar: futbol.db mac satırları (dict, tarih sırasıyla). sezon_sira: sezon -> sıra no. eski: docs/data/eski.json."""
     son_sezon = max(sezon_sira, key=sezon_sira.get)
     out = {"kapsamlar": [[k, ad] for k, ad, _ in KAPSAMLAR], "veri": {}}
     for anahtar, ad, f in KAPSAMLAR:
         ms = [m for m in maclar if f(m) and m["asama"] != "gecersiz"]
         out["veri"][anahtar] = kapsam(ms, sezon_sira, son_sezon, okunur, lig=anahtar != "kupa", sadece_mac=anahtar == "tum")
+    if eski:
+        em, ek = eski_maclar(eski)
+        em = [m for m in em if m["ev_gol"] is not None or m["durum"] == "Hük."]
+        # eski sezonlar 1959'dan önce sıralanır ("1937", "1956-1957")
+        es = sorted({m["sezon"] for m in em}, key=lambda s: (s[:4], s))
+        ss = {s: i - len(es) for i, s in enumerate(es)}
+        ss.update(sezon_sira)
+        ms = sorted(em, key=lambda m: (m["sezon"][:4], m["tarih"] or "")) + [m for m in maclar if KAPSAMLAR[1][2](m) and m["asama"] != "gecersiz"]
+        out["kapsamlar"].insert(2, ["eski", "1959 öncesi dahil"])
+        out["veri"]["eski"] = kapsam(ms, ss, son_sezon, okunur, lig=True)
+        out["ek_kulup"] = ek
     return out
 
 
 def mac_satir(m, okunur):
     return [m["tarih"], m["sezon"], m["lig"], m["tur"] or m["grup"] or "", m["ev_kulup"], okunur(m["ev_adi"]),
-            m["dep_kulup"], okunur(m["dep_adi"]), m["ev_gol"], m["dep_gol"], m["ev_pen"], m["dep_pen"], m["durum"], m["id"]]
+            m["dep_kulup"], okunur(m["dep_adi"]), m["ev_gol"], m["dep_gol"], m["ev_pen"], m["dep_pen"], m["durum"], m["id"]] + \
+           ([m["eski"]] if m.get("eski") else [])   # 1959 öncesi maç: sezon sayfası yolu
 
 
 def kapsam(ms, sezon_sira, son_sezon, okunur, lig, sadece_mac=False):

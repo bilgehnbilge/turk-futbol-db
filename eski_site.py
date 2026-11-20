@@ -50,6 +50,11 @@ def main():
     # Vikipedi'deki tek maç maddeleri (wiki_mac.py): RSSSF'deki maça golcü ve tarih; RSSSF'de olmayanlar "Ünlü maçlar"
     W = json.load(open(os.path.join(KOK, "wiki_mac.json"), encoding="utf-8")) if os.path.exists(os.path.join(KOK, "wiki_mac.json")) else []
     WIKI_ELLE = {("Fenerbahçe 0-7 Galatasaray", "1911-02-12"): ([], [["Celal İbrahim", None, None]] * 4 + [["Emin Bülent", None, None]] * 2 + [["İdris", None, None]])}
+    # Vikipedi kadrosu: [ev oyuncuları, konuk oyuncuları, ev teknik direktörü, konuk]; oyuncu [ad, ilk11, girdiği dk, çıktığı dk]
+    def kadro(w, ters):
+        a, b = ("2", "1") if ters else ("1", "2")
+        return [[[p[1], p[2], p[3], p[4]] for p in w["k" + a]], [[p[1], p[2], p[3], p[4]] for p in w["k" + b]],
+                w.get("t" + a) or [], w.get("t" + b) or []]
     kk = lambda a: logo.kok(re.sub(r"\s+(Istanbul|İstanbul|Ankara|İzmir|Izmir)$", "", a or ""))
     for w in W:
         if not w["tarih"] or w["tarih"] >= "1959-08" or w["eg"] is None:
@@ -73,10 +78,13 @@ def main():
             m["tarih"] = m["tarih"] or (w["tarih"] if bul[0] == "ayni" else None)
             m["goller"] = [[None, None, a, dk, None] for a, dk, _ in a1] + [[None, None, a, dk, "dep"] for a, dk, _ in a2]
             m["wiki"] = w["madde"]
+            if w.get("k1"):
+                m["kadro"] = kadro(w, bul[0] == "ters")
         else:
             d["maclar"].append({"yarisma": "diger", "sezon": w["tarih"][:4], "tur": w["madde"], "tarih": w["tarih"], "ev": w["ev"], "dep": w["dep"],
                                 "eg": w["eg"], "dg": w["dg"], "stad": w.get("stad"), "hakem": w.get("hakem"), "kaynak": "wiki", "wiki": w["madde"],
-                                "goller": [[None, None, a, dk, None] for a, dk, _ in g1] + [[None, None, a, dk, "dep"] for a, dk, _ in g2]})
+                                "goller": [[None, None, a, dk, None] for a, dk, _ in g1] + [[None, None, a, dk, "dep"] for a, dk, _ in g2],
+                                **({"kadro": kadro(w, False)} if w.get("k1") else {})})
     adlar = collections.Counter()
     for m in d["maclar"]:
         adlar[m["ev"]] += 1; adlar[m["dep"]] += 1
@@ -125,7 +133,7 @@ def main():
             else:
                 g.append([x[2], x[3], None, 2 if x[4] == "dep" else 1])
         s["maclar"].append([no[m["ev"]], no[m["dep"]], m["eg"], m["dg"], m.get("tur") or "", m.get("tarih"), m.get("durum"),
-                            m.get("not"), m.get("sehir"), m.get("stad"), m.get("hakem"), g, m.get("wiki")])
+                            m.get("not"), m.get("sehir"), m.get("stad"), m.get("hakem"), g, m.get("wiki"), m.get("kadro")])
     for t in d["tablolar"]:
         s = sezonlar[(t["yarisma"], t["sezon"])]
         satir = [[r[0], no.get(r[1], no.get(r[1] + " Istanbul")), r[1], *r[2:]] for r in t["satir"]]
@@ -151,7 +159,7 @@ def main():
                 sam = son[-1][0] if son[-1][2] > son[-1][3] else son[-1][1]
         out.append({"yarisma": y, "sezon": sz, "sampiyon": sam, **s})
     json.dump({"yarismalar": [[k, v, ACIKLAMA[k]] for k, v in YARISMA.items()], "kulupler": liste, "sezonlar": out,
-               "alanlar": ["ev", "dep", "ev_gol", "dep_gol", "tur", "tarih", "durum", "not", "sehir", "stad", "hakem", "goller", "wiki"]},
+               "alanlar": ["ev", "dep", "ev_gol", "dep_gol", "tur", "tarih", "durum", "not", "sehir", "stad", "hakem", "goller", "wiki", "kadro"]},
               open(CIKTI, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     bagli = sum(1 for k in liste if k["kulup"])
     print(f"1959 öncesi: {len(out)} yarışma-sezon, {sum(len(s['maclar']) for s in out)} maç, {len(liste)} kulüp "
