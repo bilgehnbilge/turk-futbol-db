@@ -418,11 +418,13 @@ async function bugunTarihte(kap) {
     }
     for (const r of mi?.maclar || []) {
       if (r[1]?.slice(5, 10) !== gun || r[5] == null) continue;
-      const [tff, tarih, rakip, , saha, a, y, kat, org, ayr] = r;
+      const [tff, tarih, rakip, rkod, saha, a, y, kat, org, ayr] = r;
+      const bay = k => k ? `<img class="logo-k bayrak-k" src="bayrak/${k}.svg" alt="" loading="lazy" onerror="this.remove()">` : "";
+      const tr = `<a class="bag" href="#/milli">${bay("tr")}Türkiye</a>`, rk = `${bay(mi.ulke?.[rkod]?.[2])}${esc(rakip)}`;
       const p = /^(Dünya Kupası|Avrupa Şampiyonası)$/.test(kat) ? 80 : /elemeleri|Uluslar/.test(kat) ? 40 : 18;
       const sk = saha === "E" ? `${a}-${y}` : `${y}-${a}`, skH = ayr ? `<a class="skor bagli" href="#/milli/mac/${tff}"><b>${sk}</b></a>` : `<b>${sk}</b>`;
       l.push({ tur: "milli", tarih, p: p + (a > y ? 8 : 0), etiket: `Milli Takım · ${esc(org || kat)}`,
-        mac: saha === "E" ? `<a class="bag" href="#/milli">Türkiye</a> ${skH} ${esc(rakip)}` : `${esc(rakip)} ${skH} <a class="bag" href="#/milli">Türkiye</a>` });
+        mac: saha === "E" ? `${tr} ${skH} ${rk}` : `${rk} ${skH} ${tr}` });
     }
     return l;
   };
