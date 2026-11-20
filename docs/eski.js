@@ -55,17 +55,35 @@ const golHtml = (d, m) => [1, 2].map(t => {
   const by = new Map(); for (const g of l) (by.get(g[0]) || by.set(g[0], []).get(g[0])).push(g);
   return `${esc(kAd(d, m[t - 1]))}: ${[...by].map(([ad, gs]) => `${esc(ad)} ${gs.every(g => g[1] == null) ? (gs.length > 1 ? gs.length : "") : gs.map(g => `${g[1]}'${g[2] === "pen" ? " (pen.)" : g[2] === "og" ? " (k.k.)" : ""}`).join(", ")}`.trim()).join(", ")}`;
 }).filter(Boolean).join(" · ");
-// kadro (Vikipedi): [ev oyuncuları, konuk oyuncuları, ev teknik direktörü, konuk]; oyuncu [ad, ilk11, girdiği dk, çıktığı dk]
-const kadroHtml = (d, m) => {
-  const k = m[13]; if (!k) return "";
-  const gol = new Map(); for (const g of m[11] || []) gol.set(`${g[3]}|${g[0]}`, (gol.get(`${g[3]}|${g[0]}`) || 0) + 1);
-  const taraf = t => { const l = k[t - 1], td = k[t + 1];
-    const oy = p => { const n = gol.get(`${t}|${p[0]}`) || [...gol].filter(([x]) => x.startsWith(t + "|") && p[0].includes(x.slice(2))).reduce((a, [, v]) => a + v, 0);
-      return `<li>${esc(p[0])}${n ? ` <span title="${n} gol">${"⚽".repeat(n)}</span>` : ""}${p[3] != null ? ` <small class="soluk">↓${p[3]}'</small>` : ""}${p[2] != null ? ` <small class="soluk">↑${p[2]}'</small>` : ""}</li>`; };
-    const ilk = l.filter(p => p[1]), yed = l.filter(p => !p[1]);
-    return `<div><b>${kBag(d, m[t - 1])}</b><ol class="eski-kadro-l">${ilk.map(oy).join("")}</ol>${yed.length ? `<div class="soluk kucuk">Sonradan giren</div><ul class="eski-kadro-l">${yed.map(oy).join("")}</ul>` : ""}${td.length ? `<div class="soluk kucuk">Teknik direktör: ${td.map(esc).join(", ")}</div>` : ""}</div>`; };
-  return `<details class="eski-kadro"><summary>Kadrolar</summary><div class="eski-kadro-ic">${taraf(1)}${taraf(2)}</div></details>`;
-};
+// maç sayfası (sitenin ortak maç düzeni, macCiz): kadrosu ya da golcüsü bilinen maçlar; #/eski/mac/<yarışma>/<sezon>/<sıra>
+const macVar = m => m[11]?.length || m[13];
+const macHref = (y, sz, i) => `#/eski/mac/${y}/${sz}/${i}`;
+const skorBagE = (y, sz, i, m, html) => macVar(m) ? `<a class="skor bagli" href="${macHref(y, sz, i)}" title="Maç ayrıntısı">${html}</a>` : html;
+async function eskiMacSayfa(y, sz, i) {
+  icerik.innerHTML = `<div class="yukleniyor">Maç yükleniyor…</div>`;
+  const d = await eskiAl(), s = d.sezonlar.find(x => x.yarisma === y && x.sezon === sz), m = s?.maclar[+i];
+  if (!m) { icerik.innerHTML = `<div class="bos">Bu maçın ayrıntısı yok.</div>`; return; }
+  // kulüp kimliği: sitedeki kulüp no ya da "e<sıra>" (sitede sayfası olmayan eski kulüp)
+  const kid = t => { const k = d.kulupler[m[t]]; return k?.kulup != null && KULUP.has(k.kulup) ? k.kulup : `e${m[t]}`; };
+  const k = m[13] || [[], [], [], []];
+  // goller: taraf golün yazıldığı takım (olayLehine); değişiklikler kadrodaki giriş/çıkış dakikalarından eşlenir
+  const olay = (m[11] || []).map(g => [g[3], "GOAL", g[1], null, g[0], null, g[2] === "pen" ? "PENALTY" : g[2] === "og" ? "OWN" : null, null, null]);
+  [0, 1].forEach(t => {
+    const gir = k[t].filter(p => p[2] != null).sort((a, b) => a[2] - b[2]), cik = k[t].filter(p => p[3] != null).sort((a, b) => a[3] - b[3]);
+    gir.forEach((p, j) => olay.push([t + 1, "SUBSTITUTION", p[2], null, cik[j]?.[0] || null, p[0], null, null, null]));
+  });
+  olay.sort((a, b) => (a[2] ?? 999) - (b[2] ?? 999));
+  const kaynak = m[12] ? "Vikipedi" : m[13] ? "Maçkolik" : "RSSSF";
+  macCiz({
+    tarih: m[5], saat: null, sezon: sz, lig: yarAd(d, y), tur: m[4], ev: [kid(0), kAd(d, m[0])], dep: [kid(1), kAd(d, m[1])],
+    skor: [m[2], m[3], null, null, m[6] || "MS"], stad: m[9] ? `${m[9]}` : null, sehir: m[8] || null, hakem: m[10],
+    ustHtml: `<a class="bag" href="#/eski">1959 öncesi</a> · <a class="bag" href="#/eski/${y}/${sz}">${esc(yarAd(d, y))} ${sezonAd(sz)}</a>${m[4] ? ` · ${esc(m[4])}` : ""}`,
+    kulupHref: id => typeof id === "number" ? `#/kulup/${id}` : null,
+    kulupBilgi: id => typeof id === "number" ? KULUP.get(id) : { ad: d.kulupler[+id.slice(1)]?.ad, logo: d.kulupler[+id.slice(1)]?.logo },
+    kaynak, madde: m[12], olayLehine: true,
+    kadro: [0, 1].map(t => k[t].map(p => ["", p[0], p[1], 0, null])), teknik: [k[2] || [], k[3] || []], olay,
+  });
+}
 const wikiBag = madde => `<a class="bag" href="https://tr.wikipedia.org/wiki/${encodeURIComponent(madde.replace(/ /g, "_"))}" target="_blank" rel="noopener">Vikipedi maddesi</a>`;
 const skorHtml = m => m[2] == null ? `<span class="soluk">${esc({ abd: "yarıda kaldı", "o/w": "hükmen", "w/o": "hükmen", awd: "hükmen", "n/p": "oynanmadı" }[m[6]] || m[6] || "–")}</span>` : `<b>${m[2]}-${m[3]}</b>`;
 
@@ -96,12 +114,13 @@ async function eskiSezonSayfa(y, sz) {
     ${kul.map(a => `<tr><td class="mt-ad">${lg(a)}<span>${esc(kAd(d, a))}</span></td>${kul.map(b => {
       if (a === b) return `<td class="mt-bos"></td>`;
       const m = h.get(`${a}|${b}`); if (!m) return `<td></td>`;
-      return `<td class="mt ${m[2] > m[3] ? "G" : m[2] < m[3] ? "M" : "B"}" title="${esc(kAd(d, a))} – ${esc(kAd(d, b))}">${m[2]}-${m[3]}</td>`;
+      const sk = macVar(m) ? `<a href="${macHref(y, sz, s.maclar.indexOf(m))}">${m[2]}-${m[3]}</a>` : `${m[2]}-${m[3]}`;
+      return `<td class="mt ${m[2] > m[3] ? "G" : m[2] < m[3] ? "M" : "B"}" title="${esc(kAd(d, a))} – ${esc(kAd(d, b))}">${sk}</td>`;
     }).join("")}</tr>`).join("")}</tbody></table></div>`;
     const ek = s.maclar.filter(m => m[2] == null || m[7]);
     if (ek.length) maclar += `<p class="soluk not">${ek.map(m => `${esc(kAd(d, m[0]))} – ${esc(kAd(d, m[1]))}: ${esc(m[7] || m[6] || "")}`).join("<br>")}</p>`;
     const gl = s.maclar.filter(m => m[11]?.length);
-    if (gl.length) maclar += `<div class="kart bolum"><h3 class="h3">Golcüleri bilinen maçlar</h3>${gl.map(m => `<p><b>${esc(kAd(d, m[0]))} ${m[2]}-${m[3]} ${esc(kAd(d, m[1]))}</b>${m[5] ? ` <span class="soluk">· ${tarihYaz(m[5])}</span>` : ""}<br><span class="soluk kucuk">${golHtml(d, m)}${m[12] ? ` · ${wikiBag(m[12])}` : ""}</span>${kadroHtml(d, m)}</p>`).join("")}</div>`;
+    if (gl.length) maclar += `<div class="kart bolum"><h3 class="h3">Golcüleri bilinen maçlar</h3>${gl.map(m => `<p><b>${esc(kAd(d, m[0]))} ${skorBagE(y, sz, s.maclar.indexOf(m), m, `${m[2]}-${m[3]}`)} ${esc(kAd(d, m[1]))}</b>${m[5] ? ` <span class="soluk">· ${tarihYaz(m[5])}</span>` : ""}<br><span class="soluk kucuk">${golHtml(d, m)}${m[12] ? ` · ${wikiBag(m[12])}` : ""}</span></p>`).join("")}</div>`;
   } else {
     const turlar = []; for (const m of s.maclar) { const t = m[4] || "Maçlar"; let g = turlar.at(-1); if (!g || g.tur !== t) turlar.push(g = { tur: t, ms: [] }); g.ms.push(m); }
     maclar = `<h2 class="bolum">Maçlar</h2>${turlar.map(g => `<div class="kart bolum eski-tur"><h3 class="h3">${esc(g.tur)}${g.ms[0][5] ? ` <span class="soluk">· ${tarihYaz(g.ms[0][5])}</span>` : ""}</h3>
@@ -109,8 +128,8 @@ async function eskiSezonSayfa(y, sz) {
         const ayr = [m[8], m[5] && m[5] !== g.ms[0][5] ? tarihYaz(m[5]) : "", m[9] ? `Stat: ${m[9]}` : "", m[10] ? `Hakem: ${m[10]}` : "", m[7]].filter(Boolean).map(esc);
         if (m[11]?.length) ayr.push(golHtml(d, m));
         if (m[12]) ayr.push(wikiBag(m[12]));
-        return `<tr${ayr.length ? ` class="ayr-var"` : ""}><td class="ad sag">${kBag(d, m[0])}</td><td class="s skor-h">${skorHtml(m)}</td><td class="ad">${kBag(d, m[1])}</td></tr>
-        ${ayr.length ? `<tr class="eski-ayr"><td colspan="3" class="soluk kucuk">${ayr.join(" · ")}${kadroHtml(d, m)}</td></tr>` : ""}`; }).join("")}</tbody></table></div>`).join("")}`;
+        return `<tr${ayr.length ? ` class="ayr-var"` : ""}><td class="ad sag">${kBag(d, m[0])}</td><td class="s skor-h">${skorBagE(y, sz, s.maclar.indexOf(m), m, skorHtml(m))}</td><td class="ad">${kBag(d, m[1])}</td></tr>
+        ${ayr.length ? `<tr class="eski-ayr"><td colspan="3" class="soluk kucuk">${ayr.join(" · ")}</td></tr>` : ""}`; }).join("")}</tbody></table></div>`).join("")}`;
   }
   const kral = s.kral.length ? `<div class="kart"><h2 class="h3">Gol kralı</h2>${s.kral.map(k => `<p><b>${esc(k[0])}</b> <span class="soluk">(${esc(k[1])})</span> · ${k[2]} gol</p>`).join("")}</div>` : "";
   icerik.innerHTML = `${ust(`${esc(ad)} ${sezonAd(sz)}`, `${oyn} maç · ${gol} gol${oyn ? ` · maç başı ${(gol / oyn).toFixed(2).replace(".", ",")}` : ""}`)}
@@ -121,5 +140,6 @@ async function eskiSezonSayfa(y, sz) {
   ${KAYNAK}`;
 }
 
-yollar.splice(yollar.length - 1, 0, [/^#\/eski$/, eskiSayfa], [/^#\/eski\/(\w+)\/([\d-]+)$/, (y, s) => eskiSezonSayfa(y, s)]);
+yollar.splice(yollar.length - 1, 0, [/^#\/eski$/, eskiSayfa], [/^#\/eski\/(\w+)\/([\d-]+)$/, (y, s) => eskiSezonSayfa(y, s)],
+  [/^#\/eski\/mac\/(\w+)\/([\d-]+)\/(\d+)$/, (y, s, i) => eskiMacSayfa(y, s, i)]);
 })();

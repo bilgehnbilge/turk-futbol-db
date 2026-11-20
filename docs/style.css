@@ -1071,10 +1071,3 @@ kbd { font: 600 11px/1 Inter, system-ui, sans-serif; padding: 3px 5px; border-ra
 .eski-ayr td { text-align: center; }
 .eski-tur { overflow: hidden; }
 
-/* 1959 öncesi: Vikipedi kadroları */
-.eski-kadro { margin-top: 6px; text-align: left; }
-.eski-kadro summary { cursor: pointer; color: var(--vurgu); font-size: 13px; }
-.eski-kadro-ic { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px; margin-top: 8px; color: var(--yazi); font-size: 13.5px; }
-.eski-kadro-l { margin: 4px 0 6px; padding-left: 1.4em; }
-.eski-kadro-l li { margin: 1px 0; }
-@media (max-width: 560px) { .eski-kadro-ic { grid-template-columns: 1fr; } }
