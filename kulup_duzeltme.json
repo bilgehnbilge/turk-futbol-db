@@ -25,6 +25,7 @@
   "bagla": [
     ["mackolik_arsiv:611", "tff:5011", "Sinopspor (1970): 3. Lig 1984-89 ve 2001-05 (tr.wikipedia Sinopspor); Köy Hiz. Sinopspor ayri"],
     ["mackolik_arsiv:9740", "tff:3661", "Ümraniyespor (1938): 3. Lig 1984-87 arşiv kaydı, aynı kulüp"],
+    ["mackolik_arsiv:11577", "mackolik_arsiv:13459", "Süleymaniye (1911, Sirkeci Süleymaniye; 1962-78 kaydı) ile Süleymaniye Sirkeci / Yeşil Beyaz (1980-94) aynı kulüp; 1990'da Küçükçekmecespor'la birleşip Yeşil Beyaz oldu (tr.wikipedia Yeşil_Beyaz_Futbol_SF; kullanıcı, 2026-11-20)"],
     ["mackolik_arsiv:1647", "tff:4710", "Adalet (1950, Adalet Gençlik Kulübü): bugünkü Alibeyköyspor (tr.wikipedia Alibeyköyspor; kullanıcı, 2026-11-20)"],
     ["mackolik_arsiv:647", "tff:4710", "Alibeyköy Adalet / Alibeyköy (1965-89) ile bugünkü Alibeyköyspor aynı kulüp (tr.wikipedia; kullanıcı, 2026-11-20)"],
     ["mackolik_arsiv:9699", "tff:3667", "Eskişehir Demirspor: 1967-88 arşiv kaydı ile bugünkü kulüp aynı (kullanıcı, 2026-11-20)"],
@@ -156,7 +157,10 @@
      "aciklama": "Aliağa'nın yarışmacı hakkı Göztepe'ye geçti, Aliağa kapandı; Göztepe TFF 3688 numarasıyla devam etti."}
   ],
   "donem_logo": {"_aciklama": "Kulübün bir dönem adıyla geçtiği yerlerde o adın logosu (docs/logo/<dosya>.png; kullanıcının verdiği)",
-    "tff:4710": {"Adalet": "e_adalet"}},
+    "tff:4710": {"Adalet": "e_adalet"},
+    "mackolik_arsiv:13459": {"Süleymaniye": "e_suleymaniye", "Süleymaniye Sirkeci": "e_suleymaniye", "Sirkeci Süleymaniye": "e_suleymaniye"},
+    "tff:4728": {"Ortaköy": "e_ortakoy"},
+    "tff:3613": {"Anadolu Hisarı İdman Yurdu": "e_anadoluhisari"}},
   "kulup_adi": {
     "_aciklama": "Ayni adli ayri kulupleri ayirt etmek icin elle gorunen ad",
     "tff:2035": "24 Erzincanspor",

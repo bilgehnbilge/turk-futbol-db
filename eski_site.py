@@ -29,9 +29,15 @@ ACIKLAMA = {
 ELLE = {"Güneş": None,   # İstanbul Güneş SK (1930'lar); Ankara Güneşspor değil (logosu LOGO'da)
         "Güneşspor": "ad:Ankara Güneşspor",   # 1956-57 Federasyon Kupası: Ankara Güneşspor (kullanıcı)
         "Hacettepe": None,
-        "Eskişehir Demirspor": "tff:3667"}
+        "Eskişehir Demirspor": "tff:3667",
+        "Ortaköy": "tff:4728",                       # İstanbul Ortaköyspor (kullanıcı)
+        "Anadolu Hisarı İdman Yurdu": "tff:3613",    # bugünkü Anadolu Hisarı İdman Yurdu (kullanıcı)
+        "Altıntuğ": "tff:39",                        # Kasımpaşa ile birleşti (kullanıcı)
+        "Altınordu İdman Yurdu": None}               # İstanbul'un Altınordu İdman Yurdu (1909); İzmir Altınordu değil
+# İstanbul Ligi'nde kaynakların kısa yazdığı adlar (yalnız istanbul yarışmalarında; kullanıcı)
+ISTANBUL_AD = {"Altınordu": "Altınordu İdman Yurdu", "Üsküdar": "Üsküdar İdman Ocağı"}
 # sitede kulübü olmayan eski kulüplerin logoları (docs/logo/<ad>.png; kullanıcının verdiği)
-LOGO = {"Güneş": "e_gunes", "Harp Okulu": "e_harp_okulu", "Harbiye": "e_harp_okulu", "Topkapı": "e_topkapi",
+LOGO = {"Darüşşafaka": "e_darussafaka", "Üsküdar İdman Ocağı": "e_uskudar_io", "Güneş": "e_gunes", "Harp Okulu": "e_harp_okulu", "Harbiye": "e_harp_okulu", "Topkapı": "e_topkapi",
         "Hilal (İstanbul)": "e_goztepe_hilal", "Hilâl": "e_goztepe_hilal", "Göztepe Hilal": "e_goztepe_hilal"}
 # aynı kulübün dönem adları (kulüp listesinde "ayni": öbür adın sırası). Harbiye 1936'da Ankara'ya taşınıp Harp Okulu
 # adını aldı (tr.wikipedia Harp_Okulu_SK; kullanıcı). Bu kulüplerin başka kaynaklardan verisi gelince aynı kimliğe bağlanır.
@@ -166,6 +172,13 @@ def main():
                                 "goller": [[None, None, a, dk, None] for a, dk, _ in g1] + [[None, None, a, dk, "dep"] for a, dk, _ in g2],
                                 **({"kadro": kadro(w, False)} if w.get("k1") else {})})
     mk_kulup = mackolik_ekle(d, kk)
+    for m in d["maclar"]:
+        if m["yarisma"].startswith("istanbul"):
+            m["ev"], m["dep"] = ISTANBUL_AD.get(m["ev"], m["ev"]), ISTANBUL_AD.get(m["dep"], m["dep"])
+    for t in d["tablolar"]:
+        if t["yarisma"].startswith("istanbul"):
+            for r in t["satir"]:
+                r[1] = ISTANBUL_AD.get(r[1], r[1])
     adlar = collections.Counter()
     for m in d["maclar"]:
         adlar[m["ev"]] += 1; adlar[m["dep"]] += 1
