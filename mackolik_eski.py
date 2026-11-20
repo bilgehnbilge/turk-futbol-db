@@ -14,7 +14,7 @@ Millî Küme ve profesyonel liglerde ise kadro ve goller var (2026-11-19, 1938 G
 
 Sonuç: raw/mackolik_kadro/fikstur/<sezon>/ (mackolik_kadro.py ile aynı yer ve biçim).
 """
-import os, sys, time
+import os, re, sys, time
 
 import mackolik as M
 import mackolik_kadro as K
@@ -129,3 +129,79 @@ def say():
 
 if __name__ == "__main__":
     {"indir": indir, "say": say, "kadro": kadro, "hepsi": hepsi, "tam": lambda: kadro(True)}[sys.argv[1]]()
+
+
+# ---------------------------------------------------------------- site verisi (eski_site.py çağırır)
+def yarisma_anahtar(ad):
+    """Maçkolik grup adı -> 1959 öncesi bölümünün yarışma anahtarı (None: alınmaz)."""
+    a = ad.replace("İ", "i").replace("I", "ı").lower()
+    if "milli" in a or "maarif" in a:
+        return "milli_kume"
+    for sehir, k in (("istanbul", "istanbul"), ("ankara", "ankara"), ("izmir", "izmir")):
+        if sehir in a or (sehir == "istanbul" and ("birliği" in a or "cuma" in a)):
+            return k + ("2" if re.search(r"\b2\.\s*lig", a) else "")
+    return None
+
+
+def _tarih(gun, etiket, haftalar):
+    """'24/09' + sezon -> '1958-09-24'. Yıl hafta tarihlerinden (yoksa sezon etiketinden: Temmuz ve sonrası ilk yıl)."""
+    m = re.match(r"(\d{1,2})/(\d{1,2})", gun or "")
+    if not m:
+        return None
+    g, a = int(m.group(1)), int(m.group(2))
+    yillar = {int(y) for y in re.findall(r"(\d{4})", etiket)}
+    for h in haftalar:
+        for t in h[1:3]:
+            x = re.match(r"(\d{1,2})\.(\d{1,2})\.(\d{4})", str(t))
+            if x and int(x.group(2)) == a:
+                return f"{x.group(3)}-{a:02d}-{g:02d}"
+    if len(yillar) == 1:
+        return f"{min(yillar)}-{a:02d}-{g:02d}"
+    return f"{min(yillar) if a >= 7 else max(yillar)}-{a:02d}-{g:02d}"
+
+
+def site_maclar():
+    """İnmiş maç listeleri, kadrolar ve olaylar -> [{yarisma, sezon, grup, hafta, tarih, ev, dep, mk_ev, mk_dep, eg, dg,
+    goller: [[ad, dk, tip ('pen'/'og'), taraf (golün yazıldığı takım)]], kadro: [ev, konuk, [], []] (oyuncu [ad, ilk11, girdi, çıktı])}]."""
+    import json
+    out = []
+    for e, gr in sezonlar():
+        klasor = os.path.join(K.FIKSTUR, e)
+        for s, ad in gr:
+            y = yarisma_anahtar(ad)
+            hyol = os.path.join(klasor, f"g{s}_haftalar.txt")
+            if not y or not os.path.exists(hyol):
+                continue
+            haftalar = M.js_dizi(open(hyol, encoding="utf-8").read())
+            gorulen = set()
+            for hf in haftalar:
+                yol = os.path.join(klasor, f"g{s}_h{hf[0]}.txt")
+                if not os.path.exists(yol):
+                    continue
+                for x in M.js_dizi(open(yol, encoding="utf-8").read()):
+                    if x[0] in gorulen or x[8] not in K.BITTI:
+                        continue
+                    gorulen.add(x[0])
+                    m = {"yarisma": y, "sezon": e, "grup": ad, "hafta": hf[0], "tarih": _tarih(x[1], e, haftalar),
+                         "ev": x[4], "dep": x[6], "mk_ev": str(x[3]), "mk_dep": str(x[5]), "eg": int(x[9]), "dg": int(x[10]), "mk": x[0]}
+                    kp = K.mac_yol(x[0])
+                    d = json.load(open(kp, encoding="utf-8")) if os.path.exists(kp) else {}
+                    if d.get("h") or d.get("a"):
+                        giren, cikan, gol = {}, {}, []
+                        for ev_ in d.get("e") or []:
+                            taraf, dk, pid, a_, tur, ek = ev_[0], ev_[1], ev_[2], ev_[3], ev_[4], (ev_[5] if len(ev_) > 5 else None) or {}
+                            if tur == 1:
+                                gol.append([a_, dk, {2: "pen", 3: "og"}.get(ek.get("d")), taraf])
+                            elif tur == 4 and ek.get("d"):
+                                giren[pid] = dk; cikan[ek["d"]] = dk
+                        kad = []
+                        for l in (d.get("h") or [], d.get("a") or []):
+                            kad.append([[p[1], 1 if j < 11 and p[0] not in giren else 0, giren.get(p[0]), cikan.get(p[0])]
+                                        for j, p in enumerate(l)])
+                        m["kadro"] = kad + [[], []]
+                        m["goller"] = gol
+                    elif d.get("e"):
+                        m["goller"] = [[ev_[3], ev_[1], {2: "pen", 3: "og"}.get((ev_[5] if len(ev_) > 5 else {}).get("d")), ev_[0]]
+                                       for ev_ in d["e"] if ev_[4] == 1]
+                    out.append(m)
+    return out

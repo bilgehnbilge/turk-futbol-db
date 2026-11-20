@@ -11,13 +11,18 @@ KOK = os.path.dirname(os.path.abspath(__file__))
 HAM = os.path.join(KOK, "raw", "rsssf_eski", "eski.json")
 CIKTI = os.path.join(KOK, "docs", "data", "eski.json")
 YARISMA = {"milli_kume": "Millî Küme", "sampiyona": "Türkiye Futbol Şampiyonası", "basbakanlik": "Başbakanlık Kupası",
-           "federasyon": "Federasyon Kupası", "istanbul": "İstanbul Ligi", "diger": "Ünlü maçlar"}
+           "federasyon": "Federasyon Kupası", "istanbul": "İstanbul Ligi", "ankara": "Ankara Ligi", "izmir": "İzmir Ligi",
+           "istanbul2": "İstanbul 2. Ligi", "ankara2": "Ankara 2. Ligi", "diger": "Ünlü maçlar"}
 ACIKLAMA = {
-    "milli_kume": "İstanbul, Ankara ve İzmir liglerinin en iyi takımlarıyla oynanan ilk ulusal lig (1937-1951).",
+    "milli_kume": "İstanbul, Ankara ve İzmir liglerinin en iyi takımlarıyla oynanan lig (1937-1951).",
     "sampiyona": "Bölge şampiyonları arasında oynanan Türkiye şampiyonluğu turnuvası (1924-1951).",
     "basbakanlik": "Millî Küme ve Türkiye Şampiyonası kazananları arasında tek maç (1944-1950).",
     "federasyon": "Avrupa Kupası'na katılacak kulübü belirlemek için düzenlenen turnuva (1956-1958); Millî Lig'in öncüsü.",
-    "istanbul": "İstanbul Futbol Ligi; RSSSF'de yalnız 1924'ün eleme turnuvası maç maç var.",
+    "istanbul": "İstanbul Futbol Birliği Ligi (1904-), Cuma Ligi, İstanbul Ligi ve 1952'den Profesyonel Lig; Maçkolik arşivi (1924: RSSSF).",
+    "ankara": "Ankara Ligi; 1955'ten Ankara Profesyonel Ligi (Maçkolik arşivi).",
+    "izmir": "İzmir Ligi; 1955'ten İzmir Profesyonel Ligi (Maçkolik arşivi).",
+    "istanbul2": "İstanbul Profesyonel 2. Ligi (Maçkolik arşivi).",
+    "ankara2": "Ankara Profesyonel 2. Ligi (Maçkolik arşivi).",
     "diger": "Vikipedi'de ayrı maddesi olan, yukarıdaki yarışmaların dışındaki maçlar (İstanbul Ligi derbileri, Gazi Büstü).",
 }
 # ad -> sitedeki kulüp no (None: bağlama). Otomatik eşlemenin üstüne yazılır.
@@ -30,6 +35,77 @@ LOGO = {"Güneş": "e_gunes", "Harp Okulu": "e_harp_okulu", "Harbiye": "e_harp_o
 # aynı kulübün dönem adları (kulüp listesinde "ayni": öbür adın sırası). Harbiye 1936'da Ankara'ya taşınıp Harp Okulu
 # adını aldı (tr.wikipedia Harp_Okulu_SK; kullanıcı). Bu kulüplerin başka kaynaklardan verisi gelince aynı kimliğe bağlanır.
 AYNI = {"Harbiye": "Harp Okulu", "Harp Okulu": "Harbiye"}   # "tff:<no>": o TFF numaralı kulüp (1959 öncesi Demirspor = bugünkü kulüp, kullanıcı)
+
+
+def mackolik_ekle(d, kk):
+    """Maçkolik arşivinin 1959 öncesi lig maçları (mackolik_eski.site_maclar) -> d["maclar"], d["tablolar"], d["krallar"].
+    Millî Küme maçları RSSSF'deki maça (yıl, takımlar, skor) tarih, gol ve kadro olarak eklenir; RSSSF'nin İstanbul Ligi sezonu
+    Maçkolik'te varsa RSSSF'ninki atılır. Döner: {takım adı: sitedeki kulüp no} (Maçkolik arşiv takım numarasıyla)."""
+    import sqlite3
+    try:
+        import mackolik_eski
+        ms = mackolik_eski.site_maclar()
+    except Exception as e:
+        print("  Maçkolik 1959 öncesi verisi okunamadı:", e)
+        return {}
+    db = os.path.join(KOK, "futbol.db")
+    kim = dict(sqlite3.connect(db).execute("SELECT kaynak_id, kulup_id FROM kulup_kimlik WHERE kaynak='mackolik_arsiv'")) if os.path.exists(db) else {}
+    mk_kulup = {}
+    for m in ms:
+        for a, k in ((m["ev"], m["mk_ev"]), (m["dep"], m["mk_dep"])):
+            if k in kim:
+                mk_kulup.setdefault(a, kim[k])
+    # RSSSF İstanbul Ligi sezonu Maçkolik'te de varsa çıkar
+    mk_yil = {y for m in ms if m["yarisma"] == "istanbul" for y in re.findall(r"\d{4}", m["sezon"])}
+    d["maclar"] = [m for m in d["maclar"] if not (m["yarisma"] == "istanbul" and m.get("kaynak") != "wiki" and m["sezon"][:4] in mk_yil)]
+    d["tablolar"] = [t for t in d["tablolar"] if not (t["yarisma"] == "istanbul" and t["sezon"][:4] in mk_yil)]
+    gruplar = collections.defaultdict(list)
+    eklenen = birlesen = 0
+    for m in ms:
+        g_hazir = [[a, dk, tip, t] for a, dk, tip, t in m.get("goller") or []]
+        if m["yarisma"] == "milli_kume":
+            yil = set(re.findall(r"\d{4}", m["sezon"]))
+            for r in d["maclar"]:
+                if r["yarisma"] == "milli_kume" and r["sezon"][:4] in yil and (kk(r["ev"]), kk(r["dep"]), r["eg"], r["dg"]) == (kk(m["ev"]), kk(m["dep"]), m["eg"], m["dg"]):
+                    r["tarih"] = r.get("tarih") or m["tarih"]
+                    if g_hazir and not r.get("goller"):
+                        r["g_hazir"] = g_hazir
+                    if m.get("kadro") and not r.get("kadro"):
+                        r["kadro"] = m["kadro"]
+                    birlesen += 1
+                    break
+            continue
+        r = {"yarisma": m["yarisma"], "sezon": m["sezon"], "tur": f"{m['hafta']}. hafta", "tarih": m["tarih"], "ev": m["ev"], "dep": m["dep"],
+             "eg": m["eg"], "dg": m["dg"], "kaynak": "mackolik"}
+        if g_hazir:
+            r["g_hazir"] = g_hazir
+        if m.get("kadro"):
+            r["kadro"] = m["kadro"]
+        d["maclar"].append(r); eklenen += 1
+        gruplar[(m["yarisma"], m["sezon"])].append(r)
+    # puan durumu (maç sonuçlarından; galibiyet 2, beraberlik 1) ve gol kralı (maçların çoğunun golcüsü biliniyorsa)
+    for (y, sz), l in gruplar.items():
+        t = collections.defaultdict(lambda: [0] * 7)
+        for r in l:
+            for a, b, x, z in ((r["ev"], r["dep"], r["eg"], r["dg"]), (r["dep"], r["ev"], r["dg"], r["eg"])):
+                v = t[a]; v[0] += 1; v[1] += x > z; v[2] += x == z; v[3] += x < z; v[4] += x; v[5] += z; v[6] += 2 * (x > z) + (x == z)
+        sira = sorted(t.items(), key=lambda kv: (-kv[1][6], -(kv[1][4] - kv[1][5]), -kv[1][4]))
+        tam = {v[0] for _, v in sira} == {2 * (len(sira) - 1)}   # çift devreli lig tamam mı (arşivde eksik maç yoksa)
+        d["tablolar"].append({"yarisma": y, "sezon": sz, "tur": "", "hesap": 1, **({} if tam else {"eksik": 1}),
+                              "satir": [[i + 1, a, *v] for i, (a, v) in enumerate(sira)]})
+        golcu = [r for r in l if r.get("g_hazir")]
+        if len(golcu) >= 0.8 * len(l):
+            say = collections.Counter()
+            for r in golcu:
+                for a, dk, tip, taraf in r["g_hazir"]:
+                    if tip != "og":
+                        say[(a, r["ev"] if taraf == 1 else r["dep"])] += 1
+            if say:
+                en = max(say.values())
+                d["krallar"] += [{"yarisma": y, "sezon": sz, "ad": a, "kulup": k, "gol": n} for (a, k), n in say.items() if n == en]
+    print(f"  Maçkolik 1959 öncesi: {eklenen} lig maçı eklendi, {birlesen} Millî Küme maçına tarih/gol/kadro; "
+          f"{sum(1 for m in ms if m.get('kadro'))} maçta kadro")
+    return mk_kulup
 
 
 def main():
@@ -85,6 +161,7 @@ def main():
                                 "eg": w["eg"], "dg": w["dg"], "stad": w.get("stad"), "hakem": w.get("hakem"), "kaynak": "wiki", "wiki": w["madde"],
                                 "goller": [[None, None, a, dk, None] for a, dk, _ in g1] + [[None, None, a, dk, "dep"] for a, dk, _ in g2],
                                 **({"kadro": kadro(w, False)} if w.get("k1") else {})})
+    mk_kulup = mackolik_ekle(d, kk)
     adlar = collections.Counter()
     for m in d["maclar"]:
         adlar[m["ev"]] += 1; adlar[m["dep"]] += 1
@@ -94,6 +171,8 @@ def main():
         if a in ELLE or sade in ELLE:
             k = ELLE.get(a, ELLE.get(sade))
             k = tff_no.get(k) if isinstance(k, str) else k
+        elif a in mk_kulup:   # Maçkolik arşiv takım numarası sitedeki kulübün kimliği
+            k = mk_kulup[a]
         else:
             c = idx.get(logo.kok(sade), set())
             k = next(iter(c)) if len(c) == 1 else None
@@ -125,13 +204,14 @@ def main():
         liste[no[m["ev"]]]["mac"] += 1; liste[no[m["dep"]]]["mac"] += 1
         # gol: [ad, dakika, tip, taraf (1 ev / 2 konuk; RSSSF'de ara skordan)]
         g, onceki = [], (0, 0)
-        for x in m.get("goller", []):
+        for x in ([] if "g_hazir" in m else m.get("goller", [])):
             if x[0] is not None:   # RSSSF: "2-1 Ad 52'" ara skor
                 taraf = 1 if x[0] > onceki[0] else 2
                 onceki = (x[0], x[1])
                 g.append([x[2], x[3], x[4], taraf])
             else:
                 g.append([x[2], x[3], None, 2 if x[4] == "dep" else 1])
+        g = m.get("g_hazir", g)
         s["maclar"].append([no[m["ev"]], no[m["dep"]], m["eg"], m["dg"], m.get("tur") or "", m.get("tarih"), m.get("durum"),
                             m.get("not"), m.get("sehir"), m.get("stad"), m.get("hakem"), g, m.get("wiki"), m.get("kadro")])
     for t in d["tablolar"]:
@@ -139,7 +219,7 @@ def main():
         satir = [[r[0], no.get(r[1], no.get(r[1] + " Istanbul")), r[1], *r[2:]] for r in t["satir"]]
         if s["tablo"] is None:
             s["tablo"] = []
-        s["tablo"].append({"tur": t.get("tur") or "", "satir": satir})
+        s["tablo"].append({"tur": t.get("tur") or "", "satir": satir, **{k: 1 for k in ("hesap", "eksik") if t.get(k)}})
     for k in d["krallar"]:
         sezonlar[(k["yarisma"], k["sezon"])]["kral"].append([k["ad"], k["kulup"], k["gol"]])
     # şampiyon: lig tablosunun ya da final grubunun birincisi; yoksa finalin (son maçın) kazananı
@@ -150,7 +230,7 @@ def main():
         if y == "diger":
             out.append({"yarisma": y, "sezon": sz, "sampiyon": None, **s}); continue
         sam = None
-        tl = [t for t in (s["tablo"] or []) if t["tur"] in ("", "Final grubu", "Lig")]
+        tl = [t for t in (s["tablo"] or []) if t["tur"] in ("", "Final grubu", "Lig") and not t.get("eksik")]   # eksik hesaplanmış tablo: şampiyon yok
         if tl and tl[-1]["satir"] and tl[-1]["satir"][0][1] is not None:
             sam = tl[-1]["satir"][0][1]
         else:

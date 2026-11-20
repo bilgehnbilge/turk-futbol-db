@@ -5,7 +5,8 @@
 (() => {
 let ESKI = null;
 const eskiAl = async () => ESKI ||= await al("data/eski.json");
-const YAR_RENK = { milli_kume: "var(--vurgu)", sampiyona: "var(--g)", basbakanlik: "var(--b)", federasyon: "var(--m)", istanbul: "var(--soluk)", diger: "var(--yazi2)" };
+const YAR_RENK = { milli_kume: "var(--vurgu)", sampiyona: "var(--g)", basbakanlik: "var(--b)", federasyon: "var(--m)", istanbul: "var(--s1)", ankara: "var(--s2)", izmir: "var(--s3)",
+  istanbul2: "var(--soluk)", ankara2: "var(--soluk)", diger: "var(--yazi2)" };
 
 // eski kulüp: sitedeki kulübe bağlıysa onun sayfasına (logosuyla), değilse düz ad
 const kAd = (d, i) => { const k = d.kulupler[i]; return k ? k.ad : "?"; };
@@ -18,7 +19,7 @@ const yarAd = (d, y) => (d.yarismalar.find(x => x[0] === y) || [, y])[1];
 const sezonAd = s => s.length === 4 ? s : s.replace("-", "–");
 const ust = (baslik, alt) => `<p class="soluk ust-bag"><a class="bag" href="#/sezonlar">Sezonlar</a> · <a class="bag" href="#/eski">1959 öncesi</a></p>
   <h1>${baslik}</h1>${alt ? `<p class="soluk">${alt}</p>` : ""}`;
-const KAYNAK = `<p class="soluk not bolum">Kaynak: <a class="bag" href="https://www.rsssf.org/tablest/turkhist.html" target="_blank" rel="noopener">RSSSF</a> (Baki Demirkiran); ayrı maddesi olan maçların golcüleri <a class="bag" href="https://tr.wikipedia.org/wiki/Kategori:T%C3%BCrkiye_futbol_kul%C3%BCplerinin_ma%C3%A7lar%C4%B1" target="_blank" rel="noopener">Vikipedi</a>'den. Bu maçlar 1959'da başlayan profesyonel ligin istatistiklerine, rekorlara ve kulüp sayfalarındaki sayılara katılmaz. Gol atanlar yalnız Başbakanlık Kupası, bazı finaller ve Vikipedi'de ayrı maddesi olan maçlarda var.</p>`;
+const KAYNAK = `<p class="soluk not bolum">Kaynak: <a class="bag" href="https://www.rsssf.org/tablest/turkhist.html" target="_blank" rel="noopener">RSSSF</a> (Baki Demirkiran); ayrı maddesi olan maçların golcüleri <a class="bag" href="https://tr.wikipedia.org/wiki/Kategori:T%C3%BCrkiye_futbol_kul%C3%BCplerinin_ma%C3%A7lar%C4%B1" target="_blank" rel="noopener">Vikipedi</a>'den. İstanbul, Ankara ve İzmir lig maçları (tarih, kadro, gol) <a class="bag" href="https://arsiv.mackolik.com" target="_blank" rel="noopener">Maçkolik arşivinden</a>. Bu maçlar 1959'da başlayan profesyonel ligin istatistiklerine ve kulüp sayfalarındaki sayılara katılmaz; Rekorlar'ın "1959 öncesi dahil" sekmesinde yer alır. Gol atanlar Başbakanlık Kupası, bazı finaller, Vikipedi'de ayrı maddesi olan maçlar ve Maçkolik'te kadrosu olan lig maçlarında var.</p>`;
 
 async function eskiSayfa() {
   document.title = "1959 öncesi · Türk Futbol Arşivi";
@@ -28,7 +29,7 @@ async function eskiSayfa() {
   for (const s of d.sezonlar) if (s.sampiyon != null && (s.yarisma === "milli_kume" || s.yarisma === "sampiyona")) say.set(s.sampiyon, (say.get(s.sampiyon) || 0) + 1);
   const top = [...say].sort((a, b) => b[1] - a[1]);
   const mac = d.sezonlar.reduce((n, s) => n + s.maclar.length, 0);
-  icerik.innerHTML = `${ust("1959 öncesi", `Millî Lig'den önceki ulusal yarışmalar · ${yillar[0]} – ${sezonAd(yillar.at(-1))} · ${sayiYaz(mac)} maç`)}
+  icerik.innerHTML = `${ust("1959 öncesi", `Millî Lig'den önceki yarışmalar ve şehir ligleri · ${yillar[0]} – ${sezonAd(yillar.at(-1))} · ${sayiYaz(mac)} maç`)}
   <div class="izgara iki bolum">${d.yarismalar.filter(([k]) => d.sezonlar.some(s => s.yarisma === k)).map(([k, ad, ac]) => {
     const l = d.sezonlar.filter(s => s.yarisma === k);
     return `<div class="kart"><h2 class="h3" style="box-shadow:inset 3px 0 0 ${YAR_RENK[k]};padding-left:10px">${esc(ad)}</h2>
@@ -115,7 +116,7 @@ async function eskiSezonSayfa(y, sz) {
   icerik.innerHTML = `${ust(`${esc(ad)} ${sezonAd(sz)}`, `${oyn} maç · ${gol} gol${oyn ? ` · maç başı ${(gol / oyn).toFixed(2).replace(".", ",")}` : ""}`)}
   ${gez}
   ${s.sampiyon != null || kral ? `<div class="izgara iki bolum">${s.sampiyon != null ? `<div class="kart"><h2 class="h3">Şampiyon</h2><p>${kBag(d, s.sampiyon)}</p></div>` : ""}${kral}</div>` : ""}
-  ${tablo ? `<h2 class="bolum">Puan durumu</h2><p class="soluk not">Kaynaktaki gibi; o yıllarda galibiyet 3, beraberlik 2, mağlubiyet 1 puandı.</p>${tablo}` : ""}
+  ${tablo ? `<h2 class="bolum">Puan durumu</h2><p class="soluk not">${s.tablo[0].hesap ? `Maçkolik arşivindeki maç sonuçlarından hesaplandı (galibiyet 2, beraberlik 1 puan; sıralama dönemin 3-2-1 sistemiyle aynı çıkar).${s.tablo[0].eksik ? " Arşivde bu sezonun bazı maçları eksik; tablo tamam değil, şampiyon gösterilmiyor." : ""}` : "Kaynaktaki gibi; o yıllarda galibiyet 3, beraberlik 2, mağlubiyet 1 puandı."}</p>${tablo}` : ""}
   ${maclar}
   ${KAYNAK}`;
 }
