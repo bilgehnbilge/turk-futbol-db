@@ -103,8 +103,10 @@ function kisaAd(id, resmi) {
   const r = adTemiz(resmi);
   return k && norm(r).includes(norm(k.ad)) ? k.ad : r;
 }
-const logoImg = (id, cls = "logo-k") => { const l = KULUP.get(id)?.logo; return l ? `<img class="${cls}" src="logo/${l}.png" alt="" loading="lazy" onerror="this.remove()">` : ""; };
-const kulupBag = (id, ad) => id != null && KULUP.has(id) ? `<a class="bag" href="#/${K}kulup/${id}">${logoImg(id)}${esc(ad ?? kulupAd(id))}</a>` : esc(ad ?? "?");
+// logo: kulübün o maçtaki (dönem) adının ayrı logosu varsa o (adlogo, ör. Alibeyköyspor'un "Adalet" adı), yoksa kulüp logosu
+const kulupLogo = (id, ad) => { const k = KULUP.get(id); return (ad != null && k?.adlogo?.[ad]) || k?.logo; };
+const logoImg = (id, cls = "logo-k", ad) => { const l = kulupLogo(id, ad); return l ? `<img class="${cls}" src="logo/${l}.png" alt="" loading="lazy" onerror="this.remove()">` : ""; };
+const kulupBag = (id, ad) => id != null && KULUP.has(id) ? `<a class="bag" href="#/${K}kulup/${id}">${logoImg(id, "logo-k", ad)}${esc(ad ?? kulupAd(id))}</a>` : esc(ad ?? "?");
 function sonuc(a, y) { if (a == null || y == null) return "N"; return a > y ? "G" : a < y ? "M" : "B"; }
 function skorYaz(a, y, pa, py, durum) {
   if (a == null && durum === "Çifte H") return `0-3 / 3-0 <small class="soluk" title="İki takım da hükmen yenik">(çifte H)</small>`;
@@ -719,9 +721,9 @@ function tabelaSatir(m, sonucGoster = false) {
   return `<div class="tabela${sonucGoster ? " sonuclu" : ""}" title="${esc(m.lig || YAR_AD[m.yar])}${m.tur ? " · " + esc(m.tur) : ""}">
     ${sonucGoster ? `<span class="son ${m.s}">${m.s === "N" ? "–" : m.s}</span>` : ""}
     <span class="tarih">${tarihYaz(m.tarih)}</span>
-    <span class="ev">${logoImg(evId)}${ad(evId, evAd)}</span>
+    <span class="ev">${logoImg(evId, "logo-k", evAd)}${ad(evId, evAd)}</span>
     ${m.eh ? `<a class="skor bagli" href="${m.eh}" title="Maç ayrıntısı">${skor}${ek}</a>` : m.id != null && detayVar(m.id) ? `<a class="skor bagli" href="#/${K}mac/${m.id}" title="Maç ayrıntısı">${skor}${ek}</a>` : `<b class="skor">${skor}${ek}</b>`}
-    <span class="dep">${ad(depId, depAd)}${logoImg(depId)}</span></div>`;
+    <span class="dep">${ad(depId, depAd)}${logoImg(depId, "logo-k", depAd)}</span></div>`;
 }
 function rekorKart(baslik, l) {
   const m = l?.[0];
@@ -985,7 +987,7 @@ function macCiz(d) {
   const ad = ([kid, a]) => href(kid) ? `<a href="${href(kid)}">${esc(a)}</a>` : esc(a);
   const buyuk = ([kid, a], i) => { const k = d.kulupBilgi ? d.kulupBilgi(kid) : KULUP.get(kid), tema = takimTema(k);
     return `<a class="taraf ${i ? "sag" : ""}" ${href(kid) ? `href="${href(kid)}"` : ""} style="--tr:${tema ? tema["--tv-acik"] : "var(--yazi)"};--trk:${tema ? tema["--tv-koyu"] : "var(--yazi)"}">
-      <span class="buyuk-logo">${k?.logo ? `<img src="logo/${k.logo}.png" alt="">` : d.bayrak?.[i] ? d.bayrak[i] : esc(a.slice(0, 2).toLocaleUpperCase("tr"))}</span><span class="ad" title="${esc(a)}">${esc(d.kulupBilgi ? a : kisaAd(kid, a))}</span></a>`; };
+      <span class="buyuk-logo">${(k?.adlogo?.[a] || k?.logo) ? `<img src="logo/${k?.adlogo?.[a] || k.logo}.png" alt="">` : d.bayrak?.[i] ? d.bayrak[i] : esc(a.slice(0, 2).toLocaleUpperCase("tr"))}</span><span class="ad" title="${esc(a)}">${esc(d.kulupBilgi ? a : kisaAd(kid, a))}</span></a>`; };
   const dakika = o => o[2] == null ? "" : `${o[2]}${o[3] ? "+" + o[3] : ""}'`;
   // oyuncuya göre olay simgeleri (kadroda göstermek için)
   const simge = new Map(), ekle = (no, s) => no && simge.set(no, (simge.get(no) || "") + s);

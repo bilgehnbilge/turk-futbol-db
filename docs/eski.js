@@ -108,7 +108,7 @@ async function eskiSezonSayfa(y, sz) {
     const kul = sira.length ? sira : [...new Set(s.maclar.flatMap(m => [m[0], m[1]]))];
     const h = new Map(); for (const m of s.maclar) if (m[2] != null) h.set(`${m[0]}|${m[1]}`, m);
     const kis = i => { const a = kAd(d, i); return a.length > 3 ? a.slice(0, 3).toLocaleUpperCase("tr") : a.toLocaleUpperCase("tr"); };
-    const lg = i => { const k = d.kulupler[i]; return k?.kulup != null && KULUP.get(k.kulup)?.logo ? logoImg(k.kulup) : eLogo(k); };
+    const lg = i => { const k = d.kulupler[i]; return k?.kulup != null && kulupLogo(k.kulup, k.ad) ? logoImg(k.kulup, "logo-k", k.ad) : eLogo(k); };
     maclar = `<h2 class="bolum">Sonuçlar</h2><p class="soluk aciklama">Satır ev sahibi, sütun konuk. Renk ev sahibinin sonucu: yeşil galibiyet, sarı beraberlik, kırmızı mağlubiyet. Maç tarihleri kaynakta yok.</p>
     <div class="tablo-kap matris-sonuc-kap"><table class="matris-sonuc"><thead><tr><th class="mt-kose">Ev \\ Konuk</th>${kul.map(k => `<th class="mt-bas" title="${esc(kAd(d, k))}">${lg(k) || `<span>${esc(kis(k))}</span>`}</th>`).join("")}</tr></thead><tbody>
     ${kul.map(a => `<tr><td class="mt-ad">${lg(a)}<span>${esc(kAd(d, a))}</span></td>${kul.map(b => {

@@ -380,6 +380,10 @@ def main():
             kulup_mac[k].append([m["id"], m["tarih"], m["sezon"], YAR[m["yarisma"]], m["lig"], m["kademe"], tur(m), asama(m),
                                  "E" if s == "ev" else "D", okunur(m[s + "_adi"]), m[r + "_kulup"], okunur(m[r + "_adi"]),
                                  *gol(m, s, r), m[s + "_pen"], m[r + "_pen"], m["durum"], m["notlar"]])
+    # dönem adına göre logo (kulup_duzeltme.json donem_logo: {"tff:<no>": {ad: logo}}) -> kulupler.json "adlogo"
+    dz_ = json.load(open(os.path.join(KOK, "kulup_duzeltme.json"), encoding="utf-8"))
+    kim_ = {f"{kn}:{ki}": kid for kid, kn, ki in c.execute("SELECT kulup_id, kaynak, kaynak_id FROM kulup_kimlik")}
+    adlogo = {kim_[k]: v for k, v in dz_.get("donem_logo", {}).items() if k in kim_}
     liste = []
     for r in c.execute("SELECT id, ad FROM kulup ORDER BY id"):
         k, ad = r
@@ -390,7 +394,8 @@ def main():
         en_ust = min((x[5] for x in ms if x[3] == "L" and x[5]), default=None)
         liste.append({"id": k, "ad": gorunen(ad, adlar.get(k, [])), "adlar": adlar.get(k, []), "ilk": sezonlar[0], "son": sezonlar[-1], "mac": len(ms),
                       "yerli": k in yerli, "enust": en_ust, "tff": tff.get(k, []), "ardil": ardil.get(k, []),
-                      **({"logo": logo[k]} if k in logo else {}), **({"ulke": ulke[k]} if k in ulke and k not in yerli else {}),
+                      **({"logo": logo[k]} if k in logo else {}), **({"adlogo": adlogo[k]} if k in adlogo else {}),
+                      **({"ulke": ulke[k]} if k in ulke and k not in yerli else {}),
                       **({"renk": [x for x in renk[str(logo[k])] if x]} if k in logo and str(logo[k]) in renk else {})})
         yaz(os.path.join(CIKTI, "kulup", f"{k}.json"), {
             "alanlar": ["id", "tarih", "sezon", "yarisma", "lig", "kademe", "grup_tur", "playoff", "saha", "takim", "rakip_id",
