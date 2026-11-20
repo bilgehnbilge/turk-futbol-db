@@ -35,7 +35,7 @@ async function eskiSayfa() {
     return `<div class="kart"><h2 class="h3" style="box-shadow:inset 3px 0 0 ${YAR_RENK[k]};padding-left:10px">${esc(ad)}</h2>
       <p class="soluk">${esc(ac)}</p>
       ${k === "diger" ? `<table class="tablo"><thead><tr><th>Tarih</th><th class="ad">Maç</th></tr></thead><tbody>
-      ${l.flatMap(s => s.maclar.map(m => `<tr><td><a class="bag" href="#/eski/${k}/${s.sezon}">${tarihYaz(m[5])}</a></td><td class="ad">${kBag(d, m[0])} <b>${m[2]}-${m[3]}</b> ${kBag(d, m[1])}</td></tr>`)).join("")}
+      ${l.flatMap(s => s.maclar.map((m, i) => `<tr><td><a class="bag" href="#/eski/${k}/${s.sezon}">${tarihYaz(m[5])}</a></td><td class="ad">${kBag(d, m[0])} ${skorBagE(k, s.sezon, i, m, `<b>${m[2]}-${m[3]}</b>`)} ${kBag(d, m[1])}</td></tr>`)).join("")}
       </tbody></table></div>` : `<table class="tablo"><thead><tr><th>Sezon</th><th class="ad">Şampiyon</th><th class="s">Maç</th></tr></thead><tbody>
       ${l.map(s => `<tr><td><a class="bag" href="#/eski/${k}/${s.sezon}">${sezonAd(s.sezon)}</a></td><td class="ad">${s.sampiyon != null ? kBag(d, s.sampiyon) : "<span class='soluk'>—</span>"}</td><td class="s">${s.maclar.length}</td></tr>`).join("")}
       </tbody></table></div>`}`;
