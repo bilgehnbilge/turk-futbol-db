@@ -93,6 +93,27 @@ def mackolik_ekle(d, kk):
             r["kadro"] = m["kadro"]
         d["maclar"].append(r); eklenen += 1
         gruplar[(m["yarisma"], m["sezon"])].append(r)
+    # Vikipedi'deki ünlü maç Maçkolik'in lig maçıysa (aynı gün, aynı iki takım): golcü/kadro/madde lig maçına, ünlü maç
+    # listede kalır ama "kopya" işaretlenir (kulüp sayılarında ve rekorlarda iki kez sayılmaz)
+    lig_gun = collections.defaultdict(list)
+    for r in d["maclar"]:
+        if r.get("kaynak") == "mackolik" and r.get("tarih"):
+            lig_gun[r["tarih"]].append(r)
+    for w in d["maclar"]:
+        if w["yarisma"] != "diger" or not w.get("tarih"):
+            continue
+        for r in lig_gun.get(w["tarih"], []):
+            if {kk(r["ev"]), kk(r["dep"])} == {kk(w["ev"]), kk(w["dep"])}:
+                ters = kk(r["ev"]) != kk(w["ev"])
+                if w.get("goller") and not r.get("g_hazir"):
+                    r["g_hazir"] = [[x[2], x[3], x[4] if x[4] in ("pen", "og") else None, (2 if x[4] == "dep" else 1) if not ters else (1 if x[4] == "dep" else 2)]
+                                    for x in w["goller"]]
+                if w.get("kadro") and not r.get("kadro"):
+                    k = w["kadro"]
+                    r["kadro"] = [k[1], k[0], k[3], k[2]] if ters else k
+                r["wiki"] = w.get("wiki")
+                w["kopya"] = 1
+                break
     # puan durumu (maç sonuçlarından; galibiyet 2, beraberlik 1) ve gol kralı (maçların çoğunun golcüsü biliniyorsa)
     for (y, sz), l in gruplar.items():
         t = collections.defaultdict(lambda: [0] * 7)
@@ -230,7 +251,7 @@ def main():
                 g.append([x[2], x[3], None, 2 if x[4] == "dep" else 1])
         g = m.get("g_hazir", g)
         s["maclar"].append([no[m["ev"]], no[m["dep"]], m["eg"], m["dg"], m.get("tur") or "", m.get("tarih"), m.get("durum"),
-                            m.get("not"), m.get("sehir"), m.get("stad"), m.get("hakem"), g, m.get("wiki"), m.get("kadro")])
+                            m.get("not"), m.get("sehir"), m.get("stad"), m.get("hakem"), g, m.get("wiki"), m.get("kadro"), m.get("kopya")])
     for t in d["tablolar"]:
         s = sezonlar[(t["yarisma"], t["sezon"])]
         satir = [[r[0], no.get(r[1], no.get(r[1] + " Istanbul")), r[1], *r[2:]] for r in t["satir"]]
@@ -256,7 +277,7 @@ def main():
                 sam = son[-1][0] if son[-1][2] > son[-1][3] else son[-1][1]
         out.append({"yarisma": y, "sezon": sz, "sampiyon": sam, **s})
     json.dump({"yarismalar": [[k, v, ACIKLAMA[k]] for k, v in YARISMA.items()], "kulupler": liste, "sezonlar": out,
-               "alanlar": ["ev", "dep", "ev_gol", "dep_gol", "tur", "tarih", "durum", "not", "sehir", "stad", "hakem", "goller", "wiki", "kadro"]},
+               "alanlar": ["ev", "dep", "ev_gol", "dep_gol", "tur", "tarih", "durum", "not", "sehir", "stad", "hakem", "goller", "wiki", "kadro", "kopya"]},
               open(CIKTI, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     bagli = sum(1 for k in liste if k["kulup"])
     print(f"1959 öncesi: {len(out)} yarışma-sezon, {sum(len(s['maclar']) for s in out)} maç, {len(liste)} kulüp "

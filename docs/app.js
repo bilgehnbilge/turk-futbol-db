@@ -512,7 +512,7 @@ async function eskiKulupMaclari(id) {
   const out = [];
   for (const s of d.sezonlar) s.maclar.forEach((r, i) => {
     const ev = benim.has(r[0]), dep = benim.has(r[1]);
-    if (ev === dep) return;
+    if (ev === dep || r[14]) return;   // r[14]: lig maçının kopyası olan ünlü maç (iki kez sayılmaz)
     const [biz, onlar, a, y] = ev ? [r[0], r[1], r[2], r[3]] : [r[1], r[0], r[3], r[2]];
     const rk = d.kulupler[onlar];
     out.push({ id: null, tarih: r[5], sezon: s.sezon, yar: "E", lig: yAd[s.yarisma] || s.yarisma, kademe: null, tur: r[4], po: false, saha: ev ? "E" : "D",
@@ -834,10 +834,12 @@ async function ikiliSayfa(a, b) {
   if (!ka || !kb) { icerik.innerHTML = `<div class="bos">Kulüp bulunamadı.</div>`; return; }
   document.title = `${ka.ad} – ${kb.ad} · Türk Futbol Arşivi`;
   icerik.innerHTML = `<div class="yukleniyor">Yükleniyor…</div>`;
-  const ms = (await kulupMaclari(a)).filter(m => m.rakipId === b);
+  // 1959 öncesi maçlar da (yarışma "E"; tarihsizler sezonun başına sıralanır)
+  const ms = [...(await eskiKulupMaclari(a)), ...(await kulupMaclari(a))].filter(m => m.rakipId === b)
+    .sort((x, y) => (x.tarih || x.k || "").localeCompare(y.tarih || y.k || ""));
   const d = { yar: "", saha: "", sezon: "", sonuc: "", rakip: "", sira: "yeni" };
   const ciz = () => {
-    const f = ms.filter(m => (!d.yar || m.yar === d.yar) && (!d.saha || m.saha === d.saha));
+    const f = ms.filter(m => (!d.yar || m.yar === d.yar || (d.yar === "LE" && (m.yar === "L" || m.yar === "E"))) && (!d.saha || m.saha === d.saha));
     const t = toplam(f);
     icerik.innerHTML = `
     <div class="karsilasma">
@@ -846,8 +848,8 @@ async function ikiliSayfa(a, b) {
           <span class="buyuk-logo">${k.logo ? `<img src="logo/${k.logo}.png" alt="">` : esc(k.ad.slice(0, 2).toLocaleUpperCase("tr"))}</span>
           <span class="ad">${esc(k.ad)}</span></a>`; }).join("")}
     </div>
-    <p class="soluk">${ms.length ? `${tarihYaz(ms[0].tarih)} ile ${tarihYaz(ms.at(-1).tarih)} arasında ${ms.length} resmi maç` : "Aralarında kayıtlı maç yok."}</p>
-    <div class="filtre"><div class="cipler">${[["", "Tümü"], ["L", "Lig"], ["K", "Kupa"], ["O", "Diğer kupalar"], ["A", "Avrupa"]].filter(([v]) => !v || ms.some(m => m.yar === v)).map(([v, ad]) => `<button class="cip ${d.yar === v ? "aktif" : ""}" data-y="${v}">${ad}</button>`).join("")}</div>
+    <p class="soluk">${ms.length ? `${ms[0].tarih ? tarihYaz(ms[0].tarih) : ms[0].sezon.slice(0, 4)} ile ${tarihYaz(ms.at(-1).tarih)} arasında ${ms.length} maç${ms.some(m => m.yar === "E") ? ` (1959 öncesi: ${ms.filter(m => m.yar === "E").length})` : ""}` : "Aralarında kayıtlı maç yok."}</p>
+    <div class="filtre"><div class="cipler">${[["", "Tüm maçlar"], ["L", "Lig"], ["LE", "Lig ve 1959 öncesi"], ["K", "Kupa"], ["O", "Diğer kupalar"], ["A", "Avrupa"], ["E", "1959 öncesi"]].filter(([v]) => !v || (v === "LE" ? ms.some(m => m.yar === "E") : ms.some(m => m.yar === v))).map(([v, ad]) => `<button class="cip ${d.yar === v ? "aktif" : ""}" data-y="${v}">${ad}</button>`).join("")}</div>
     <div class="cipler">${[["", "İç + dış"], ["E", `${esc(ka.ad)} evinde`], ["D", `${esc(kb.ad)} evinde`]].map(([v, ad]) => `<button class="cip ${d.saha === v ? "aktif" : ""}" data-s="${v}">${ad}</button>`).join("")}</div></div>
     <div class="kart"><div class="ozet-sat">
       <div><b>${t.O}</b><span>Maç</span></div><div><b style="color:var(--g)">${t.G}</b><span>${esc(ka.ad)} kazandı</span></div>
@@ -858,14 +860,15 @@ async function ikiliSayfa(a, b) {
     <h2 class="bolum">Bütün maçlar</h2>
     <div class="tablo-kap"><table class="tablo"><thead><tr><th class="o">S</th><th>Tarih</th><th>Sezon</th><th class="gizle-mobil">Yarışma</th><th>Ev sahibi</th><th class="s">Skor</th><th>Deplasman</th></tr></thead>
     <tbody>${[...f].reverse().map(m => {
-      const ev = m.saha === "E" ? logoImg(m.kulup) + esc(m.takim) : logoImg(m.rakipId) + esc(m.rakip), dep = m.saha === "E" ? logoImg(m.rakipId) + esc(m.rakip) : logoImg(m.kulup) + esc(m.takim);
+      const biz = logoImg(m.kulup, "logo-k", m.takim) + esc(m.takim), onlar = logoImg(m.rakipId, "logo-k", m.rakip) + esc(m.rakip);
+      const ev = m.saha === "E" ? biz : onlar, dep = m.saha === "E" ? onlar : biz;
       const sk = m.saha === "E" ? skorYaz(m.a, m.y, m.pa, m.py, m.durum) : skorYaz(m.y, m.a, m.py, m.pa, m.durum);
-      return `<tr><td class="o"><span class="son ${m.s}">${m.s === "N" ? "–" : m.s}</span></td><td>${tarihYaz(m.tarih)}</td><td><a class="bag" href="#/${K}sezon/${m.sezon}">${m.sezon}</a></td>
-        <td class="gizle-mobil">${esc(m.lig || "")}${m.tur ? ` <span class="soluk">· ${esc(m.tur)}</span>` : ""}</td><td class="ad">${ev}</td><td class="s skor">${skorBag(m.id, sk)}</td><td class="ad">${dep}</td></tr>`;
+      return `<tr><td class="o"><span class="son ${m.s}">${m.s === "N" ? "–" : m.s}</span></td><td>${tarihYaz(m.tarih)}</td><td><a class="bag" href="${m.szh || `#/${K}sezon/${m.sezon}`}">${m.sezon}</a></td>
+        <td class="gizle-mobil">${esc(m.lig || "")}${m.tur ? ` <span class="soluk">· ${esc(m.tur)}</span>` : ""}</td><td class="ad">${ev}</td><td class="s skor">${m.eh ? `<a class="skor bagli" href="${m.eh}">${sk}</a>` : skorBag(m.id, sk)}</td><td class="ad">${dep}</td></tr>`;
     }).join("")}</tbody></table></div>`;
     icerik.querySelectorAll("[data-y]").forEach(x => x.addEventListener("click", () => { d.yar = x.dataset.y; ciz(); }));
     icerik.querySelectorAll("[data-s]").forEach(x => x.addEventListener("click", () => { d.saha = x.dataset.s; ciz(); }));
-    EK.ikili($("#ikiliEk"), f, a, b);
+    EK.ikili($("#ikiliEk"), f.filter(m => m.tarih), a, b);   // grafik ve seriler tarih sırasıyla: tarihsiz eski maçlar dışarıda
   };
   ciz();
 }
