@@ -31,10 +31,13 @@ ELLE = {"Güneş": None,   # İstanbul Güneş SK (1930'lar); Ankara Güneşspor
         "Hacettepe": None,
         "Eskişehir Demirspor": "tff:3667"}
 # sitede kulübü olmayan eski kulüplerin logoları (docs/logo/<ad>.png; kullanıcının verdiği)
-LOGO = {"Güneş": "e_gunes", "Harp Okulu": "e_harp_okulu", "Harbiye": "e_harp_okulu"}
+LOGO = {"Güneş": "e_gunes", "Harp Okulu": "e_harp_okulu", "Harbiye": "e_harp_okulu", "Topkapı": "e_topkapi",
+        "Hilal (İstanbul)": "e_goztepe_hilal", "Hilâl": "e_goztepe_hilal", "Göztepe Hilal": "e_goztepe_hilal"}
 # aynı kulübün dönem adları (kulüp listesinde "ayni": öbür adın sırası). Harbiye 1936'da Ankara'ya taşınıp Harp Okulu
 # adını aldı (tr.wikipedia Harp_Okulu_SK; kullanıcı). Bu kulüplerin başka kaynaklardan verisi gelince aynı kimliğe bağlanır.
-AYNI = {"Harbiye": "Harp Okulu", "Harp Okulu": "Harbiye"}   # "tff:<no>": o TFF numaralı kulüp (1959 öncesi Demirspor = bugünkü kulüp, kullanıcı)
+# İstanbul Hilal (1912) bugün Göztepe Hilal; RSSSF 1924'te "Hilâl", Maçkolik'te "Hilal (İstanbul)" (kullanıcı).
+AYNI = {"Harbiye": "Harp Okulu", "Harp Okulu": "Harbiye", "Hilâl": "Hilal (İstanbul)", "Hilal (İstanbul)": "Hilâl",
+        "Göztepe Hilal": "Hilal (İstanbul)"}   # "tff:<no>": o TFF numaralı kulüp (1959 öncesi Demirspor = bugünkü kulüp, kullanıcı)
 
 
 def mackolik_ekle(d, kk):
