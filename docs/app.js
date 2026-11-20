@@ -999,7 +999,7 @@ function macCiz(d) {
   <p class="soluk not bolum">${d.olayKaynak && !d.tff ? `Goller: ${esc(d.olayKaynak)}` : d.olayKaynak ? `Kadro: <a class="bag" href="https://www.tff.org/Default.aspx?pageID=29&macId=${d.tff}" target="_blank" rel="noopener">TFF maç sayfası</a>; goller, kartlar ve değişiklikler: ${esc(d.olayKaynak)}`
     : d.kaynak === "Maçkolik" ? (d.kadro[0].length ? "Kadro, goller, kartlar ve oyuncu değişiklikleri: Maçkolik arşivi" : "Goller, kartlar ve oyuncu değişiklikleri: Maçkolik. Bu dönemin kadroları henüz yok")
     : d.kaynak === "Vikipedi" ? `Goller: <a class="bag" href="https://tr.wikipedia.org/wiki/${encodeURIComponent(d.madde.replace(/ /g, "_"))}" target="_blank" rel="noopener">Vikipedi</a>. Kadro bilgisi yok`
-    : `Kadro ve olaylar: ${d.tff ? `<a class="bag" href="${d.kaynakUrl || `https://www.tff.org/Default.aspx?pageID=29&macId=${d.tff}`}" target="_blank" rel="noopener">TFF maç sayfası</a>` : esc(d.kaynak)}`}. Oyuncu adları kaynakta yazıldığı gibidir.</p>`;
+    : `Kadro ve olaylar: ${d.tff ? `<a class="bag" href="${d.kaynakUrl || `https://www.tff.org/Default.aspx?pageID=29&macId=${d.tff}`}" target="_blank" rel="noopener">TFF maç sayfası</a>` : esc(d.kaynak)}`}.${d.ekNot ? " " + d.ekNot : ""} Oyuncu adları kaynakta yazıldığı gibidir.</p>`;
   icerik.querySelectorAll(".akis-bas .cip").forEach(b => b.addEventListener("click", () => {
     icerik.querySelectorAll(".akis-bas .cip").forEach(x => { x.classList.toggle("aktif", x === b); x.setAttribute("aria-pressed", x === b); });
     $("#akis").classList.toggle("onemli", b.dataset.a === "onemli");
