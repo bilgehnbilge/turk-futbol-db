@@ -29,7 +29,8 @@ def arsiv_maclari():
     out = {}
     for klasor in glob.glob(os.path.join(HAM, "fikstur", "*")):
         sezon = os.path.basename(klasor)
-        y1, y2 = int(sezon[:4]), int(sezon[5:9])
+        y1 = int(sezon[:4])
+        y2 = int(sezon[5:9]) if len(sezon) >= 9 else y1   # tek yıllık sezonlar (1952, 1959)
         for f in glob.glob(os.path.join(klasor, "g*_h*.txt")):
             if f.endswith("_haftalar.txt"):
                 continue
