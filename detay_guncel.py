@@ -162,10 +162,10 @@ def main(sezon):
     import bal, kadin, oyuncu
     t = sqlite3.connect(os.path.join(RAW, "tff.db"))
     detay("erkek", oyuncu.OYUNCU_DB, t.execute(
-        "SELECT kaynak_id, tarih, durum FROM mac WHERE kaynak='tff' AND sezon=? AND ev_gol IS NOT NULL ORDER BY tarih", (sezon,)).fetchall(), oyuncu.yol)
+        "SELECT kaynak_id, tarih, NULL FROM mac WHERE kaynak='tff' AND sezon=? AND ev_gol IS NOT NULL ORDER BY tarih", (sezon,)).fetchall(), oyuncu.yol)
     if os.path.exists(bal.DB):
         detay("BAL", bal.DETAY_DB, sqlite3.connect(bal.DB).execute(
-            "SELECT kaynak_id, tarih, durum FROM mac WHERE sezon=? AND ev_gol IS NOT NULL ORDER BY tarih", (sezon,)).fetchall(), bal.mac_yol)
+            "SELECT kaynak_id, tarih, NULL FROM mac WHERE sezon=? AND ev_gol IS NOT NULL ORDER BY tarih", (sezon,)).fetchall(), bal.mac_yol)
     try:
         kadin_guncel()
     except (Exception, SystemExit) as e:
