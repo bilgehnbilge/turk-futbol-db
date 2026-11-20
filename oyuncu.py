@@ -49,21 +49,25 @@ AYLAR = {a: i for i, a in enumerate(["ocak", "şubat", "mart", "nisan", "mayıs"
 KISI_DB = os.path.join(KOK, "raw", "kisi.db")
 
 
+def kisi_oku(kisi, t):
+    """TFF kişi sayfası -> (kisi, ad, doğum tarihi, doğum yeri, uyruk)."""
+    import html as H
+    al = lambda k: (lambda m: " ".join(H.unescape(re.sub(r"<[^>]+>", "", m.group(1))).split()) if m else "")(
+        re.search(r'oyuncuBilgileri_' + k + r'"[^>]*>(.*?)</', t, re.S))
+    g = re.match(r"(\d{1,2})\s+(\S+)\s+(\d{4})", al("Label2"))
+    ay = AYLAR.get(g.group(2).replace("I", "ı").replace("İ", "i").lower()) if g else None
+    dogum = f"{g.group(3)}-{ay:02d}-{int(g.group(1)):02d}" if g and ay else None
+    return (int(kisi), topla.temiz(al("lblAdi")), dogum, topla.temiz(al("Label1")) or None, al("Label3") or None)
+
+
 def kisi_ayikla():
     """İnmiş TFF oyuncu sayfaları (raw/tff_kisi) -> raw/kisi.db: ad, doğum tarihi, doğum yeri, uyruk."""
-    import html as H
     c = sqlite3.connect(KISI_DB)
     c.execute("DROP TABLE IF EXISTS kisi")
     c.execute("CREATE TABLE kisi(kisi INTEGER PRIMARY KEY, ad TEXT, dogum TEXT, yer TEXT, uyruk TEXT)")
-    al = lambda t, k: (lambda m: " ".join(H.unescape(re.sub(r"<[^>]+>", "", m.group(1))).split()) if m else "")(
-        re.search(r'oyuncuBilgileri_' + k + r'"[^>]*>(.*?)</', t, re.S))
     satir = []
     for f in glob.glob(os.path.join(KISI_HAM, "*", "*.html.gz")):
-        t = gzip.open(f).read().decode("cp1254", "replace")
-        g = re.match(r"(\d{1,2})\s+(\S+)\s+(\d{4})", al(t, "Label2"))
-        ay = AYLAR.get(g.group(2).replace("I", "ı").replace("İ", "i").lower()) if g else None
-        dogum = f"{g.group(3)}-{ay:02d}-{int(g.group(1)):02d}" if g and ay else None
-        satir.append((int(os.path.basename(f)[:-8]), topla.temiz(al(t, "lblAdi")), dogum, topla.temiz(al(t, "Label1")) or None, al(t, "Label3") or None))
+        satir.append(kisi_oku(os.path.basename(f)[:-8], gzip.open(f).read().decode("cp1254", "replace")))
     c.executemany("INSERT INTO kisi VALUES(?,?,?,?,?)", satir)
     c.commit()
     print(f"{len(satir)} oyuncu sayfası -> {KISI_DB}; doğum tarihi olan: {sum(1 for r in satir if r[2])}")

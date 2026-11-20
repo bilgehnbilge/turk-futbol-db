@@ -4,7 +4,7 @@ name: Güncel sezonu güncelle
 # Site verisi (docs/) commit'lenir; futbol.db "veritabani" sürümüne (Releases) yüklenir.
 on:
   schedule:
-    - cron: "0 5 * * 1,4"   # pazartesi ve perşembe 08:00 (TSİ)
+    - cron: "0 4 * * *"   # her gün 07:00 (TSİ)
   workflow_dispatch:
 
 permissions:
@@ -18,7 +18,7 @@ concurrency:
 jobs:
   guncelle:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

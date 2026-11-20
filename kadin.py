@@ -83,6 +83,7 @@ def guncel():
     topla.HAM = HAM
     d = topla.Indirici()
     sezon = simdiki_sezon()
+    kalan = []
     for kaynak, pid in GUNCEL:
         klasor = os.path.join(HAM, f"{kaynak}_{sezon}_{pid}")
         if os.path.isdir(klasor):
@@ -93,13 +94,17 @@ def guncel():
         if not any((m["tarih"] or "") >= f"{sezon[:4]}-08-01" for m in topla.maclar(t) or []):
             print(f"{kaynak} {sezon}: sayfa henüz yeni sezona geçmemiş, atlandı", flush=True)
             shutil.rmtree(klasor, ignore_errors=True)
+        elif os.path.isdir(klasor):
+            kalan.append(os.path.basename(klasor))
     print("Bitti, indirilen sayfa:", d.indirilen)
+    return kalan
 
 
-def kur():
+def kur(sadece=None):
+    """sadece=[klasör adları]: mevcut kadin.db'de yalnız o sezonlar yeniden yazılır (detay_guncel.py)."""
     topla.LIG.update(LIG_AD)
     topla.kademe = lambda kaynak, yil: kademe(kaynak, f"{yil}-{yil + 1}")
-    topla.kur(DB, HAM)
+    topla.kur(DB, HAM, sadece=sadece)
     c = sqlite3.connect(DB)
     for r in c.execute("SELECT sezon, lig, COUNT(*), SUM(ev_gol IS NOT NULL) FROM mac GROUP BY 1, 2 ORDER BY 1, 2"):
         print(*r)

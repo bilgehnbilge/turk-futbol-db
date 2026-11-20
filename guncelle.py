@@ -4,7 +4,8 @@
   python3 guncelle.py --yayinla   # ayrıca GitHub'a gönderir (site birkaç dakikada yenilenir)
   python3 guncelle.py --sezon 2026-2027
 
-Lig: TFF (~250 sayfa x 2 sn). Avrupa kupaları: UEFA'nın maç verisi (avrupa.py uefa; takım eşlemesi uefa_kimlik.json).
+Lig: TFF (~250 sayfa x 2 sn). Maç ayrıntıları, kadın ligleri ve kişi sayfaları: detay_guncel.py (GitHub'da girdiler
+Releases'ten gelir ve geri yüklenir: girdiler.py). Avrupa kupaları: UEFA'nın maç verisi (avrupa.py uefa; takım eşlemesi uefa_kimlik.json).
 Süre: ~10 dakika indirme + 3 dakika birleştirme. Tam kurulum (topla.py kur) gerekmez.
 TFF'nin güncel sezon sayfaları (arşive geçmeden önce): Süper Lig 198, 1. Lig 142, 2. Lig 976, 3. Lig 971,
 Profesyonelliğe Geçiş Ligi 1596 (bal.py, raw/bal.db).
@@ -34,6 +35,11 @@ def main():
     p.add_argument("--yayinla", action="store_true", help="commit + git push")
     a = p.parse_args()
 
+    if os.environ.get("GITHUB_ACTIONS"):   # yerelde duran girdiler (maç ayrıntıları, kadın ligleri...) Releases'ten
+        import girdiler
+        girdiler_var = girdiler.al()
+    else:
+        girdiler_var = True
     d = topla.Indirici()
     klasorler = []
     for kaynak, pid in GUNCEL:
@@ -59,6 +65,12 @@ def main():
         avrupa.uefa_guncel(a.sezon)
     except Exception as e:
         print("Avrupa güncellenemedi:", e, flush=True)
+    if girdiler_var:   # güncel sezonun maç ayrıntıları (erkek, BAL, kadın), kadın ligleri, yeni oyuncuların kişi sayfaları
+        try:
+            import detay_guncel
+            detay_guncel.main(a.sezon)
+        except (Exception, SystemExit) as e:
+            print("Maç ayrıntıları güncellenemedi:", e, flush=True)
     calistir(sys.executable, "-B", "birlestir.py")
     if os.path.isdir(os.path.join(KOK, "raw", "uefa_mac")):   # UEFA maç detayları futbol.db maç numaralarına yeniden bağlanır
         calistir(sys.executable, "-B", "uefa_detay.py", "ayikla")
@@ -70,13 +82,21 @@ def main():
         degisti = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=KOK).returncode != 0
         if degisti:
             calistir("git", "commit", "-q", "-m", f"Güncel sezon {a.sezon}: {datetime.date.today():%d.%m.%Y} itibarıyla")
-            calistir("git", "push", "-q")
+            for deneme in range(3):   # bu arada başka bir push geldiyse üstüne al (site verisinde botunki geçerli)
+                if subprocess.run(["git", "push", "-q"], cwd=KOK).returncode == 0:
+                    break
+                calistir("git", "pull", "-q", "--rebase", "-X", "theirs")
+            else:
+                sys.exit("git push başarısız")
         else:
             print("Site verisinde değişiklik yok.")
         if subprocess.run(["gh", "release", "view", "veritabani"], cwd=KOK, capture_output=True).returncode != 0:
             calistir("gh", "release", "create", "veritabani", "--title", "Güncel veritabanı",
                      "--notes", "futbol.db: her güncellemede üzerine yazılır.")
         calistir("gh", "release", "upload", "veritabani", "futbol.db", "--clobber")
+        if girdiler_var:
+            import girdiler
+            girdiler.yukle()
 
 
 if __name__ == "__main__":
