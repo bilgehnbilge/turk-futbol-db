@@ -10,7 +10,10 @@ const YAR_RENK = { milli_kume: "var(--vurgu)", sampiyona: "var(--g)", basbakanli
 // eski kulüp: sitedeki kulübe bağlıysa onun sayfasına (logosuyla), değilse düz ad
 const kAd = (d, i) => { const k = d.kulupler[i]; return k ? k.ad : "?"; };
 const eLogo = k => k?.logo ? `<img class="logo-k" src="logo/${k.logo}.png" alt="" loading="lazy" onerror="this.remove()">` : "";   // sitede kulübü olmayan eski kulüp
-const kBag = (d, i) => { const k = d.kulupler[i]; return !k ? "?" : k.kulup != null && KULUP.has(k.kulup) ? kulupBag(k.kulup, k.ad) : eLogo(k) + esc(k.ad); };
+const kBag = (d, i) => { const k = d.kulupler[i]; if (!k) return "?";
+  if (k.kulup != null && KULUP.has(k.kulup)) return kulupBag(k.kulup, k.ad);
+  const o = k.ayni != null ? d.kulupler[k.ayni] : null;   // aynı kulübün öbür dönem adı (Harbiye = Harp Okulu)
+  return o ? `<span title="Aynı kulüp: ${esc(o.ad)}">${eLogo(k)}${esc(k.ad)}</span>` : eLogo(k) + esc(k.ad); };
 const yarAd = (d, y) => (d.yarismalar.find(x => x[0] === y) || [, y])[1];
 const sezonAd = s => s.length === 4 ? s : s.replace("-", "–");
 const ust = (baslik, alt) => `<p class="soluk ust-bag"><a class="bag" href="#/sezonlar">Sezonlar</a> · <a class="bag" href="#/eski">1959 öncesi</a></p>

@@ -26,7 +26,10 @@ ELLE = {"Güneş": None,   # İstanbul Güneş SK (1930'lar); Ankara Güneşspor
         "Hacettepe": None,
         "Eskişehir Demirspor": "tff:3667"}
 # sitede kulübü olmayan eski kulüplerin logoları (docs/logo/<ad>.png; kullanıcının verdiği)
-LOGO = {"Güneş": "e_gunes", "Harp Okulu": "e_harp_okulu"}   # "tff:<no>": o TFF numaralı kulüp (1959 öncesi Demirspor = bugünkü kulüp, kullanıcı)
+LOGO = {"Güneş": "e_gunes", "Harp Okulu": "e_harp_okulu", "Harbiye": "e_harp_okulu"}
+# aynı kulübün dönem adları (kulüp listesinde "ayni": öbür adın sırası). Harbiye 1936'da Ankara'ya taşınıp Harp Okulu
+# adını aldı (tr.wikipedia Harp_Okulu_SK; kullanıcı). Bu kulüplerin başka kaynaklardan verisi gelince aynı kimliğe bağlanır.
+AYNI = {"Harbiye": "Harp Okulu", "Harp Okulu": "Harbiye"}   # "tff:<no>": o TFF numaralı kulüp (1959 öncesi Demirspor = bugünkü kulüp, kullanıcı)
 
 
 def main():
@@ -96,6 +99,9 @@ def main():
             no[sade] = len(liste)
             liste.append({"ad": sade, "kulup": kulup[a], "mac": 0, **({"logo": LOGO[sade]} if sade in LOGO and kulup[a] is None else {})})
         no[a] = no[sade]
+    for x in liste:
+        if x["ad"] in AYNI and AYNI[x["ad"]] in no:
+            x["ayni"] = no[AYNI[x["ad"]]]
     sezonlar = collections.defaultdict(lambda: {"maclar": [], "tablo": None, "kral": []})
     # Millî Küme: sonuç tablosunda zaten olan eşleşme ayrıca listede yazılıysa (yarıda kalan maç) notu tablodaki maça taşınır
     matris = {(m["sezon"], m["ev"], m["dep"]): m for m in d["maclar"] if m.get("kaynak") == "matris"}
