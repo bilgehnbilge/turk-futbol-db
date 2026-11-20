@@ -63,12 +63,13 @@ def eski_maclar(eski):
     for s in eski["sezonlar"]:
         if s["yarisma"] not in ESKI_YAR:
             continue
-        for m in s["maclar"]:
+        for i, m in enumerate(s["maclar"]):
             ev, dep, eg, dg, tur, tarih, durum = m[:7]
+            eh = f"eski/mac/{s['yarisma']}/{s['sezon']}/{i}" if (len(m) > 11 and m[11]) or (len(m) > 13 and m[13]) else None
             out.append({"yarisma": "eski", "kademe": None, "asama": "", "sezon": s["sezon"], "lig": ESKI_YAR[s["yarisma"]], "tur": tur,
                         "grup": None, "tarih": tarih, "ev_kulup": kim(ev), "dep_kulup": kim(dep), "ev_adi": K[ev]["ad"], "dep_adi": K[dep]["ad"],
                         "ev_gol": eg, "dep_gol": dg, "ev_pen": None, "dep_pen": None, "durum": "Hük." if durum in ("w/o", "o/w", "awd") else "MS",
-                        "id": None, "eski": f"eski/{s['yarisma']}/{s['sezon']}"})
+                        "id": None, "eski": f"eski/{s['yarisma']}/{s['sezon']}", "eh": eh})
     return out, ek
 
 
@@ -96,7 +97,7 @@ def hesapla(maclar, sezon_sira, okunur, eski=None):
 def mac_satir(m, okunur):
     return [m["tarih"], m["sezon"], m["lig"], m["tur"] or m["grup"] or "", m["ev_kulup"], okunur(m["ev_adi"]),
             m["dep_kulup"], okunur(m["dep_adi"]), m["ev_gol"], m["dep_gol"], m["ev_pen"], m["dep_pen"], m["durum"], m["id"]] + \
-           ([m["eski"]] if m.get("eski") else [])   # 1959 öncesi maç: sezon sayfası yolu
+           ([m["eski"], m.get("eh")] if m.get("eski") else [])   # 1959 öncesi maç: sezon sayfası, maç sayfası (ayrıntısı varsa)
 
 
 def kapsam(ms, sezon_sira, son_sezon, okunur, lig, sadece_mac=False):

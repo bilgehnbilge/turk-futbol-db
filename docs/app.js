@@ -106,6 +106,7 @@ function kisaAd(id, resmi) {
 // logo: kulübün o maçtaki (dönem) adının ayrı logosu varsa o (adlogo, ör. Alibeyköyspor'un "Adalet" adı), yoksa kulüp logosu
 const kulupLogo = (id, ad) => { const k = KULUP.get(id); return (ad != null && k?.adlogo?.[ad]) || k?.logo; };
 const logoImg = (id, cls = "logo-k", ad) => { const l = kulupLogo(id, ad); return l ? `<img class="${cls}" src="logo/${l}.png" alt="" loading="lazy" onerror="this.remove()">` : ""; };
+const rakipBag = m => m.rakipId == null && m.rlogo ? `<img class="logo-k" src="logo/${m.rlogo}.png" alt="" loading="lazy" onerror="this.remove()">${esc(m.rakip)}` : kulupBag(m.rakipId, m.rakip);
 const kulupBag = (id, ad) => id != null && KULUP.has(id) ? `<a class="bag" href="#/${K}kulup/${id}">${logoImg(id, "logo-k", ad)}${esc(ad ?? kulupAd(id))}</a>` : esc(ad ?? "?");
 function sonuc(a, y) { if (a == null || y == null) return "N"; return a > y ? "G" : a < y ? "M" : "B"; }
 function skorYaz(a, y, pa, py, durum) {
@@ -498,7 +499,7 @@ function seriler(ms) {
   });
 }
 
-const FILTRE_VARSAYILAN = { yar: "L", saha: "", sezon: "", sonuc: "", rakip: "", sira: "yeni", oncul: false, eski: false };
+const FILTRE_VARSAYILAN = { yar: "L", saha: "", sezon: "", sonuc: "", rakip: "", sira: "yeni", oncul: false };
 // 1959 öncesi maçları (data/eski.json) kulüp maçı biçiminde: yar "E", tarihsizler sezonun başına; m.eh maç sayfası, m.szh sezon sayfası
 let ESKI_VERI = null, ESKI_SIRA = [];
 async function eskiKulupMaclari(id) {
@@ -515,7 +516,7 @@ async function eskiKulupMaclari(id) {
     const [biz, onlar, a, y] = ev ? [r[0], r[1], r[2], r[3]] : [r[1], r[0], r[3], r[2]];
     const rk = d.kulupler[onlar];
     out.push({ id: null, tarih: r[5], sezon: s.sezon, yar: "E", lig: yAd[s.yarisma] || s.yarisma, kademe: null, tur: r[4], po: false, saha: ev ? "E" : "D",
-      takim: d.kulupler[biz].ad, rakipId: rk?.kulup ?? null, rakip: rk?.ad || "?", a, y, pa: null, py: null, durum: r[6] || "MS", not: r[7], kulup: id,
+      takim: d.kulupler[biz].ad, rakipId: rk?.kulup ?? null, rakip: rk?.ad || "?", rlogo: rk?.kulup == null ? rk?.logo : null, a, y, pa: null, py: null, durum: r[6] || "MS", not: r[7], kulup: id,
       iptal: false, s: a == null ? "N" : sonuc(a, y), eh: r[11]?.length || r[13] ? `#/eski/mac/${s.yarisma}/${s.sezon}/${i}` : null, szh: `#/eski/${s.yarisma}/${s.sezon}`,
       k: r[5] || `${s.sezon.slice(0, 4)}-${s.sezon.length > 4 ? "08" : "01"}-01` });
   });
@@ -570,9 +571,10 @@ async function kulupSayfa(id, sekme) {
   SON_HERO = `${BOLUM}:${id}`;   // başlığın giriş hareketi yalnız kulübe ilk girişte (sekme değişiminde değil)
 
   const ciz = () => {
+    // 1959 öncesi maçlar (yarışma "E") rekorlar / maçlar / rakipler sekmelerinde; "Tüm maçlar", "Lig ve 1959 öncesi", "1959 öncesi" sekmeleriyle
     const eskiVar = eskiMs.length && ["rekorlar", "maclar", "rakipler"].includes(sekme);
-    const kay = eskiVar && durum.eski ? [...eskiMs, ...tum].sort((a, b) => (a.k || a.tarih || "").localeCompare(b.k || b.tarih || "")) : tum;
-    $("#filtreAlan").innerHTML = filtreHtml(durum, kay, sekme, onculler, eskiVar ? eskiMs.length : 0);
+    const kay = eskiVar ? [...eskiMs, ...tum].sort((a, b) => (a.k || a.tarih || "").localeCompare(b.k || b.tarih || "")) : tum;
+    $("#filtreAlan").innerHTML = filtreHtml(durum, kay, sekme, onculler);
     filtreBagla(durum, () => { kulupSayfa(id, sekme); }, ciz);
     const ms = filtrele(kay, durum, sekme);
     const hedef = $("#sekmeIcerik");
@@ -595,11 +597,11 @@ async function kulupSayfa(id, sekme) {
 }
 
 function filtrele(ms, d, sekme) {
-  return ms.filter(m => (!d.yar || m.yar === d.yar || (d.yar === "L" && m.yar === "E")) && (!d.saha || m.saha === d.saha)
+  return ms.filter(m => (!d.yar || m.yar === d.yar || (d.yar === "LE" && (m.yar === "L" || m.yar === "E"))) && (!d.saha || m.saha === d.saha)
     && (sekme === "rekorlar" || sekme === "rakipler" ? true : (!d.sezon || m.sezon === d.sezon))
     && (sekme !== "maclar" || ((!d.sonuc || (d.sonuc === "GY" ? m.y === 0 && m.s !== "N" : m.s === d.sonuc)) && (!d.rakip || norm(m.rakip).includes(norm(d.rakip))))));
 }
-function filtreHtml(d, ms, sekme, onculler, eskiSay = 0) {
+function filtreHtml(d, ms, sekme, onculler) {
   if (sekme === "oyuncular") return "";   // oyuncu rekorları kulübün bütün maçlarından (filtre yok)
   if (sekme === "ozet" || sekme === "sezonlar") {
     return onculler.length ? `<div class="filtre"><label><input type="checkbox" id="fOncul" ${d.oncul ? "checked" : ""}> Öncül kulüplerin maçlarını da kat (${onculler.map(kulupAd).map(esc).join(", ")})</label></div>` : "";
@@ -608,7 +610,7 @@ function filtreHtml(d, ms, sekme, onculler, eskiSay = 0) {
   const cip = (ad, deger, alan) => `<button class="cip ${d[alan] === deger ? "aktif" : ""}" data-alan="${alan}" data-deger="${deger}">${ad}</button>`;
   const sezonlar = [...new Set(ms.map(m => m.sezon))].sort().reverse();
   return `<div class="filtre">
-    <div class="cipler">${cip("Tümü", "", "yar")}${["L", "K", "O", "A", "T", "E"].filter(y => yarlar.includes(y)).map(y => cip(YAR_AD[y], y, "yar")).join("")}</div>
+    <div class="cipler">${cip("Tüm maçlar", "", "yar")}${["L", ...(yarlar.includes("E") ? ["LE"] : []), "K", "O", "A", "T", "E"].filter(y => y === "LE" || yarlar.includes(y)).map(y => cip(y === "LE" ? "Lig ve 1959 öncesi" : YAR_AD[y], y, "yar")).join("")}</div>
     <div class="cipler">${cip("İç + dış", "", "saha")}${cip("İç saha", "E", "saha")}${cip("Deplasman", "D", "saha")}</div>
     ${sekme === "maclar" ? `
       <div class="cipler">${cip("Her sonuç", "", "sonuc")}${cip("G", "G", "sonuc")}${cip("B", "B", "sonuc")}${cip("M", "M", "sonuc")}${cip("Gol yemedi", "GY", "sonuc")}</div>
@@ -617,7 +619,6 @@ function filtreHtml(d, ms, sekme, onculler, eskiSay = 0) {
       <select id="fSira">${[["yeni", "En yeni"], ["eski", "En eski"], ["fark", "En farklı galibiyet"], ["farkm", "En farklı mağlubiyet"], ["gol", "En gollü"]]
         .map(([v, a]) => `<option value="${v}" ${d.sira === v ? "selected" : ""}>${a}</option>`).join("")}</select>` : ""}
     ${onculler.length ? `<label><input type="checkbox" id="fOncul" ${d.oncul ? "checked" : ""}> Öncülleri kat</label>` : ""}
-    ${eskiSay ? `<label title="Millî Küme, Türkiye Futbol Şampiyonası, Federasyon Kupası, şehir ligleri ve öbür 1959 öncesi maçlar (${eskiSay} maç); Lig seçiliyken de sayılır"><input type="checkbox" id="fEski" ${d.eski ? "checked" : ""}> 1959 öncesi dahil</label>` : ""}
   </div>`;
 }
 function filtreBagla(d, yenidenYukle, ciz) {
@@ -627,7 +628,6 @@ function filtreBagla(d, yenidenYukle, ciz) {
   const r = $("#fRakip");
   if (r) { r.addEventListener("input", e => { d.rakip = e.target.value; clearTimeout(r._t); r._t = setTimeout(() => { ciz(); const n = $("#fRakip"); n.focus(); n.setSelectionRange(n.value.length, n.value.length); }, 250); }); }
   $("#fOncul")?.addEventListener("change", e => { d.oncul = e.target.checked; yenidenYukle(); });
-  $("#fEski")?.addEventListener("change", e => { d.eski = e.target.checked; ciz(); });
 }
 
 // öne çıkan özet kartı (kulüp ve milli takım): t = { O, G, B, M, AG, YG, GY }
@@ -676,7 +676,7 @@ function ozetHtml(ms) {
     </div>
     <div class="kart"><h3>Son maçlar</h3>
       ${son.map(m => `<div class="son-satir"><span class="son ${m.s}">${m.s}</span>
-        <span class="tarih">${tarihYaz(m.tarih)}</span><span class="rakip">${kulupBag(m.rakipId, m.rakip)}${m.saha === "E" ? "" : ` <small class="soluk" title="Deplasman">(D)</small>`}</span>
+        <span class="tarih">${tarihYaz(m.tarih)}</span><span class="rakip">${rakipBag(m)}${m.saha === "E" ? "" : ` <small class="soluk" title="Deplasman">(D)</small>`}</span>
         <b class="skor">${skorBag(m.id, skorYaz(m.a, m.y, m.pa, m.py, m.durum))}</b></div>`).join("")}
     </div>
   </div>`;
@@ -688,7 +688,7 @@ function macSatir(m, gosterTakim) {
     <td class="gizle-mobil">${esc(m.lig || YAR_AD[m.yar])}${m.tur ? ` <span class="soluk">· ${esc(m.tur)}</span>` : ""}${m.po ? ` <span class="rozet">play-off</span>` : ""}${m.iptal ? ` <span class="rozet" title="${esc(m.not || "")}">sayılmadı</span>` : ""}</td>
     ${gosterTakim ? `<td class="ad">${logoImg(m.kulup)}${esc(m.takim)}</td>` : ""}
     <td class="o">${m.saha === "E" ? "İç" : "Dış"}</td>
-    <td class="ad">${kulupBag(m.rakipId, m.rakip)}</td>
+    <td class="ad">${rakipBag(m)}</td>
     <td class="s skor">${m.eh ? `<a class="skor bagli" href="${m.eh}">${skorYaz(m.a, m.y, m.pa, m.py, m.durum)}</a>` : detayVar(m.id) ? `<a class="skor bagli" href="#/${K}mac/${m.id}">${skorYaz(m.a, m.y, m.pa, m.py, m.durum)}</a>` : skorYaz(m.a, m.y, m.pa, m.py, m.durum)}</td></tr>`;
 }
 function macTablosu(hedef, ms, d) {
@@ -721,9 +721,9 @@ function tabelaSatir(m, sonucGoster = false) {
   return `<div class="tabela${sonucGoster ? " sonuclu" : ""}" title="${esc(m.lig || YAR_AD[m.yar])}${m.tur ? " · " + esc(m.tur) : ""}">
     ${sonucGoster ? `<span class="son ${m.s}">${m.s === "N" ? "–" : m.s}</span>` : ""}
     <span class="tarih">${tarihYaz(m.tarih)}</span>
-    <span class="ev">${logoImg(evId, "logo-k", evAd)}${ad(evId, evAd)}</span>
+    <span class="ev">${logoImg(evId, "logo-k", evAd) || (evId == null && m.rlogo ? `<img class="logo-k" src="logo/${m.rlogo}.png" alt="">` : "")}${ad(evId, evAd)}</span>
     ${m.eh ? `<a class="skor bagli" href="${m.eh}" title="Maç ayrıntısı">${skor}${ek}</a>` : m.id != null && detayVar(m.id) ? `<a class="skor bagli" href="#/${K}mac/${m.id}" title="Maç ayrıntısı">${skor}${ek}</a>` : `<b class="skor">${skor}${ek}</b>`}
-    <span class="dep">${ad(depId, depAd)}${logoImg(depId, "logo-k", depAd)}</span></div>`;
+    <span class="dep">${ad(depId, depAd)}${logoImg(depId, "logo-k", depAd) || (depId == null && m.rlogo ? `<img class="logo-k" src="logo/${m.rlogo}.png" alt="">` : "")}</span></div>`;
 }
 function rekorKart(baslik, l) {
   const m = l?.[0];
@@ -783,7 +783,7 @@ function rakipTablosu(hedef, ms, id) {
   for (const m of ms) {
     if (m.s === "N") continue;
     const k = m.rakipId ?? "ad:" + m.rakip;
-    const x = r.get(k) || { id: m.rakipId, ad: m.rakipId != null ? kulupAd(m.rakipId) : m.rakip, O: 0, G: 0, B: 0, M: 0, AG: 0, YG: 0, son: "" };
+    const x = r.get(k) || { id: m.rakipId, ad: m.rakipId != null ? kulupAd(m.rakipId) : m.rakip, rlogo: m.rlogo, O: 0, G: 0, B: 0, M: 0, AG: 0, YG: 0, son: "" };
     x.O++; x[m.s]++; x.AG += m.a; x.YG += m.y; x.son = m.tarih > x.son ? m.tarih : x.son; r.set(k, x);
   }
   let liste = [...r.values()], sira = "O", ters = true, ara = "";
@@ -793,7 +793,7 @@ function rakipTablosu(hedef, ms, id) {
     hedef.innerHTML = `<div class="filtre"><input type="search" id="rAra" placeholder="Rakip ara…" value="${esc(ara)}"><span class="soluk">${liste.length} farklı rakip</span></div>
     <div class="tablo-kap"><table class="tablo"><thead><tr>
       ${[["ad", "Rakip"], ["O", "O"], ["G", "G"], ["B", "B"], ["M", "M"], ["AG", "AG"], ["YG", "YG"], ["Av", "Av"]].map(([k, a]) => `<th class="sirala ${k === "ad" ? "" : "s"}" data-k="${k}">${a}${sira === k ? (ters ? " ↓" : " ↑") : ""}</th>`).join("")}<th class="gizle-mobil">Son maç</th><th></th></tr></thead>
-    <tbody>${g.slice(0, 400).map(x => `<tr><td class="ad">${x.id != null ? kulupBag(x.id) : esc(x.ad)}</td><td class="s">${x.O}</td><td class="s">${x.G}</td><td class="s">${x.B}</td><td class="s">${x.M}</td>
+    <tbody>${g.slice(0, 400).map(x => `<tr><td class="ad">${x.id != null ? kulupBag(x.id) : rakipBag({ rakipId: null, rakip: x.ad, rlogo: x.rlogo })}</td><td class="s">${x.O}</td><td class="s">${x.G}</td><td class="s">${x.B}</td><td class="s">${x.M}</td>
       <td class="s">${x.AG}</td><td class="s">${x.YG}</td><td class="s">${x.AG - x.YG > 0 ? "+" : ""}${x.AG - x.YG}</td><td class="gizle-mobil">${tarihYaz(x.son)}</td>
       <td>${x.id != null ? `<a class="bag" href="#/${K}h2h/${id}/${x.id}">maçlar →</a>` : ""}</td></tr>`).join("")}</tbody></table></div>`;
     hedef.querySelectorAll("th.sirala").forEach(th => th.addEventListener("click", () => { if (sira === th.dataset.k) ters = !ters; else { sira = th.dataset.k; ters = sira !== "ad"; } ciz(); }));
@@ -1837,7 +1837,7 @@ async function rekorlarSayfa(kap) {
     const acik = rekorDurum.acik.has(id), n = acik ? l.length : 10;
     return `<div class="tablo-kap rekor-tablo-kap"><table class="tablo rekor-tablo"><tbody>${l.slice(0, n).map((m, i) => `<tr>
       <td class="s sira">${r[i]}</td><td class="tarih">${tarihYaz(m[0])}<br><a class="bag" href="${szH(m)}">${esc(m[1])}</a></td>
-      <td class="ad" style="text-align:right" title="${esc(m[5])}">${kB(m[4], m[5])}</td><td class="o skor">${skorBag(m[13], skorYaz(m[8], m[9], m[10], m[11], m[12]))}</td><td class="ad" title="${esc(m[7])}">${kB(m[6], m[7])}</td>
+      <td class="ad" style="text-align:right" title="${esc(m[5])}">${kB(m[4], m[5])}</td><td class="o skor">${m[15] ? `<a class="skor bagli" href="#/${m[15]}">${skorYaz(m[8], m[9], m[10], m[11], m[12])}</a>` : skorBag(m[13], skorYaz(m[8], m[9], m[10], m[11], m[12]))}</td><td class="ad" title="${esc(m[7])}">${kB(m[6], m[7])}</td>
       <td class="ek soluk" style="font-size:13px">${esc(m[2] || "")}${m[3] ? ` · ${esc(m[3])}` : ""}</td></tr>`).join("")}</tbody></table></div>
       ${l.length > 10 ? `<button class="dugme daha" data-ac="${id}">${acik ? "Daha az göster" : `İlk ${l.length}'i göster`}</button>` : ""}`;
   };
@@ -1877,7 +1877,7 @@ async function rekorlarSayfa(kap) {
     <p class="soluk not">Kaynak: ${BOLUM === "kadin" ? `${KADIN_KAYNAK}. Kendi kalesine goller hariç, penaltı golleri dahil.` : `TFF maç sayfaları — lig 1991-92'den, Türkiye Kupası 1991-2007${MK_NOT()}. Kendi kalesine goller hariç, penaltı golleri dahil.`}</p>`;
   };
   // tabela kartları: kapsamın zirvesindeki rekorlar büyük skor tabelasında
-  const tabelaKart = (baslik, m) => !m ? "" : `<a class="tabela-kart" href="${detayVar(m[13]) ? `#/${K}mac/${m[13]}` : szH(m)}">
+  const tabelaKart = (baslik, m) => !m ? "" : `<a class="tabela-kart" href="${detayVar(m[13]) ? `#/${K}mac/${m[13]}` : m[15] ? `#/${m[15]}` : szH(m)}">
     <span class="tk-bas">${baslik}</span>
     <span class="tk-skor"><span class="tk-takim">${lgR(m[4])}<span>${esc(kisaR(m[4], m[5]))}</span></span><b>${m[8]}<i>:</i>${m[9]}</b><span class="tk-takim">${lgR(m[6])}<span>${esc(kisaR(m[6], m[7]))}</span></span></span>
     <span class="tk-alt">${tarihYaz(m[0])} · ${esc(m[2] || "")}${m[3] ? ` · ${esc(m[3])}` : ""}</span></a>`;
