@@ -25,6 +25,7 @@
   "bagla": [
     ["mackolik_arsiv:611", "tff:5011", "Sinopspor (1970): 3. Lig 1984-89 ve 2001-05 (tr.wikipedia Sinopspor); Köy Hiz. Sinopspor ayri"],
     ["mackolik_arsiv:9740", "tff:3661", "Ümraniyespor (1938): 3. Lig 1984-87 arşiv kaydı, aynı kulüp"],
+    ["mackolik_arsiv:9699", "tff:3667", "Eskişehir Demirspor: 1967-88 arşiv kaydı ile bugünkü kulüp aynı (kullanıcı, 2026-11-20)"],
     ["tff:5331", "mackolik_arsiv:13485", "Afşinspor: ayni kulup (cift kayit denetimi 2026-11-12)"],
     ["mackolik_arsiv:234", "mackolik:d0zdg647gvgc95xdtk1vpbkys", "Ajax: ayni kulup (cift kayit denetimi 2026-11-12)"],
     ["tff:5315", "mackolik_arsiv:13510", "Alaşehirspor: ayni kulup (cift kayit denetimi 2026-11-12)"],
@@ -155,6 +156,7 @@
   "kulup_adi": {
     "_aciklama": "Ayni adli ayri kulupleri ayirt etmek icin elle gorunen ad",
     "tff:2035": "24 Erzincanspor",
-    "tff:379": "Çankırı Belediyespor"
+    "tff:379": "Çankırı Belediyespor",
+    "tff:3667": "Eskişehir Demirspor"
   }
 }

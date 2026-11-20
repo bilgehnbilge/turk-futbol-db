@@ -9,7 +9,8 @@ const YAR_RENK = { milli_kume: "var(--vurgu)", sampiyona: "var(--g)", basbakanli
 
 // eski kulüp: sitedeki kulübe bağlıysa onun sayfasına (logosuyla), değilse düz ad
 const kAd = (d, i) => { const k = d.kulupler[i]; return k ? k.ad : "?"; };
-const kBag = (d, i) => { const k = d.kulupler[i]; return !k ? "?" : k.kulup != null && KULUP.has(k.kulup) ? kulupBag(k.kulup, k.ad) : esc(k.ad); };
+const eLogo = k => k?.logo ? `<img class="logo-k" src="logo/${k.logo}.png" alt="" loading="lazy" onerror="this.remove()">` : "";   // sitede kulübü olmayan eski kulüp
+const kBag = (d, i) => { const k = d.kulupler[i]; return !k ? "?" : k.kulup != null && KULUP.has(k.kulup) ? kulupBag(k.kulup, k.ad) : eLogo(k) + esc(k.ad); };
 const yarAd = (d, y) => (d.yarismalar.find(x => x[0] === y) || [, y])[1];
 const sezonAd = s => s.length === 4 ? s : s.replace("-", "–");
 const ust = (baslik, alt) => `<p class="soluk ust-bag"><a class="bag" href="#/sezonlar">Sezonlar</a> · <a class="bag" href="#/eski">1959 öncesi</a></p>
@@ -74,7 +75,7 @@ async function eskiSezonSayfa(y, sz) {
     const kul = sira.length ? sira : [...new Set(s.maclar.flatMap(m => [m[0], m[1]]))];
     const h = new Map(); for (const m of s.maclar) if (m[2] != null) h.set(`${m[0]}|${m[1]}`, m);
     const kis = i => { const a = kAd(d, i); return a.length > 3 ? a.slice(0, 3).toLocaleUpperCase("tr") : a.toLocaleUpperCase("tr"); };
-    const lg = i => { const k = d.kulupler[i]; return k?.kulup != null && KULUP.get(k.kulup)?.logo ? logoImg(k.kulup) : ""; };
+    const lg = i => { const k = d.kulupler[i]; return k?.kulup != null && KULUP.get(k.kulup)?.logo ? logoImg(k.kulup) : eLogo(k); };
     maclar = `<h2 class="bolum">Sonuçlar</h2><p class="soluk aciklama">Satır ev sahibi, sütun konuk. Renk ev sahibinin sonucu: yeşil galibiyet, sarı beraberlik, kırmızı mağlubiyet. Maç tarihleri kaynakta yok.</p>
     <div class="tablo-kap matris-sonuc-kap"><table class="matris-sonuc"><thead><tr><th class="mt-kose">Ev \\ Konuk</th>${kul.map(k => `<th class="mt-bas" title="${esc(kAd(d, k))}">${lg(k) || `<span>${esc(kis(k))}</span>`}</th>`).join("")}</tr></thead><tbody>
     ${kul.map(a => `<tr><td class="mt-ad">${lg(a)}<span>${esc(kAd(d, a))}</span></td>${kul.map(b => {

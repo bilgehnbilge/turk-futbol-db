@@ -21,8 +21,12 @@ ACIKLAMA = {
     "diger": "Vikipedi'de ayrı maddesi olan, yukarıdaki yarışmaların dışındaki maçlar (İstanbul Ligi derbileri, Gazi Büstü).",
 }
 # ad -> sitedeki kulüp no (None: bağlama). Otomatik eşlemenin üstüne yazılır.
-ELLE = {"Güneş": None,   # İstanbul Güneş SK (1930'lar); Ankara Güneşspor değil
-        "Güneşspor": None, "Hacettepe": None}
+ELLE = {"Güneş": None,   # İstanbul Güneş SK (1930'lar); Ankara Güneşspor değil (logosu LOGO'da)
+        "Güneşspor": "ad:Ankara Güneşspor",   # 1956-57 Federasyon Kupası: Ankara Güneşspor (kullanıcı)
+        "Hacettepe": None,
+        "Eskişehir Demirspor": "tff:3667"}
+# sitede kulübü olmayan eski kulüplerin logoları (docs/logo/<ad>.png; kullanıcının verdiği)
+LOGO = {"Güneş": "e_gunes", "Harp Okulu": "e_harp_okulu"}   # "tff:<no>": o TFF numaralı kulüp (1959 öncesi Demirspor = bugünkü kulüp, kullanıcı)
 
 
 def main():
@@ -38,6 +42,8 @@ def main():
         if z["yerli"] and z["ilk"][:4] <= "1963":
             for a in [z["ad"]] + [x[0] for x in z["adlar"]]:
                 idx[logo.kok(a)].add(z["id"])
+    tff_no = {f"tff:{t}": z["id"] for z in Z for t in z.get("tff") or []}
+    tff_no.update({f"ad:{z['ad']}": z["id"] for z in Z if z["yerli"]})   # ELLE'de "ad:<sitedeki ad>" da olur
     # Vikipedi'deki tek maç maddeleri (wiki_mac.py): RSSSF'deki maça golcü ve tarih; RSSSF'de olmayanlar "Ünlü maçlar"
     W = json.load(open(os.path.join(KOK, "wiki_mac.json"), encoding="utf-8")) if os.path.exists(os.path.join(KOK, "wiki_mac.json")) else []
     WIKI_ELLE = {("Fenerbahçe 0-7 Galatasaray", "1911-02-12"): ([], [["Celal İbrahim", None, None]] * 4 + [["Emin Bülent", None, None]] * 2 + [["İdris", None, None]])}
@@ -73,9 +79,10 @@ def main():
         adlar[m["ev"]] += 1; adlar[m["dep"]] += 1
     kulup = {}
     for a in adlar:
-        sade = re.sub(r"\s+(Istanbul|İstanbul|Ankara|İzmir|Izmir)$", "", a)
+        sade = re.sub(r"\s+(Istanbul|İstanbul|Ankara|İzmir|Izmir)$", "", re.split(r"\s{3,}", a)[0])   # RSSSF notu yapışmış adlar
         if a in ELLE or sade in ELLE:
             k = ELLE.get(a, ELLE.get(sade))
+            k = tff_no.get(k) if isinstance(k, str) else k
         else:
             c = idx.get(logo.kok(sade), set())
             k = next(iter(c)) if len(c) == 1 else None
@@ -84,10 +91,10 @@ def main():
     no = {}
     liste = []
     for a, n in adlar.most_common():
-        sade = re.sub(r"\s+(Istanbul|İstanbul|Ankara|İzmir|Izmir)$", "", a)
+        sade = re.sub(r"\s+(Istanbul|İstanbul|Ankara|İzmir|Izmir)$", "", re.split(r"\s{3,}", a)[0])   # RSSSF notu yapışmış adlar
         if sade not in no:
             no[sade] = len(liste)
-            liste.append({"ad": sade, "kulup": kulup[a], "mac": 0})
+            liste.append({"ad": sade, "kulup": kulup[a], "mac": 0, **({"logo": LOGO[sade]} if sade in LOGO and kulup[a] is None else {})})
         no[a] = no[sade]
     sezonlar = collections.defaultdict(lambda: {"maclar": [], "tablo": None, "kral": []})
     # Millî Küme: sonuç tablosunda zaten olan eşleşme ayrıca listede yazılıysa (yarıda kalan maç) notu tablodaki maça taşınır
