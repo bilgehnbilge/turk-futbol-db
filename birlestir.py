@@ -731,6 +731,12 @@ def mac_duzelt(c, dz, no_bul, kes_no):
         k = c.execute("""UPDATE mac SET ev_gol=?, dep_gol=?, durum=?, notlar=? WHERE sezon=? AND tarih=? AND ev_kulup=? AND dep_kulup=?""",
                       (d.get("ev_gol"), d.get("dep_gol"), d["durum"], d.get("not"), d["sezon"], d["tarih"], ev, dep)).rowcount
         yaz(f"   Elle mac duzeltmesi ({d['sezon']} {d['tarih']}): {k} mac")
+    for d in dz.get("cekilme", []):   # ligden cekilen takim: o sezonki 0-3 maclari hukmen
+        no = no_bul(("tff", kes_no(d["kim"].split(":")[1], d["sezon"])))
+        k = c.execute("""UPDATE mac SET durum='Hük.', notlar=? WHERE sezon=? AND yarisma=? AND durum='MS'
+                         AND ((ev_kulup=? AND ev_gol=0 AND dep_gol=3) OR (dep_kulup=? AND ev_gol=3 AND dep_gol=0))""",
+                      (d.get("not"), d["sezon"], d.get("yarisma", "lig"), no, no)).rowcount
+        yaz(f"   Ligden cekilme ({d['kim']} {d['sezon']}): {k} mac hukmen")
 
 
 def fazla_maclar(c, secilen):

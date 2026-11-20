@@ -73,7 +73,8 @@
     ["mackolik_arsiv:247", "mackolik:4tic29sox7m39fy1ztgv0jsiq", "Twente: ayni kulup (cift kayit denetimi 2026-11-12)"],
     ["mackolik_arsiv:121", "mackolik:cu0eztmjcsbydyp53aleznorw", "Werder Bremen: ayni kulup (cift kayit denetimi 2026-11-12)"],
     ["tff:263", "tff:5342", "Çayelispor: ayni kulup (cift kayit denetimi 2026-11-12)"],
-    ["mackolik_arsiv:12973", "tff:263", "Çayelispor (1949): 1973-94 arşiv kaydı, aynı kulüp"]
+    ["mackolik_arsiv:12973", "tff:263", "Çayelispor (1949): 1973-94 arşiv kaydı, aynı kulüp"],
+    ["mackolik_arsiv:625", "tff:1211", "Hacettepe SK: 1947 Sanayi Barbarosspor, 1998 Asaşspor, Gençlerbirliği ASAŞ/OFTAŞ, 2008 Hacettepe (tr.wikipedia Hacettepe_SK; kullanıcı, 2026-11-20)"]
   ],
 
   "baglama": [
@@ -104,7 +105,10 @@
     {"kim": "tff:8722", "ilk": "2015-2016", "son": "2020-2021", "ad": "Muş Menderesspor", "kaynak": "tr.wikipedia Muşspor (2015)"},
     {"kim": "tff:8722", "ilk": "2021-2022", "son": "2023-2024", "ad": "Muş 1984 Muşspor", "kaynak": "tr.wikipedia Muşspor (2015)"},
     {"kim": "tff:103", "ilk": "1959", "son": "1965-1966", "ad": "Kömürspor", "kaynak": "tr.wikipedia Fenerspor: 1942 Kömürspor, 16.07.1966 Esnafspor ile birleşip Zonguldakspor"},
-    {"kim": "tff:103", "ilk": "1966-1967", "son": "2010-2011", "eski": "Zonguldak Fenerspor", "ad": "Zonguldakspor", "kaynak": "tr.wikipedia Fenerspor"}
+    {"kim": "tff:103", "ilk": "1966-1967", "son": "2010-2011", "eski": "Zonguldak Fenerspor", "ad": "Zonguldakspor", "kaynak": "tr.wikipedia Fenerspor"},
+    {"kim": "mackolik_arsiv:625", "ilk": "1959", "son": "1996-1997", "ad": "Sanayi Barbaros", "kaynak": "tr.wikipedia Hacettepe_SK: 1947-1998 Sanayi Barbarosspor (Maçkolik bugünkü adı 'Hacettepe Spor' yazıyor)"},
+    {"kim": "mackolik_arsiv:1182", "ilk": "1959", "son": "1984-1985", "eski": "Keçiörengücü", "ad": "Hacettepe", "kaynak": "tr.wikipedia Ankara_Keçiörengücü_SK: 1945-1988 Hacettepe"},
+    {"kim": "mackolik_arsiv:1182", "ilk": "1985-1986", "son": "1987-1988", "eski": "Keçiörengücü", "ad": "Hacettepe Yeni Camuzoğlu", "kaynak": "arşivin o sezonki lig adı; Keçiörengücü adı 1988"}
   ],
 
   "mac_duzelt": [
@@ -154,7 +158,13 @@
 
   "ardil": [
     {"onceki": "tff:3688-once", "sonraki": "tff:106", "sezon": "2007-2008", "tur": "hak devri",
-     "aciklama": "Aliağa'nın yarışmacı hakkı Göztepe'ye geçti, Aliağa kapandı; Göztepe TFF 3688 numarasıyla devam etti."}
+     "aciklama": "Aliağa'nın yarışmacı hakkı Göztepe'ye geçti, Aliağa kapandı; Göztepe TFF 3688 numarasıyla devam etti."},
+    {"onceki": "tff:1211", "sonraki": "tff:3351", "sezon": "2022-2023", "tur": "hak devri",
+     "aciklama": "Hacettepe SK faaliyetlerini durdurdu; Bölgesel Amatör Lig hakkını Kalecik FK'ye devretti, kulüp Hacettepe 1945 adını aldı (tr.wikipedia Hacettepe_SK)."}
+  ],
+  "cekilme": [
+    {"kim": "tff:1211", "sezon": "2000-2001", "yarisma": "lig",
+     "not": "Asaşspor Doğu Anadolu ağırlıklı gruba alınınca ligden çekildi; maçlar 0-3 hükmen (tr.wikipedia Hacettepe_SK)"}
   ],
   "donem_logo": {"_aciklama": "Kulübün bir dönem adıyla geçtiği yerlerde o adın logosu (docs/logo/<dosya>.png; kullanıcının verdiği)",
     "tff:4710": {"Adalet": "e_adalet"},
