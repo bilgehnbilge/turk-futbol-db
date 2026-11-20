@@ -1,5 +1,5 @@
   TFF ek maclar (play-off/baraj, ozel kupalar): 130
-Kaynaklar: Mackolik 51875 mac, Avrupa 1506, TFF 131215
+Kaynaklar: Mackolik 51875 mac, Avrupa 1506, TFF 131197
 1) Mackolik<->TFF: 4721 ortak mac adayi, 410 Mackolik kulubu TFF numarasina baglandi
 2) Arsiv<->Mackolik: puan tablosundaki 2907 takim satirinin 2803'i imzayla eslendi, 274 arsiv kimligi
    Mackolik'ten TFF'de de bulunan lig sezonlari cikarildi: 884 mac
@@ -30,14 +30,14 @@ Kaynaklar: Mackolik 51875 mac, Avrupa 1506, TFF 131215
    Elle mac duzeltmesi (2026-2027 2026-11-01): 1 mac
    Elle mac duzeltmesi (2026-2027 2026-11-07): 1 mac
    Ligden cekilme (tff:1211 2000-2001): 32 mac hukmen
-   Resmi puan durumu: 898 tablo okundu, 672 lig grubuna baglandi; puan silme/ek puan satiri: 335
+   Resmi puan durumu: 898 tablo okundu, 672 lig grubuna baglandi; puan silme/ek puan satiri: 337
    Resmi tabloda sayilmayan maclar: 47 play-off, 6 gecersiz
-   Hukmen: 29 skorsuz maca resmi tablodan sonuc yazildi, 919 oynanmamis mac eklendi
+   Hukmen: 33 skorsuz maca resmi tablodan sonuc yazildi, 920 oynanmamis mac eklendi
 
-futbol.db: 184690 mac, 1864 kulup
+futbol.db: 184673 mac, 1864 kulup
    avrupa 1506 1956-1957 2026-2027
    kupa 7901 1962-1963 2026-2027
-   lig 174547 1959 2026-2027
+   lig 174530 1959 2026-2027
    ozel_kupa 85 1965-1966 2025-2026
    terfi 651 1959-1960 1982-1983
 
@@ -132,6 +132,6 @@ Sezon tamligi: 876 lig grubunun 821'inde mac sayisi tam (n*(n-1)). Tutmayanlar (
    (5, '2023-2024', '9.GRUP', 13, 155, 156)
    (5, '2025-2026', '1. GRUP', 14, 181, 182)
    (5, '2025-2026', '3.GRUP', 15, 209, 210)
-   (5, '2026-2027', '12. GRUP', 13, 139, 156)
+   (5, '2026-2027', '12. GRUP', 13, 122, 156)
 
 Kulubu bulunamayan mac tarafi: 62
