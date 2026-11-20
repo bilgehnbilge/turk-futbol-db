@@ -915,7 +915,7 @@ async function mkMacAl(id) {
   const r = (await al(`data/mk/m/${no.slice(0, 2)}.json?s=${OZET.surum || ""}`).catch(() => ({})))[no];
   if (!r) return null;
   const [tarih, saat, sezon, lig, tur, ev, dep, skor] = r.m;
-  return { id, tarih, saat, sezon, lig, tur, ev, dep, skor, kaynak: "Maçkolik", kadro: [[], []], teknik: [[], []],
+  return { id, tarih, saat, sezon, lig, tur, ev, dep, skor, kaynak: "Maçkolik", olayLehine: true, kadro: [[], []], teknik: [[], []],
     olay: r.o.map(([taraf, tur, dk, ek, a1, a2, ay]) => [taraf, tur, dk, ek, a1, a2, ay, null, null]) };
 }
 // Vikipedi'deki tek maç maddelerinin golcüleri (kupa finalleri, Cumhurbaşkanlığı / Başbakanlık kupaları): data/wk.json
@@ -926,7 +926,7 @@ async function wkMacAl(id) {
   const r = WK[id];
   if (!r) return null;
   const [tarih, saat, sezon, lig, tur, ev, dep, skor] = r.m;
-  return { id, tarih, saat, sezon, lig, tur, ev, dep, skor, stad: r.s, hakem: r.h, kaynak: "Vikipedi", madde: r.q, kadro: [[], []], teknik: [[], []],
+  return { id, tarih, saat, sezon, lig, tur, ev, dep, skor, stad: r.s, hakem: r.h, kaynak: "Vikipedi", olayLehine: true, madde: r.q, kadro: [[], []], teknik: [[], []],
     olay: r.o.map(([taraf, tur, dk, ek, a1, a2, ay]) => [taraf, tur, dk, ek, a1, a2, ay, null, null]) };
 }
 async function macSayfa(id) {
@@ -934,12 +934,12 @@ async function macSayfa(id) {
   let d = (DETAYLI ||= new Set(OZET.detayli || [])).has(id) ? await al(`${V}mac/${id}.json?s=${OZET.surum || ""}`) : await tffMacAl(id);
   if (!d || (d.kaynak === "TFF" && !d.olay.some(o => o[1] === "GOAL") && (d.skor[0] || d.skor[1]))) {
     const mk = await mkMacAl(id);   // 1990-91: TFF'nin kadrosu + Maçkolik'in golleri, kartları, değişiklikleri
-    if (mk && d) { d.olay = mk.olay; d.uyum = null; d.olayKaynak = "Maçkolik"; }
+    if (mk && d) { d.olay = mk.olay; d.olayLehine = true; d.uyum = null; d.olayKaynak = "Maçkolik"; }
     else if (mk) d = mk;
   }
   if (!d || (!d.olay.some(o => o[1] === "GOAL") && (d.skor[0] || d.skor[1]))) {
     const wk = await wkMacAl(id);   // TFF'de / Maçkolik'te golü olmayan kupa maçları: Vikipedi maddesinin golcüleri
-    if (wk && d) { d.olay = wk.olay; d.uyum = null; d.olayKaynak = `Vikipedi (${wk.madde})`; }
+    if (wk && d) { d.olay = wk.olay; d.olayLehine = true; d.uyum = null; d.olayKaynak = `Vikipedi (${wk.madde})`; }
     else if (wk) d = wk;
   }
   if (!d) { icerik.innerHTML = `<div class="bos">Bu maçın ayrıntısı yok.</div>`; return; }
@@ -947,6 +947,10 @@ async function macSayfa(id) {
 }
 function macCiz(d) {
   const onek = d.oyuncuOnek || "u";
+  // kendi kalesine gol akışta golün yazıldığı takımın (rakibin) tarafında: TFF ve UEFA verisi oyuncunun takımını tutuyor,
+  // Maçkolik ve Vikipedi olayları (olayLehine) zaten golün yazıldığı takımı
+  if (!d.olayLehine)
+    d = { ...d, olay: d.olay.map(o => o[1] === "GOAL" && o[6] === "OWN" ? [3 - o[0], ...o.slice(1)] : o) };
   const [eg, dg, ep, dp, durum] = d.skor;
   document.title = `${d.ev[1]} ${eg}-${dg} ${d.dep[1]} · Türk Futbol Arşivi`;
   const href = d.kulupHref || (kid => kid != null && KULUP.has(kid) ? `#/${K}kulup/${kid}` : null);   // kadın bölümü kendi kulüp bağlantısını verir
