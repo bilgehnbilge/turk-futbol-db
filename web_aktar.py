@@ -408,11 +408,11 @@ def main():
     for m in maclar:
         sez[m["sezon"]].append([m["id"], m["tarih"], YAR[m["yarisma"]], m["lig"], m["kademe"], tur(m), asama(m),
                                 m["ev_kulup"], okunur(m["ev_adi"]), m["dep_kulup"], okunur(m["dep_adi"]), m["ev_gol"], m["dep_gol"],
-                                m["ev_pen"], m["dep_pen"], m["durum"], m["notlar"]])
+                                m["ev_pen"], m["dep_pen"], m["durum"], m["notlar"], m["saat"] or None])
     for s, ms in sez.items():
         yaz(os.path.join(CIKTI, "sezon", f"{s}.json"), {
             "alanlar": ["id", "tarih", "yarisma", "lig", "kademe", "grup_tur", "playoff", "ev_id", "ev", "dep_id", "dep",
-                        "ev_gol", "dep_gol", "ev_pen", "dep_pen", "durum", "not"],
+                        "ev_gol", "dep_gol", "ev_pen", "dep_pen", "durum", "not", "saat"],
             "maclar": ms})
     import bugun   # ana sayfa "Bugün tarihte": gün başına seçilmiş lig ve kupa maçları
     bugun.main(os.path.join(CIKTI, "sezon"), os.path.join(CIKTI, "bugun.json"))

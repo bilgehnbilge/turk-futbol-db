@@ -95,7 +95,7 @@ def detay(etiket, db, maclar, yol_, gun=30, en_cok=1500, bekle=2.0):
     return yazilan
 
 
-def kisi(dbs, en_cok=600, bekle=2.0):
+def kisi(dbs, en_cok=600, bekle=2.0, sure=1800):
     """Kadrolarda geçip raw/kisi.db'de olmayan oyuncuların TFF kişi sayfaları (doğum tarihi/yeri, uyruk). Her çalışmada en
     çok en_cok sayfa (~2,5 sn/sayfa): eksikler (ör. BAL oyuncuları) çalışmalara yayılır. Sıra: dbs sırası, en çok maça çıkan önce."""
     import oyuncu
@@ -113,7 +113,11 @@ def kisi(dbs, en_cok=600, bekle=2.0):
     hedef = list(dict.fromkeys(hedef))[:en_cok]
     print(f"kişi: {len(hedef)} oyuncu sayfası indirilecek", flush=True)
     n = hata = 0
+    bas = time.time()
     for x in hedef:
+        if time.time() - bas > sure:   # TFF kişi sayfaları yavaş (~6 sn/sayfa): bot süresi aşılmasın
+            print(f"  kişi: {sure // 60} dakika doldu, kalanı sonraki çalışmada", flush=True)
+            break
         y = oyuncu.kisi_yol(x)
         if os.path.exists(y):
             t = gzip.open(y).read()

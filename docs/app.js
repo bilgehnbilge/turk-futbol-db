@@ -1686,7 +1686,7 @@ async function sezonSayfa(sezon) {
   document.title = `${sezon} · Türk Futbol Arşivi`;
   icerik.innerHTML = `<div class="yukleniyor">${esc(sezon)} yükleniyor…</div>`;
   const d = await al(`data/sezon/${sezon}.json?s=${OZET.surum || ""}`);
-  const ms = d.maclar.map(r => ({ id: r[0], tarih: r[1], yar: r[2], lig: r[3], kademe: r[4], tur: r[5], po: r[6] === "p" || r[6] === "x", iptal: r[6] === "x", ev: r[7], evAd: r[8], dep: r[9], depAd: r[10], eg: r[11], dg: r[12], ep: r[13], dp: r[14], durum: r[15] }));
+  const ms = d.maclar.map(r => ({ id: r[0], tarih: r[1], yar: r[2], lig: r[3], kademe: r[4], tur: r[5], po: r[6] === "p" || r[6] === "x", iptal: r[6] === "x", ev: r[7], evAd: r[8], dep: r[9], depAd: r[10], eg: r[11], dg: r[12], ep: r[13], dp: r[14], durum: r[15], saat: r[17] }));
   const i = OZET.sezonlar.indexOf(sezon);
   const onceki = OZET.sezonlar[i - 1], sonraki = OZET.sezonlar[i + 1];
   const gruplar = new Map();

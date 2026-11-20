@@ -181,7 +181,7 @@ function ligBolumu(kap, sezon, sirali, Z, sec = {}) {
     const yaris = yarisCiz(yarisKap, L, takimSec, id => tbody.querySelectorAll("tr").forEach(tr => tr.classList.toggle("vurgu-sat", id != null && tr.dataset.t === String(id))));
     // maçlar
     let macHafta = Math.min(L.sonHafta || 1, L.toplamHafta || 1);
-    const satir = m => `<div class="tabela${durum.takim != null ? " sonuclu" : ""}">${durum.takim != null ? `<span class="son ${sonucBak(m, durum.takim)}">${sonucBak(m, durum.takim)}</span>` : ""}<span class="tarih">${tarihYaz(m.tarih)}${durum.takim != null && m.hafta ? ` · ${m.hafta}. h` : ""}</span>
+    const satir = m => `<div class="tabela${durum.takim != null ? " sonuclu" : ""}">${durum.takim != null ? `<span class="son ${sonucBak(m, durum.takim)}">${sonucBak(m, durum.takim)}</span>` : ""}<span class="tarih">${tarihYaz(m.tarih)}${m.saat ? `<span class="saat">${esc(m.saat)}</span>` : ""}${durum.takim != null && m.hafta ? ` · ${m.hafta}. h` : ""}</span>
       <span class="ev">${typeof m.ev === "number" ? logoImg(m.ev) : ""}<span>${esc(kisaAd(m.ev, m.evAd))}</span></span>${skorBag(m.id, `<b class="skor">${skorYaz(m.eg, m.dg, m.ep, m.dp, m.durum)}</b>`)}
       <span class="dep"><span>${esc(kisaAd(m.dep, m.depAd))}</span>${typeof m.dep === "number" ? logoImg(m.dep) : ""}</span></div>`;
     const sonucBak = (m, id) => { if (m.eg == null) return "N"; const ev = tid(m, "ev") === id; const a = ev ? m.eg : m.dg, b = ev ? m.dg : m.eg; return a > b ? "G" : a < b ? "M" : "B"; };

@@ -15,7 +15,7 @@ const kOzet = async () => KZ;
 const s_ = () => KZ.surum || "";
 const kMaclar = async () => KM ||= (await al(`data/kadin/maclar.json?s=${s_()}`)).maclar.map(r => ({
   tff: r[0], tarih: r[1], sezon: r[2], kademe: r[3], lig: r[4], grup: r[5], asama: r[6], hafta: r[7], ev: r[8], dep: r[9],
-  eg: r[10], dg: r[11], ep: r[12], dp: r[13], ayr: r[14], durum: r[15] }));
+  eg: r[10], dg: r[11], ep: r[12], dp: r[13], ayr: r[14], durum: r[15], saat: r[16] }));
 const kOyuncular = async () => KOY ||= (await al(`data/kadin/tff/oyuncular.json?s=${s_()}`)).oyuncu.map(r => ({ kisi: r[0], ad: r[1], mac: r[2], gol: r[3], ilk: r[4], son: r[5], kulup: r[6] }));
 const kAd = id => KK.get(id)?.ad ?? "?";
 const kLogo = (id, cls = "logo-k") => { const l = KK.get(id)?.logo; return l ? `<img class="${cls}" src="logo/${l}.png" alt="" loading="lazy" onerror="this.remove()">` : ""; };
@@ -133,7 +133,7 @@ async function kadinSezon(sezon, kademeSec) {
   const km = ms.filter(m => m.kademe === kad);
   // lig bölümü sezon.js'teki ligBolumu ile (lig seçici, hafta kaydırıcı, sıralama yarışı, maçlar): kadın maçları o biçime çevrilir
   const cevir = m => ({ id: m.tff, tarih: m.tarih, yar: "L", lig: kademeAd(sezon, m.kademe), kademe: m.kademe, tur: m.grup || "", ev: m.ev, evAd: kAd(m.ev), dep: m.dep, depAd: kAd(m.dep),
-    eg: m.eg, dg: m.dg, ep: m.ep, dp: m.dp, durum: m.durum === "H" ? "Hük." : m.durum });
+    eg: m.eg, dg: m.dg, ep: m.ep, dp: m.dp, durum: m.durum === "H" ? "Hük." : m.durum, saat: m.saat });
   const gruplar = new Map();
   for (const m of ms.filter(m => !m.asama)) { const k = `${m.kademe}|${m.grup || ""}`; (gruplar.get(k) || gruplar.set(k, { yar: "L", kademe: m.kademe, lig: kademeAd(sezon, m.kademe), grup: m.grup ? (/^\d+$/.test(m.grup) ? `${+m.grup}. grup` : m.grup) : "", ms: [] }).get(k)).ms.push(cevir(m)); }
   const sirali = [...gruplar.values()].sort((a, b) => a.kademe - b.kademe || String(a.grup).localeCompare(String(b.grup), "tr", { numeric: true }));

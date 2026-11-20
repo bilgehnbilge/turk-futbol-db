@@ -637,6 +637,11 @@ def main():
         for s in ("ev", "dep"):   # "eski" verilmisse yalniz o adla yazilmis maclar
             c.execute(f"UPDATE mac SET {s}_adi=? WHERE {s}_kulup=? AND sezon BETWEEN ? AND ? AND (? IS NULL OR {s}_adi=?)",
                       (d["ad"], no, d["ilk"], d["son"], d.get("eski"), d.get("eski")))
+    # Mackolik saatleri: 1990 oncesi lig maclarinda kisin 11:00, yazin 12:00 (UTC'ye cevrilmis tek tip deger, gercek
+    # baslama saati degil); Avrupa/kupa maclarinda 00:00-07:59 arasi anlamsiz degerler. 1990 sonrasi TFF ile birebir tutuyor.
+    n = c.execute("""UPDATE mac SET saat=NULL WHERE kaynak='mackolik' AND saat<>''
+                     AND ((yarisma='lig' AND sezon<'1990-1991') OR saat<'08:00')""").rowcount
+    yaz(f"   Guvenilmez Mackolik saati silindi: {n}")
     c.execute("""INSERT INTO kulup_adi
                  SELECT kulup, ad, MIN(sezon), MAX(sezon), COUNT(*) FROM
                    (SELECT ev_kulup kulup, ev_adi ad, sezon FROM mac UNION ALL SELECT dep_kulup, dep_adi, sezon FROM mac)

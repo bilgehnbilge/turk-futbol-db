@@ -398,6 +398,7 @@ details.rekor[open] summary::after { content: "Gizle ▴"; }
 .tabelalar { display: flex; flex-direction: column; margin-top: 4px; }
 .tabela { display: grid; grid-template-columns: 78px minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 10px; padding: 7px 0; border-top: 1px solid var(--cizgi); font-size: 14px; }
 .tabela .tarih { color: var(--soluk); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.tabela .saat { display: block; font-size: 11.5px; opacity: .85; }
 .tabela .ev { display: flex; align-items: center; justify-content: flex-end; min-width: 0; text-align: right; }
 .tabela .dep { display: flex; align-items: center; min-width: 0; }
 .tabela .ev > :not(img), .tabela .dep > :not(img) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -409,6 +410,7 @@ details.rekor[open] summary::after { content: "Gizle ▴"; }
 .seri-maclar .tabela:first-child { border-top: 0; }
 @media (max-width: 520px) {
   .tabela { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); } .tabela .tarih { grid-column: 1 / -1; }
+  .tabela .saat { display: inline; margin-left: 4px; }
   .tabela.sonuclu { grid-template-columns: 22px minmax(0, 1fr) auto minmax(0, 1fr); } .tabela.sonuclu .tarih { grid-column: 2 / -1; grid-row: 1; }
   .tabela.sonuclu .son { grid-row: 1 / 3; }
 }

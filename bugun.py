@@ -19,7 +19,7 @@ GUNDE = 6
 
 
 def neden_puan(r):
-    _id, tarih, yar, lig, kademe, tur, po, ev, _e, dep, _d, eg, dg, ep, dp, durum, _not = r
+    _id, tarih, yar, lig, kademe, tur, po, ev, _e, dep, _d, eg, dg, ep, dp, durum, _not = r[:17]
     if eg is None or dg is None or not tarih:
         return None
     tur = tur or ""

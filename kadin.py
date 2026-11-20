@@ -88,10 +88,14 @@ def guncel():
         klasor = os.path.join(HAM, f"{kaynak}_{sezon}_{pid}")
         if os.path.isdir(klasor):
             shutil.rmtree(klasor)
-        topla.sezon_indir(d, kaynak, sezon, pid)
-        giris = os.path.join(klasor, "giris.html")
-        t = open(giris, encoding="cp1254", errors="replace").read() if os.path.exists(giris) else ""
-        if not any((m["tarih"] or "") >= f"{sezon[:4]}-08-01" for m in topla.maclar(t) or []):
+        import glob
+        yeni_mi = lambda: any((m["tarih"] or "") >= f"{sezon[:4]}-08-01"
+                              for f in glob.glob(os.path.join(klasor, "*.html"))
+                              for m in topla.maclar(open(f, encoding="cp1254", errors="replace").read()) or [])
+        topla.sezon_indir(d, kaynak, sezon, pid, deneme=True)   # önce ilk iki grup: sayfa eski sezondaysa gerisi inmez
+        if yeni_mi():
+            topla.sezon_indir(d, kaynak, sezon, pid)   # gruplu liglerde (3. Lig) maçlar grup/hafta sayfalarında, giriş sayfasında değil
+        if not yeni_mi():
             print(f"{kaynak} {sezon}: sayfa henüz yeni sezona geçmemiş, atlandı", flush=True)
             shutil.rmtree(klasor, ignore_errors=True)
         elif os.path.isdir(klasor):

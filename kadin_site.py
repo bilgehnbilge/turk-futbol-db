@@ -73,7 +73,7 @@ def aktar():
         tff = int(tff) if tff.isdigit() else -mid
         asama = "" if asama == "lig" else ASAMA.get(asama, asama)
         maclar.append([tff, tarih, sezon, kademe, lig, grup or "", asama, hafta, ev, dep, eg, dg, ep, dp,
-                       1 if tff in detay else 0, durum or (ham if eg is None and ham not in (None, "", "-") else None)])
+                       1 if tff in detay else 0, durum or (ham if eg is None and ham not in (None, "", "-") else None), saat or None])
         for k in (ev, dep):
             kul_mac[k] += 1
             sezon_kul[k].add(sezon)
@@ -91,13 +91,13 @@ def aktar():
 
     os.makedirs(CIKTI, exist_ok=True)
     yaz(os.path.join(CIKTI, "maclar.json"), {
-        "alanlar": ["tff", "tarih", "sezon", "kademe", "lig", "grup", "asama", "hafta", "ev", "dep", "ev_gol", "dep_gol", "ev_pen", "dep_pen", "ayrinti", "durum"],
+        "alanlar": ["tff", "tarih", "sezon", "kademe", "lig", "grup", "asama", "hafta", "ev", "dep", "ev_gol", "dep_gol", "ev_pen", "dep_pen", "ayrinti", "durum", "saat"],
         "maclar": maclar})
 
     # ---- erkek bölümüyle aynı biçimde: kulüp maç dosyaları ve TFF ayrıntıları (kulüp, maç, oyuncu sayfaları app.js'in kodunu kullanır)
     m_dict = []
     for r in maclar:
-        tff, tarih, sezon, kademe, lig, grup, asama, hafta, ev, dep, eg, dg, ep, dp, ayr, durum = r
+        tff, tarih, sezon, kademe, lig, grup, asama, hafta, ev, dep, eg, dg, ep, dp, ayr, durum = r[:16]
         m_dict.append({"id": tff, "kaynak": "tff" if tff > 0 else "puan", "kaynak_id": str(tff), "yarisma": "lig", "lig": lig, "kademe": kademe, "sezon": sezon,
                        "grup": grup or None, "asama": "play-off" if asama else "lig", "tur": asama or None, "tarih": tarih, "saat": None,
                        "ev_kulup": ev, "dep_kulup": dep, "ev_adi": kulup[ev]["ad"], "dep_adi": kulup[dep]["ad"], "ev_gol": eg, "dep_gol": dg,
