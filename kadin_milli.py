@@ -114,49 +114,48 @@ def _sade(a):
 
 
 def uefa_tamamla(detay, maclar):
-    """TFF sayfasında bir tarafın kadrosu boş olan maçlara UEFA'dan rakip kadrosu, teknik direktörü ve olayları; TFF'de
-    Türkiye'nin golleri yoksa onları da (oyuncular TFF kadrosuna soyadıyla bağlanır). Tamamlanan maçlara "uq": "UEFA"."""
+    """TFF maç ayrıntılarındaki eksikleri UEFA maç verisinden doldurur (aynı gün tek UEFA maçı olanlar): boş kadro,
+    teknik direktör, bir tarafın hiç olayı yoksa kartlar ve değişiklikler, golleri skordan eksik taraf (UEFA'nınki skorla
+    tutuyorsa), stat, seyirci, hakem. Türkiye oyuncuları TFF kadrosuna soyadıyla bağlanır. Eklenenler "uq" listesinde.
+    maclar: [tff, tarih, saha (E/D), attığı, yediği]. Döner: (tamamlanan maç sayısı, {tff: Türkiye teknik direktörü})."""
     import gzip, json
     yol = os.path.join(UEFA_HAM, "maclar.json")
     if not os.path.exists(yol):
-        return 0
+        return 0, {}
     tarih = {}
     for mid, m in json.load(open(yol, encoding="utf-8")).items():
         tarih.setdefault(m["kickOffTime"]["date"], []).append(mid)
-    n = 0
-    for x in maclar:
-        tff, gun = x[0], x[1]
+    en = lambda t, k: ((t or {}).get(k) or {}).get("EN")
+    n, tr_td = 0, {}
+    for tff, gun, saha, a, y in maclar:
         r = detay.get(tff)
-        if not r or all(r["k"]) or len(tarih.get(gun, [])) != 1:
+        if not r or len(tarih.get(gun, [])) != 1:
             continue
         f = os.path.join(UEFA_HAM, "mac", f"{tarih[gun][0]}.json.gz")
         if not os.path.exists(f):
             continue
         d = json.load(gzip.open(f, "rt", encoding="utf-8"))
         m, k_ = d["mac"], d.get("kadro") or {}
-        if k_.get("lineupStatus") == "NOT_AVAILABLE":
-            continue
+        ek = []
         tr_s = "homeTeam" if m["homeTeam"]["id"] == UEFA_TR else "awayTeam"
         rk_s = "awayTeam" if tr_s == "homeTeam" else "homeTeam"
-        # sitedeki Türkiye tarafı TFF sayfasındaki gibi; TFF'de iki kadro da yoksa listedeki saha (E/D)
-        tr_i = (0 if r["k"][0] else 1) if any(r["k"]) else (0 if x[4] != "D" else 1)
+        tr_i = 0 if saha != "D" else 1                   # sitedeki Türkiye tarafı (TFF'deki saha)
+        TR, RK = tr_i + 1, 2 - tr_i
         def kadro_al(s_):
             x_ = k_.get(s_) or {}
             kad = [[str(p.get("jerseyNumber") or ""), (p.get("player") or {}).get("internationalName"), ilk11, None, None]
                    for ilk11, b in ((1, "field"), (0, "bench")) for p in x_.get(b) or []]
-            td = [[(((c.get("person") or {}).get("translations") or {}).get("name") or {}).get("EN"), None]
+            td = [[en((c.get("person") or {}).get("translations"), "name") or (c.get("person") or {}).get("internationalName"), None]
                   for c in x_.get("coaches") or [] if c.get("role", "COACH") == "COACH"]
             return kad, [t for t in td if t[0]]
-        kad, td = kadro_al(rk_s)
-        if not kad:
-            continue
-        if not r["k"][tr_i]:
-            r["k"][tr_i], td_tr = kadro_al(tr_s)
-            if not r["t"][tr_i]:
-                r["t"][tr_i] = td_tr
-        r["k"][1 - tr_i] = kad
-        if not r["t"][1 - tr_i]:
-            r["t"][1 - tr_i] = td
+        for i, s_ in ((tr_i, tr_s), (1 - tr_i, rk_s)):
+            kad, td = kadro_al(s_)
+            if kad and not r["k"][i]:
+                r["k"][i] = kad; ek.append("kadro")
+            if td and not r["t"][i]:
+                r["t"][i] = td; ek.append("teknik direktör")
+        if r["t"][tr_i]:
+            tr_td[tff] = r["t"][tr_i][0][0]
         # Türkiye oyuncusunu TFF kadrosuna bağla: soyadı (UEFA "Ad Soyad" ya da yalnız soyad yazabiliyor)
         soy = {}
         for p in r["k"][tr_i]:
@@ -167,11 +166,10 @@ def uefa_tamamla(detay, maclar):
                 if len(soy.get(s_, ())) == 1:
                     return next(iter(soy[s_]))
             return (ad, None)
-        TR, RK = tr_i + 1, 2 - tr_i
         lehine = lambda taraf, tip: taraf if tip != "K" else 3 - taraf      # kendi kalesine gol karşı tarafın hanesine
         tr_olay = any(o[0] == TR and o[1] != "G" for o in r["o"])
         rk_olay = any(o[0] == RK and o[1] != "G" for o in r["o"])
-        ugol = {TR: [], RK: []}
+        ugol, olay_ek = {TR: [], RK: []}, False
         for e in d.get("olay") or []:
             tur = UEFA_TUR.get(e.get("type"))
             pa, sa = e.get("primaryActor") or {}, e.get("secondaryActor") or {}
@@ -191,29 +189,59 @@ def uefa_tamamla(detay, maclar):
             if tur == "G":
                 ugol[lehine(o[0], tip)].append(o)
             elif not (tr_olay if bizim else rk_olay):
-                r["o"].append(o)
+                r["o"].append(o); olay_ek = True
         # goller: TFF'de bir tarafın golleri skordan azsa ve UEFA'nınki skorla tutuyorsa o tarafın golleri UEFA'dan
-        for taraf, hedef in ((TR, x[5]), (RK, x[6])):
+        for taraf, hedef in ((TR, a), (RK, y)):
             tff_n = sum(1 for o in r["o"] if o[1] == "G" and lehine(o[0], o[6]) == taraf)
             if hedef and tff_n < hedef and len(ugol[taraf]) == hedef:
-                r["o"] = [o for o in r["o"] if not (o[1] == "G" and lehine(o[0], o[6]) == taraf)] + ugol[taraf]
-        r["o"].sort(key=lambda o: (o[2] is None, o[2] or 0, o[3] or 0))
-        r["uq"] = "UEFA"
-        n += 1
-    return n
+                dk = {o[2] for o in ugol[taraf]}          # aynı dakikadaki TFF 'kendi kalesine' kaydı başka hanede yazılmış olabilir
+                r["o"] = [o for o in r["o"] if not (o[1] == "G" and (lehine(o[0], o[6]) == taraf or (o[6] == "K" and o[2] in dk)))] + ugol[taraf]
+                olay_ek = True
+        if olay_ek:
+            r["o"].sort(key=lambda o: (o[2] is None, o[2] or 0, o[3] or 0)); ek.append("olaylar")
+        st = m.get("stadium") or {}
+        stad = en(st.get("translations"), "officialName") or en(st.get("translations"), "name")
+        sehir = en((st.get("city") or {}).get("translations"), "name")
+        if stad and not r.get("s"):
+            r["s"] = f"{stad}, {sehir}" if sehir and sehir not in stad else stad; ek.append("stat")
+        if m.get("matchAttendance") and not r.get("sy"):
+            r["sy"] = m["matchAttendance"]; ek.append("seyirci")
+        hk = next((x for x in m.get("referees") or [] if x.get("role") == "REFEREE"), None)
+        if hk and not r.get("hk"):
+            p_ = hk.get("person") or {}
+            r["hk"] = en(p_.get("translations"), "name") or p_.get("internationalName"); r["hu"] = p_.get("countryCode"); ek.append("hakem")
+        if ek:
+            r["uq"] = list(dict.fromkeys(ek)); n += 1
+    return n, tr_td
 
 
 def site(yaz, cikti):
-    kur()
-    def yaz_(yol, veri):
-        if yol.endswith("milli_detay.json"):
-            ms = json.load(open(CIKTI, encoding="utf-8"))
-            satir = [[m["tff"], m["tarih"], None, None, "E" if m["ev"] == "TÜRKİYE" else "D",
-                      *((m["ev_gol"], m["dep_gol"]) if m["ev"] == "TÜRKİYE" else (m["dep_gol"], m["ev_gol"]))] for m in ms]
-            print("kadın milli: UEFA'dan tamamlanan maç:", uefa_tamamla(veri, satir))
-        yaz(yol, veri)
+    """milli.site'in çıktısı yazılmadan önce UEFA'yla tamamlanır; teknik direktör listesi TFF'de boşsa UEFA'dan."""
     import json
-    milli.site(yaz_, cikti)
+    kur()
+    tut = {}
+    milli.site(lambda yol, veri: tut.__setitem__(yol, veri), cikti)
+    ms = json.load(open(CIKTI, encoding="utf-8"))
+    satir = [[m["tff"], m["tarih"], "E" if m["ev"] == "TÜRKİYE" else "D",
+              *((m["ev_gol"], m["dep_gol"]) if m["ev"] == "TÜRKİYE" else (m["dep_gol"], m["ev_gol"]))] for m in ms if m["ev_gol"] is not None]
+    for yol, veri in tut.items():
+        if yol.endswith("milli_detay.json"):
+            n, tr_td = uefa_tamamla(veri, satir)
+            print("kadın milli: UEFA'dan tamamlanan maç:", n)
+    for yol, veri in tut.items():
+        if yol.endswith("milli.json"):
+            tek = veri["teknik"]
+            bilinen = {t for _, l in tek.values() for t in l}
+            sira = {x[0]: x[1] for x in veri["maclar"]}
+            ek = {}
+            for tff, ad in tr_td.items():
+                if tff not in bilinen:
+                    ek.setdefault(ad, []).append(tff)
+            for ad, l in ek.items():
+                anahtar = next((k for k, (a_, _) in tek.items() if a_ == ad), f"u{len(tek)}")
+                tek.setdefault(anahtar, [ad, []])[1].extend(l)
+                tek[anahtar][1].sort(key=lambda t: sira.get(t, ""))
+        yaz(yol, veri)
 
 
 if __name__ == "__main__":

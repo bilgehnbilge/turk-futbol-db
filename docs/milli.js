@@ -234,7 +234,8 @@ function oyuncular(d, kap) {
   ${td.length ? `<h2 class="bolum">Teknik direktörler</h2>
   <div class="tablo-kap"><table class="tablo">${bas(["Teknik direktör", "Dönem"])}<tbody>${td.map(x => `<tr><td class="ad">${esc(x.ad)}</td><td class="soluk">${x.bas?.slice(0, 4)}–${x.son?.slice(0, 4)}</td>${hucre(x.t)}</tr>`).join("")}</tbody></table></div>` : ""}
   <p class="soluk not">Kaynak: <a class="bag" href="https://www.tff.org/Default.aspx?pageID=425" target="_blank" rel="noopener">TFF A Milli Takım maçları</a> (kadrolar, kartlar, değişiklikler, goller);
-    TFF'nin gol listesi eksik olan maçlarda gol atanlar, ayrıca stat, seyirci ve hakem İngilizce Vikipedi'nin milli takım maç listelerinden. Oyuncu listeleri bütün maçlardan (filtreden bağımsız). Eski maçlarda kart bilgisi eksik olabilir.</p>`;
+    ${BOLUM === "erkek" ? "TFF'nin gol listesi eksik olan maçlarda gol atanlar, ayrıca stat, seyirci ve hakem İngilizce Vikipedi'nin milli takım maç listelerinden."
+      : "TFF sayfasında olmayan rakip kadroları, teknik direktörler, eksik olaylar, stat, seyirci ve hakem UEFA maç verisinden (UEFA'nın kayıtlı tuttuğu maçlarda)."} Oyuncu listeleri bütün maçlardan (filtreden bağımsız). Eski maçlarda kart bilgisi eksik olabilir.</p>`;
 }
 
 async function milliMacSayfa(tff) {
@@ -248,7 +249,7 @@ async function milliMacSayfa(tff) {
     tarih: m.tarih, ev: [null, (ev ? tr : rk)[0]], dep: [null, (ev ? rk : tr)[0]], bayrak: [(ev ? tr : rk)[1], (ev ? rk : tr)[1]],
     skor: [ev ? m.a : m.y, ev ? m.y : m.a, null, null, null], ustHtml: `<a class="bag" href="#/${K}milli">${milliAd()}</a> · ${esc(m.org)}`,
     stad: r.s, seyirci: r.sy, hakem: r.hk, kaynak: "TFF", tff, kaynakUrl: `https://www.tff.org/Default.aspx?pageID=440&macID=${tff}`, oyuncuOnek: "k",
-    ekNot: r.uq ? `${esc(m.rakip)} kadrosu ve TFF sayfasında olmayan olaylar: UEFA maç verisi.` : null,
+    ekNot: r.uq ? `TFF sayfasında olmayan bilgiler (${esc([].concat(r.uq).join(", "))}): UEFA maç verisi.` : null, hakem_ulke: r.hu,
     kadro: r.k.map(l => l.map(([forma, ad, ilk11, kisi]) => [forma, ad, ilk11, 0, kisi])), teknik: r.t.map(l => l.map(([ad, k]) => BOLUM === "erkek" ? [ad, "a" + k] : ad)),
     olay: r.o.map(([taraf, tur, dk, ek, a1, a2, tip, k1, k2]) => [taraf, TUR[tur], dk, ek || null, a1, a2, tip === "P" ? "PENALTY" : tip === "K" ? "OWN" : tip === "H" ? "HEADER" : null, k1, k2]),
   });
