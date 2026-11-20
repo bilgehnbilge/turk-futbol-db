@@ -37,7 +37,8 @@ LOGO = {"Güneş": "e_gunes", "Harp Okulu": "e_harp_okulu", "Harbiye": "e_harp_o
 # adını aldı (tr.wikipedia Harp_Okulu_SK; kullanıcı). Bu kulüplerin başka kaynaklardan verisi gelince aynı kimliğe bağlanır.
 # İstanbul Hilal (1912) bugün Göztepe Hilal; RSSSF 1924'te "Hilâl", Maçkolik'te "Hilal (İstanbul)" (kullanıcı).
 AYNI = {"Harbiye": "Harp Okulu", "Harp Okulu": "Harbiye", "Hilâl": "Hilal (İstanbul)", "Hilal (İstanbul)": "Hilâl",
-        "Göztepe Hilal": "Hilal (İstanbul)"}   # "tff:<no>": o TFF numaralı kulüp (1959 öncesi Demirspor = bugünkü kulüp, kullanıcı)
+        "Göztepe Hilal": "Hilal (İstanbul)",
+        "Hilal": "Hilal (Ankara)", "Hilal (Ankara)": "Hilal"}   # 1956-58 Federasyon Kupası'ndaki "Hilal" Ankara Hilal (kullanıcı)   # "tff:<no>": o TFF numaralı kulüp (1959 öncesi Demirspor = bugünkü kulüp, kullanıcı)
 
 
 def mackolik_ekle(d, kk):
