@@ -236,6 +236,27 @@ def kisi_birlestir(kadro, tersi, m_, ad, okunur):
                 if mac_say[rx] > mac_say[ra]:
                     ra, rx = rx, ra
                 ust[rx] = ra
+    # aynı ad + aynı tam doğum tarihi (kişi sayfası; 1 Ocak / 1 Temmuz yalnız yıl demek) ve hiç birlikte kadroda olmayan:
+    # kulüp ya da sezon tutmasa da aynı kişi (ör. bir numarası alt ligde, öbürü Süper Lig'de)
+    kisi_db = os.path.join(KOK, "raw", "kisi.db")
+    dg = collections.defaultdict(list)
+    if os.path.exists(kisi_db):
+        for x, d_ in sqlite3.connect(kisi_db).execute("SELECT kisi, dogum FROM kisi WHERE dogum IS NOT NULL"):
+            if x in mac_say and d_[5:] not in ("01-01", "07-01") and S(x):
+                dg[(S(x), d_)].append(x)
+    n_dg = 0
+    for l in dg.values():
+        l = sorted(l, key=lambda x: -mac_say[x])
+        for x in l[1:]:
+            if (l[0], x) in birlikte:
+                continue
+            ra, rx = bul(l[0]), bul(x)
+            if ra != rx:
+                if mac_say[rx] > mac_say[ra]:
+                    ra, rx = rx, ra
+                ust[rx] = ra
+                n_dg += 1
+    print(f"aynı oyuncunun ikinci TFF numarası: {sum(1 for x in ust if bul(x) != x)} (doğum tarihiyle eklenen {n_dg})")
     return {x: bul(x) for x in ust if bul(x) != x}
 
 
