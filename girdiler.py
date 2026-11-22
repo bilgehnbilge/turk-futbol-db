@@ -16,7 +16,8 @@ SURUM = "veritabani"
 PAKET = "girdiler.tar.gz"
 # raw/ altındaki yollar
 GIRDILER = ["oyuncu.db", "bal_detay.db", "kisi.db", "kadin.db", "kadin_detay.db", "kadin_kupa_eslesme.json",
-            "uefa_kadin", "mackolik_td/ek.json", "mackolik_td/takim_no.json"]
+            "uefa_kadin", "mackolik_td/ek.json", "mackolik_td/takim_no.json",
+            "mackolik_kadro", "rsssf_eski/eski.json"]   # son ikisi: 1959-91 Süper Lig kadroları ve 1959 öncesi bölümü
 
 
 def yukle():

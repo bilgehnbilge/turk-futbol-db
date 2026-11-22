@@ -1,0 +1,1 @@
+({"l":[[6500,"İstanbul Profesyonel 1.Ligi"],[27942,"Ankara Profesyonel 1.Ligi"],[28201,"Ankara Profesyonel 2. Ligi"],[30429,"İzmir Profesyonel Ligi"],[29363,"İstanbul Profesyonel 2. Ligi"]],"c":[[12908,"3.Kademe Beyaz Grup"],[12907,"3.Kademe Kırmızı Grup"]]})

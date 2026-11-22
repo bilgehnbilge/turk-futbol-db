@@ -292,7 +292,7 @@ def main():
     c = sqlite3.connect(DB)
     c.row_factory = sqlite3.Row
     # Ham kaynağı yerelde duran çıktılar (GitHub Actions'ta raw/ yok): kaynak yoksa eski dosyalar korunur
-    koru = [a for a, kaynak in (("mac", "uefa_detay.db"), ("oyuncu_uefa.json", "uefa_detay.db"), ("teknik.json", "oyuncu.db"), ("tff", "oyuncu.db"), ("kadin", "kadin.db"), ("mk", "mackolik_detay.jsonl"), ("oyuncu_bag.json", "oyuncu.db"))
+    koru = [a for a, kaynak in (("mac", "uefa_detay.db"), ("oyuncu_uefa.json", "uefa_detay.db"), ("teknik.json", "oyuncu.db"), ("tff", "oyuncu.db"), ("kadin", "kadin.db"), ("mk", "mackolik_detay.jsonl"), ("oyuncu_bag.json", "oyuncu.db"), ("eski.json", "rsssf_eski/eski.json"))
             if not os.path.exists(os.path.join(KOK, "raw", kaynak)) and os.path.exists(os.path.join(CIKTI, a))]
     gecici = CIKTI + ".korunan"
     if os.path.isdir(gecici):
