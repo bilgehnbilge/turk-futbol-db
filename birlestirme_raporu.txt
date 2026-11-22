@@ -31,8 +31,8 @@ Kaynaklar: Mackolik 51875 mac, Avrupa 1506, TFF 131194
    Elle mac duzeltmesi (2026-2027 2026-11-07): 1 mac
    Ligden cekilme (tff:1211 2000-2001): 32 mac hukmen
    Resmi puan durumu: 898 tablo okundu, 672 lig grubuna baglandi; puan silme/ek puan satiri: 337
-   Resmi tabloda sayilmayan maclar: 47 play-off, 6 gecersiz
-   Hukmen: 34 skorsuz maca resmi tablodan sonuc yazildi, 921 oynanmamis mac eklendi
+   Resmi tabloda sayilmayan maclar: 48 play-off, 6 gecersiz
+   Hukmen: 33 skorsuz maca resmi tablodan sonuc yazildi, 921 oynanmamis mac eklendi
    Guvenilmez Mackolik saati silindi: 33115
 
 futbol.db: 184671 mac, 1864 kulup
@@ -78,7 +78,7 @@ Birden cok TFF numarasi ya da birden cok Mackolik kimligi tek kulupte birlesen k
 
 1990 sinirinda emin olunamayan eslesmeler (BAGLANMADI):
 
-Sezon tamligi: 876 lig grubunun 821'inde mac sayisi tam (n*(n-1)). Tutmayanlar (kademe, sezon, grup, takim, bulunan, beklenen):
+Sezon tamligi: 876 lig grubunun 820'inde mac sayisi tam (n*(n-1)). Tutmayanlar (kademe, sezon, grup, takim, bulunan, beklenen):
    (3, '1979-1980', 'A Grubu', 8, 112, 56)
    (3, '1979-1980', 'Grup B', 10, 180, 90)
    (3, '1997-1998', '01', 16, 241, 240)
@@ -133,6 +133,7 @@ Sezon tamligi: 876 lig grubunun 821'inde mac sayisi tam (n*(n-1)). Tutmayanlar (
    (5, '2023-2024', '9.GRUP', 13, 155, 156)
    (5, '2025-2026', '1. GRUP', 14, 181, 182)
    (5, '2025-2026', '3.GRUP', 15, 209, 210)
+   (5, '2026-2027', '10. GRUP', 14, 181, 182)
    (5, '2026-2027', '12. GRUP', 13, 120, 156)
 
 Kulubu bulunamayan mac tarafi: 62
