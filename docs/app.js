@@ -1026,6 +1026,7 @@ function macCiz(d) {
   </div>
   ${d.uyum === "uyumsuz" ? `<p class="uyari bolum">TFF'nin bu maç için verdiği gol listesi skorla uyuşmuyor; kaynakta bir yazım hatası var. Goller TFF'de yazıldığı gibi gösteriliyor.</p>` : ""}
   ${d.uyum === "yok" ? `<p class="soluk not bolum">TFF bu maçın gollerini kaydetmemiş.</p>` : ""}
+  ${d.hikaye ? `<div class="kart bolum"><h2 class="h3">Maçın hikâyesi</h2><p>${esc(d.hikaye)}</p></div>` : ""}
   ${istatHtml(d)}
   ${d.olay.length ? (() => { const nD = d.olay.filter(o => o[1] === "SUBSTITUTION").length, nO = d.olay.length - nD;
     return `<div class="kart bolum"><div class="akis-bas"><h2 class="h3">Maçın akışı</h2>

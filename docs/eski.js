@@ -53,7 +53,8 @@ async function eskiSayfa() {
 const golHtml = (d, m) => [1, 2].map(t => {
   const l = m[11].filter(g => g[3] === t); if (!l.length) return "";
   const by = new Map(); for (const g of l) (by.get(g[0]) || by.set(g[0], []).get(g[0])).push(g);
-  return `${esc(kAd(d, m[t - 1]))}: ${[...by].map(([ad, gs]) => `${esc(ad)} ${gs.every(g => g[1] == null) ? (gs.length > 1 ? gs.length : "") : gs.map(g => `${g[1]}'${g[2] === "pen" ? " (pen.)" : g[2] === "og" ? " (k.k.)" : ""}`).join(", ")}`.trim()).join(", ")}`;
+  return `${esc(kAd(d, m[t - 1]))}: ${[...by].map(([ad, gs]) => `${esc(ad)} ${(() => { const b = gs.filter(g => g[1] != null), n = gs.length - b.length;   // dakikası bilinmeyenler sayıyla: "5', 9' +1"
+    return b.length ? b.map(g => `${g[1]}'${g[2] === "pen" ? " (pen.)" : g[2] === "og" ? " (k.k.)" : ""}`).join(", ") + (n ? ` +${n}` : "") : n > 1 ? n : ""; })()}`.trim()).join(", ")}`;
 }).filter(Boolean).join(" · ");
 // maç sayfası (sitenin ortak maç düzeni, macCiz): kadrosu ya da golcüsü bilinen maçlar; #/eski/mac/<yarışma>/<sezon>/<sıra>
 const macVar = m => m[11]?.length || m[13];
@@ -80,7 +81,8 @@ async function eskiMacSayfa(y, sz, i) {
     ustHtml: `<a class="bag" href="#/eski">1959 öncesi</a> · <a class="bag" href="#/eski/${y}/${sz}">${esc(yarAd(d, y))} ${sezonAd(sz)}</a>${m[4] ? ` · ${esc(m[4])}` : ""}`,
     kulupHref: id => typeof id === "number" ? `#/kulup/${id}` : null,
     kulupBilgi: id => typeof id === "number" ? KULUP.get(id) : { ad: d.kulupler[+id.slice(1)]?.ad, logo: d.kulupler[+id.slice(1)]?.logo },
-    kaynak, madde: m[12], olayLehine: true,
+    kaynak, madde: m[12], olayLehine: true, hikaye: m[15],
+    ekNot: m[16] ? `Ek bilgi ve maçın hikâyesi: <a class="bag" href="${esc(m[16][1])}" target="_blank" rel="noopener">${esc(m[16][0])}</a>.` : null,
     kadro: [0, 1].map(t => k[t].map(p => ["", p[0], p[1], 0, null])), teknik: [k[2] || [], k[3] || []], olay,
   });
 }

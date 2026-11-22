@@ -237,8 +237,16 @@ def main():
             e["not"] = m.get("not") or m.get("durum")
         else:
             tut.append(m)
+    # elle eklenen maç bilgisi (eski_mac_elle.json): golcüler, hakem, saha, maçın hikâyesi ve kaynağı
+    elle_yol = os.path.join(KOK, "eski_mac_elle.json")
+    ELLE_MAC = {(e["yarisma"], e["tarih"], *e["skor"]): e for e in (json.load(open(elle_yol, encoding="utf-8")) if os.path.exists(elle_yol) else [])}
     for m in tut:
         s = sezonlar[(m["yarisma"], m["sezon"])]
+        e = ELLE_MAC.pop((m["yarisma"], m.get("tarih"), m["eg"], m["dg"]), None)
+        if e:
+            m.update({k: e[k] for k in ("hakem", "stad", "sehir", "hikaye", "kaynak") if e.get(k)})
+            if e.get("goller"):
+                m["g_hazir"] = e["goller"]
         liste[no[m["ev"]]]["mac"] += 1; liste[no[m["dep"]]]["mac"] += 1
         # gol: [ad, dakika, tip, taraf (1 ev / 2 konuk; RSSSF'de ara skordan)]
         g, onceki = [], (0, 0)
@@ -251,7 +259,9 @@ def main():
                 g.append([x[2], x[3], None, 2 if x[4] == "dep" else 1])
         g = m.get("g_hazir", g)
         s["maclar"].append([no[m["ev"]], no[m["dep"]], m["eg"], m["dg"], m.get("tur") or "", m.get("tarih"), m.get("durum"),
-                            m.get("not"), m.get("sehir"), m.get("stad"), m.get("hakem"), g, m.get("wiki"), m.get("kadro"), m.get("kopya")])
+                            m.get("not"), m.get("sehir"), m.get("stad"), m.get("hakem"), g, m.get("wiki"), m.get("kadro"), m.get("kopya"), m.get("hikaye"), m.get("kaynak")])
+    for k in ELLE_MAC:
+        print("  UYARI: eski_mac_elle.json maçı bulunamadı:", k)
     for t in d["tablolar"]:
         s = sezonlar[(t["yarisma"], t["sezon"])]
         satir = [[r[0], no.get(r[1], no.get(r[1] + " Istanbul")), r[1], *r[2:]] for r in t["satir"]]
@@ -277,7 +287,7 @@ def main():
                 sam = son[-1][0] if son[-1][2] > son[-1][3] else son[-1][1]
         out.append({"yarisma": y, "sezon": sz, "sampiyon": sam, **s})
     json.dump({"yarismalar": [[k, v, ACIKLAMA[k]] for k, v in YARISMA.items()], "kulupler": liste, "sezonlar": out,
-               "alanlar": ["ev", "dep", "ev_gol", "dep_gol", "tur", "tarih", "durum", "not", "sehir", "stad", "hakem", "goller", "wiki", "kadro", "kopya"]},
+               "alanlar": ["ev", "dep", "ev_gol", "dep_gol", "tur", "tarih", "durum", "not", "sehir", "stad", "hakem", "goller", "wiki", "kadro", "kopya", "hikaye", "kaynak"]},
               open(CIKTI, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     bagli = sum(1 for k in liste if k["kulup"])
     print(f"1959 öncesi: {len(out)} yarışma-sezon, {sum(len(s['maclar']) for s in out)} maç, {len(liste)} kulüp "
