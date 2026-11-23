@@ -571,6 +571,8 @@ async function kulupSayfa(id, sekme) {
   SON_HERO = `${BOLUM}:${id}`;   // başlığın giriş hareketi yalnız kulübe ilk girişte (sekme değişiminde değil)
 
   const ciz = () => {
+    // "İç sahada / Deplasmanda en farklı galibiyet" bağlantısının değiştirdiği saha süzgeci rekorlara dönünce eski hâline gelir
+    if (sekme === "rekorlar" && "sahaOnce" in durum) { durum.saha = durum.sahaOnce; delete durum.sahaOnce; }
     // 1959 öncesi maçlar (yarışma "E") rekorlar / maçlar / rakipler sekmelerinde; "Tüm maçlar", "Lig ve 1959 öncesi", "1959 öncesi" sekmeleriyle
     const eskiVar = eskiMs.length && ["rekorlar", "maclar", "rakipler"].includes(sekme);
     const kay = eskiVar ? [...eskiMs, ...tum].sort((a, b) => (a.k || a.tarih || "").localeCompare(b.k || b.tarih || "")) : tum;
@@ -582,7 +584,15 @@ async function kulupSayfa(id, sekme) {
       hedef.innerHTML = ozetHtml(tum, durum);
       if (BOLUM === "erkek") { if (typeof yolculukCiz === "function") yolculukCiz(hedef, id); if (typeof eloCiz === "function") eloCiz(hedef, id); if (typeof avrupaCiz === "function") avrupaCiz(hedef, tum); }
     }
-    else if (sekme === "rekorlar") hedef.innerHTML = rekorHtml(ms);
+    else if (sekme === "rekorlar") {
+      hedef.innerHTML = rekorHtml(ms);
+      // rekor başlığı -> Maçlar sekmesi, o rekora göre sıralı (sezon, sonuç ve rakip süzgeci sıfırlanır; yarışma ve saha korunur)
+      hedef.querySelectorAll("[data-git]").forEach(a => a.addEventListener("click", () => {
+        const git = JSON.parse(a.dataset.git);
+        if ("saha" in git && git.saha !== durum.saha) durum.sahaOnce = durum.saha;
+        Object.assign(durum, { sezon: "", sonuc: "", rakip: "" }, git);
+      }));
+    }
     else if (sekme === "oyuncular") {   // oyuncularla ilgili her şey: golcüler ve maç listeleri (lig, kupa, Avrupa), kart, maç ve yaş rekorları
       hedef.innerHTML = "";
       tffOyunculari(hedef, id); if (BOLUM === "erkek" && tum.some(m => m.yar === "A")) avrupaOyunculari(hedef, id);
@@ -725,10 +735,15 @@ function tabelaSatir(m, sonucGoster = false) {
     ${m.eh ? `<a class="skor bagli" href="${m.eh}" title="Maç ayrıntısı">${skor}${ek}</a>` : m.id != null && detayVar(m.id) ? `<a class="skor bagli" href="#/${K}mac/${m.id}" title="Maç ayrıntısı">${skor}${ek}</a>` : `<b class="skor">${skor}${ek}</b>`}
     <span class="dep">${ad(depId, depAd)}${logoImg(depId, "logo-k", depAd) || (depId == null && m.rlogo ? `<img class="logo-k" src="logo/${m.rlogo}.png" alt="">` : "")}</span></div>`;
 }
-function rekorKart(baslik, l) {
+// rekor kartı başlığı: Maçlar sekmesine, o rekora göre sıralı ve süzülmüş listeye götürür (git: filtre durumuna yazılacaklar)
+function rekorBas(baslik, git) {
+  return git ? `<a class="baslik rekor-git" href="${location.hash.replace(/\/rekorlar$/, "")}/maclar" data-git='${esc(JSON.stringify(git))}' title="Bütün listeyi aç">${baslik} <span aria-hidden="true">→</span></a>`
+    : `<span class="baslik">${baslik}</span>`;
+}
+function rekorKart(baslik, l, git) {
   const m = l?.[0];
   if (!m) return `<div class="kart rekor"><span class="baslik">${baslik}</span><span class="soluk">—</span></div>`;
-  return `<div class="kart rekor"><span class="baslik">${baslik}</span>
+  return `<div class="kart rekor">${rekorBas(baslik, git)}
     <span class="deger">${Math.abs(m.a - m.y) ? `${Math.max(m.a, m.y)}-${Math.min(m.a, m.y)}` : `${m.a}-${m.y}`}</span>
     <div class="tabelalar">${l.slice(0, 4).map(m => tabelaSatir(m)).join("")}</div>
     ${l.length > 4 ? `<span class="detay">ve aynı skorla ${l.length - 4} maç daha</span>` : ""}</div>`;
@@ -761,7 +776,7 @@ function rekorHtml(ms0) {
   const sz = new Map();
   for (const m of oy) { const x = sz.get(m.sezon) || { sezon: m.sezon, O: 0, GY: 0 }; x.O++; if (m.y === 0) x.GY++; sz.set(m.sezon, x); }
   const enSezon = [...sz.values()].filter(x => x.O >= 5).sort((a, b) => b.GY - a.GY || b.GY / b.O - a.GY / a.O).slice(0, 5);
-  const gyKart = `<div class="kart rekor"><span class="baslik">Kalesini gole kapattığı maç</span>
+  const gyKart = `<div class="kart rekor">${rekorBas("Kalesini gole kapattığı maç", { sonuc: "GY", sira: "yeni" })}
       <span class="deger">${sayiYaz(gy.length)} <small class="soluk" style="font-size:1rem">/ ${sayiYaz(oy.length)} (%${yuzde(gy.length, oy.length)})</small></span>
       <span class="detay">İç sahada ${gy.filter(m => m.saha === "E").length}, deplasmanda ${gy.filter(m => m.saha === "D").length}</span></div>
     <div class="kart rekor"><span class="baslik">En çok gol yemediği sezonlar</span>
@@ -770,8 +785,8 @@ function rekorHtml(ms0) {
   <h2>Kalesini gole kapattığı maçlar</h2>
   <div class="izgara iki ust-hiza">${gyKart}${seriKart(sr.find(s => s.k === "golyemeden"))}</div>
   <h2 class="bolum">En farklı sonuçlar</h2>
-  <div class="izgara iki ust-hiza">${rekorKart("En farklı galibiyet", gal)}${rekorKart("En farklı mağlubiyet", mag)}${rekorKart("En gollü maç", gol)}
-  ${rekorKart("İç sahada en farklı galibiyet", evG)}${rekorKart("Deplasmanda en farklı galibiyet", depG)}</div>
+  <div class="izgara iki ust-hiza">${rekorKart("En farklı galibiyet", gal, { sira: "fark" })}${rekorKart("En farklı mağlubiyet", mag, { sira: "farkm" })}${rekorKart("En gollü maç", gol, { sira: "gol" })}
+  ${rekorKart("İç sahada en farklı galibiyet", evG, { sira: "fark", saha: "E" })}${rekorKart("Deplasmanda en farklı galibiyet", depG, { sira: "fark", saha: "D" })}</div>
   <h2 class="bolum">Seriler <small class="soluk" style="font-weight:400;font-size:14px">— seçili maçlar art arda, sezonlar arası; ayrıntı için karta tıkla</small></h2>
   <div class="izgara iki ust-hiza">${sr.map(seriKart).join("")}</div>
   <p class="soluk" style="font-size:13px;margin-top:16px">Seriler seçili filtredeki maçların tarih sırasıyla hesaplanır; kulüp seçili yarışmada bir sezon ya da daha uzun süre yoksa seri kesilir. Penaltıyla biten kupa maçları beraberlik sayılır. Hükmen sonuçlar${hukmenSay ? ` (${hukmenSay} maç)` : ""} rekorlara, serilere ve gol sayımlarına girmez. "İç saha" seçilirse ev sahibi yenilmezlik serisi gibi kayıtlar çıkar.</p>
