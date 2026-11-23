@@ -33,12 +33,13 @@ Kaynaklar: Mackolik 51875 mac, Avrupa 1506, TFF 131194
    Resmi puan durumu: 898 tablo okundu, 672 lig grubuna baglandi; puan silme/ek puan satiri: 337
    Resmi tabloda sayilmayan maclar: 47 play-off, 6 gecersiz
    Hukmen: 32 skorsuz maca resmi tablodan sonuc yazildi, 921 oynanmamis mac eklendi
+   Gruptan cekilme (tff:17 2009-2010 3. Klasman Grubu): 5 mac hukmen yazildi, 11 mac eklendi
    Guvenilmez Mackolik saati silindi: 33115
 
-futbol.db: 184671 mac, 1864 kulup
+futbol.db: 184682 mac, 1864 kulup
    avrupa 1506 1956-1957 2026-2027
    kupa 7901 1962-1963 2026-2027
-   lig 174528 1959 2026-2027
+   lig 174539 1959 2026-2027
    ozel_kupa 85 1965-1966 2025-2026
    terfi 651 1959-1960 1982-1983
 
@@ -78,13 +79,12 @@ Birden cok TFF numarasi ya da birden cok Mackolik kimligi tek kulupte birlesen k
 
 1990 sinirinda emin olunamayan eslesmeler (BAGLANMADI):
 
-Sezon tamligi: 876 lig grubunun 821'inde mac sayisi tam (n*(n-1)). Tutmayanlar (kademe, sezon, grup, takim, bulunan, beklenen):
+Sezon tamligi: 876 lig grubunun 822'inde mac sayisi tam (n*(n-1)). Tutmayanlar (kademe, sezon, grup, takim, bulunan, beklenen):
    (3, '1979-1980', 'A Grubu', 8, 112, 56)
    (3, '1979-1980', 'Grup B', 10, 180, 90)
    (3, '1997-1998', '01', 16, 241, 240)
    (3, '2000-2001', '01', 16, 241, 240)
    (3, '2005-2006', '03', 10, 91, 90)
-   (3, '2009-2010', '3. Klasman Grubu', 9, 61, 72)
    (4, '2009-2010', '02', 11, 93, 110)
    (4, '2009-2010', '2. Klasman Grubu', 9, 61, 72)
    (1, '2011-2012', '', 18, 330, 306)
