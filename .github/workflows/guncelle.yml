@@ -3,11 +3,16 @@ name: Güncel sezonu güncelle
 # TFF'den güncel sezonun dört ligini çeker, futbol.db'yi ve site verisini yeniden üretir.
 # Site verisi (docs/) commit'lenir; futbol.db "veritabani" sürümüne (Releases) yüklenir.
 on:
+  # GitHub zamanlanmış çalışmaları saatlerce geciktirebiliyor ya da hiç başlatmayabiliyor (özellikle saat başlarında).
+  # Bu yüzden günde üç deneme, saat başı dışında: o gün (UTC) başarılı bir çalışma olduysa sonrakiler hemen çıkar.
   schedule:
-    - cron: "0 4 * * *"   # her gün 07:00 (TSİ)
+    - cron: "17 3 * * *"    # 06:17 TSİ
+    - cron: "43 9 * * *"    # 12:43 TSİ
+    - cron: "29 15 * * *"   # 18:29 TSİ
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: write
   pages: write
 
@@ -20,22 +25,37 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 150
     steps:
+      - name: Bugün zaten çalıştı mı?
+        id: kontrol
+        if: github.event_name == 'schedule'
+        run: |
+          n=$(gh run list -R "${{ github.repository }}" --workflow guncelle.yml --status success \
+                --created ">=$(date -u +%Y-%m-%d)" --json databaseId --jq 'length')
+          echo "bugün başarılı çalışma: $n"
+          if [ "$n" -gt 0 ]; then echo "atla=1" >> "$GITHUB_OUTPUT"; fi
+        env:
+          GH_TOKEN: ${{ github.token }}
       - uses: actions/checkout@v4
+        if: steps.kontrol.outputs.atla != '1'
       - uses: actions/setup-python@v5
+        if: steps.kontrol.outputs.atla != '1'
         with:
           python-version: "3.12"
       - name: Git kimliği
+        if: steps.kontrol.outputs.atla != '1'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: Güncelle ve yayınla
+        if: steps.kontrol.outputs.atla != '1'
         run: python3 guncelle.py --yayinla
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Siteyi yeniden oluştur
+        if: steps.kontrol.outputs.atla != '1'
         run: gh api -X POST "repos/${{ github.repository }}/pages/builds" || true
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Rapor
-        if: always()
+        if: always() && steps.kontrol.outputs.atla != '1'
         run: sed -n '1,20p' birlestirme_raporu.txt || true
