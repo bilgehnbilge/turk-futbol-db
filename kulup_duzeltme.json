@@ -162,6 +162,11 @@
     {"onceki": "tff:1211", "sonraki": "tff:3351", "sezon": "2022-2023", "tur": "hak devri",
      "aciklama": "Hacettepe SK faaliyetlerini durdurdu; Bölgesel Amatör Lig hakkını Kalecik FK'ye devretti, kulüp Hacettepe 1945 adını aldı (tr.wikipedia Hacettepe_SK)."}
   ],
+  "cekilme_grup": [
+    {"kim": "tff:17", "sezon": "2009-2010", "kademe": 3, "grup": "3. Klasman Grubu",
+     "not": "Erzurumspor ligden çekildi; klasman grubundaki 16 maçı 0-3 hükmen sayıldı (TFF puan tablosu: 38 maç, 0G 5B 33M, 7-101)"}
+  ],
+
   "cekilme": [
     {"kim": "tff:1211", "sezon": "2000-2001", "yarisma": "lig",
      "not": "Asaşspor Doğu Anadolu ağırlıklı gruba alınınca ligden çekildi; maçlar 0-3 hükmen (tr.wikipedia Hacettepe_SK)"}

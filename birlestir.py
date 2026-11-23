@@ -632,6 +632,7 @@ def main():
     no_bul = lambda node: kok_no.get(bb.bul(node)) if node in bb.p else None
     mac_duzelt(c, dz, no_bul, kes_no)
     resmi_tablolar(c, no_bul, kes_no, dugum)
+    cekilme_grup(c, dz, no_bul, kes_no)
     for d in dz.get("donem_adi", []):   # elle donem adi (orn. Vikipedi'den eski adlar)
         no = kok_no[bb.bul(kim_coz(d["kim"]))]
         for s in ("ev", "dep"):   # "eski" verilmisse yalniz o adla yazilmis maclar
@@ -742,6 +743,37 @@ def mac_duzelt(c, dz, no_bul, kes_no):
                          AND ((ev_kulup=? AND ev_gol=0 AND dep_gol=3) OR (dep_kulup=? AND ev_gol=3 AND dep_gol=0))""",
                       (d.get("not"), d["sezon"], d.get("yarisma", "lig"), no, no)).rowcount
         yaz(f"   Ligden cekilme ({d['kim']} {d['sezon']}): {k} mac hukmen")
+
+
+def cekilme_grup(c, dz, no_bul, kes_no):
+    """Ligden cekilen takim, resmi tablosu bagli olmayan grupta (orn. 2009-10 2. Lig 3. Klasman Grubu: TFF tablosu iki
+    asamanin toplami): grubun her takimina karsi iki maci da 0-3 hukmen yazilir; fikstur sayfasinda olmayanlar eklenir."""
+    for d in dz.get("cekilme_grup", []):
+        no = no_bul(("tff", kes_no(d["kim"].split(":")[1], d["sezon"])))
+        ms = c.execute("""SELECT id, yarisma, lig, kademe, ev_kulup, dep_kulup, ev_adi, dep_adi FROM mac
+                          WHERE sezon=? AND grup=? AND asama='lig' AND kademe=?""", (d["sezon"], d["grup"], d["kademe"])).fetchall()
+        if not no or not ms:
+            yaz(f"   Gruptan cekilme ({d['kim']} {d['sezon']} {d['grup']}): grup ya da takim bulunamadi"); continue
+        _, y, lig, kd = ms[0][:4]
+        ad = {}
+        for r in ms:
+            ad.setdefault(r[4], r[6]); ad.setdefault(r[5], r[7])
+        var = collections.defaultdict(list)
+        for r in ms:
+            var[(r[4], r[5])].append(r[0])
+        guncel = eklenen = 0
+        for rakip in sorted(set(ad) - {no}):
+            for e, dp in ((no, rakip), (rakip, no)):
+                eg, dg = (0, 3) if e == no else (3, 0)
+                if var[(e, dp)]:
+                    for mid in var[(e, dp)]:
+                        c.execute("UPDATE mac SET ev_gol=?, dep_gol=?, durum='Hük.', notlar=? WHERE id=?", (eg, dg, d["not"], mid)); guncel += 1
+                else:
+                    c.execute(f"INSERT INTO mac VALUES(NULL,{','.join('?' * 26)})",
+                              ("hukmen", f"{d['sezon']}/{d['grup']}/{e}-{dp}", y, lig, kd, d["sezon"], d["grup"], "lig", None, None, None,
+                               e, dp, ad[e], ad[dp], ad[e], ad[dp], eg, dg, None, None, None, None, "Hük.", None, d["not"]))
+                    eklenen += 1
+        yaz(f"   Gruptan cekilme ({d['kim']} {d['sezon']} {d['grup']}): {guncel} mac hukmen yazildi, {eklenen} mac eklendi")
 
 
 def fazla_maclar(c, secilen):
