@@ -184,11 +184,22 @@ def kisi_yol(k):
     return os.path.join(KISI_HAM, str(k)[-2:].zfill(2), f"{k}.html.gz")
 
 
-def kisi_indir(bekle):
-    """TFF oyuncu sayfaları (doğum tarihi/yeri, uyruk, lisans): kadrolarda geçen kişiler, en çok maça çıkandan başlayarak."""
+def kisi_indir(bekle, ek_db=None, atla_db=None):
+    """TFF oyuncu sayfaları (doğum tarihi/yeri, uyruk, lisans): kadrolarda geçen kişiler, en çok maça çıkandan başlayarak.
+    ek_db: başka bir ayrıntı veritabanının kadroları da (ör. BAL: bal_detay.db); atla_db: bu kisi.db'de (kisi, kisi_yok)
+    zaten olanlar indirilmez (ör. botun Releases'teki kisi.db'si: bot günde ~350 oyuncu ekliyor)."""
     c = sqlite3.connect(OYUNCU_DB)
     hedef_l = [k for (k,) in c.execute("SELECT kisi FROM kadro WHERE kisi IS NOT NULL GROUP BY kisi ORDER BY COUNT(*) DESC")]
-    liste = [k for k in hedef_l if not os.path.exists(kisi_yol(k)) and not os.path.exists(kisi_yol(k) + ".yok")]
+    if ek_db:
+        hedef_l += [k for (k,) in sqlite3.connect(ek_db).execute("SELECT kisi FROM kadro WHERE kisi IS NOT NULL GROUP BY kisi ORDER BY COUNT(*) DESC")]
+        hedef_l = list(dict.fromkeys(hedef_l))
+    atla = set()
+    if atla_db:
+        a_ = sqlite3.connect(atla_db)
+        atla = {k for (k,) in a_.execute("SELECT kisi FROM kisi")}
+        if a_.execute("SELECT 1 FROM sqlite_master WHERE name='kisi_yok'").fetchone():
+            atla |= {k for (k,) in a_.execute("SELECT kisi FROM kisi_yok")}
+    liste = [k for k in hedef_l if k not in atla and not os.path.exists(kisi_yol(k)) and not os.path.exists(kisi_yol(k) + ".yok")]
     print(f"{len(liste)}/{len(hedef_l)} oyuncu sayfası indirilecek (~{len(liste) * (bekle + 0.8) / 3600:.1f} saat)", flush=True)
     hata = kesinti = 0
     for i, k in enumerate(liste, 1):
@@ -475,5 +486,7 @@ if __name__ == "__main__":
     p.add_argument("--kademe", type=int)
     p.add_argument("--sezon")
     p.add_argument("--bekle", type=float, default=2.0)
+    p.add_argument("--ek", help="kisi: ek kadro veritabanı (ör. raw/bal_detay.db)")
+    p.add_argument("--atla", help="kisi: bu kisi.db'de olanları indirme")
     a = p.parse_args()
-    {"indir": lambda: indir(a.kademe, a.sezon, a.bekle), "kupa": lambda: (kupa_gruplari(), indir(None, None, a.bekle, kupa=True)), "kisi_ayikla": kisi_ayikla, "ayikla": ayikla, "durum": durum, "ek": ek_maclar, "uyum": gol_uyum, "kisi": lambda: kisi_indir(a.bekle)}[a.komut]()
+    {"indir": lambda: indir(a.kademe, a.sezon, a.bekle), "kupa": lambda: (kupa_gruplari(), indir(None, None, a.bekle, kupa=True)), "kisi_ayikla": kisi_ayikla, "ayikla": ayikla, "durum": durum, "ek": ek_maclar, "uyum": gol_uyum, "kisi": lambda: kisi_indir(a.bekle, a.ek, a.atla)}[a.komut]()

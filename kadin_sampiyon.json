@@ -1,5 +1,6 @@
 {
   "_aciklama": "Kadın liglerinde en üst ligin şampiyonları (sezon -> TFF kulüp no). Kaynak: RSSSF 'Turkey - List of Women Champions' ve İngilizce Vikipedi (Turkish Women's Football First League / Super League), 2026-11-17. Play-off ve final turlarıyla belirlenen sezonlar puan tablosundan çıkarılamadığı için elle tutulur. null: şampiyon ilan edilmedi.",
+  "2001-2002": "3607",
   "2007-2008": "2895",
   "2008-2009": "3596",
   "2009-2010": "2895",
@@ -19,5 +20,80 @@
   "2023-2024": "3604",
   "2024-2025": "6834",
   "2025-2026": "3592",
-  "_notlar": {"2019-2020": "COVID-19 salgını nedeniyle lig tamamlanmadı, şampiyon ilan edilmedi."}
+  "_eski_aciklama": "Sitede maç verisi olmayan sezonlar (TFF kadın arşivi 2007-08'den başlıyor; 2001-02 kadin_eski.py ile ayrıca var): [sezon, şampiyon, TFF kulüp no (sitede varsa), not, kaynak]. Kaynak: tr.wikipedia sezon sayfaları, RSSSF 'Turkey - List of Women Champions', 2026-11-23.",
+  "_eski": [
+    [
+      "1993-1994",
+      "Dinarsuspor",
+      null,
+      "Finalde Acarlar'ı 3-1 yendi (21 Mayıs 1994).",
+      "https://tr.wikipedia.org/wiki/1993-94_T%C3%BCrkiye_Bayanlar_Futbol_Ligi"
+    ],
+    [
+      "1994-1995",
+      "Dinarsuspor",
+      null,
+      "Finalde Acarlar'ı 2-1 yendi (25 Mayıs 1995).",
+      "https://tr.wikipedia.org/wiki/1994-95_T%C3%BCrkiye_Bayanlar_Futbol_Ligi"
+    ],
+    [
+      "1995-1996",
+      "Dinarsuspor",
+      null,
+      "Bolu'daki finalde Gürtaş'ı 5-1 yendi (26 Mayıs 1996).",
+      "https://tr.wikipedia.org/wiki/1995-96_T%C3%BCrkiye_Bayanlar_Futbol_Ligi"
+    ],
+    [
+      "1996-1997",
+      "Dinarsuspor",
+      null,
+      "Tek grup lig birincisi; ikinci İstanbul Sitespor.",
+      "https://tr.wikipedia.org/wiki/1996-97_T%C3%BCrkiye_Bayanlar_Futbol_Ligi"
+    ],
+    [
+      "1997-1998",
+      "Marshall Boyaspor",
+      null,
+      "1. Kategori lig birincisi.",
+      "https://tr.wikipedia.org/wiki/1997-98_T%C3%BCrkiye_Bayanlar_Futbol_Ligi"
+    ],
+    [
+      "1998-1999",
+      "Marshall Boyaspor",
+      null,
+      "1. Kategori lig birincisi.",
+      "https://tr.wikipedia.org/wiki/1998-99_T%C3%BCrkiye_Bayanlar_Futbol_Ligi"
+    ],
+    [
+      "1999-2000",
+      "Delta Mobilyaspor",
+      null,
+      "Ligi averajla önde bitiren Marshall Boyaspor'un şike yaptığı tespit edildi; şampiyonluk Delta Mobilyaspor'a verildi.",
+      "https://tr.wikipedia.org/wiki/1999-2000_T%C3%BCrkiye_Bayanlar_Futbol_Ligi"
+    ],
+    [
+      "2000-2001",
+      "İstanbul Kuzeyspor",
+      "2549",
+      "Ankara'daki finalde Zeytinburnuspor'u uzatmada 3-2 yendi.",
+      "https://tr.wikipedia.org/wiki/2000-01_T%C3%BCrkiye_Bayanlar_Futbol_Ligi"
+    ],
+    [
+      "2002-2003",
+      "Samsungücü",
+      "574",
+      "Bartın'daki finalde Gazi Üniversitesi'ni 3-0 yendi (29 Haziran 2003).",
+      "https://tr.wikipedia.org/wiki/2002-03_T%C3%BCrkiye_Bayanlar_Futbol_Ligi"
+    ],
+    [
+      "2006-2007",
+      "Gazi Üniversitesi",
+      "2895",
+      "Bursa'daki finalde Mersin Camspor'u 2-0 yendi (30 Nisan 2007).",
+      "https://tr.wikipedia.org/wiki/2006-07_T%C3%BCrkiye_Bayanlar_Futbol_Ligi"
+    ]
+  ],
+  "_notlar": {
+    "2019-2020": "COVID-19 salgını nedeniyle lig tamamlanmadı, şampiyon ilan edilmedi."
+  }
 }

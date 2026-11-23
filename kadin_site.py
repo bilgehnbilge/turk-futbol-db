@@ -34,6 +34,8 @@ def kadin_mi(ad):
 
 
 def aktar():
+    import kadin_eski   # 2001-02 sezonu (TFF arşivinden önce; depodaki kadin_eski.json'dan)
+    kadin_eski.ekle(DB, DETAY_DB)
     c = sqlite3.connect(DB)
     o = sqlite3.connect(DETAY_DB) if os.path.exists(DETAY_DB) else None
     erkek = json.load(open(os.path.join(KOK, "docs", "data", "kulupler.json"), encoding="utf-8"))
@@ -66,11 +68,14 @@ def aktar():
         detay = {int(m) for (m,) in o.execute("SELECT mac FROM mac_bilgi")}
     maclar, kul_mac = [], collections.Counter()
     sezon_kul = collections.defaultdict(set)
-    for (mid, tff, sezon, kademe, lig, grup, asama, hafta, tarih, saat, ev, dep, eg, dg, ep, dp, ham, durum) in c.execute(
-            "SELECT id, kaynak_id, sezon, kademe, lig, grup, asama, hafta, tarih, saat, ev_id, dep_id, ev_gol, dep_gol, ev_pen, dep_pen, ham_skor, durum "
+    elle = set()   # kaynaklı elle eklenen maçlar (kadin_eski.json "elle": TFF'de sayfası yok)
+    for (mid, kyn, tff, sezon, kademe, lig, grup, asama, hafta, tarih, saat, ev, dep, eg, dg, ep, dp, ham, durum) in c.execute(
+            "SELECT id, kaynak, kaynak_id, sezon, kademe, lig, grup, asama, hafta, tarih, saat, ev_id, dep_id, ev_gol, dep_gol, ev_pen, dep_pen, ham_skor, durum "
             "FROM mac ORDER BY tarih IS NULL, tarih, saat, id"):
         # TFF maç no; fikstürde olmayıp puan tablosundan eklenen maçlar (kadin.py duzelt) eksi numara alır
         tff = int(tff) if tff.isdigit() else -mid
+        if kyn == "elle":
+            elle.add(tff)
         asama = "" if asama == "lig" else ASAMA.get(asama, asama)
         maclar.append([tff, tarih, sezon, kademe, lig, grup or "", asama, hafta, ev, dep, eg, dg, ep, dp,
                        1 if tff in detay else 0, durum or (ham if eg is None and ham not in (None, "", "-") else None), saat or None])
@@ -102,7 +107,7 @@ def aktar():
                        "grup": grup or None, "asama": "play-off" if asama else "lig", "tur": asama or None, "tarih": tarih, "saat": None,
                        "ev_kulup": ev, "dep_kulup": dep, "ev_adi": kulup[ev]["ad"], "dep_adi": kulup[dep]["ad"], "ev_gol": eg, "dep_gol": dg,
                        "ev_pen": ep, "dep_pen": dp, "durum": ("Hük." if durum == "Hük." else "MS") if eg is not None else None,
-                       "notlar": "TFF puan tablosundan (fikstürde yok)" if tff < 0 else None})
+                       "notlar": "Vikipedi'den (TFF'de maç sayfası yok)" if tff in elle else "TFF puan tablosundan (fikstürde yok)" if tff < 0 else None})
     detayli = avrupa(m_dict, kulup)   # Türk kadın kulüplerinin UEFA maçları (kadin_avrupa.py)
     kulup_mac = collections.defaultdict(list)
     for m in m_dict:
@@ -156,7 +161,8 @@ def aktar():
         "mac": len(maclar), "oynanan": sum(r[10] is not None for r in maclar), "ayrintili": len(detay),
         "sezonlar": sezonlar, "ligler": {s: sorted(l) for s, l in ligler.items()}, "detayli": detayli, "detayli_aralik": web_aktar.araliklar(tff_ayr),
         "kulupler": sorted(kulup.values(), key=lambda k: -k["mac"]), "krallar": krallar, "oyuncu": oyuncu,
-        "sampiyonlar": sampiyonlar(kulup), "sampiyon_not": json.load(open(SAMPIYON, encoding="utf-8")).get("_notlar", {})})
+        "sampiyonlar": sampiyonlar(kulup), "sampiyon_not": json.load(open(SAMPIYON, encoding="utf-8")).get("_notlar", {}),
+        "sampiyon_eski": sampiyon_eski(kulup)})
     toplam = sum(os.path.getsize(os.path.join(d, f)) for d, _, fs in os.walk(CIKTI) for f in fs)
     print(f"kadın: {len(maclar)} maç ({len(tff_ayr)} ayrıntılı), {len(kulup)} kulüp, {oyuncu} oyuncu -> {CIKTI} ({toplam / 1e6:.1f} MB)")
 
@@ -199,6 +205,12 @@ def sampiyonlar(kulup):
             raise SystemExit(f"kadin_sampiyon.json: {s} şampiyonu (TFF {t}) kulüp listesinde yok")
         out[s] = tff.get(t)
     return out
+
+
+def sampiyon_eski(kulup):
+    """kadin_sampiyon.json "_eski": maç verisi olmayan sezonlar -> [sezon, şampiyon adı, kulüp kimliği (sitede varsa), not, kaynak]."""
+    tff = {v["tff"][0]: k for k, v in kulup.items() if v["tff"]}
+    return [[s, a, tff.get(t) if t else None, n, u] for s, a, t, n, u in json.load(open(SAMPIYON, encoding="utf-8")).get("_eski", [])]
 
 
 UEFA_HAM = os.path.join(KOK, "raw", "uefa_kadin")
