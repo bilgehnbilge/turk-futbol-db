@@ -488,14 +488,18 @@ function seriler(ms) {
   const sira = new Map([...ESKI_SIRA, ...(OZET.sezonlar || [])].map((s, i) => [s, i]));
   return tanim.map(([k, ad, f]) => {
     let en = { n: 0 }, cur = { n: 0 };
+    const hepsi = [];   // 2+ maçlık bütün seriler
+    const kapat = i => { if (cur.n > 1) hepsi.push({ n: cur.n, bas: cur.bas, son: i - 1 }); cur = { n: 0 }; };
     for (let i = 0; i < oynanan.length; i++) {
       // seçili maçlarda kulübün bulunmadığı sezon(lar) varsa seri kesilir (ör. ligden düşüp yıllar sonra dönmek)
-      if (i && sira.get(oynanan[i].sezon) - sira.get(oynanan[i - 1].sezon) > 1) cur = { n: 0 };
+      if (i && sira.get(oynanan[i].sezon) - sira.get(oynanan[i - 1].sezon) > 1) kapat(i);
       if (f(oynanan[i])) { if (!cur.n) cur.bas = i; cur.n++; if (cur.n > en.n) en = { n: cur.n, bas: cur.bas, son: i }; }
-      else cur = { n: 0 };
+      else kapat(i);
     }
-    const devam = cur.n ? { n: cur.n, bas: cur.bas, son: oynanan.length - 1 } : null;
-    return { k, ad, en, devam, liste: oynanan };
+    const devam = cur.n ? { n: cur.n, bas: cur.bas, son: oynanan.length - 1, devam: true } : null;
+    if (devam && devam.n > 1) hepsi.push(devam);
+    const enUzun = hepsi.sort((a, b) => b.n - a.n || a.bas - b.bas).slice(0, 10);
+    return { k, ad, en, devam, enUzun, liste: oynanan };
   });
 }
 
@@ -768,8 +772,18 @@ function rekorHtml(ms0) {
     const r = s.en.n ? `<span class="deger">${s.en.n} maç</span><span class="detay">${tarihYaz(s.liste[s.en.bas].tarih)} – ${tarihYaz(s.liste[s.en.son].tarih)}</span>
       <span class="detay">${esc(s.liste[s.en.bas].sezon)}${s.liste[s.en.son].sezon !== s.liste[s.en.bas].sezon ? " → " + esc(s.liste[s.en.son].sezon) : ""}</span>` : `<span class="soluk">—</span>`;
     const dv = s.devam && s.devam.n > 1 ? `<span class="detay"><b>Süren seri:</b> ${s.devam.n} maç</span>` : "";
-    return `<details class="kart rekor"><summary><span class="baslik">${s.ad}</span>${r}${dv}</summary>
-      ${s.en.n ? `<div class="seri-maclar tabelalar">${s.liste.slice(s.en.bas, s.en.son + 1).map(m => tabelaSatir(m, true)).join("")}</div>` : ""}</details>`;
+    // açılınca en uzun 10 seri; her satır açılınca o serinin maçları
+    const sezonAralik = x => { const a = s.liste[x.bas].sezon, b = s.liste[x.son].sezon; return esc(a) + (a !== b ? " → " + esc(b) : ""); };
+    let sira = 0;
+    const satirlar = s.enUzun.map((x, i) => {
+      if (!i || x.n !== s.enUzun[i - 1].n) sira = i + 1;
+      return `<li><details class="seri-alt"${i ? "" : " open"}><summary><span class="sira">${sira}</span>
+        <span class="kim"><span>${tarihYaz(s.liste[x.bas].tarih)} – ${x.devam ? "<b>sürüyor</b>" : tarihYaz(s.liste[x.son].tarih)}</span><small>${sezonAralik(x)}</small></span>
+        <b class="n">${x.n}</b></summary>
+        <div class="seri-maclar tabelalar">${s.liste.slice(x.bas, x.son + 1).map(m => tabelaSatir(m, true)).join("")}</div></details></li>`;
+    }).join("");
+    return `<details class="kart rekor seri-kart"><summary><span class="baslik">${s.ad}</span>${r}${dv}</summary>
+      ${s.enUzun.length ? `<ol class="sirali seri-liste">${satirlar}</ol>` : ""}</details>`;
   };
   // kalesini gole kapattığı maçlar: toplam, iç/dış, en iyi sezonlar
   const oy = ms.filter(m => m.s !== "N"), gy = oy.filter(m => m.y === 0);
@@ -787,7 +801,7 @@ function rekorHtml(ms0) {
   <h2 class="bolum">En farklı sonuçlar</h2>
   <div class="izgara iki ust-hiza">${rekorKart("En farklı galibiyet", gal, { sira: "fark" })}${rekorKart("En farklı mağlubiyet", mag, { sira: "farkm" })}${rekorKart("En gollü maç", gol, { sira: "gol" })}
   ${rekorKart("İç sahada en farklı galibiyet", evG, { sira: "fark", saha: "E" })}${rekorKart("Deplasmanda en farklı galibiyet", depG, { sira: "fark", saha: "D" })}</div>
-  <h2 class="bolum">Seriler <small class="soluk" style="font-weight:400;font-size:14px">— seçili maçlar art arda, sezonlar arası; ayrıntı için karta tıkla</small></h2>
+  <h2 class="bolum">Seriler <small class="soluk" style="font-weight:400;font-size:14px">— seçili maçlar art arda, sezonlar arası; en uzun 10 seri ve maçları için karta tıkla</small></h2>
   <div class="izgara iki ust-hiza">${sr.map(seriKart).join("")}</div>
   <p class="soluk" style="font-size:13px;margin-top:16px">Seriler seçili filtredeki maçların tarih sırasıyla hesaplanır; kulüp seçili yarışmada bir sezon ya da daha uzun süre yoksa seri kesilir. Penaltıyla biten kupa maçları beraberlik sayılır. Hükmen sonuçlar${hukmenSay ? ` (${hukmenSay} maç)` : ""} rekorlara, serilere ve gol sayımlarına girmez. "İç saha" seçilirse ev sahibi yenilmezlik serisi gibi kayıtlar çıkar.</p>
 `;

@@ -288,6 +288,17 @@ a.rekor-git:hover span, a.rekor-git:focus-visible span { opacity: 1; transform: 
 details.rekor[open] summary { margin-bottom: 8px; }
 details.rekor summary::after { content: "Maçları göster ▾"; font-size: 12.5px; color: var(--vurgu); font-weight: 600; margin-top: 6px; }
 details.rekor[open] summary::after { content: "Gizle ▴"; }
+details.seri-kart summary::after { content: "En uzun seriler ▾"; }
+details.seri-kart[open] > summary::after { content: "Gizle ▴"; }
+.seri-liste { border-top: 1px solid var(--cizgi); }
+.seri-liste li { display: block; padding: 0; }
+.seri-kart .seri-alt > summary { display: flex; flex-direction: row; align-items: center; gap: 12px; padding: 8px 0; cursor: pointer; list-style: none; margin: 0; }
+.seri-alt > summary::-webkit-details-marker { display: none; }
+.seri-kart details.seri-alt > summary::after { content: "▾"; margin: 0; font-size: 12px; color: var(--soluk); }
+.seri-kart details.seri-alt[open] > summary::after { content: "▴"; }
+.seri-alt > summary:hover .kim > span { color: var(--vurgu); }
+.seri-alt .kim > span { font-size: 13.5px; }
+.seri-alt .seri-maclar { max-height: 300px; margin-bottom: 8px; }
 
 /* sıralı listeler (rekorlar sayfası) */
 .rekor-kart h3 { margin-bottom: 2px; }
