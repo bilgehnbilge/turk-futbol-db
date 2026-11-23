@@ -590,6 +590,7 @@ async function kulupSayfa(id, sekme) {
     }
     else if (sekme === "rekorlar") {
       hedef.innerHTML = rekorHtml(ms);
+      donusCiz($("#donusAlan"), id, ms);
       // rekor başlığı -> Maçlar sekmesi, o rekora göre sıralı (sezon, sonuç ve rakip süzgeci sıfırlanır; yarışma ve saha korunur)
       hedef.querySelectorAll("[data-git]").forEach(a => a.addEventListener("click", () => {
         const git = JSON.parse(a.dataset.git);
@@ -761,6 +762,79 @@ function enIyi(ms, f, esit) {   // rekor + aynı değerdeki bütün maçlar (en 
   }
   return l;
 }
+// sıralı liste (eşit değerler aynı sırada): l = [{ kim, alt, n }]
+function siraliListe(l) {
+  let r = 0;
+  return `<ol class="sirali">${l.map((x, i) => { if (!i || x.n !== l[i - 1].n) r = i + 1;
+    return `<li><span class="sira">${r}</span><span class="kim">${x.kim}<small>${x.alt}</small></span><b class="n">${x.n}</b></li>`; }).join("") || `<li class="soluk">—</li>`}</ol>`;
+}
+// kulübün sezon rekorları (seçili maçlardan): en iyi ve en kötü sezonlar
+function sezonRekorHtml(ms) {
+  const sz = new Map();
+  for (const m of ms) {
+    if (m.s === "N") continue;
+    const x = sz.get(m.sezon) || { sezon: m.sezon, h: m.szh || `#/${K}sezon/${m.sezon}`, O: 0, G: 0, B: 0, M: 0, AG: 0, YG: 0 };
+    x.O++; x[m.s]++; x.AG += m.a; x.YG += m.y; sz.set(m.sezon, x);
+  }
+  const l = [...sz.values()], dolu = l.filter(x => x.O >= 10);   // oran ve ortalamalarda en az 10 maç
+  if (l.length < 2) return "";
+  const alt = x => `${x.O} maç · ${x.G}G ${x.B}B ${x.M}M · ${x.AG}-${x.YG}`;
+  const kart = (baslik, aciklama, liste, deger) => `<div class="kart rekor-kart"><h3>${baslik}</h3><p class="soluk aciklama">${aciklama}</p>
+    ${siraliListe(liste.slice(0, 5).map(x => ({ kim: `<a class="bag" href="${x.h}">${esc(x.sezon)}</a>`, alt: alt(x), n: deger(x) })))}</div>`;
+  const s = (f, g) => [...l].sort((a, b) => f(b) - f(a) || (g ? g(b) - g(a) : 0) || a.O - b.O);
+  const sd = (f) => [...dolu].sort((a, b) => f(b) - f(a) || b.O - a.O);
+  return `<h2 class="bolum">Sezon rekorları <small class="soluk" style="font-weight:400;font-size:14px">— seçili maçlarda</small></h2>
+  <div class="izgara iki ust-hiza">
+    ${kart("En çok galibiyet", "Bir sezonda kazandığı maç", s(x => x.G, x => x.G / x.O), x => x.G)}
+    ${dolu.length > 1 ? kart("En yüksek galibiyet oranı", "En az 10 maçlık sezonlar", sd(x => x.G / x.O), x => `%${yuzde(x.G, x.O)}`) : ""}
+    ${kart("En çok gol attığı", "Bir sezonda attığı gol", s(x => x.AG, x => x.AG - x.YG), x => x.AG)}
+    ${dolu.length > 1 ? kart("En az gol yediği", "Maç başına yediği gol, en az 10 maçlık sezonlar", sd(x => -x.YG / x.O), x => (x.YG / x.O).toFixed(2)) : ""}
+    ${kart("En çok mağlubiyet", "Bir sezonda kaybettiği maç", s(x => x.M, x => x.M / x.O), x => x.M)}
+    ${dolu.length > 1 ? kart("En çok gol yediği", "Maç başına yediği gol, en az 10 maçlık sezonlar", sd(x => x.YG / x.O), x => (x.YG / x.O).toFixed(2)) : ""}
+  </div>`;
+}
+// en çok yendiği ve yenildiği rakipler (seçili maçlardan); ayrıntısı Rakipler sekmesinde ve iki kulübün maçları sayfasında
+function rakipRekorHtml(ms) {
+  const r = new Map();
+  for (const m of ms) {
+    if (m.s === "N") continue;
+    const k = m.rakipId ?? "ad:" + m.rakip;
+    const x = r.get(k) || { id: m.rakipId, ad: m.rakip, rlogo: m.rlogo, kulup: m.kulup, O: 0, G: 0, B: 0, M: 0, AG: 0, YG: 0 };
+    x.O++; x[m.s]++; x.AG += m.a; x.YG += m.y; r.set(k, x);
+  }
+  const l = [...r.values()];
+  if (l.length < 2) return "";
+  const kim = x => x.id != null ? `${kulupBag(x.id)}` : rakipBag({ rakipId: null, rakip: x.ad, rlogo: x.rlogo });
+  const alt = x => `${x.O} maç · ${x.G}G ${x.B}B ${x.M}M · ${x.AG}-${x.YG}${x.id != null ? ` · <a class="bag" href="#/${K}h2h/${x.kulup}/${x.id}">maçlar</a>` : ""}`;
+  const kart = (baslik, aciklama, f) => `<div class="kart rekor-kart"><h3><a class="rekor-git" href="${location.hash.replace(/\/rekorlar$/, "")}/rakipler" title="Bütün rakipler">${baslik} <span aria-hidden="true">→</span></a></h3><p class="soluk aciklama">${aciklama}</p>
+    ${siraliListe([...l].sort((a, b) => f(b) - f(a) || a.O - b.O).filter(x => f(x) > 0).slice(0, 5).map(x => ({ kim: kim(x), alt: alt(x), n: f(x) })))}</div>`;
+  return `<h2 class="bolum">Rakipler</h2>
+  <div class="izgara iki ust-hiza">${kart("En çok yendiği rakipler", "Galibiyet sayısı", x => x.G)}${kart("En çok yenildiği rakipler", "Mağlubiyet sayısı", x => x.M)}</div>`;
+}
+// geri dönüşler: TFF maç sayfalarındaki gol dakikalarından (data/tff/kulup/<id>.json: donus, kacan); seçili maçlarla süzülür
+async function donusCiz(kap, kid, ms) {
+  if (!kap) return;
+  let d;
+  try { d = await al(`${V}tff/kulup/${kid}.json?s=${OZET.surum || ""}`); } catch { return; }
+  if (!d.donus || !kap.isConnected) return;
+  const mac = new Map(ms.filter(m => m.id != null && !HUKMEN_DURUM.has(m.durum)).map(m => [m.id, m]));
+  const kart = (baslik, aciklama, l, yazi) => {
+    l = l.filter(x => mac.has(x[0]));
+    const satir = x => `${tabelaSatir(mac.get(x[0]))}<span class="detay donus-not">${yazi(x)}</span>`;
+    return `<div class="kart rekor">${`<span class="baslik">${baslik}</span>`}
+      ${l.length ? `<span class="deger">${l[0][1]} <small>gol ${baslik.startsWith("Geriden") ? "geriden" : "öndeyken"}</small></span>
+        <div class="tabelalar">${l.slice(0, 5).map(satir).join("")}</div>
+        ${l.length > 5 ? `<details class="donus-hepsi"><summary>${l.length - 5} maç daha</summary><div class="seri-maclar tabelalar">${l.slice(5).map(satir).join("")}</div></details>` : ""}`
+        : `<span class="soluk">—</span>`}
+      ${aciklama ? `<span class="detay">${aciklama}</span>` : ""}</div>`;
+  };
+  kap.innerHTML = `<h2 class="bolum">Geri dönüşler <small class="soluk" style="font-weight:400;font-size:14px">— gol dakikası bilinen maçlarda</small></h2>
+  <div class="izgara iki ust-hiza">
+    ${kart("Geriden gelip kazandığı maçlar", "", d.donus, x => `${x[4]}. dakikada ${x[2]}-${x[3]} gerideydi`)}
+    ${kart("Öndeyken kaybettiği maçlar", "", d.kacan, x => `${x[4]}. dakikada ${x[2]}-${x[3]} öndeydi`)}
+  </div>
+  <p class="soluk" style="font-size:13px">Gollerin dakikası TFF maç sayfalarından (lig 1991-92'den, Türkiye Kupası 1991-2007) ve Maçkolik arşivinden; gol listesi skorla tutmayan maçlar hesaba girmez.</p>`;
+}
 function rekorHtml(ms0) {
   if (!ms0.filter(m => m.s !== "N").length) return `<div class="bos">Bu filtreye uyan maç yok.</div>`;
   const hukmenSay = ms0.filter(m => m.s !== "N" && HUKMEN_DURUM.has(m.durum)).length;
@@ -801,6 +875,9 @@ function rekorHtml(ms0) {
   <h2 class="bolum">En farklı sonuçlar</h2>
   <div class="izgara iki ust-hiza">${rekorKart("En farklı galibiyet", gal, { sira: "fark" })}${rekorKart("En farklı mağlubiyet", mag, { sira: "farkm" })}${rekorKart("En gollü maç", gol, { sira: "gol" })}
   ${rekorKart("İç sahada en farklı galibiyet", evG, { sira: "fark", saha: "E" })}${rekorKart("Deplasmanda en farklı galibiyet", depG, { sira: "fark", saha: "D" })}</div>
+  ${sezonRekorHtml(ms)}
+  ${rakipRekorHtml(ms)}
+  <div id="donusAlan"></div>
   <h2 class="bolum">Seriler <small class="soluk" style="font-weight:400;font-size:14px">— seçili maçlar art arda, sezonlar arası; en uzun 10 seri ve maçları için karta tıkla</small></h2>
   <div class="izgara iki ust-hiza">${sr.map(seriKart).join("")}</div>
   <p class="soluk" style="font-size:13px;margin-top:16px">Seriler seçili filtredeki maçların tarih sırasıyla hesaplanır; kulüp seçili yarışmada bir sezon ya da daha uzun süre yoksa seri kesilir. Penaltıyla biten kupa maçları beraberlik sayılır. Hükmen sonuçlar${hukmenSay ? ` (${hukmenSay} maç)` : ""} rekorlara, serilere ve gol sayımlarına girmez. "İç saha" seçilirse ev sahibi yenilmezlik serisi gibi kayıtlar çıkar.</p>

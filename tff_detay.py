@@ -434,6 +434,8 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
     kul_kart = collections.defaultdict(lambda: collections.defaultdict(lambda: [0, 0, 0, None, None]))   # kulüp -> kisi -> [sarı, kırmızı, maç, ilk, son]
     mac_gol = collections.defaultdict(list)   # kulüp -> [kisi, gol, futbol maç no, lig mi]
     genel_gol = []
+    # geri dönüşler: gol dakikalarıyla maçın akışı. kulüp -> [futbol maç no, en büyük fark, o anki skor (biz, onlar), dakika]
+    donus, kacan = collections.defaultdict(list), collections.defaultdict(list)
     kaleci = lambda k_: bas_say[k_] >= 3 and ilk_say[k_] / bas_say[k_] >= 0.6
     # yaş rekorları: yalnız tam doğum tarihi (1 Ocak / 1 Temmuz yalnız yıl bilindiğini gösterir; oyuncu.py kisi_ayikla)
     kisi_db = os.path.join(KOK, "raw", "kisi.db")
@@ -477,6 +479,23 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
                 cikis.setdefault(x[4], x[2])
         lig = m["yarisma"] == "lig"
         hukmen = m["durum"] in ("Hük.", "Çifte H")
+        # maçın akışı: yalnız bütün gollerin dakikası belli ve gol listesi skorla birebir tutuyorsa
+        gl = [x for x in ol if x[1] == "G"]
+        if gl and not hukmen and m["ev_gol"] is not None and all(x[2] is not None for x in gl):
+            sk, en_ = [0, 0], [[0, None, None], [0, None, None]]   # taraf -> [en büyük geride kalış, skor, dakika]
+            for x in sorted(gl, key=lambda x: (x[2], x[3] or 0)):
+                sk[(2 - x[0]) if x[6] == "K" else (x[0] - 1)] += 1
+                for i_ in (0, 1):
+                    geri_ = sk[1 - i_] - sk[i_]
+                    if geri_ > en_[i_][0]:
+                        en_[i_] = [geri_, sk[i_], sk[1 - i_], f"{x[2]}+{x[3]}" if x[3] else str(x[2])]
+            if sk == [m["ev_gol"], m["dep_gol"]]:
+                for i_, kid_ in ((0, m["ev_kulup"]), (1, m["dep_kulup"])):
+                    if en_[i_][0] and sk[i_] > sk[1 - i_]:
+                        donus[kid_].append([f, *en_[i_]])
+                    if en_[1 - i_][0] and sk[i_] < sk[1 - i_]:   # rakip geriden gelip kazandı: biz öndeydik
+                        g_ = en_[1 - i_]
+                        kacan[kid_].append([f, g_[0], g_[2], g_[1], g_[3]])
         for i, taraf in enumerate(k):
             kid = m["ev_kulup"] if i == 0 else m["dep_kulup"]
             anahtar_ = (m["sezon"], kid, YAR[m["yarisma"]], m["kademe"] or 0)
@@ -625,6 +644,9 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
             "sezon_gy": ilk_n([x for x in ss if x[5]], lambda x: (-x[5], x[2])),
             "mac_gol_alanlar": ["kisi", "ad", "gol", "mac", "lig", "tarih", "rakip"],
             "mac_gol": ilk_n(mg, lambda x: (-x[2], x[5] or "")), "mac_lig_gol": ilk_n([x for x in mg if x[4]], lambda x: (-x[2], x[5] or "")),
+            "donus_alanlar": ["mac", "fark", "biz", "onlar", "dakika"],   # en geride (kacan: en önde) olunan an
+            "donus": sorted(donus.get(kid, []), key=lambda x: (-x[1], m_[x[0]]["tarih"] or "")),
+            "kacan": sorted(kacan.get(kid, []), key=lambda x: (-x[1], m_[x[0]]["tarih"] or "")),
             **yas_rekor(kid)})
     for x in genel_gol:
         x[1] = okunur(ad.get(x[0], ""))

@@ -1088,3 +1088,10 @@ kbd { font: 600 11px/1 Inter, system-ui, sans-serif; padding: 3px 5px; border-ra
 .eski-ayr td { text-align: center; }
 .eski-tur { overflow: hidden; }
 
+
+/* kulüp rekorları: geri dönüşler */
+.donus-not { margin: -2px 0 6px; font-size: 12.5px !important; }
+.rekor .donus-hepsi > summary { display: block; font-size: 12.5px; color: var(--vurgu); font-weight: 600; cursor: pointer; margin: 6px 0; list-style: none; }
+.donus-hepsi > summary::-webkit-details-marker { display: none; }
+.donus-hepsi > summary::after { content: " ▾"; }
+.donus-hepsi[open] > summary::after { content: " ▴"; }
