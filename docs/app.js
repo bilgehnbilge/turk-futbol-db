@@ -1942,13 +1942,27 @@ async function rekorlarSayfa(kap) {
   const lig = kap !== "kupa";
   const sira = (l, f) => { let r = 0, onceki; return l.map((x, i) => { const d = f(x); if (d !== onceki) { r = i + 1; onceki = d; } return r; }); };
 
+  // rekor maçının yarışması, kaynaklardaki farklı yazımlar tek biçime: "3.Lig" -> "3. Lig", "Grup 4"/"04"/"4.GRUP" -> "4. Grup"
+  const REKOR_LIG = { "1.Ligi": "1. Lig", "Milli Ligi": "Millî Lig", "1.Ligi / Milli Ligi": "Millî Lig", "2.Futbol Ligi": "2. Lig" };
+  const rekorYarisma = (lig, tur) => {
+    const nokta = x => x.replace(/(\d)\.(?=\p{L})/gu, "$1. ");
+    lig = REKOR_LIG[lig] || nokta(lig || "");
+    tur = nokta((tur || "").trim().replace(/^Kupa /, "")).replace(/GRUP/g, "Grup");
+    let r;
+    if (/^\d+$/.test(tur)) tur = `${+tur}. Grup`;
+    else if ((r = tur.match(/^Grup (\d+)$/))) tur = `${r[1]}. Grup`;
+    else if ((r = tur.match(/^(?:Grup )?([A-Z])$/))) tur = `${r[1]} Grubu`;
+    else if (/^(Beyaz|Kırmızı|Yeşil|Mavi|Sarı)$/.test(tur)) tur = `${tur} Grup`;
+    else if (tur === "Lig") tur = "";
+    return esc(lig) + (tur ? ` · ${esc(tur)}` : "");
+  };
   const macTablo = (l, id) => {
     const r = sira(l, m => id === "gollu" ? m[8] + m[9] : `${Math.abs(m[8] - m[9])}|${Math.max(m[8], m[9])}`);
     const acik = rekorDurum.acik.has(id), n = acik ? l.length : 10;
-    return `<div class="tablo-kap rekor-tablo-kap"><table class="tablo rekor-tablo"><tbody>${l.slice(0, n).map((m, i) => `<tr>
-      <td class="s sira">${r[i]}</td><td class="tarih">${tarihYaz(m[0])}<br><a class="bag" href="${szH(m)}">${esc(m[1])}</a></td>
-      <td class="ad" style="text-align:right" title="${esc(m[5])}">${kB(m[4], m[5])}</td><td class="o skor">${m[15] ? `<a class="skor bagli" href="#/${m[15]}">${skorYaz(m[8], m[9], m[10], m[11], m[12])}</a>` : skorBag(m[13], skorYaz(m[8], m[9], m[10], m[11], m[12]))}</td><td class="ad" title="${esc(m[7])}">${kB(m[6], m[7])}</td>
-      <td class="ek soluk" style="font-size:13px">${esc(m[2] || "")}${m[3] ? ` · ${esc(m[3])}` : ""}</td></tr>`).join("")}</tbody></table></div>
+    return `<div class="tablo-kap rekor-tablo-kap"><table class="tablo rekor-tablo"><tbody>${l.slice(0, n).map((m, i) => `<tr class="rk-ust">
+      <td class="s sira" rowspan="2">${r[i]}</td><td class="tarih" rowspan="2">${tarihYaz(m[0])}<br><a class="bag" href="${szH(m)}">${esc(m[1])}</a></td>
+      <td class="ad" style="text-align:right" title="${esc(m[5])}">${kB(m[4], m[5])}</td><td class="o skor">${m[15] ? `<a class="skor bagli" href="#/${m[15]}">${skorYaz(m[8], m[9], m[10], m[11], m[12])}</a>` : skorBag(m[13], skorYaz(m[8], m[9], m[10], m[11], m[12]))}</td><td class="ad" title="${esc(m[7])}">${kB(m[6], m[7])}</td></tr>
+      <tr class="rk-alt"><td class="yar" colspan="3">${rekorYarisma(m[2], m[3])}</td></tr>`).join("")}</tbody></table></div>
       ${l.length > 10 ? `<button class="dugme daha" data-ac="${id}">${acik ? "Daha az göster" : `İlk ${l.length}'i göster`}</button>` : ""}`;
   };
   const seriKart = k => {
@@ -1990,7 +2004,7 @@ async function rekorlarSayfa(kap) {
   const tabelaKart = (baslik, m) => !m ? "" : `<a class="tabela-kart" href="${detayVar(m[13]) ? `#/${K}mac/${m[13]}` : m[15] ? `#/${m[15]}` : szH(m)}">
     <span class="tk-bas">${baslik}</span>
     <span class="tk-skor"><span class="tk-takim">${lgR(m[4])}<span>${esc(kisaR(m[4], m[5]))}</span></span><b>${m[8]}<i>:</i>${m[9]}</b><span class="tk-takim">${lgR(m[6])}<span>${esc(kisaR(m[6], m[7]))}</span></span></span>
-    <span class="tk-alt">${tarihYaz(m[0])} · ${esc(m[2] || "")}${m[3] ? ` · ${esc(m[3])}` : ""}</span></a>`;
+    <span class="tk-alt">${tarihYaz(m[0])} · ${rekorYarisma(m[2], m[3])}</span></a>`;
   const oyuncuTabela = () => { const x = TR?.mac_gol.filter(golKap[kap] || (() => false))[0]; return x ? `<a class="tabela-kart" href="#/${K}oyuncu/k${x[0]}">
     <span class="tk-bas">Bir maçta en çok gol</span><span class="tk-skor tk-oyuncu"><b>${x[2]}</b><span class="tk-takim"><span><b class="tk-ad">${esc(x[1])}</b><small>${esc(KULUP.get(x[6])?.ad || "")} – ${esc(KULUP.get(x[7])?.ad || "")}</small></span></span></span>
     <span class="tk-alt">${tarihYaz(x[4])} · ${esc(x[8] === "L" ? KADEME_AD[x[9]] || "Lig" : YAR_AD[x[8]] || "")}</span></a>` : ""; };
