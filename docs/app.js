@@ -566,7 +566,7 @@ async function kulupSayfa(id, sekme) {
   </section>
   ${ardilHtml}
   <div class="kulup-sekme"><nav class="sekmeler">
-    ${[["ozet", "Özet"], ["rekorlar", "Rekorlar ve seriler"], ["oyuncular", "Oyuncu rekorları"], ["maclar", "Maçlar"], ["rakipler", "Rakipler"], ["sezonlar", "Sezon sezon"]]
+    ${[["ozet", "Özet"], ["rekorlar", "Rekorlar ve seriler"], ["oyuncular", "Oyuncu rekorları"], ["maclar", "Maçlar"], ["rakipler", "Rakipler"], ...(BOLUM === "erkek" && tum.some(m => m.yar === "A") ? [["ulkeler", "Ülkelere göre"]] : []), ["sezonlar", "Sezon sezon"]]
       .map(([s, ad]) => `<a href="#/${K}kulup/${id}/${s}" class="${s === sekme ? "aktif" : ""}">${ad}</a>`).join("")}
   </nav></div>
   <div id="filtreAlan"></div>
@@ -607,6 +607,7 @@ async function kulupSayfa(id, sekme) {
     else if (sekme === "maclar") macTablosu(hedef, ms, durum);
     else if (sekme === "rakipler") rakipTablosu(hedef, ms, id);
     else if (sekme === "sezonlar") hedef.innerHTML = sezonSezonHtml(tum);
+    else if (sekme === "ulkeler") avrupaUlkeler(hedef, id);
   };
   ciz();
 }
@@ -617,7 +618,7 @@ function filtrele(ms, d, sekme) {
     && (sekme !== "maclar" || ((!d.sonuc || (d.sonuc === "GY" ? m.y === 0 && m.s !== "N" : m.s === d.sonuc)) && (!d.rakip || norm(m.rakip).includes(norm(d.rakip))))));
 }
 function filtreHtml(d, ms, sekme, onculler) {
-  if (sekme === "oyuncular") return "";   // oyuncu rekorları kulübün bütün maçlarından (filtre yok)
+  if (sekme === "oyuncular" || sekme === "ulkeler") return "";   // oyuncu rekorları kulübün bütün maçlarından (filtre yok)
   if (sekme === "ozet" || sekme === "sezonlar") {
     return onculler.length ? `<div class="filtre"><label><input type="checkbox" id="fOncul" ${d.oncul ? "checked" : ""}> Öncül kulüplerin maçlarını da kat (${onculler.map(kulupAd).map(esc).join(", ")})</label></div>` : "";
   }
@@ -1690,11 +1691,13 @@ const bayrak = u => { const k = bayrakKod(u); return k ? `<img class="bayrak" sr
 const ulkeHtml = u => `${bayrak(u)} ${esc(ulkeAd(u))}`;
 const avrupaDurum = { kulup: "", yar: "", sira: "O", ters: true, ulke: null };
 
-async function avrupaUlkeler() {
-  const kap = document.createElement("section");
-  kap.className = "bolum";
-  kap.innerHTML = `<h2>Avrupa'da ülkelere göre</h2><div class="yukleniyor" style="padding:20px">Yükleniyor…</div>`;
-  icerik.appendChild(kap);
+// sabit: kulüp sayfasının "Ülkelere göre" sekmesi (kap o sekmenin alanı, kulüp seçimi yok, kendi durumu)
+const kulupUlkeDurum = { kulup: "", yar: "", sira: "O", ters: true, ulke: null };
+async function avrupaUlkeler(kap, sabit) {
+  if (!kap) { kap = document.createElement("section"); kap.className = "bolum"; icerik.appendChild(kap); }
+  const baslik = sabit ? "" : `<h2>Avrupa'da ülkelere göre</h2>`;
+  kap.innerHTML = `${baslik}<div class="yukleniyor" style="padding:20px">Yükleniyor…</div>`;
+  if (sabit && kulupUlkeDurum.kulup !== String(sabit)) Object.assign(kulupUlkeDurum, { kulup: String(sabit), yar: "", ulke: null });
   const d = await al(`data/avrupa.json?s=${OZET.surum || ""}`);
   // kulübe bağlanmamış rakip (RSSSF Intertoto): adından yabancı kulüp kaydı bulunursa ona bağla
   const adIndeks = new Map();
@@ -1706,7 +1709,7 @@ async function avrupaUlkeler() {
   const kulupler = [...tum.reduce((m, x) => { for (const k of [x.ev, x.dep]) if (turk(k)) m.set(k, (m.get(k) || 0) + 1); return m; }, new Map())].sort((a, b) => b[1] - a[1]);
   const ligler = [...new Set(tum.map(m => m.lig))];
   const ciz = () => {
-    const D = avrupaDurum;
+    const D = sabit ? kulupUlkeDurum : avrupaDurum;
     // her maç, Türk tarafının bakışıyla (iki Türk takımı karşılaştıysa — Süper Kupa vb. — dışarıda kalır)
     const satir = [];
     for (const m of tum) {
@@ -1727,10 +1730,10 @@ async function avrupaUlkeler() {
     const l = [...tablo.values()].sort((p, q) => { const f = anahtar[D.sira], a = f(p), b = f(q); return (typeof a === "string" ? a.localeCompare(b, "tr") : a - b) * (D.ters ? -1 : 1) || q.O - p.O; });
     const top = satir.reduce((t, m) => (t.O++, t[m.s]++, t.AG += m.a, t.YG += m.y, t), { O: 0, G: 0, B: 0, M: 0, AG: 0, YG: 0 });
     const ayrinti = D.ulke !== null ? satir.filter(m => m.ulke === D.ulke).sort((p, q) => q.tarih.localeCompare(p.tarih)) : [];
-    kap.innerHTML = `<h2>Avrupa'da ülkelere göre</h2>
-      <p class="soluk not">Türk kulüplerinin Avrupa kupası maçları, rakibin ülkesine göre. Bir ülkeye tıklayınca o ülke takımlarıyla oynanan maçlar açılır.</p>
+    kap.innerHTML = `${baslik}
+      <p class="soluk not">${sabit ? `${esc(kulupAd(sabit))} kulübünün Avrupa kupası maçları, rakibin ülkesine göre` : "Türk kulüplerinin Avrupa kupası maçları, rakibin ülkesine göre"}. Bir ülkeye tıklayınca o ülke takımlarıyla oynanan maçlar açılır.</p>
       <div class="filtre">
-        <select id="avKulup" aria-label="Kulüp"><option value="">Bütün Türk kulüpleri</option>${kulupler.map(([id, n]) => `<option value="${id}" ${+D.kulup === id ? "selected" : ""}>${esc(kulupAd(id))} (${n})</option>`).join("")}</select>
+        ${sabit ? "" : `<select id="avKulup" aria-label="Kulüp"><option value="">Bütün Türk kulüpleri</option>${kulupler.map(([id, n]) => `<option value="${id}" ${+D.kulup === id ? "selected" : ""}>${esc(kulupAd(id))} (${n})</option>`).join("")}</select>`}
         <select id="avYar" aria-label="Kupa"><option value="">Bütün kupalar</option>${ligler.map(y => `<option ${D.yar === y ? "selected" : ""}>${esc(y)}</option>`).join("")}</select>
         <span class="soluk">${top.O} maç · ${top.G}G ${top.B}B ${top.M}M · ${top.AG}-${top.YG}</span>
       </div>
@@ -1742,7 +1745,7 @@ async function avrupaUlkeler() {
       ${D.ulke !== null ? `<div class="kart bolum"><h3>${ulkeHtml(D.ulke)} — ${ayrinti.length} maç</h3><div class="tabelalar">${ayrinti.map(m => tabelaSatir({
         id: m.id, tarih: m.tarih, lig: m.lig, tur: m.tur, saha: m.saha, kulup: m.biz, takim: kulupAd(m.biz), rakipId: m.rakip, rakip: m.rakip != null ? kulupAd(m.rakip) : m.rakipAd,
         a: m.a, y: m.y, pa: m.saha === "E" ? m.ep : m.dp, py: m.saha === "E" ? m.dp : m.ep, durum: m.durum, s: m.s }, true)).join("")}</div></div>` : ""}`;
-    kap.querySelector("#avKulup").addEventListener("change", e => { D.kulup = e.target.value; D.ulke = null; ciz(); });
+    kap.querySelector("#avKulup")?.addEventListener("change", e => { D.kulup = e.target.value; D.ulke = null; ciz(); });
     kap.querySelector("#avYar").addEventListener("change", e => { D.yar = e.target.value; D.ulke = null; ciz(); });
     kap.querySelectorAll("th.sirala").forEach(th => th.addEventListener("click", () => { if (D.sira === th.dataset.k) D.ters = !D.ters; else { D.sira = th.dataset.k; D.ters = th.dataset.k !== "ad"; } ciz(); }));
     kap.querySelectorAll("tr[data-u]").forEach(tr => tr.addEventListener("click", () => { D.ulke = D.ulke === tr.dataset.u ? null : tr.dataset.u; ciz(); }));
