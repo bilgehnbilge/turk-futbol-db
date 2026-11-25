@@ -18,7 +18,8 @@ PAKET = "girdiler.tar.gz"
 GIRDILER = ["oyuncu.db", "bal_detay.db", "kisi.db", "kadin.db", "kadin_detay.db", "kadin_kupa_eslesme.json",
             "uefa_kadin", "mackolik_td/ek.json", "mackolik_td/takim_no.json",
             "mackolik_kadro", "rsssf_eski/eski.json",   # 1959-91 Süper Lig kadroları ve 1959 öncesi bölümü
-            "uefa_mac", "uefa_istat"]   # Avrupa maçlarının UEFA kadro/olay ve istatistikleri (bot yeni maçları ekler)
+            "uefa_mac", "uefa_istat",
+            "mackolik_arsiv"]   # 1990 öncesi kupa / Süper Kupa arşiv maç listeleri (kadroları siteye bağlamak için)   # Avrupa maçlarının UEFA kadro/olay ve istatistikleri (bot yeni maçları ekler)
 
 
 def yukle():

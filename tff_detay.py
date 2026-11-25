@@ -19,6 +19,7 @@ DOGUM_DUZELT = {int(k): v[0] for k, v in json.load(open(os.path.join(KOK, "dogum
 OYUNCU_DB = os.path.join(KOK, "raw", "oyuncu.db")
 KUPA_ES = os.path.join(KOK, "tff_kupa_eslesme.json")   # Maçkolik kupa maçı -> TFF maç no (1990-2007 kupa sayfaları)
 YAR = {"lig": "L", "kupa": "K", "ozel_kupa": "O", "avrupa": "A", "terfi": "T"}
+MK_KUPA = 70_500_000   # 1990 öncesi Türkiye Kupası / Süper Kupa maçlarının ayrıntı numarası (Maçkolik arşiv kadrosu)
 MK_MAC = 70_000_000   # TFF'de olmayan (Maçkolik kaynaklı, 1984-85 öncesi Süper Lig) maçların ayrıntı numarası:
 # MK_MAC + Maçkolik maç kimliklerinin sıralı listesindeki yeri (sıkışık numara: ayrıntı dosyaları no // 250 ile gruplanır;
 # bu maçların listesi tarihî ve sabit olduğu için numaralar her kurulumda aynı kalır)
@@ -115,6 +116,12 @@ def aktar(c, maclar, okunur, cikti):
             bag[m["id"]] = (mk_sira[m["kaynak_id"]], 0)
         elif f"{m['kaynak']}:{m['kaynak_id']}" in kupa:
             bag[m["id"]] = tuple(kupa[f"{m['kaynak']}:{m['kaynak_id']}"])
+    # 1990 öncesi Türkiye Kupası ve Süper Kupa (TFF'de yok): ayrıntısı Maçkolik arşiv kadrosu; sabit numara MK_KUPA + sıra
+    eski_kupa = sorted((m["yarisma"], m["kaynak"], m["kaynak_id"], m["id"]) for m in maclar
+                       if m["yarisma"] in ("kupa", "ozel_kupa") and m["id"] not in bag and m["kaynak_id"] and m["ev_gol"] is not None
+                       and m["tarih"] and m["tarih"] < "1990-07-01")
+    for i, (_, _, _, f) in enumerate(eski_kupa):
+        bag[f] = (MK_KUPA + i, 0)
     if yerel:
         mevcut = maclari_yaz(o, c, maclar, bag, okunur, tff)
         yaz(varyol, {"maclar": artis(sorted(mevcut))})

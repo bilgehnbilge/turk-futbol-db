@@ -43,6 +43,23 @@ def arsiv_maclari():
     return out
 
 
+def kupa_arsiv_maclari():
+    """Türkiye Kupası (1962-90) ve Süper Kupa (1965-90) arşiv maçları, kadrosu inmiş olanlar:
+    {arşiv maç no: (tarih, ev arşiv takım no, dep arşiv takım no, ev gol, dep gol)} (raw/mackolik_arsiv kupa_* ve superkupa_*)."""
+    kok = os.path.join(KOK, "raw", "mackolik_arsiv")
+    out = {}
+    for kl in glob.glob(os.path.join(kok, "kupa_*")) + glob.glob(os.path.join(kok, "superkupa_*")):
+        e = os.path.basename(kl).split("_")[-1]
+        if not ("1962" <= e[:4] < "1990") or not os.path.exists(os.path.join(kl, "sezon.html")):
+            continue
+        sayfalar = glob.glob(os.path.join(kl, "tur_*.html")) or [os.path.join(kl, "sezon.html")]
+        for s in sayfalar:
+            for x in M.kupa_satirlari(open(s, encoding="utf-8").read()):
+                if os.path.exists(os.path.join(HAM, "mac", x["kaynak_id"][-2:].zfill(2), f"{x['kaynak_id']}.json")):
+                    out[x["kaynak_id"]] = (x["tarih"], x["ev_id"], x["dep_id"], x["ev_gol"], x["dep_gol"])
+    return out
+
+
 def takim_kulup(c):
     """arşiv takım no -> {kulüp}"""
     out = collections.defaultdict(set)
@@ -63,28 +80,43 @@ def yukle(maclar, bag, c):
     for m in maclar:
         if m["kademe"] == 1 and m["yarisma"] == "lig" and m["id"] in bag and m["tarih"]:
             aday[(m["sezon"], m["tarih"])].append(m)
+    kupa_aday = collections.defaultdict(list)   # Türkiye Kupası ve Süper Kupa (1990 öncesi): tarihe göre
+    for m in maclar:
+        if m["yarisma"] in ("kupa", "ozel_kupa") and m["id"] in bag and m["tarih"] and m["tarih"] < "1990-07-01":
+            kupa_aday[m["tarih"]].append(m)
+    isler = [(mid, sezon, tarih, ev, dep, False, None) for mid, (sezon, tarih, ev, dep) in arsiv_maclari().items()] + \
+            [(mid, None, tarih, ev, dep, True, (eg, dg)) for mid, (tarih, ev, dep, eg, dg) in kupa_arsiv_maclari().items()]
     out, say = {}, collections.Counter()
-    for mid, (sezon, tarih, ev, dep) in arsiv_maclari().items():
+    for mid, sezon, tarih, ev, dep, kupa_mi, skor in isler:
         y = os.path.join(HAM, "mac", mid[-2:].zfill(2), f"{mid}.json")
         if not os.path.exists(y):
             continue
         g = datetime.date.fromisoformat(tarih)
         bul = []
         for d in (0, -1, 1):
-            for m in aday.get((sezon, (g + datetime.timedelta(d)).isoformat()), []):
+            gun = (g + datetime.timedelta(d)).isoformat()
+            for m in (kupa_aday.get(gun, []) if kupa_mi else aday.get((sezon, gun), [])):
                 if m["ev_kulup"] in tk[ev] and m["dep_kulup"] in tk[dep]:
                     bul.append((m, 0))
                 elif m["ev_kulup"] in tk[dep] and m["dep_kulup"] in tk[ev]:
                     bul.append((m, 1))
             if bul:
                 break
+        if not bul and kupa_mi:
+            # alt lig takımlarının arşiv no'su kulübe bağlı olmayabiliyor: aynı gün, aynı skor ve en az bir takımı tutan tek maç
+            for m in kupa_aday.get(tarih, []):
+                sk = (str(m["ev_gol"]), str(m["dep_gol"]))
+                if sk == skor and (m["ev_kulup"] in tk[ev] or m["dep_kulup"] in tk[dep]):
+                    bul.append((m, 0))
+                elif sk == skor[::-1] and (m["ev_kulup"] in tk[dep] or m["dep_kulup"] in tk[ev]):
+                    bul.append((m, 1))
         if len(bul) != 1:
-            say["bağlanamadı" if not bul else "birden çok aday"] += 1
+            say[("kupa " if kupa_mi else "") + ("bağlanamadı" if not bul else "birden çok aday")] += 1
             continue
         m, ters = bul[0]
         t, t_ters = bag[m["id"]]
         out[t] = (ters ^ t_ters, json.load(open(y, encoding="utf-8")))
-        say["bağlandı"] += 1
+        say["kupa bağlandı" if kupa_mi else "bağlandı"] += 1
     return out, say
 
 

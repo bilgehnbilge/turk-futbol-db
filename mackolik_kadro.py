@@ -156,10 +156,53 @@ def lig_takimlari(etiket):
     return out
 
 
+SUPER_SEZON = [f"{y}-{y + 1}" for y in range(1965, 1990)]
+
+
+def super_sezon_maclari(etiket, indir_=True):
+    """Süper Kupa (Cumhurbaşkanlığı / Devlet Başkanlığı Kupası; arşivde kupa id=2) sezon sayfasındaki maçlar."""
+    kl = os.path.join(M.ARSIV_HAM, f"superkupa_{etiket}")
+    yol = os.path.join(kl, "sezon.html")
+    if not os.path.exists(yol):
+        if not indir_:
+            return []
+        h = M.curl_metin(f"{M.ARSIV}/AjaxHandlers/CupHandler.aspx?command=seasonMatches&id=2&season={etiket.replace('-', '/')}")
+        time.sleep(BEKLE + random.uniform(0, 5))
+        if h is None:
+            print(f"  süper kupa {etiket}: sezon sayfası alınamadı (sonra yeniden denenir)", flush=True)
+            return []
+        os.makedirs(kl, exist_ok=True)
+        open(yol + ".tmp", "w", encoding="utf-8").write(h)
+        os.replace(yol + ".tmp", yol)
+    return [x for x in M.kupa_satirlari(open(yol, encoding="utf-8").read()) if x["ev_gol"]]
+
+
+def superkupa():
+    """1965-90 Süper Kupa maç kadroları (sezon başına bir maç; yoklama yok, hepsi denenir)."""
+    say = dict(kadrolu=0, kadrosuz=0, hata=0)
+    for etiket in reversed(SUPER_SEZON):
+        for x in super_sezon_maclari(etiket):
+            mid = x["kaynak_id"]
+            if os.path.exists(mac_yol(mid)):
+                continue
+            if not mac_indir(mid, f"{x['ev_adi']} - {x['dep_adi']}"):
+                say["hata"] += 1
+                time.sleep(BEKLE + random.uniform(0, 5))
+                continue
+            if kadrolu_mu(mid):
+                say["kadrolu"] += 1
+                time.sleep(BEKLE + random.uniform(0, 5))
+            else:
+                say["kadrosuz"] += 1
+        print(f"  süper kupa {etiket} {time.strftime('%H:%M')}", flush=True)
+    print(f"Süper Kupa bitti: {say}", flush=True)
+
+
 def kupa():
-    """1962-90 Türkiye Kupası kadroları. Site hatası (HTTP/okunamayan yanıt) ile kadrosu olmayan maç ayrılır: hata
+    """Önce 1965-90 Süper Kupa (küçük), sonra 1962-90 Türkiye Kupası kadroları. Site hatası (HTTP/okunamayan yanıt) ile kadrosu olmayan maç ayrılır: hata
     kaydedilmez (sonraki çalıştırmada yeniden denenir), kadrosuz maç boş olarak kaydedilir ve beklemeden sonrakine geçilir.
     Bir turun ilk 5 maçı kadrosuzsa turun kalanından yalnız Süper Lig takımının oynadığı maçlar istenir."""
+    superkupa()
     top = dict(kadrolu=0, kadrosuz=0, hata=0, atlanan=0)
     for etiket in reversed(KUPA_SEZON):
         print(f"kupa {etiket}: tur listesi", flush=True)
@@ -194,6 +237,9 @@ def kupa():
 
 def kupa_say():
     """Ağa çıkmadan: sezon başına diskte olan tur sayfası ve inen kadro."""
+    sk = [x["kaynak_id"] for e in SUPER_SEZON for x in super_sezon_maclari(e, False)]
+    var = [m for m in sk if os.path.exists(mac_yol(m))]
+    print(f"süper kupa: {len(sk)} maç listede, {len(var)} indi, {sum(map(kadrolu_mu, var))} kadrolu")
     for etiket in KUPA_SEZON:
         kl = os.path.join(M.ARSIV_HAM, f"kupa_{etiket}")
         sezon = open(os.path.join(kl, "sezon.html"), encoding="utf-8").read()
