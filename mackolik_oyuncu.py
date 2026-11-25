@@ -88,14 +88,28 @@ def yukle(maclar, bag, c):
     return out, say
 
 
-def kisi_esle(ar, kadro, ad, sezon=None, kulup=None):
+def kisi_esle(ar, kadro, ad, sezon=None, kulup=None, tarih=None, dogum=None):
     """Arşiv oyuncu no -> TFF kişi no.
     1. 1990-91: aynı maç ve taraftaki ad benzerliği (çoğunluk oyu).
     2. Kalanlar: tam ad (aksan ve büyük/küçük harf farkı gözetmeden) TFF'de tek bir kişide geçiyorsa, o kişi başka bir arşiv
        oyuncusuna bağlanmadıysa ve iki kariyer aynı sezonda çakışmıyorsa (TFF'deki ilk sezon arşivdeki son sezondan sonra).
     3. Adı TFF'de birden çok kişide geçenler: arşivdeki son kulübünde, arşivin son sezonunda ya da hemen sonrakinde TFF
        kariyerine başlayan tek kişi.
-       sezon: TFF maç no -> sezon; kulup(TFF maç no, TFF tarafı 0/1) -> kulüp."""
+    Her adımda: TFF doğum tarihine göre arşivdeki ilk maçında 15 yaşından küçük olacak kişiye bağlanmaz (aynı adlı iki
+    ayrı oyuncu; ör. 1977-84 Trabzonspor/Boluspor'daki Faruk Sağlam ile 1964 doğumlu TFF'deki Faruk Sağlam).
+       sezon: TFF maç no -> sezon; kulup(TFF maç no, TFF tarafı 0/1) -> kulüp; tarih: TFF maç no -> maç tarihi;
+       dogum: TFF kişi no -> doğum tarihi (date)."""
+    ilk = {}   # arşiv oyuncu no -> arşivdeki ilk maç tarihi
+    if tarih and dogum:
+        for t, (ters, d) in ar.items():
+            tr = tarih(t)
+            if tr:
+                for l in (d["h"], d["a"]):
+                    for pid, _, _ in l:
+                        if pid and (pid not in ilk or tr < ilk[pid]):
+                            ilk[pid] = tr
+    def uygun(pid, k):
+        return not (pid in ilk and k in dogum and (datetime.date.fromisoformat(ilk[pid]) - dogum[k]).days < 15 * 365)
     oy = collections.defaultdict(collections.Counter)
     for t, (ters, d) in ar.items():
         if t not in kadro:
@@ -106,7 +120,7 @@ def kisi_esle(ar, kadro, ad, sezon=None, kulup=None):
                 p = sorted(((ad_puani(a, ad.get(k, "")), k) for _, k, _ in tl), reverse=True)
                 if p and p[0][0] >= 0.5 and (len(p) == 1 or p[0][0] - p[1][0] >= 0.2):
                     oy[pid][p[0][1]] += 1
-    es = {pid: c.most_common(1)[0][0] for pid, c in oy.items()}
+    es = {pid: k for pid, c in oy.items() if uygun(pid, k := c.most_common(1)[0][0])}
     if sezon is None:
         return es
     from oyuncu_bag import sade
@@ -141,12 +155,12 @@ def kisi_esle(ar, kadro, ad, sezon=None, kulup=None):
         l = tff_ad.get(s_, set())
         if len(l) == 1 and ad_say[s_] == 1:
             k = next(iter(l))
-            if k not in kullanilan and tff_ilk.get(k, "9999") > ar_son.get(pid, ""):
+            if k not in kullanilan and tff_ilk.get(k, "9999") > ar_son.get(pid, "") and uygun(pid, k):
                 es[pid] = k; kullanilan.add(k)
         elif len(l) > 1 and kulup and pid in ar_son:
             son = ar_son[pid]
             aday = [k for k in l if k not in kullanilan and k in tff_ilk and tff_ilk_k.get(k) == ar_son_k.get(pid)
-                    and son <= tff_ilk[k] and int(tff_ilk[k][:4]) - int(son[:4]) <= 1]
+                    and son <= tff_ilk[k] and int(tff_ilk[k][:4]) - int(son[:4]) <= 1 and uygun(pid, k)]
             if len(aday) == 1:
                 es[pid] = aday[0]; kullanilan.add(aday[0])
     return es

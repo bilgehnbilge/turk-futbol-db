@@ -371,8 +371,16 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
     import mackolik_oyuncu as MO
     erkek = os.path.basename(OYUNCU_DB) == "oyuncu.db"   # kadın verisi (kadin_site.py) aynı kodla geçer: arşiv yalnız erkek
     ar, ar_say = MO.yukle(maclar, bag, c) if erkek else ({}, {})
+    dog_es = {}   # eşleştirmede yaş kontrolü için doğum tarihleri (yalnız yıl bilinenler dahil)
+    if erkek and os.path.exists(os.path.join(KOK, "raw", "kisi.db")):
+        for k_, d_ in sqlite3.connect(os.path.join(KOK, "raw", "kisi.db")).execute("SELECT kisi, dogum FROM kisi WHERE dogum IS NOT NULL"):
+            try:
+                dog_es[k_] = datetime.date.fromisoformat(DOGUM_DUZELT.get(k_, d_))
+            except ValueError:
+                pass
     es_mk = MO.kisi_esle(ar, kadro, ad, {t_: m_[f_]["sezon"] for t_, (f_, _) in tersi.items()},
-                         lambda t_, i: m_[tersi[t_][0]]["ev_kulup" if (i == 0) != bool(tersi[t_][1]) else "dep_kulup"]) if erkek else {}
+                         lambda t_, i: m_[tersi[t_][0]]["ev_kulup" if (i == 0) != bool(tersi[t_][1]) else "dep_kulup"],
+                         lambda t_: m_[tersi[t_][0]]["tarih"] if t_ in tersi else None, dog_es) if erkek else {}
     mk_kadro, mk_olay = MO.kat(ar, es_mk, kadro, olay, ad, ilk_sira, ilk_say, bas_say)
     # 1959 öncesi arşiv kadroları: yalnız oyuncular sayfasının "Bütün maçlar" listelerine (maç ve oyuncu sayfalarına girmez)
     eski, eski_ad = MO.eski_kariyer(es_mk, c) if erkek else ({}, {})
