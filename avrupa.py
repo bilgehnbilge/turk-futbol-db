@@ -415,6 +415,7 @@ def uefa_guncel(sezon):
     eslesmeyen = sorted({x[s + "_adi"] for x in yeni for s in ("ev", "dep") if x[s + "_id"].startswith("uefa:")})
     print(f"UEFA {sezon}: {len(yeni)} Turk takimi maci ({sum(1 for x in yeni if x.get('ev_gol'))} oynanmis); "
           f"onceki {len(eski) - len(kalan)} satirin yerine yazildi; kimligi bilinmeyen takim: {eslesmeyen}", flush=True)
+    return ue
 
 
 def guncel(sezon):

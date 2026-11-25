@@ -62,9 +62,18 @@ def main():
         print("BAL güncellenemedi:", e, flush=True)
     try:   # Avrupa kupaları: UEFA'nın maç verisi (Maçkolik GitHub sunucularına 403 veriyor); alınamazsa eski veri kalır
         import avrupa
-        avrupa.uefa_guncel(a.sezon)
+        ue = avrupa.uefa_guncel(a.sezon)
     except Exception as e:
+        ue = None
         print("Avrupa güncellenemedi:", e, flush=True)
+    # yeni oynanan Avrupa maçlarının kadro/olay/istatistiği. raw/uefa_mac girdilerden gelmediyse çalışmaz: boş klasörle
+    # uefa_detay ayikla yalnız yeni maçlardan veritabanı kurar ve web_aktar sitedeki bütün Avrupa maç ayrıntılarını siler.
+    if girdiler_var and ue and os.path.isdir(os.path.join(KOK, "raw", "uefa_mac")):
+        try:
+            import uefa_detay
+            uefa_detay.guncel(ue)
+        except Exception as e:
+            print("Avrupa maç ayrıntıları güncellenemedi:", e, flush=True)
     if girdiler_var:   # güncel sezonun maç ayrıntıları (erkek, BAL, kadın), kadın ligleri, yeni oyuncuların kişi sayfaları
         try:
             import detay_guncel

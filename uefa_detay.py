@@ -55,13 +55,8 @@ def indir():
         yol = os.path.join(HAM, f"{mid}.json.gz")
         if os.path.exists(yol):
             continue
-        kadro = al(f"{API}/{mid}/lineups")
-        olay = al(f"{API}/{mid}/events?filter=LINEUP&offset=0&limit=200")
-        if kadro is None or olay is None:
-            print("alınamadı", mid, flush=True); continue
-        with gzip.open(yol + ".tmp", "wt", encoding="utf-8") as f:
-            json.dump({"mac": m, "kadro": kadro, "olay": olay}, f, ensure_ascii=False)
-        os.replace(yol + ".tmp", yol)
+        if not mac_kaydet(mid, m):
+            continue
         yeni += 1
         if i % 100 == 0:
             print(f"  {i}/{len(ms)} {time.strftime('%H:%M')}", flush=True)
@@ -69,9 +64,64 @@ def indir():
     print("Bitti,", yeni, "yeni maç", flush=True)
 
 
+def mac_kaydet(mid, m, kadro=None):
+    """Tek maçın kadro + olaylarını raw/uefa_mac'a yazar; alınamazsa False."""
+    kadro = kadro or al(f"{API}/{mid}/lineups")
+    olay = al(f"{API}/{mid}/events?filter=LINEUP&offset=0&limit=200")
+    if kadro is None or olay is None:
+        print("alınamadı", mid, flush=True)
+        return False
+    yol = os.path.join(HAM, f"{mid}.json.gz")
+    with gzip.open(yol + ".tmp", "wt", encoding="utf-8") as f:
+        json.dump({"mac": m, "kadro": kadro, "olay": olay}, f, ensure_ascii=False)
+    os.replace(yol + ".tmp", yol)
+    return True
+
+
+def guncel(ue):
+    """Bot için: güncel sezonun (avrupa.uefa_guncel'in döndürdüğü [(kod, maç)]) bitmiş maçlarından ayrıntısı
+    inmemiş olanların kadro/olay ve istatistiklerini indirir. Kadro yayımlanmadıysa (boş) dosya yazılmaz, sonra denenir."""
+    os.makedirs(HAM, exist_ok=True)
+    yeni = 0
+    for _, m in ue or []:
+        mid = str(m["id"])
+        if m.get("status") != "FINISHED" or os.path.exists(os.path.join(HAM, f"{mid}.json.gz")):
+            continue
+        kadro = al(f"{API}/{mid}/lineups")
+        if not kadro or not ((kadro.get("homeTeam") or {}).get("field") or (kadro.get("awayTeam") or {}).get("field")):
+            print("kadro henüz yok:", mid, flush=True)
+            continue
+        if mac_kaydet(mid, m, kadro):
+            yeni += 1
+            istat_indir(mid)
+        time.sleep(0.4)
+    print("UEFA maç ayrıntısı:", yeni, "yeni maç", flush=True)
+
+
 OYUNCU_ISTAT = {"minutes_played_official", "goals", "assists", "attempts", "attempts_on_target", "passes_attempted", "passes_completed",
                 "passes_accuracy", "tackles", "recovered_ball", "fouls_committed", "fouls_suffered", "saves", "offsides", "distance_covered",
                 "top_speed", "cross_completed", "yellow_cards", "red_cards"}
+
+
+def istat_indir(uid):
+    """Tek maçın takım ve oyuncu istatistiklerini raw/uefa_istat'a yazar; alınamazsa False."""
+    d = os.path.join(KOK, "raw", "uefa_istat")
+    os.makedirs(d, exist_ok=True)
+    yol = os.path.join(d, f"{uid}.json.gz")
+    takim = al(f"https://matchstats.uefa.com/v1/team-statistics/{uid}")
+    oyuncu = al(f"https://matchstats.uefa.com/v1/player-statistics/{uid}")
+    if takim is None and oyuncu is None:
+        print("alınamadı", uid, flush=True)
+        return False
+    sade = lambda l: {s["name"]: s["value"] for s in l or [] if s.get("value") not in (None, "")}
+    veri = {"takim": [{"takim": x.get("teamId"), "istat": sade(x.get("statistics"))} for x in takim or [] if isinstance(x, dict)],
+            "oyuncu": [{"oyuncu": x.get("playerId"), "takim": x.get("teamId"),
+                        "istat": {k: v for k, v in sade(x.get("statistics")).items() if k in OYUNCU_ISTAT}}
+                       for x in oyuncu or [] if isinstance(x, dict)]}
+    with gzip.open(yol + ".tmp", "wt", encoding="utf-8") as f:
+        json.dump(veri, f, ensure_ascii=False)
+    os.replace(yol + ".tmp", yol)
+    return True
 
 
 def istat():
@@ -81,21 +131,10 @@ def istat():
     idler = sorted(os.path.basename(f)[:-8] for f in glob.glob(os.path.join(HAM, "*.json.gz")))
     yeni = 0
     for i, uid in enumerate(idler, 1):
-        yol = os.path.join(d, f"{uid}.json.gz")
-        if os.path.exists(yol):
+        if os.path.exists(os.path.join(d, f"{uid}.json.gz")):
             continue
-        takim = al(f"https://matchstats.uefa.com/v1/team-statistics/{uid}")
-        oyuncu = al(f"https://matchstats.uefa.com/v1/player-statistics/{uid}")
-        if takim is None and oyuncu is None:
-            print("alınamadı", uid, flush=True); continue
-        sade = lambda l: {s["name"]: s["value"] for s in l or [] if s.get("value") not in (None, "")}
-        veri = {"takim": [{"takim": x.get("teamId"), "istat": sade(x.get("statistics"))} for x in takim or [] if isinstance(x, dict)],
-                "oyuncu": [{"oyuncu": x.get("playerId"), "takim": x.get("teamId"),
-                            "istat": {k: v for k, v in sade(x.get("statistics")).items() if k in OYUNCU_ISTAT}}
-                           for x in oyuncu or [] if isinstance(x, dict)]}
-        with gzip.open(yol + ".tmp", "wt", encoding="utf-8") as f:
-            json.dump(veri, f, ensure_ascii=False)
-        os.replace(yol + ".tmp", yol)
+        if not istat_indir(uid):
+            continue
         yeni += 1
         if i % 200 == 0:
             print(f"  {i}/{len(idler)} {time.strftime('%H:%M')}", flush=True)
