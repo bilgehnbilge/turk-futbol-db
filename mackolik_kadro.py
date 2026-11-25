@@ -16,7 +16,7 @@ Sezon sezon (1990-91'den geriye): önce sezonun hafta hafta maç listesi, sonra 
 Arşiv sitesi saatlik kotaya takıldığı için istekler arası 40 sn beklenir (~90 istek/saat).
 Sonuç: raw/mackolik_kadro/fikstur/<sezon>/ (maç listeleri) ve raw/mackolik_kadro/mac/<son iki hane>/<maç no>.json
 """
-import json, os, random, subprocess, sys, time
+import glob, json, os, random, subprocess, sys, time
 
 import mackolik as M
 
@@ -140,28 +140,41 @@ def kupa_turlari_indir(etiket):
     for ad, x in satir:
         if x["ev_gol"] and x["kaynak_id"] not in gorulen:
             gorulen.add(x["kaynak_id"])
-            out.setdefault(ad or "", []).append((x["kaynak_id"], f"{x['ev_adi']} - {x['dep_adi']}"))
+            out.setdefault(ad or "", []).append((x["kaynak_id"], f"{x['ev_adi']} - {x['dep_adi']}", {x["ev_id"], x["dep_id"]}))
     return list(out.items())
+
+
+def lig_takimlari(etiket):
+    """Sezonun Süper Lig (en üst lig) takımlarının arşiv takım no'ları (diskteki lig fikstüründen)."""
+    out = set()
+    for et, gr in sezonlar():
+        if et == etiket:
+            for s, _ in gr:
+                for yol in glob.glob(os.path.join(FIKSTUR, etiket, f"g{s}_h*.txt")):
+                    if not yol.endswith("_haftalar.txt"):
+                        out |= {x[i] for x in M.js_dizi(open(yol, encoding="utf-8").read()) for i in (3, 5)}
+    return out
 
 
 def kupa():
     """1962-90 Türkiye Kupası kadroları. Site hatası (HTTP/okunamayan yanıt) ile kadrosu olmayan maç ayrılır: hata
     kaydedilmez (sonraki çalıştırmada yeniden denenir), kadrosuz maç boş olarak kaydedilir ve beklemeden sonrakine geçilir.
-    Bir turun ilk 5 maçı kadrosuzsa turun kalanı istenmez."""
+    Bir turun ilk 5 maçı kadrosuzsa turun kalanından yalnız Süper Lig takımının oynadığı maçlar istenir."""
     top = dict(kadrolu=0, kadrosuz=0, hata=0, atlanan=0)
     for etiket in reversed(KUPA_SEZON):
         print(f"kupa {etiket}: tur listesi", flush=True)
         turlar = kupa_turlari_indir(etiket)
+        lig = lig_takimlari(etiket)
+        if not lig:
+            print(f"  UYARI {etiket}: Süper Lig takım listesi bulunamadı, yoklama atlaması kapalı", flush=True)
         n = sum(len(m) for _, m in turlar)
         print(f"kupa {etiket}: {len(turlar)} tur, {n} oynanmış maç {time.strftime('%H:%M')}", flush=True)
         for ad, maclar in turlar:
             bakilan = kadrolu = 0
-            for i, (mid, mad) in enumerate(maclar):
-                if bakilan >= YOKLA and kadrolu == 0:
-                    kalan = len(maclar) - i
-                    top["atlanan"] += kalan
-                    print(f"  {etiket} {ad or 'tüm turlar'}: ilk {YOKLA} maçta kadro yok, kalan {kalan} maç atlandı", flush=True)
-                    break
+            for mid, mad, takim in maclar:
+                if lig and bakilan >= YOKLA and kadrolu == 0 and not (takim & lig):
+                    top["atlanan"] += 1   # kadrosuz turda Süper Lig takımı oynamayan maç
+                    continue
                 if os.path.exists(mac_yol(mid)):
                     bakilan += 1; kadrolu += kadrolu_mu(mid)
                     continue
