@@ -203,6 +203,44 @@ def kat(ar, es, kadro, olay, ad, ilk_sira, ilk_say, bas_say):
     return kaynak, olay_kaynak
 
 
+def eski_kariyer(es, c):
+    """1959 öncesi (Millî Küme, İstanbul ligleri, Maarif Mükâfatı...) arşiv kadroları: kişi -> [maç, gol, ilk sezon, son sezon,
+    son kulüp] ve kişi -> ad. Kişi numarası 1959-91 ile aynı (kisi_esle eşlemesi ya da MK + arşiv oyuncu no), böylece iki
+    dönemde oynamış oyuncunun sayıları toplanır. Oynayan: ilk 11 (oyuna sonradan girenler hariç) ve oyuna girenler."""
+    kisi = lambda pid: es.get(pid) or MK + pid
+    tk = takim_kulup(c)
+    out, ad = {}, {}
+    for mid, (sezon, tarih, ev, dep) in arsiv_maclari().items():
+        if sezon[:4] >= "1959":
+            continue
+        y = os.path.join(HAM, "mac", mid[-2:].zfill(2), f"{mid}.json")
+        if not os.path.exists(y):
+            continue
+        d = json.load(open(y, encoding="utf-8"))
+        if not (d.get("h") or d.get("a")):
+            continue
+        olay = d.get("e") or []
+        giren = {e[2] for e in olay if e[4] == 4}
+        for takim, l in ((ev, d.get("h") or []), (dep, d.get("a") or [])):
+            kul = min(tk.get(takim) or [None], key=lambda x: (x is None, x))
+            for j, (pid, a, _) in enumerate(l):
+                if not pid or not (j < 11 and pid not in giren or pid in giren):
+                    continue
+                k = kisi(pid)
+                ad.setdefault(k, a)
+                r = out.setdefault(k, [0, 0, sezon, sezon, kul, tarih])
+                r[0] += 1
+                r[2] = min(r[2], sezon)
+                if tarih >= r[5]:
+                    r[3], r[4], r[5] = max(r[3], sezon), kul if kul is not None else r[4], tarih
+        for e in olay:
+            if e[4] == 1 and e[2] and (e[5] or {}).get("d") != 3:
+                k = kisi(e[2])
+                if k in out:
+                    out[k][1] += 1
+    return {k: v[:5] for k, v in out.items()}, ad
+
+
 if __name__ == "__main__":
     c = sqlite3.connect(os.path.join(KOK, "futbol.db")); c.row_factory = sqlite3.Row
     maclar = [dict(r) for r in c.execute("SELECT * FROM mac")]

@@ -1370,16 +1370,6 @@ async function tffOyuncuRekorlari(kap, kid) {
     ${kart("Bir sezonda en çok kırmızı kart", "İkinci sarıdan kırmızı dahil", d.sezon_kirmizi, x => x[8], x => `${sz(x)} · ${x[6]} maç`)}
   </div>` : ""}
   ${d.genc?.length ? (() => {   // yaş rekorları: maç günündeki yaş (tam doğum tarihi bilinen oyuncular)
-    const yasYaz = x => {   // maç günü ve gün farkından doğum tarihi -> "15 yaş 3 ay 18 gün"
-      const m = new Date(x[3] + "T12:00:00Z"), d = new Date(m - x[2] * 864e5);
-      const ay = (dd, n) => { const s = Date.UTC(dd.getUTCFullYear(), dd.getUTCMonth() + n, 1);   // n ay sonrası (ay sonuna kırpılır)
-        const son = new Date(Date.UTC(dd.getUTCFullYear(), dd.getUTCMonth() + n + 1, 0)).getUTCDate();
-        return new Date(s + (Math.min(dd.getUTCDate(), son) - 1) * 864e5 + 432e5); };
-      let n = (m.getUTCFullYear() - d.getUTCFullYear()) * 12 + m.getUTCMonth() - d.getUTCMonth();
-      if (ay(d, n) > m) n--;
-      const y = Math.floor(n / 12), a = n % 12, g = Math.round((m - ay(d, n)) / 864e5);
-      return `${y} yaş${a ? ` ${a} ay` : ""}${g ? ` ${g} gün` : ""}`;
-    };
     const yasMac = x => `${tarihYaz(x[3])} · ${x[5] != null ? kulupBag(x[5]) : ""} · ${skorBag(x[4], "maç")}`;
     const yk = (baslik, aciklama, l) => `<div class="kart rekor-kart"><h3>${baslik}</h3><p class="soluk aciklama">${aciklama}</p>
       ${l.length ? `<ol class="sirali">${l.map((x, i) => `<li><span class="sira">${i + 1}</span><span class="kim">${oy(x[0], x[1])}<small class="soluk">${yasMac(x)}</small></span><b class="n" style="font-size:13px;white-space:nowrap">${yasYaz(x)}</b></li>`).join("")}</ol>` : `<p class="soluk">—</p>`}</div>`;
@@ -1416,24 +1406,40 @@ async function tffOyunculari(hedef, kid) {
 }
 
 // oyuncu arama dizini (kulüp arama kutusunda: en az 3 harf yazılınca yüklenir)
+// yaş satırı [kisi, ad, gün, maç tarihi, ...]: maç günü ve gün farkından doğum tarihi -> "15 yaş 3 ay 18 gün"
+function yasYaz(x) {
+  const m = new Date(x[3] + "T12:00:00Z"), d = new Date(m - x[2] * 864e5);
+  const ay = (dd, n) => { const s = Date.UTC(dd.getUTCFullYear(), dd.getUTCMonth() + n, 1);   // n ay sonrası (ay sonuna kırpılır)
+    const son = new Date(Date.UTC(dd.getUTCFullYear(), dd.getUTCMonth() + n + 1, 0)).getUTCDate();
+    return new Date(s + (Math.min(dd.getUTCDate(), son) - 1) * 864e5 + 432e5); };
+  let n = (m.getUTCFullYear() - d.getUTCFullYear()) * 12 + m.getUTCMonth() - d.getUTCMonth();
+  if (ay(d, n) > m) n--;
+  const y = Math.floor(n / 12), a = n % 12, g = Math.round((m - ay(d, n)) / 864e5);
+  return `${y} yaş${a ? ` ${a} ay` : ""}${g ? ` ${g} gün` : ""}`;
+}
+
 // ---------------------------------------------------------------- oyuncu istatistikleri (#/oyuncular; data/tff/istatistik.json)
-const OY_KAPSAM = [["tum", "Bütün maçlar"], ["sl", "Süper Lig"], ["lig", "Bütün ligler"], ["kupa", "Türkiye Kupası"]];
+// tum: 1959 öncesi arşiv kadroları dahil (Millî Küme, İstanbul ligleri...); tum59: 1959 öncesi hariç
+const OY_KAPSAM = [["tum", "Bütün maçlar"], ["tum59", "1959 öncesi hariç"], ["sl", "Süper Lig"], ["lig", "Bütün ligler"], ["kupa", "Türkiye Kupası"]];
+const YAS_KAPSAM = [["tum", "Bütün maçlar"], ["k1", "Süper Lig"], ["k2", "1. Lig"], ["k3", "2. Lig"], ["k4", "3. Lig"], ["k5", "BAL"], ["kupa", "Türkiye Kupası"]];
 async function oyuncularSayfa(sekme, kapsam) {
   document.title = "Oyuncular · Türk Futbol Arşivi";
   icerik.innerHTML = `<div class="yukleniyor">Oyuncu istatistikleri yükleniyor…</div>`;
   const d = await al(`data/tff/istatistik.json?s=${OZET.surum || ""}`);
-  const oyB = (k, a) => `<a class="bag" href="#/oyuncu/k${k}">${esc(a)}</a>`;
-  const yil = (a, b) => `${a.slice(0, 4)}–${b.slice(5)}`;
-  const SEK = [["gol", "Golcüler"], ["mac", "En çok maç"], ["krallar", "Gol kralları"], ["kart", "Kartlar"], ["karsilastir", "Karşılaştır"]];
+  const oyB = (k, a, sayfasiz) => sayfasiz ? esc(a) : `<a class="bag" href="#/oyuncu/k${k}">${esc(a)}</a>`;
+  const yil = (a, b) => `${a.slice(0, 4)}–${(b.length > 4 ? b.slice(5) : b)}`;
+  const SEK = [["gol", "Golcüler"], ["mac", "En çok maç"], ["krallar", "Gol kralları"], ...(d.yas && Object.keys(d.yas).length ? [["yas", "Yaş rekorları"]] : []), ["kart", "Kartlar"], ["karsilastir", "Karşılaştır"]];
+  const kapsamlar = OY_KAPSAM.filter(([k]) => d.liste[k]);
   let govde = "";
   if (sekme === "karsilastir") return oyuncuKarsilastir(kapsam === "tum" ? "" : kapsam, SEK);
   if (sekme === "gol" || sekme === "mac") {
     const l = d.liste[kapsam]?.[sekme] || [];
-    govde = `<div class="cipler gorunum">${OY_KAPSAM.map(([k, ad]) => `<a class="cip ${k === kapsam ? "aktif" : ""}" href="#/oyuncular/${sekme}/${k}">${ad}</a>`).join("")}</div>
-    <div class="kart cy-kart" id="cyKart"></div>
+    govde = `<div class="cipler gorunum">${kapsamlar.map(([k, ad]) => `<a class="cip ${k === kapsam ? "aktif" : ""}" href="#/oyuncular/${sekme}/${k}">${ad}</a>`).join("")}</div>
+    ${kapsam === "tum" && d.liste.tum59 ? `<p class="soluk not">1959 öncesi (Millî Küme, İstanbul ligleri, Maarif Mükâfatı...) Maçkolik arşivinin kadrolarından sayılır; yalnız o dönemde oynamış oyuncuların sayfası yok (adları bağlantısız).</p>` : ""}
+    ${kapsam === "tum" && d.liste.tum59 ? "" : `<div class="kart cy-kart" id="cyKart"></div>`}
     <div class="tablo-kap"><table class="tablo"><thead><tr><th class="s sira">#</th><th class="ad">Oyuncu</th><th class="ad">Son kulübü</th><th>Yıllar</th>
       <th class="s" data-sira>Maç</th><th class="s" data-sira>Gol</th><th class="s" title="Maç başına gol" data-sira>Gol/maç</th></tr></thead><tbody>
-      ${l.map((x, i) => `<tr><td class="s soluk sira">${i + 1}</td><td class="ad">${oyB(x[0], x[1])}</td><td class="ad">${kulupBag(x[6])}</td><td class="soluk">${yil(x[4], x[5])}</td>
+      ${l.map((x, i) => `<tr><td class="s soluk sira">${i + 1}</td><td class="ad">${oyB(x[0], x[1], x[7])}</td><td class="ad">${x[6] != null ? kulupBag(x[6]) : ""}</td><td class="soluk">${yil(x[4], x[5])}</td>
         <td class="s">${sekme === "mac" ? `<b>${sayiYaz(x[2])}</b>` : sayiYaz(x[2])}</td><td class="s">${sekme === "gol" ? `<b>${x[3]}</b>` : x[3]}</td>
         <td class="s soluk">${x[2] ? (x[3] / x[2]).toFixed(2) : ""}</td></tr>`).join("")}</tbody></table></div>`;
   } else if (sekme === "krallar") {
@@ -1448,6 +1454,20 @@ async function oyuncularSayfa(sekme, kapsam) {
         return `<tr><td><a class="bag" href="#/sezon/${s}">${s}</a></td><td class="ad">${esit.map(x => oyB(x[0], x[1])).join(", ")}</td><td class="ad">${esit.map(x => kulupBag(x[4])).join(", ")}</td>
           <td class="s"><b>${l[0][2]}</b></td><td class="s soluk">${esit.map(x => x[3]).join(", ")}</td>
           ${[0, 1].map(i => `<td class="ad soluk">${sonra[i] ? `${oyB(sonra[i][0], sonra[i][1])} (${sonra[i][2]})` : ""}</td>`).join("")}</tr>`; }).join("")}</tbody></table></div>`;
+  } else if (sekme === "yas") {
+    const kp = d.yas[kapsam] ? kapsam : "tum", r = d.yas[kp] || {};
+    const yasMac = x => `${tarihYaz(x[3])} · ${x[5] != null ? kulupBag(x[5]) : ""} · ${skorBag(x[4], "maç")}`;
+    const yk = (baslik, aciklama, l = []) => `<div class="kart rekor-kart"><h3>${baslik}</h3><p class="soluk aciklama">${aciklama}</p>
+      ${l.length ? `<ol class="sirali">${l.map((x, i) => `<li><span class="sira">${i + 1}</span><span class="kim">${oyB(x[0], x[1])}<small class="soluk">${yasMac(x)}</small></span><b class="n" style="font-size:13px;white-space:nowrap">${yasYaz(x)}</b></li>`).join("")}</ol>` : `<p class="soluk">—</p>`}</div>`;
+    govde = `<div class="cipler gorunum">${YAS_KAPSAM.filter(([k]) => d.yas[k]).map(([k, ad]) => `<a class="cip ${k === kp ? "aktif" : ""}" href="#/oyuncular/yas/${k}">${ad}</a>`).join("")}</div>
+    <div class="izgara iki ust-hiza">
+      ${yk("En genç oyuncular", "İlk maçındaki yaşı", r.genc)}
+      ${yk("En yaşlı oyuncular", "Son maçındaki yaşı", r.yasli)}
+      ${yk("En genç golcüler", "İlk golündeki yaşı (kendi kalesine hariç)", r.genc_gol)}
+      ${yk("En yaşlı golcüler", "Son golündeki yaşı", r.yasli_gol)}
+    </div>
+    <p class="soluk not">Yaş, maç günündeki yaştır; yalnız doğum tarihi tam bilinen oyuncular sayılır (TFF oyuncu sayfalarından, şimdilik ${sayiYaz(d.yas_kapsam || 0)} oyuncu).
+      1959 öncesi ve Maçkolik arşivinden gelen (1959-90) oyuncuların çoğunun doğum tarihi bilinmediği için eski dönem listelerde az yer alır.</p>`;
   } else {
     const kt = (baslik, l) => `<div><h2>${baslik}</h2><div class="tablo-kap"><table class="tablo"><thead><tr><th class="s sira">#</th><th class="ad">Oyuncu</th><th class="s">Sayı</th><th class="s">Maç</th></tr></thead><tbody>
       ${l.map((x, i) => `<tr><td class="s soluk sira">${i + 1}</td><td class="ad">${oyB(x[0], x[1])}</td><td class="s"><b>${x[3]}</b></td><td class="s soluk">${sayiYaz(x[2])}</td></tr>`).join("")}</tbody></table></div></div>`;
@@ -1459,7 +1479,8 @@ async function oyuncularSayfa(sekme, kapsam) {
     <div class="filtre bolum"><input id="oyAra" type="search" placeholder="Oyuncu ara (en az 3 harf)…" autocomplete="off"></div><div id="oyAraSonuc"></div>
     <nav class="sekmeler bolum">${SEK.map(([k, ad]) => `<a href="#/oyuncular/${k}${k === "gol" || k === "mac" ? "/" + (OY_KAPSAM.some(x => x[0] === kapsam) ? kapsam : "tum") : ""}" class="${k === sekme ? "aktif" : ""}">${ad}</a>`).join("")}</nav>
     ${govde}`;
-  if (sekme === "gol" || sekme === "mac") { EK.oyuncuListesi(icerik, sekme); EK.golcuYarisi($("#cyKart"), d.liste[kapsam]?.[sekme] || [], kapsam, sekme); }
+  // golcü yarışı oyuncu sayfalarındaki sezonlardan: 1959 öncesi orada yok, bu yüzden 1959 öncesini sayan listede yarış gösterilmez
+  if (sekme === "gol" || sekme === "mac") { EK.oyuncuListesi(icerik, sekme); if (!(kapsam === "tum" && d.liste.tum59)) EK.golcuYarisi($("#cyKart"), d.liste[kapsam]?.[sekme] || [], kapsam === "tum59" ? "tum" : kapsam, sekme); }
   if (sekme === "krallar") EK.kralCizelgesi($("#kralKart"), d.krallar, +kapsam || 1);
   const ara = $("#oyAra");
   ara.addEventListener("input", async () => {

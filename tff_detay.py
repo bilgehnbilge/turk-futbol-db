@@ -260,11 +260,13 @@ def kisi_birlestir(kadro, tersi, m_, ad, okunur):
     return {x: bul(x) for x in ust if bul(x) != x}
 
 
-def istatistik_yaz(O, ad, okunur, tff, n=100):
+def istatistik_yaz(O, ad, okunur, tff, n=100, eski=None, yas=None, yas_kapsam=0):
     """Oyuncu istatistikleri sayfası (#/oyuncular) -> tff/istatistik.json:
-    liste[yarışma][gol|mac]: ilk n oyuncu [kisi, ad, mac, gol, ilk sezon, son sezon, son kulüp];
+    liste[yarışma][gol|mac]: ilk n oyuncu [kisi, ad, mac, gol, ilk sezon, son sezon, son kulüp(, 1: oyuncu sayfası yok)];
+      "tum" 1959 öncesi arşiv kadrolarını (eski: kisi -> [maç, gol, ilk, son, son kulüp]) da sayar, "tum59" saymaz;
+    yas[kapsam]: genc, yasli, genc_gol, yasli_gol -> [kisi, ad, gün, tarih, maç, kulüp, rakip] (kapsam: tum, k1..k5, kupa);
     krallar[sezon][kademe]: lig golü en çok olan ilk 3 [kisi, ad, gol, mac, kulüp]; kart[sari|kirmizi]: ilk 50."""
-    KAPSAM = {"tum": lambda y, k: True, "sl": lambda y, k: y == "L" and k == 1, "lig": lambda y, k: y in ("L", "T"),
+    KAPSAM = {"tum59": lambda y, k: True, "sl": lambda y, k: y == "L" and k == 1, "lig": lambda y, k: y in ("L", "T"),
               "kupa": lambda y, k: y == "K"}
     liste = {}
     for kp, f in KAPSAM.items():
@@ -279,6 +281,16 @@ def istatistik_yaz(O, ad, okunur, tff, n=100):
             son = max(rs, key=lambda x: (x[0][0], x[1][0]))[0]
             sat.append([kisi, okunur(ad.get(kisi, "")), mac, gol, min(a[0] for a, _ in rs), son[0], son[1]])
         liste[kp] = {"gol": sorted([x for x in sat if x[3]], key=lambda x: (-x[3], x[2]))[:n], "mac": sorted(sat, key=lambda x: (-x[2], -x[3]))[:n]}
+        if kp == "tum59":
+            tum = {x[0]: list(x) for x in sat}
+            for kisi, (mac, gol, ilk, son, kul) in (eski or {}).items():
+                if kisi in tum:
+                    x = tum[kisi]
+                    x[2] += mac; x[3] += gol; x[4] = min(x[4], ilk)
+                else:
+                    tum[kisi] = [kisi, okunur(ad.get(kisi, "")), mac, gol, ilk, son, kul, 1]
+            sat_ = list(tum.values())
+            liste["tum"] = {"gol": sorted([x for x in sat_ if x[3]], key=lambda x: (-x[3], x[2]))[:n], "mac": sorted(sat_, key=lambda x: (-x[2], -x[3]))[:n]}
     kral = collections.defaultdict(lambda: collections.defaultdict(list))
     for kisi, d in O.items():
         if not kisi:
@@ -298,7 +310,8 @@ def istatistik_yaz(O, ad, okunur, tff, n=100):
         sat = [[kisi, okunur(ad.get(kisi, "")), sum(v[0] for v in d.values()), sum(v[i] for v in d.values())] for kisi, d in O.items() if kisi]
         kart[k] = sorted([x for x in sat if x[3]], key=lambda x: (-x[3], x[2]))[:50]
     yaz(os.path.join(tff, "istatistik.json"), {"alanlar": ["kisi", "ad", "mac", "gol", "ilk", "son", "son_kulup"], "liste": liste,
-        "kral_alanlar": ["kisi", "ad", "gol", "mac", "kulup"], "krallar": krallar, "kart_alanlar": ["kisi", "ad", "mac", "sayi"], "kart": kart})
+        "kral_alanlar": ["kisi", "ad", "gol", "mac", "kulup"], "krallar": krallar, "kart_alanlar": ["kisi", "ad", "mac", "sayi"], "kart": kart,
+        "yas_alanlar": ["kisi", "ad", "gun", "tarih", "mac", "kulup", "rakip"], "yas": yas or {}, "yas_kapsam": yas_kapsam})
 
 
 def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
@@ -358,8 +371,13 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
     import mackolik_oyuncu as MO
     erkek = os.path.basename(OYUNCU_DB) == "oyuncu.db"   # kadın verisi (kadin_site.py) aynı kodla geçer: arşiv yalnız erkek
     ar, ar_say = MO.yukle(maclar, bag, c) if erkek else ({}, {})
-    mk_kadro, mk_olay = MO.kat(ar, MO.kisi_esle(ar, kadro, ad, {t_: m_[f_]["sezon"] for t_, (f_, _) in tersi.items()},
-                                                    lambda t_, i: m_[tersi[t_][0]]["ev_kulup" if (i == 0) != bool(tersi[t_][1]) else "dep_kulup"]), kadro, olay, ad, ilk_sira, ilk_say, bas_say)
+    es_mk = MO.kisi_esle(ar, kadro, ad, {t_: m_[f_]["sezon"] for t_, (f_, _) in tersi.items()},
+                         lambda t_, i: m_[tersi[t_][0]]["ev_kulup" if (i == 0) != bool(tersi[t_][1]) else "dep_kulup"]) if erkek else {}
+    mk_kadro, mk_olay = MO.kat(ar, es_mk, kadro, olay, ad, ilk_sira, ilk_say, bas_say)
+    # 1959 öncesi arşiv kadroları: yalnız oyuncular sayfasının "Bütün maçlar" listelerine (maç ve oyuncu sayfalarına girmez)
+    eski, eski_ad = MO.eski_kariyer(es_mk, c) if erkek else ({}, {})
+    for k_, a_ in eski_ad.items():
+        ad.setdefault(k_, a_)
     global MK_ILK
     if erkek:
         MK_ILK = min((m["sezon"] for m in maclar if m["id"] in bag and bag[m["id"]][0] in mk_kadro), default=None)
@@ -380,6 +398,14 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
         for es, ana in BIRLES.items():
             ilk_say[ana] += ilk_say.pop(es, 0); bas_say[ana] += bas_say.pop(es, 0)
         print(f"TFF'de iki numaralı oyuncular birleşti: {len(BIRLES)}")
+        for es, ana in BIRLES.items():
+            if es in eski:
+                r_ = eski.pop(es)
+                if ana in eski:
+                    e_ = eski[ana]
+                    eski[ana] = [e_[0] + r_[0], e_[1] + r_[1], min(e_[2], r_[2]), *max((e_[3], e_[4]), (r_[3], r_[4]), key=lambda x: x[0])]
+                else:
+                    eski[ana] = r_
     teknik = collections.defaultdict(lambda: ([], []))
     import mackolik_td   # TFF'de boş kalan teknik direktörler: Maçkolik arşivi takım fikstürleri (raw/mackolik_td/ek.json)
     for mac, taraf, kisi, a in list(o.execute("SELECT mac, taraf, kisi, ad FROM teknik")) + (mackolik_td.ek_satirlar(o) if erkek else []):
@@ -450,6 +476,9 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
             dog[ana] = dog[es]
     yas_oy = collections.defaultdict(dict)    # kulüp -> kisi -> [en genç: gün, maç] + [en yaşlı: gün, maç]
     yas_gol = collections.defaultdict(dict)
+    # genel yaş rekorları (oyuncular sayfası): kapsam (tum, k1..k5 lig kademesi, kupa) -> kisi -> [gün, maç, kulüp] x 2
+    yas_g_oy = collections.defaultdict(dict)
+    yas_g_gol = collections.defaultdict(dict)
     ilk_tarih = {}   # kişi -> TFF'deki ilk maçı
     def yas_ekle(tablo, kid, kisi, f_, tarih):
         if kisi not in dog or not tarih:
@@ -465,6 +494,20 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
         else:
             if g < r_[0]: r_[0], r_[1] = g, f_
             if g > r_[2]: r_[2], r_[3] = g, f_
+    def yas_genel(tablo, m, kid, kisi, f_):
+        if kisi not in dog or not m["tarih"]:
+            return
+        g = (datetime.date.fromisoformat(m["tarih"]) - dog[kisi]).days
+        if g < 12 * 365 or g > 50 * 365:
+            return
+        kap = ["tum"] + ([f"k{m['kademe']}"] if m["yarisma"] == "lig" and m["kademe"] else []) + (["kupa"] if m["yarisma"] == "kupa" else [])
+        for kp in kap:
+            r_ = tablo[kp].get(kisi)
+            if not r_:
+                tablo[kp][kisi] = [g, f_, kid, g, f_, kid]
+            else:
+                if g < r_[0]: r_[0:3] = [g, f_, kid]
+                if g > r_[3]: r_[3:6] = [g, f_, kid]
     for t in mevcut:
         f, ters = tersi[t]
         m = m_[f]
@@ -516,6 +559,7 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
                     continue
                 kul_sezon[kid][(kisi, m["sezon"])][3] += 1
                 yas_ekle(yas_oy, kid, kisi, f, m["tarih"])
+                yas_genel(yas_g_oy, m, kid, kisi, f)
                 kk_ = kul_kart[kid][kisi]
                 kk_[2] += 1
                 kk_[3] = min(kk_[3] or m["sezon"], m["sezon"]); kk_[4] = max(kk_[4] or m["sezon"], m["sezon"])
@@ -548,6 +592,7 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
                         kul_lig[kid][x[4]][1] += 1
                     bu_mac[(kid, x[4])] += 1
                     yas_ekle(yas_gol, kid, x[4], f, m["tarih"])
+                    yas_genel(yas_g_gol, m, kid, x[4], f)
             elif x[1] == "Y":
                 r[5] += 1
                 kul_sezon[kid][(x[4], m["sezon"])][4] += 1
@@ -589,7 +634,6 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
     for b, d in okova.items():
         yaz(os.path.join(odir, f"{b}.json"), {"alanlar": ["sezon", "kulup", "yarisma", "kademe", "mac", "ilk11", "gol", "penalti", "kendi_kalesine",
                                                          "sari", "kirmizi", "dakika", "yedek", "kaleci_mac", "gol_yemeden", "yenen_gol"], "oyuncu": d})
-    istatistik_yaz(O, ad, okunur, tff)
     yaz(os.path.join(tff, "oyuncular.json"), {"alanlar": ["kisi", "ad", "mac", "gol", "ilk", "son", "son_kulup"],
                                               "oyuncu": sorted(dizin, key=lambda x: -x[2])})
     kdir = os.path.join(tff, "kulup")
@@ -623,6 +667,19 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
             out["genc" + ad_] = sorted((sat(k_, r[0], r[1]) for k_, r in v.items()), key=lambda x: x[2])[:10]
             out["yasli" + ad_] = sorted((sat(k_, r[2], r[3]) for k_, r in v.items()), key=lambda x: -x[2])[:10]
         return out
+    # oyuncular sayfası: genel listeler ve yaş rekorları
+    def yas_satir(k_, g, f_, kid):
+        m = m_[f_]
+        return [k_, okunur(ad.get(k_, "")), g, m["tarih"], f_, kid, m["dep_kulup"] if m["ev_kulup"] == kid else m["ev_kulup"]]
+    yas = {}
+    for kp in sorted(set(yas_g_oy) | set(yas_g_gol)):
+        r = {}
+        for ad_, t_ in (("", yas_g_oy), ("_gol", yas_g_gol)):
+            v = {k_: x for k_, x in t_.get(kp, {}).items() if not supheli(k_)}
+            r["genc" + ad_] = [yas_satir(k_, x[0], x[1], x[2]) for k_, x in sorted(v.items(), key=lambda y: y[1][0])[:25]]
+            r["yasli" + ad_] = [yas_satir(k_, x[3], x[4], x[5]) for k_, x in sorted(v.items(), key=lambda y: -y[1][3])[:25]]
+        yas[kp] = r
+    istatistik_yaz(O, ad, okunur, tff, eski=eski, yas=yas, yas_kapsam=len(dog))
     for kid, d in kul_oy.items():
         A = lambda k_: okunur(ad.get(k_, ""))
         l = [[k_, A(k_), *v] for k_, v in d.items() if k_]
