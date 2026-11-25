@@ -9,6 +9,8 @@ d = skor ve durum.
 
   python3 mackolik_kadro.py say      # ağa çıkmadan: kaç sezon/maç listesi ve kadro indi
   python3 mackolik_kadro.py indir    # yarıda kalırsa aynı komut kaldığı yerden sürer
+  python3 mackolik_kadro.py kupa     # 1962-90 Türkiye Kupası (tur sayfaları + kadrolar); kaldığı yerden sürer
+  python3 mackolik_kadro.py kupa_say # ağa çıkmadan kupa durumu
 
 Sezon sezon (1990-91'den geriye): önce sezonun hafta hafta maç listesi, sonra her maçın kadro verisi.
 Arşiv sitesi saatlik kotaya takıldığı için istekler arası 40 sn beklenir (~90 istek/saat).
@@ -105,6 +107,94 @@ def indir():
     print("Bitti.", flush=True)
 
 
+KUPA_SEZON = [f"{y}-{y + 1}" for y in range(1962, 1990)]
+YOKLA = 5   # bir turun ilk 5 maçında kadro yoksa turun geri kalanı istenmez
+
+
+def kadrolu_mu(mid):
+    d = json.load(open(mac_yol(mid), encoding="utf-8"))
+    return bool(d.get("h") or d.get("a"))
+
+
+def kupa_turlari_indir(etiket):
+    """Sezonun tur sayfalarını (maç numaraları) indirir; [(tur adı, [(maç no, 'Ev - Dep'), ...])] döner (yalnız oynanmış)."""
+    kl = os.path.join(M.ARSIV_HAM, f"kupa_{etiket}")
+    sezon = open(os.path.join(kl, "sezon.html"), encoding="utf-8").read()
+    turlar = M.kupa_turlari(sezon)
+    if not turlar:   # 1967-75: arşiv bütün maçları sezon sayfasında veriyor
+        satir = [(None, x) for x in M.kupa_satirlari(sezon)]
+    else:
+        satir = []
+        for tid, ad in sorted(turlar, key=lambda x: int(x[0])):
+            yol = os.path.join(kl, f"tur_{tid}.html")
+            if not os.path.exists(yol):
+                h = M.curl_metin(f"{M.ARSIV}/AjaxHandlers/CupHandler.aspx?command=legMatches&id={tid}")
+                time.sleep(BEKLE + random.uniform(0, 5))
+                if h is None:
+                    print(f"  kupa {etiket} {ad}: tur sayfası alınamadı (sonra yeniden denenir)", flush=True)
+                    continue
+                open(yol + ".tmp", "w", encoding="utf-8").write(h)
+                os.replace(yol + ".tmp", yol)
+            satir += [(ad, x) for x in M.kupa_satirlari(open(yol, encoding="utf-8").read())]
+    out, gorulen = {}, set()
+    for ad, x in satir:
+        if x["ev_gol"] and x["kaynak_id"] not in gorulen:
+            gorulen.add(x["kaynak_id"])
+            out.setdefault(ad or "", []).append((x["kaynak_id"], f"{x['ev_adi']} - {x['dep_adi']}"))
+    return list(out.items())
+
+
+def kupa():
+    """1962-90 Türkiye Kupası kadroları. Site hatası (HTTP/okunamayan yanıt) ile kadrosu olmayan maç ayrılır: hata
+    kaydedilmez (sonraki çalıştırmada yeniden denenir), kadrosuz maç boş olarak kaydedilir ve beklemeden sonrakine geçilir.
+    Bir turun ilk 5 maçı kadrosuzsa turun kalanı istenmez."""
+    top = dict(kadrolu=0, kadrosuz=0, hata=0, atlanan=0)
+    for etiket in reversed(KUPA_SEZON):
+        print(f"kupa {etiket}: tur listesi", flush=True)
+        turlar = kupa_turlari_indir(etiket)
+        n = sum(len(m) for _, m in turlar)
+        print(f"kupa {etiket}: {len(turlar)} tur, {n} oynanmış maç {time.strftime('%H:%M')}", flush=True)
+        for ad, maclar in turlar:
+            bakilan = kadrolu = 0
+            for i, (mid, mad) in enumerate(maclar):
+                if bakilan >= YOKLA and kadrolu == 0:
+                    kalan = len(maclar) - i
+                    top["atlanan"] += kalan
+                    print(f"  {etiket} {ad or 'tüm turlar'}: ilk {YOKLA} maçta kadro yok, kalan {kalan} maç atlandı", flush=True)
+                    break
+                if os.path.exists(mac_yol(mid)):
+                    bakilan += 1; kadrolu += kadrolu_mu(mid)
+                    continue
+                if not mac_indir(mid, mad):
+                    top["hata"] += 1
+                    time.sleep(BEKLE + random.uniform(0, 5))
+                    continue
+                bakilan += 1
+                if kadrolu_mu(mid):
+                    kadrolu += 1; top["kadrolu"] += 1
+                    time.sleep(BEKLE + random.uniform(0, 5))
+                else:
+                    top["kadrosuz"] += 1   # beklemeden sonraki maça
+            print(f"  {etiket} {ad or 'tüm turlar'}: {len(maclar)} maç, {kadrolu} kadrolu {time.strftime('%H:%M')}", flush=True)
+    print(f"Bitti. Bu çalıştırmada: {top}", flush=True)
+
+
+def kupa_say():
+    """Ağa çıkmadan: sezon başına diskte olan tur sayfası ve inen kadro."""
+    for etiket in KUPA_SEZON:
+        kl = os.path.join(M.ARSIV_HAM, f"kupa_{etiket}")
+        sezon = open(os.path.join(kl, "sezon.html"), encoding="utf-8").read()
+        turlar = M.kupa_turlari(sezon)
+        if turlar:
+            inen = sum(os.path.exists(os.path.join(kl, f"tur_{tid}.html")) for tid, _ in turlar)
+            ms = M.kupa_maclar(kl)[1]
+        else:
+            inen, ms = "-", M.kupa_satirlari(sezon)
+        ms = [x for x in ms if x["ev_gol"]]
+        var = [x["kaynak_id"] for x in ms if os.path.exists(mac_yol(x["kaynak_id"]))]
+        print(f"kupa {etiket}: tur {inen}/{len(turlar)}, {len(ms)} maç, {len(var)} indi, {sum(map(kadrolu_mu, var))} kadrolu")
+
+
 def say():
     tm = tk = 0
     for etiket, gr in sezonlar():
@@ -118,4 +208,4 @@ def say():
 
 
 if __name__ == "__main__":
-    {"indir": indir, "say": say}[sys.argv[1] if len(sys.argv) > 1 else "say"]()
+    {"indir": indir, "say": say, "kupa": kupa, "kupa_say": kupa_say}[sys.argv[1] if len(sys.argv) > 1 else "say"]()
