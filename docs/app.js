@@ -1231,6 +1231,23 @@ function kadinAvrupaHtml(l, M) {
     <small class="soluk">${esc(m.tur || "")} · ${m.ilk11 ? "İlk 11" : m.giris != null ? `${m.giris}'de girdi` : ""}${m.cikis != null ? ` · ${m.cikis}'de çıktı` : ""}${m.gol ? " · " + "⚽".repeat(m.gol) : ""}${m.sari ? " · 🟨" : ""}${m.kirmizi ? " · 🟥" : ""}</small></span></div>`).join("")}</div>
   <p class="soluk not">Kaynak: UEFA maç kadroları; oyuncu, aynı kulüpte oynadığı sezon, ad ve doğum tarihiyle TFF kaydına eşlendi.</p>`;
 }
+// TFF lisans hareketleri (oyuncu sayfası): [veriliş, kulüp no ya da adı, tür (HAREKET_TUR sırası ya da adı), sözleşme baş., bitiş, yurt dışına çıkış]
+const HAREKET_TUR = ["Amatör transfer", "Filiz lisans", "Yurt içi transfer", "Karşılıklı sona erdirme", "Profesyonelliğe geçiş",
+  "Sözleşme yenileme", "Amatöre dönüş", "Geçici transfer (kiralık)", "Uzatma", "Yurt dışı transfer", "Tedbir kaldırma", "Fesih"];
+function lisansHtml(h) {
+  if (!h || !h.length) return "";
+  const satir = r => {
+    const [t, k, tur, b, s, yd] = r;
+    const sz = b || s ? `${b ? tarihYaz(b) : "…"} – ${s ? tarihYaz(s) : "…"}` : "";
+    return `<tr><td>${t ? tarihYaz(t) : "–"}</td><td class="ad">${typeof k === "number" ? kulupBag(k) : esc(k || "")}</td>
+      <td class="ad">${esc(typeof tur === "number" ? HAREKET_TUR[tur] : tur)}${yd ? ` <small class="soluk">· yurt dışına çıkış ${tarihYaz(yd)}</small>` : ""}</td><td class="soluk">${sz}</td></tr>`;
+  };
+  const l = [...h].reverse();   // en yeni üstte
+  return `<h2 class="bolum">Lisans hareketleri <small class="soluk" style="font-weight:400;font-size:14px">— TFF kayıtları, her sezon yenilenen vizeler hariç</small></h2>
+  <div class="tablo-kap"><table class="tablo"><thead><tr><th>Tarih</th><th class="ad">Kulüp</th><th class="ad">İşlem</th><th>Sözleşme</th></tr></thead>
+  <tbody>${l.slice(0, 15).map(satir).join("")}</tbody></table></div>
+  ${l.length > 15 ? `<details class="donus-hepsi"><summary>${l.length - 15} kayıt daha</summary><div class="tablo-kap"><table class="tablo"><tbody>${l.slice(15).map(satir).join("")}</tbody></table></div></details>` : ""}`;
+}
 async function tffOyuncuSayfa(kisi) {
   icerik.innerHTML = `<div class="yukleniyor">Yükleniyor…</div>`;
   const d = await al(`${V}tff/o/${kisi % 500}.json?s=${OZET.surum || ""}`), p = d.oyuncu[kisi];
@@ -1304,6 +1321,7 @@ async function tffOyuncuSayfa(kisi) {
     const [sz, kid] = k.split("|");
     return `<tr><td><a class="bag" href="#/${K}sezon/${sz}">${sz}</a></td><td class="ad">${kulupBag(+kid)}</td><td class="ad soluk">${[...new Set(l.map(r => tffYarAd(r.yar, r.kademe)))].join(", ")}</td>${hucre(topla(l))}</tr>`;
   }).join("")}</tbody></table></div>
+  ${lisansHtml(p.h)}
   <p class="soluk not">Kaynak: <a class="bag" href="https://www.tff.org/Default.aspx?pageId=30&kisiId=${kisi}" target="_blank" rel="noopener">TFF</a> ${BOLUM === "kadin" ? "maç sayfaları (kadın ligleri, 2008-09'dan bugüne)." : `maç sayfaları (lig 1990-91'den, gol dakikaları 1991-92'den; Türkiye Kupası 1990-2007)${MK_NOT()}.`}
     Ligler bugünkü adlarıyla gösteriliyor (1. kademe: ${esc(KADEME_AD[1])}, 2. kademe: ${esc(KADEME_AD[2])}…). Dakika, oyuna giriş-çıkış ve kırmızı kart dakikalarından hesaplanan yaklaşık süredir; uzatmalar sayılmaz.
     ${kaleci ? "Kaleci istatistikleri ilk 11'de kaleci olarak başladığı maçlardan (TFF kadroyu kaleciyle başlatıyor); oyundan çıktığı maçlarda da bütün maçın skoru sayılır, hükmen maçlar hariç." : ""}

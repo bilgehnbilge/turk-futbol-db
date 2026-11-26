@@ -321,6 +321,44 @@ def istatistik_yaz(O, ad, okunur, tff, n=100, eski=None, yas=None, yas_kapsam=0)
         "yas_alanlar": ["kisi", "ad", "gun", "tarih", "mac", "kulup", "rakip"], "yas": yas or {}, "yas_kapsam": yas_kapsam})
 
 
+HAREKET_TUR = ["Amatör Transfer", "Filiz Lisans", "Yurt İçi Transfer", "Karşılıklı Sona Erdirme", "Profesyonelliğe Geçiş",
+               "Sözleşme Yenileme", "Amatöre Dönüş", "Geçici Transfer", "Uzatma", "Yurt Dışı Transfer", "Tedbir Kaldırma", "Fesih"]
+HAREKET_ATLA = {"Amatör Vize", "Vize"}   # her sezon yenilenen vizeler: kulüp değişmez, sayfayı şişirir
+
+
+def hareketler(c, kisi_db, okunur_kulup):
+    """TFF lisans hareketleri (kisi.db hareket; tff_kisi_ek.py ayikla) -> {kisi: [[veriliş, kulüp, tür, sözleşme baş., bitiş, yurt dışı]]}.
+    kulüp: futbol.db kulüp no (TFF kulüp numarasından, o tarihteki sezona göre) ya da bağlanamayan kulübün adı (çoğu amatör kulüp);
+    tür: HAREKET_TUR sırası ya da listede yoksa adı. Vizeler alınmaz. Sondaki boş alanlar kırpılır."""
+    if not os.path.exists(kisi_db) or not sqlite3.connect(kisi_db).execute("SELECT 1 FROM sqlite_master WHERE name='hareket'").fetchone():
+        return {}
+    tk = collections.defaultdict(list)
+    for kid, no, s1, s2 in c.execute("SELECT kulup_id, kaynak_id, ilk_sezon, son_sezon FROM kulup_kimlik WHERE kaynak='tff'"):
+        tk[int(str(no).split("-")[0])].append((s1 or "", s2 or "9999", kid))   # "2434-once": aynı TFF no, önceki kulüp
+    def kulup(no, tarih):
+        l = tk.get(no)
+        if not l:
+            return None
+        if len(l) > 1 and tarih:
+            y, a = int(tarih[:4]), int(tarih[5:7])
+            sz = f"{y}-{y + 1}" if a >= 7 else f"{y - 1}-{y}"
+            for s1, s2, kid in l:
+                if s1 <= sz <= s2:
+                    return kid
+        return max(l)[2]
+    tur = {t: i for i, t in enumerate(HAREKET_TUR)}
+    out = collections.defaultdict(list)
+    for kisi, no, kad, bas, bit, t, ver, yd in sqlite3.connect(kisi_db).execute(
+            "SELECT kisi, kulup_tff, kulup_ad, bas, bit, tur, verilis, yurtdisi FROM hareket ORDER BY kisi, COALESCE(verilis, bas), sira"):
+        if t in HAREKET_ATLA:
+            continue
+        r = [ver or "", kulup(no, ver or bas) or okunur_kulup(kad or ""), tur.get(t, t), bas or "", bit or "", yd or ""]
+        while r and r[-1] == "":
+            r.pop()
+        out[kisi].append(r)
+    return out
+
+
 def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
     okunur = kisi_okunur_kur(o, okunur_kulup)
     m_ = {m["id"]: m for m in maclar}
@@ -635,11 +673,16 @@ def maclari_yaz(o, c, maclar, bag, okunur_kulup, tff):
         es_l[ana].append(es)
         if ana not in kb and es in kb:
             kb[ana] = kb[es]
+    hr = hareketler(c, kisi_db, okunur_kulup)
+    for es, ana in BIRLES.items():
+        if ana not in hr and es in hr:
+            hr[ana] = hr[es]
     for kisi, sat in O.items():
         if not kisi:
             continue
         satir = sorted([[*a, *v] for a, v in sat.items() if v[0] or v[8]], key=lambda x: (x[0], x[2]))
-        okova[kisi % 500][kisi] = {"ad": okunur(ad.get(kisi, "")), **({"tam": tam_ad[kisi]} if kisi in tam_ad and tam_ad[kisi] != ad[kisi] else {}), "s": satir, **({"d": kb[kisi]} if kisi in kb and any(kb[kisi]) else {}), **({"es": es_l[kisi]} if kisi in es_l else {})}
+        okova[kisi % 500][kisi] = {"ad": okunur(ad.get(kisi, "")), **({"tam": tam_ad[kisi]} if kisi in tam_ad and tam_ad[kisi] != ad[kisi] else {}), "s": satir, **({"d": kb[kisi]} if kisi in kb and any(kb[kisi]) else {}), **({"es": es_l[kisi]} if kisi in es_l else {}),
+                               **({"h": hr[kisi]} if kisi in hr else {})}
         if not any(s[4] for s in satir):
             continue   # hiç oynamamış (yalnız yedek kulübesi): sayfası var (maç kadrolarından bağlantı), arama dizininde yok
         mac = sum(s[4] for s in satir)

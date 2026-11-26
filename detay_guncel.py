@@ -104,6 +104,8 @@ def kisi(dbs, en_cok=600, bekle=2.0, sure=1800):
         return 0
     k = sqlite3.connect(oyuncu.KISI_DB)
     k.execute("CREATE TABLE IF NOT EXISTS kisi_yok(kisi INTEGER PRIMARY KEY)")   # sayfası boş çıkanlar: bir daha denenmez
+    import tff_kisi_ek
+    tff_kisi_ek.tablolar(k)   # lisans hareketleri (oyuncu sayfasındaki tablo; 20'den çoksa sonraki sayfalar geri gönderimle)
     var = {r for (r,) in k.execute("SELECT kisi FROM kisi UNION SELECT kisi FROM kisi_yok")}
     hedef = []
     for db in dbs:
@@ -140,6 +142,14 @@ def kisi(dbs, en_cok=600, bekle=2.0, sure=1800):
             k.execute("INSERT OR IGNORE INTO kisi_yok VALUES(?)", (x,))
             continue
         k.execute("INSERT OR REPLACE INTO kisi VALUES(?,?,?,?,?)", oyuncu.kisi_oku(x, t))
+        sayfalar = [t]
+        for _ in range(tff_kisi_ek.toplam_sayfa(t) - 1):
+            time.sleep(bekle)
+            r = tff_kisi_ek.sonraki(oyuncu.KISI_URL.format(x), sayfalar[-1], "grdTakimlar")
+            if not r or r[0] != 200 or b"oyuncuBilgileri_lblAdi" not in r[1]:
+                break
+            sayfalar.append(r[1].decode("cp1254", "replace"))
+        tff_kisi_ek.hareket_yaz(k, x, sayfalar)
         n += 1
     k.commit()
     print(f"kişi: {n} oyuncu eklendi", flush=True)
