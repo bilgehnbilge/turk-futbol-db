@@ -232,6 +232,8 @@ def kupa():
                     time.sleep(BEKLE + random.uniform(0, 5))
                 else:
                     top["kadrosuz"] += 1   # beklemeden sonraki maça
+                    if HEPSI:   # art arda hızlı istek arşivde 429 veriyor
+                        time.sleep(BEKLE + random.uniform(0, 5))
             print(f"  {etiket} {ad or 'tüm turlar'}: {len(maclar)} maç, {kadrolu} kadrolu {time.strftime('%H:%M')}", flush=True)
     print(f"Bitti. Bu çalıştırmada: {top}", flush=True)
 
