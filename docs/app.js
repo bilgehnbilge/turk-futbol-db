@@ -2112,12 +2112,14 @@ function hakkindaSayfa() {
   const eksik = OZET.kapsam.filter(k => k[4] !== k[5]).length;
   icerik.innerHTML = `<div style="max-width:760px">
   <h1>Veri hakkında</h1>
-  <p>Bu arşiv, Türkiye'de 1959'dan bu yana oynanan profesyonel lig maçlarını, terfi maçlarını, Türkiye Kupası'nı ve Türk kulüplerinin resmi Avrupa kupası maçlarını bir araya getirir. Toplam <b>${sayiYaz(OZET.mac)}</b> maç ve <b>${sayiYaz(OZET.kulup)}</b> kulüp var. En son maç tarihi ${tarihYaz(OZET.son_tarih)}.</p>
+  <p>Bu arşiv, Türkiye'de 1959'dan bu yana oynanan profesyonel lig maçlarını (Süper Lig'den Profesyonelliğe Geçiş Ligi'ne beş kademe), terfi maçlarını, Türkiye Kupası'nı, Süper Kupa'yı ve Türk kulüplerinin resmi Avrupa kupası maçlarını bir araya getirir. Toplam <b>${sayiYaz(OZET.mac)}</b> maç ve <b>${sayiYaz(OZET.kulup)}</b> kulüp var. Site her gün güncellenir${OZET.surum ? `; son güncelleme ${tarihYaz(`${OZET.surum.slice(0, 4)}-${OZET.surum.slice(4, 6)}-${OZET.surum.slice(6, 8)}`)}` : ""}.</p>
+  <p>Maçların kadroları, golleri, kartları ve oyuncu değişiklikleri 1990'dan bugüne TFF maç sayfalarından; 1959-1991 Süper Lig ile 1962-1990 Türkiye Kupası ve Süper Kupa maçlarında Maçkolik arşivinden gelir. Oyuncu sayfalarında maç, gol, kart ve dakika istatistikleri, doğum bilgileri, TFF lisans hareketleri (transfer, kiralık, sözleşme), Avrupa ve milli takım maçları yer alır. A Milli Takım ve kadın ligleri ayrı bölümlerdedir.</p>
   <h2 class="bolum">Kaynaklar</h2>
   <ul>
-    <li><b>TFF</b>: 1984-85'ten bugüne Süper Lig, 1990-91'den bugüne alt ligler ve 1994-95'ten sonraki kupa eşleşmeleri.</li>
-    <li><b>Maçkolik</b> (yeni site ve arşiv): 1959-1990 arası ligler, Türkiye Kupası ve Avrupa kupaları.</li>
-    <li><b>RSSSF ve Vikipedi</b>: 1995-2003 Intertoto maçları; kulüp ardıllıkları ve eski adlar; 1966'dan bugüne Cumhurbaşkanlığı (1981-82'de Devlet Başkanlığı) Kupası, TFF Süper Kupa ve Başbakanlık Kupası maçları (1991-2006 arası TFF maç sayfalarından).</li>
+    <li><b>TFF</b>: 1984-85'ten bugüne Süper Lig, 1990-91'den bugüne alt ligler, Profesyonelliğe Geçiş Ligi (2010-11'den), kadın ligleri (2007-08'den) ve Türkiye Kupası; maç sayfaları (kadro 1990-91'den, gol dakikaları 1991-92'den), oyuncu, teknik direktör ve hakem sayfaları, A Milli Takım maçları. Doğum tarihleri TFF kayıtlarındaki gibidir.</li>
+    <li><b>Maçkolik</b> (yeni site ve arşiv): 1959-1990 arası ligler, Türkiye Kupası ve Avrupa kupaları; arşivden 1959-1991 Süper Lig ve 1962-1990 Türkiye Kupası ile Süper Kupa kadroları ve gol dakikaları.</li>
+    <li><b>UEFA</b>: Avrupa kupası maçlarının kadroları, olayları ve istatistikleri.</li>
+    <li><b>RSSSF ve Vikipedi</b>: 1959 öncesi milli küme ve federasyon kupası maçları; 1995-2003 Intertoto maçları; kulüp ardıllıkları ve eski adlar; 1966'dan bugüne Cumhurbaşkanlığı (1980-82'de Devlet Başkanlığı) Kupası, TFF Süper Kupa ve Başbakanlık Kupası maçları (1991-2006 arası TFF maç sayfalarından).</li>
     <li><b>Kulüp logoları</b>: Football Manager topluluk logo paketi (TCM), kulüplerin bugünkü logoları; FM kimlikleri Sortitoutsi'den eşlendi; pakette olmayan kulüplerde Türkçe Vikipedi'deki arma. Kadın kulüplerinde erkek takımıyla aynı kulüpse onun logosu, değilse TFF maç sayfalarındaki kulüp logosu. Logolar kulüplerin tescilli markasıdır.</li>
   </ul>
   <h2 class="bolum">Kulüpler nasıl eşlendi</h2>
@@ -2127,7 +2129,8 @@ function hakkindaSayfa() {
     <li>Puan tabloları maç sonuçlarından hesaplanır; puan silme cezaları ve averaj kuralları dahil değildir.</li>
     <li>Ankara, İstanbul ve İzmir mahalli ligleri kapsam dışıdır.</li>
     <li>Lig gruplarının ${OZET.kapsam.length - eksik} / ${OZET.kapsam.length} tanesinde maç sayısı tam; kalanlar ligden çekilen takımlar, dört devreli gruplar ya da lig içinde oynanan play-off maçlarıdır.</li>
-    <li>Oyuncu, gol ve kart bilgisi henüz yok.</li>
+    <li>1990 öncesi 2. ve 3. Lig maçlarında kadro ve gol bilgisi yoktur; 1959-1990 Süper Lig ve kupa maçlarının bir kısmında da Maçkolik arşivinde kadro bulunmuyor.</li>
+    <li>Oyuncular TFF kişi numarasıyla tanımlanır; 1990 öncesi arşiv oyuncuları ad, kulüp, sezon ve yaşa bakılarak TFF kaydına bağlanır, bağlanamayanlar ayrı sayfa olarak kalır.</li>
   </ul></div>`;
 }
 
