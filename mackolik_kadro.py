@@ -109,6 +109,7 @@ def indir():
 
 KUPA_SEZON = [f"{y}-{y + 1}" for y in range(1962, 1990)]
 YOKLA = 5   # bir turun ilk 5 maçında kadro yoksa turun geri kalanı istenmez
+HEPSI = "--hepsi" in sys.argv   # kupa --hepsi: yoklama atlaması kapalı, kadrosuz turların bütün maçları da istenir
 
 
 def kadrolu_mu(mid):
@@ -215,7 +216,7 @@ def kupa():
         for ad, maclar in turlar:
             bakilan = kadrolu = 0
             for mid, mad, takim in maclar:
-                if lig and bakilan >= YOKLA and kadrolu == 0 and not (takim & lig):
+                if lig and not HEPSI and bakilan >= YOKLA and kadrolu == 0 and not (takim & lig):
                     top["atlanan"] += 1   # kadrosuz turda Süper Lig takımı oynamayan maç
                     continue
                 if os.path.exists(mac_yol(mid)):
