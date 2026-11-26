@@ -3,9 +3,11 @@
 
   python3 tff_kisi_ek.py td [--db ...]       # teknik direktörler: kişi sayfası (doğum vb., raw/tff_kisi) + görev geçmişi (raw/tff_td)
   python3 tff_kisi_ek.py hakem [--db ...]    # hakemler: kişi sayfası (raw/tff_kisi) + hakem kartı: lisans, klasman, bölge (raw/tff_hakem)
+  python3 tff_kisi_ek.py liste               # bütün teknik adamlar (antrenör, altyapı dahil) son görevleriyle (raw/tff_tdliste);
+                                             #   sonra "td" maç kağıdında adı geçmeyen üst düzey görevlilerin görev geçmişini de indirir
   python3 tff_kisi_ek.py hareket             # 20'den çok lisans hareketi olan oyuncuların 2., 3. ... sayfaları (raw/tff_kisi_ek)
   python3 tff_kisi_ek.py say                 # ne kadarı indi
-  python3 tff_kisi_ek.py ayikla [--hedef kisi.db]   # -> hareket, td_gorev, hakem_kart tabloları
+  python3 tff_kisi_ek.py ayikla [--hedef kisi.db]   # -> hareket, td_gorev, hakem_kart, td_liste tabloları
 
 Teknik direktör, hakem ve oyuncu aynı TFF kişi numarasını kullanır (pageId=30&kisiId=, 219&antId=, 72&hakemId=).
 Sayfalı tablolar ASP.NET geri gönderimiyle (__doPostBack) gelir: kayıtlı sayfanın gizli alanlarıyla "Sonraki" bağlantısı POST edilir,
@@ -143,6 +145,9 @@ def gorev_indir(ne, dbs):
         "hakem": (HAKEM_HAM, HAKEM_URL, "hakem", None, "Hakem Bilgi Kartı".encode("cp1254")),
     }[ne]
     liste = hedefler(dbs, tablo)
+    if ne == "td":   # teknik adam listesinden (indiyse) maç kağıdında adı geçmeyen üst düzey görevliler
+        bilinen = set(liste)
+        liste += [r[0] for r in liste_satirlari() if r[0] not in bilinen and UST_GOREV.search(r[4] or "")]
     eksik = [k for k in liste if not os.path.exists(yol(kok, k)) or not (os.path.exists(oyuncu.kisi_yol(k)) or os.path.exists(oyuncu.kisi_yol(k) + ".yok"))]
     print(f"{ne}: {len(liste)} kişi, {len(eksik)} eksik (~{len(eksik) * 2 * (BEKLE + 1) / 3600:.1f} saat)", flush=True)
     sy = Sayac()
@@ -167,6 +172,157 @@ def gorev_indir(ne, dbs):
         if i % 200 == 0:
             print(f"  {i}/{len(eksik)} {time.strftime('%H:%M')}", flush=True)
     print("Bitti.", flush=True)
+
+
+# ---------------------------------------------------------------- teknik adam listesi (pageID=163, "Takıma Göre", Tümü)
+# TFF teknik adam araması her kişiyi SON görevinin kulübüyle bir kez listeler; takım adı en az 3 harfli ön ekle aranır.
+# Bilinen bütün kulüp adlarının ilk 3 harfiyle arayınca son görevi bu kulüplerden birinde olan herkes (antrenör, altyapı dahil) çıkar.
+LISTE_HAM = os.path.join(KOK, "raw", "tff_tdliste")
+LISTE_URL = "https://www.tff.org/default.aspx?pageID=163"
+LP = "ctl00$MPane$m_163_864_ctnr$m_163_864$"
+BOS = "Uygun kayıt bulunamadı".encode("cp1254")
+
+
+def _form(t):
+    """sayfadaki bütün input alanları (gönderme düğmeleri hariç)"""
+    f = {}
+    for m in re.finditer(r"<input[^>]+>", t):
+        s = m.group(0)
+        n = re.search(r'name="([^"]+)"', s)
+        ty = re.search(r'type="([^"]+)"', s)
+        if not n or (ty and ty.group(1) in ("submit", "image", "checkbox", "button")):
+            continue
+        v = re.search(r'value="([^"]*)"', s)
+        f[html.unescape(n.group(1))] = html.unescape(v.group(1)) if v else ""
+    return f
+
+
+def liste_yol(ek, s=1):
+    a = urllib.parse.quote(ek, safe="")
+    return os.path.join(LISTE_HAM, f"{a}.html.gz" if s == 1 else f"{a}_{s}.html.gz")
+
+
+def on_ekler(dbs):
+    """bilinen TFF kulüp adlarının (maç kağıtları, lisans hareketleri, görev listeleri) ilk 3 harfi"""
+    adlar = set()
+    for db in dbs + [oyuncu.KISI_DB]:
+        if not os.path.exists(db):
+            continue
+        c = sqlite3.connect(db)
+        tab = {r[0] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+        if "mac_bilgi" in tab:
+            for a, b in c.execute("SELECT DISTINCT ev_adi, dep_adi FROM mac_bilgi"):
+                adlar.update((a, b))
+        for t in ("hareket", "td_gorev"):
+            if t in tab:
+                adlar.update(r[0] for r in c.execute(f"SELECT DISTINCT kulup_ad FROM {t}"))
+    ekler = set()
+    for a in adlar:
+        a = " ".join((a or "").split())
+        if len(a) >= 3:
+            ekler.add(a[:3].replace("i", "İ").upper())
+    return sorted(e for e in ekler if len(e.strip()) == 3)
+
+
+def liste_indir(dbs):
+    import http.cookiejar
+    op = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
+
+    def git(veri=None):
+        try:
+            with op.open(urllib.request.Request(LISTE_URL, data=veri, headers={"User-Agent": UA}), timeout=90) as y:
+                return y.status, y.read()
+        except urllib.error.HTTPError as e:
+            return e.code, b""
+        except Exception:
+            return 0, b""
+
+    def gonder(f):
+        time.sleep(BEKLE)
+        return git(urllib.parse.urlencode(f, encoding="cp1254").encode())
+
+    def sablon_al():
+        kod, t = git()
+        if kod != 200:
+            return None
+        f = _form(t.decode("cp1254", "replace"))
+        f["__EVENTTARGET"], f["__EVENTARGUMENT"] = LP + "RadTabStrip1", LP + "RadTabStrip1$Tab2"
+        kod, t = gonder(f)
+        return t.decode("cp1254", "replace") if kod == 200 and LP.encode() + b"txtTakimAdi" in t else None
+
+    ekler = on_ekler(dbs)
+    bitti = lambda e: os.path.exists(liste_yol(e) + ".yok") or (os.path.exists(liste_yol(e)) and all(
+        os.path.exists(liste_yol(e, s)) for s in range(2, toplam_sayfa(_oku(liste_yol(e))) + 1)))
+    eksik = [e for e in ekler if not bitti(e)]
+    print(f"liste: {len(ekler)} ön ek, {len(eksik)} eksik {time.strftime('%H:%M')}", flush=True)
+    sy = Sayac()
+    sablon = None
+    for i, ek in enumerate(eksik, 1):
+        if sablon is None:
+            sablon = sablon_al()
+            if sablon is None:
+                sy.basarisiz("liste şablon", 0); continue
+        y = liste_yol(ek)
+        if os.path.exists(y):
+            t = _oku(y)
+        else:
+            f = _form(sablon)
+            f.update({LP + "txtTakimAdi": ek, LP + "Button1": "Ara", LP + "f2_text": "Tümü", LP + "f2_Input": "Tümü",
+                      LP + "f2_value": "1", LP + "f2_index": "0"})
+            kod, g = gonder(f)
+            if kod == 200 and BOS in g:
+                os.makedirs(LISTE_HAM, exist_ok=True)
+                open(y + ".yok", "w").close(); sy.basarili(); continue
+            if kod != 200 or b"antID=" not in g:
+                sy.basarisiz(f"liste {ek}", kod); sablon = None; continue
+            yaz(y, g); sy.basarili()
+            t = g.decode("cp1254", "replace")
+        n = toplam_sayfa(t)
+        for s in range(2, n + 1):
+            ys = liste_yol(ek, s)
+            if os.path.exists(ys):
+                t = _oku(ys); continue
+            hed = [html.unescape(x) for x in re.findall(r"__doPostBack\(&#39;([^&]*\$rdgSonuclar\$[^&]*)&#39;,&#39;&#39;\)\"[^>]*>\)?\s*Sonraki", t)]
+            if not hed:
+                break
+            f = _form(t)
+            f["__EVENTTARGET"], f["__EVENTARGUMENT"] = hed[0], ""
+            kod, g = gonder(f)
+            if kod != 200 or f"{s} / {n}".encode() not in g:
+                sy.basarisiz(f"liste {ek} s{s}", kod); sablon = None; break
+            yaz(ys, g); sy.basarili()
+            t = g.decode("cp1254", "replace")
+        if i % 25 == 0:
+            print(f"  {i}/{len(eksik)} {time.strftime('%H:%M')}", flush=True)
+    print("Bitti.", flush=True)
+
+
+def liste_oku(t):
+    """[(kişi no, ad, TFF kulüp no, kulüp adı, görev, baş., bitiş, fesih)]"""
+    i = t.find("rdgSonuclar")
+    out = []
+    for tr in re.findall(r"<tr[^>]*>(.*?)</tr>", t[i:], re.S):
+        m = re.search(r"antI[dD]=(\d+)", tr)
+        if not m:
+            continue
+        h = [_hucre(x) for x in re.findall(r"<td[^>]*>(.*?)</td>", tr, re.S)]
+        if len(h) < 6:
+            continue
+        kno = re.search(r"kulupI[dD]=(\d+)", tr)
+        out.append((int(m.group(1)), h[0], int(kno.group(1)) if kno else None, h[1], h[2], _tarih(h[3]), _tarih(h[4]), _tarih(h[5])))
+    return out
+
+
+def liste_satirlari():
+    sat = {}
+    for f in glob.glob(os.path.join(LISTE_HAM, "*.html.gz")):
+        for r in liste_oku(_oku(f)):
+            sat[r[0]] = r
+    return list(sat.values())
+
+
+# TD görev sayfası indirilecekler: son görevi profesyonel/BAL/A takım düzeyinde olanlar
+UST_GOREV = re.compile(r"PROFESYONEL|PGL|BAL|A TAKIM|KADIN")
 
 
 def hareket_indir():
@@ -235,6 +391,7 @@ TABLOLAR = {
     "hareket": "CREATE TABLE IF NOT EXISTS hareket(kisi INTEGER, sira INTEGER, kulup_tff INTEGER, kulup_ad TEXT, bas TEXT, bit TEXT, tur TEXT, verilis TEXT, yurtdisi TEXT)",
     "td_gorev": "CREATE TABLE IF NOT EXISTS td_gorev(kisi INTEGER, sira INTEGER, kulup_tff INTEGER, kulup_ad TEXT, gorev TEXT, bas TEXT, bit TEXT, fesih TEXT)",
     "hakem_kart": "CREATE TABLE IF NOT EXISTS hakem_kart(kisi INTEGER PRIMARY KEY, lisans TEXT, klasman TEXT, bolge TEXT)",
+    "td_liste": "CREATE TABLE IF NOT EXISTS td_liste(kisi INTEGER PRIMARY KEY, ad TEXT, kulup_tff INTEGER, kulup_ad TEXT, gorev TEXT, bas TEXT, bit TEXT, fesih TEXT)",
 }
 
 
@@ -285,6 +442,9 @@ def ayikla(db):
     hk = [(int(os.path.basename(f)[:-8]), *hakem_oku(_oku(f))) for f in glob.glob(os.path.join(HAKEM_HAM, "*", "*.html.gz"))]
     c.executemany("INSERT OR REPLACE INTO hakem_kart VALUES(?,?,?,?)", hk)
     print(f"hakem_kart: {len(hk)} hakem", flush=True)
+    tl = liste_satirlari()
+    c.executemany("INSERT OR REPLACE INTO td_liste VALUES(?,?,?,?,?,?,?,?)", tl)
+    print(f"td_liste: {len(tl)} teknik adam (son görevleriyle)", flush=True)
     c.commit()
 
 
@@ -294,16 +454,21 @@ def say(dbs):
         var = sum(1 for k in liste if os.path.exists(yol(kok, k)) or os.path.exists(yol(kok, k) + ".yok"))
         print(f"{ne}: {var}/{len(liste)} görev sayfası; ek sayfa {len(glob.glob(os.path.join(kok, '*', '*_*.html.gz')))}")
     print(f"hareket ek sayfa: {len(glob.glob(os.path.join(EK_HAM, '*', '*.html.gz')))}")
+    ekler = on_ekler(dbs)
+    var = sum(1 for e in ekler if os.path.exists(liste_yol(e)) or os.path.exists(liste_yol(e) + ".yok"))
+    print(f"teknik adam listesi: {var}/{len(ekler)} ön ek, {len(liste_satirlari())} kişi")
 
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("komut", choices=["td", "hakem", "hareket", "say", "ayikla"])
+    p.add_argument("komut", choices=["td", "hakem", "hareket", "liste", "say", "ayikla"])
     p.add_argument("--hedef", default=oyuncu.KISI_DB, help="ayikla: yazılacak kisi.db")
     p.add_argument("--db", nargs="*", default=VARSAYILAN_DB, help="kadro/teknik/hakem tablolu ayrıntı veritabanları")
     a = p.parse_args()
     if a.komut == "hareket":
         hareket_indir()
+    elif a.komut == "liste":
+        liste_indir(a.db)
     elif a.komut == "ayikla":
         ayikla(a.hedef)
     elif a.komut == "say":
