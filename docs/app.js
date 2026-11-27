@@ -1439,7 +1439,7 @@ function yasYaz(x) {
 // ---------------------------------------------------------------- oyuncu istatistikleri (#/oyuncular; data/tff/istatistik.json)
 // tum: 1959 öncesi arşiv kadroları dahil (Millî Küme, İstanbul ligleri...); tum59: 1959 öncesi hariç
 const OY_KAPSAM = [["tum", "Bütün maçlar"], ["tum59", "1959 öncesi hariç"], ["sl", "Süper Lig"], ["lig", "Bütün ligler"], ["kupa", "Türkiye Kupası"]];
-const YAS_KAPSAM = [["tum", "Bütün maçlar"], ["k1", "Süper Lig"], ["k2", "1. Lig"], ["k3", "2. Lig"], ["k4", "3. Lig"], ["k5", "BAL"], ["kupa", "Türkiye Kupası"]];
+const YAS_KAPSAM = [["tum", "Bütün maçlar"], ["k1", "Süper Lig"], ["k2", "1. Lig"], ["k3", "2. Lig"], ["k4", "3. Lig"], ["k5", "PGL"], ["kupa", "Türkiye Kupası"]];
 async function oyuncularSayfa(sekme, kapsam) {
   document.title = "Oyuncular · Türk Futbol Arşivi";
   icerik.innerHTML = `<div class="yukleniyor">Oyuncu istatistikleri yükleniyor…</div>`;

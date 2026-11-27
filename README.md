@@ -11,7 +11,7 @@ Türkiye'de 1959'dan bugüne oynanan profesyonel lig maçları (5 kademe), terfi
 | Kulüpler | 1.864 kulüp: sezon sezon puan tabloları, maçlar, rekorlar, seriler (yenilmezlik, gol yemeden…), geri dönüşler, rakipler, oyuncu ve teknik direktör listeleri, Elo |
 | Maçlar | 184.682 maç (174.539 lig, 7.901 Türkiye Kupası, 1.506 Avrupa, 651 terfi, 85 Süper Kupa); 1990'dan bugüne TFF maç sayfalarından kadro, gol, kart, oyuncu değişikliği ve hakemler; 1959-1990 Süper Lig, Türkiye Kupası ve Süper Kupa kadroları Maçkolik arşivinden; Avrupa maçları UEFA'dan |
 | Oyuncular | 69 bin oyuncu sayfası: kulüp, sezon ve yarışma kırılımlı maç, gol, kart, dakika (kalecilerde gol yemeden); doğum tarihi ve yeri; TFF lisans hareketleri (transfer, kiralık, sözleşme); Avrupa ve milli takım maçları. Gol, maç ve yaş rekorları (5 lig ve kupa ayrı) |
-| Ligler | Süper Lig, 1. Lig, 2. Lig, 3. Lig ve Profesyonelliğe Geçiş Ligi (BAL, 2010-11'den); 1959 öncesi milli küme ve federasyon kupası maçları ayrı bölümde |
+| Ligler | Süper Lig, 1. Lig, 2. Lig, 3. Lig ve Profesyonelliğe Geçiş Ligi (PGL, 2010-11'den); 1959 öncesi milli küme ve federasyon kupası maçları ayrı bölümde |
 | Milli Takım | A Milli Takım'ın 657 maçı, kadroları ve golleri |
 | Kadın | Kadın ligleri (2007-08'den bugüne) ayrı bölümde: 13 bin maç, 17 bin oyuncu, Avrupa ve milli maçlar |
 | Rekorlar, Sayılar, Elo, Karşılaştır | Genel rekorlar, sezon istatistikleri, Elo puanları, iki kulübü ya da oyuncuyu karşılaştırma |
@@ -24,7 +24,7 @@ Türkiye'de 1959'dan bugüne oynanan profesyonel lig maçları (5 kademe), terfi
 | `futbol.db` | SQLite veritabanı: `mac`, `kulup`, `kulup_kimlik`, `kulup_adi`, `kulup_ardil` tabloları ve `takim_maci` görünümü. Depodaki kopya eski olabilir; güncelini bot her çalışmada Releases'e ("veritabani" sürümü) yükler |
 | `guncelle.py`, `.github/workflows/guncelle.yml` | Bot: güncel sezonu TFF ve UEFA'dan çeker, veritabanını ve siteyi yeniden üretir, gönderir (günde bir kez) |
 | `girdiler.py` | Depoya girmeyen büyük girdiler (maç ayrıntıları, kişi bilgileri, kadın ligleri, Maçkolik kadroları…) Releases'te `girdiler.tar.gz` olarak durur; bot her çalışmada indirip günceller |
-| `topla.py`, `bal.py`, `kadin.py` | TFF lig arşivleri (erkek ligleri, BAL, kadın ligleri) |
+| `topla.py`, `bal.py`, `kadin.py` | TFF lig arşivleri (erkek ligleri, PGL, kadın ligleri) |
 | `oyuncu.py`, `tff_kisi_ek.py` | TFF maç sayfaları (kadro, gol, kart), kişi sayfaları (doğum, lisans hareketleri), teknik direktör ve hakem sayfaları |
 | `mackolik*.py`, `avrupa.py`, `uefa_detay.py`, `milli.py` | Maçkolik (1959-1990 maçlar ve arşiv kadroları), UEFA (Avrupa maçları), A Milli Takım |
 | `rsssf_*.py`, `wiki_*.py` | RSSSF ve Vikipedi: Intertoto, 1959 öncesi, Süper Kupa, kulüp ardıllıkları ve logolar |
